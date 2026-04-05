@@ -1,0 +1,544 @@
+/* ═══════════════════════════════════════════════
+   MINERALIS – style.css
+   Pixel-art parchment map menu
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --parchment:    #d4b483;
+  --parchment-dk: #b8904a;
+  --parchment-lt: #ecdcb0;
+  --earth:        #6b3d1e;
+  --wood:         #8b5e3c;
+  --wood-lt:      #a8784f;
+  --wood-dk:      #5c3a1a;
+  --ink:          #2c1a0e;
+  --ink-lt:       #4a2e1a;
+  --sand:         #c9a96e;
+  --gold:         #d4a017;
+  --gold-lt:      #f5c842;
+  --highlight:    #f0d080;
+  --green:        #7a9e5a;
+  --red:          #b82010;
+}
+
+/* ── reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #110a04;
+  font-family: 'VT323', monospace;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ctext y='16' font-size='16'%3E⛏%3C/text%3E%3C/svg%3E") 4 16, crosshair;
+}
+
+/* ════════════════════════════════
+   OUTER FRAME
+════════════════════════════════ */
+.frame {
+  position: relative;
+  width:  min(1100px, 98vw);
+  height: min(660px,  96vh);
+  background: var(--parchment);
+  border: 6px solid var(--earth);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 80px rgba(107,61,30,.5),
+    0 0 50px rgba(0,0,0,.85);
+  overflow: hidden;
+}
+
+/* parchment grain */
+.frame::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 200;
+  mix-blend-mode: multiply;
+}
+
+/* grid lines */
+.frame::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(107,61,30,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107,61,30,.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── corner bolts ── */
+.corner {
+  position: absolute;
+  width: 26px; height: 26px;
+  background: var(--wood-dk);
+  border: 3px solid var(--earth);
+  z-index: 50;
+}
+.corner--tl { top:  6px; left:  6px; }
+.corner--tr { top:  6px; right: 6px; }
+.corner--bl { bottom: 6px; left:  6px; }
+.corner--br { bottom: 6px; right: 6px; }
+
+/* ════════════════════════════════
+   MAP LAYER
+════════════════════════════════ */
+.map-layer {
+  position: absolute; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.landmass {
+  position: absolute;
+  z-index: 3;
+}
+
+.lm-na {
+  top: 8%; left: 3%; width: 22%; height: 36%;
+  clip-path: polygon(15% 0%,85% 0%,100% 20%,95% 80%,70% 100%,30% 95%,0% 70%,5% 15%);
+  background: linear-gradient(135deg, var(--sand) 55%, var(--parchment-dk));
+}
+.lm-sa {
+  top: 45%; left: 12%; width: 14%; height: 28%;
+  clip-path: polygon(20% 0%,80% 0%,100% 30%,85% 100%,15% 100%,0% 50%);
+  background: linear-gradient(135deg, var(--sand) 60%, var(--green));
+}
+.lm-eu {
+  top: 6%; left: 36%; width: 14%; height: 22%;
+  clip-path: polygon(10% 0%,90% 0%,100% 40%,80% 100%,20% 95%,0% 55%);
+  background: linear-gradient(135deg, var(--sand) 55%, var(--parchment-dk));
+}
+.lm-af {
+  top: 28%; left: 40%; width: 16%; height: 38%;
+  clip-path: polygon(20% 0%,80% 0%,100% 25%,95% 70%,60% 100%,40% 100%,5% 65%,0% 25%);
+  background: linear-gradient(135deg, var(--sand) 60%, var(--parchment-dk));
+}
+.lm-as {
+  top: 5%; left: 53%; width: 32%; height: 42%;
+  clip-path: polygon(5% 0%,95% 0%,100% 25%,90% 70%,70% 100%,40% 95%,20% 80%,0% 40%);
+  background: linear-gradient(135deg, var(--parchment-lt) 50%, var(--sand));
+}
+.lm-oc {
+  top: 60%; left: 68%; width: 18%; height: 20%;
+  clip-path: polygon(10% 0%,90% 0%,100% 50%,80% 100%,20% 100%,0% 60%);
+  background: linear-gradient(135deg, var(--sand) 55%, var(--parchment-dk));
+}
+
+.map-badge {
+  position: absolute;
+  font-family: 'VT323', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--ink);
+  background: rgba(212,180,131,.65);
+  padding: 1px 5px;
+  z-index: 8;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+/* sparkle gems */
+.sparkle {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: var(--gold-lt);
+  border-radius: 50%;
+  z-index: 10;
+  pointer-events: none;
+  animation: sparkle 2.5s ease-in-out infinite;
+}
+@keyframes sparkle {
+  0%,100% { opacity: 0;   transform: scale(.5); }
+  50%      { opacity: 1;  transform: scale(1.5); box-shadow: 0 0 6px var(--gold-lt); }
+}
+
+/* ════════════════════════════════
+   PHASE CARDS
+   Posicionados individualmente sobre a América do Sul
+════════════════════════════════ */
+.cards {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 20;
+  pointer-events: none; /* filhos recebem eventos individualmente */
+}
+.card-row { display: contents; } /* ignora o wrapper, cards ficam livres */
+
+.phase-card {
+  width: 80px; height: 80px;
+  background: var(--ink);
+  border: none;
+  border-radius: 2px;
+  position: absolute;
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: all;
+  transition: transform .12s, box-shadow .12s;
+  box-shadow: 3px 3px 0 var(--wood-dk);
+  image-rendering: pixelated;
+}
+.phase-card:not(.locked):hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0 var(--wood-dk);
+}
+
+/* Posições individuais – dentro da silhueta da América do Sul
+   lm-sa: top 45–73%, left 12–26%                              */
+/* 1.3 Machu Picchu (Peru) – norte/esquerda */
+.phase-card[data-phase="1.3"] {
+  top:  46%;
+  left: 12%;
+}
+/* 1.2 Amazônia (Brasil) – norte/direita */
+.phase-card[data-phase="1.2"] {
+  top:  46%;
+  left: 20%;
+}
+/* 1.1 Andes / Potosí (Bolívia) – centro-sul */
+.phase-card[data-phase="1.1"] {
+  top:  60%;
+  left: 14%;
+}
+
+.card-icon {
+  width: 100%; height: 100%;
+  display: block;
+}
+.card-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* label e stars agora estão dentro do SVG — escondemos os elementos HTML */
+.card-label { display: none; }
+.stars       { display: none; }
+
+/* locked state – grayscale + transparente */
+.phase-card.locked {
+  cursor: not-allowed;
+  opacity: 0.38;
+  filter: grayscale(1) brightness(.7);
+  transition: opacity .15s, filter .15s;
+}
+.phase-card.locked:hover {
+  opacity: 0.52;
+}
+.phase-card.locked::after {
+  content: '🔒';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  background: rgba(0,0,0,.35);
+}
+
+/* selected highlight */
+.phase-card.selected {
+  outline: 3px solid var(--gold-lt);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════
+   CENTRAL MENU PANEL
+════════════════════════════════ */
+.menu-panel {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-44%, -50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── STATE 1: Title block ── */
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+}
+
+/* O banner agora tem overflow:visible para o Corvan crescer acima */
+.title-btn-inner {
+  background: var(--parchment-lt);
+  border: 4px solid var(--wood-dk);
+  padding: 10px 20px 10px 20px;
+  position: relative;
+  box-shadow: 4px 4px 0 var(--wood-dk);
+  transition: transform .1s, box-shadow .1s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden; /* Corvan fica contido */
+}
+.title-btn-inner::before,
+.title-btn-inner::after {
+  content: '';
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px;
+  background: var(--wood-dk);
+  border-radius: 50%;
+  z-index: 2;
+}
+.title-btn-inner::before { left: 8px; }
+.title-btn-inner::after  { right: 8px; }
+
+.title-btn:hover .title-btn-inner {
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0 var(--wood-dk);
+}
+.title-btn:active .title-btn-inner {
+  transform: translate(2px,2px);
+  box-shadow: 2px 2px 0 var(--wood-dk);
+}
+
+.title-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(18px, 2.4vw, 28px);
+  color: var(--ink);
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 0 var(--parchment-dk);
+  display: block;
+  animation: titlePulse 3s ease-in-out infinite;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 2px 2px 0 var(--parchment-dk); }
+  50%      { text-shadow: 2px 2px 0 var(--parchment-dk), 0 0 16px var(--gold-lt); }
+}
+
+/* ── Corvan: dentro do banner, alinhado à direita do texto ── */
+.corvan-wrap {
+  position: relative;
+  width: 52px;
+  height: 72px;        /* mesma altura do banner interno */
+  flex-shrink: 0;
+  overflow: hidden;    /* garante que fica dentro da caixa */
+  pointer-events: none;
+  align-self: stretch;
+  display: flex;
+  align-items: flex-end;
+}
+.corvan-svg {
+  width: 52px;
+  height: 72px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  animation: corvanBob 2.5s ease-in-out infinite;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,.5));
+  display: block;
+}
+@keyframes corvanBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* lamp & lantern glow pulse */
+.lamp-glow, .lantern-glow {
+  animation: glowPulse 1.8s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { opacity: .2; r: 5; }
+  50%      { opacity: .5; r: 8; }
+}
+
+.title-hint {
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: var(--ink-lt);
+  letter-spacing: 1px;
+  animation: hintBlink 1.6s step-end infinite;
+  opacity: .6;
+}
+@keyframes hintBlink {
+  0%,100% { opacity: .6; }
+  50%      { opacity: .15; }
+}
+
+/* ── STATE 2: Menu buttons block ── */
+.menu-block {
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 240px;
+  background: var(--wood);
+  border: 4px solid var(--wood-dk);
+  box-shadow: 5px 5px 0 var(--wood-dk);
+  overflow: hidden;
+  animation: menuReveal .25s ease-out;
+}
+@keyframes menuReveal {
+  from { opacity: 0; transform: scaleY(.6); transform-origin: top; }
+  to   { opacity: 1; transform: scaleY(1); }
+}
+
+.menu-block.visible {
+  display: flex;
+}
+
+.menu-header {
+  background: var(--parchment-lt);
+  border-bottom: 3px solid var(--wood-dk);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-title-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(12px, 1.6vw, 18px);
+  color: var(--ink);
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 var(--parchment-dk);
+}
+
+.menu-close {
+  background: var(--wood-dk);
+  border: 2px solid var(--earth);
+  color: var(--parchment-lt);
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  width: 26px; height: 26px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s;
+}
+.menu-close:hover { background: var(--red); }
+
+.menu-divider {
+  height: 3px;
+  background: linear-gradient(90deg, var(--wood-dk), var(--gold-lt), var(--wood-dk));
+}
+
+.menu-btns {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px 14px;
+  gap: 6px;
+}
+
+.menu-btn {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--parchment-lt);
+  background: var(--wood-dk);
+  border: 2px solid rgba(255,220,140,.2);
+  padding: 7px 16px;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  transition: background .1s, color .1s, transform .08s;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.4);
+}
+.menu-btn::before {
+  content: '» ';
+  color: var(--gold-lt);
+  opacity: 0;
+  transition: opacity .1s;
+}
+.menu-btn:hover {
+  background: var(--earth);
+  color: var(--highlight);
+  transform: translateX(-3px);
+}
+.menu-btn:hover::before { opacity: 1; }
+.menu-btn:active { transform: translate(2px,2px); box-shadow: none; }
+
+.btn-sair {
+  margin-top: 4px;
+  border-top: 2px solid rgba(255,100,80,.3);
+  color: #ff9090;
+}
+.btn-sair:hover { background: #5a1010; color: #ffb0b0; }
+
+/* ════════════════════════════════
+   TOOLTIP
+════════════════════════════════ */
+.tooltip {
+  position: absolute;
+  background: var(--ink);
+  border: 2px solid var(--wood);
+  color: var(--parchment-lt);
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  padding: 4px 10px;
+  z-index: 999;
+  pointer-events: none;
+  white-space: nowrap;
+  display: none;
+  box-shadow: 2px 2px 0 var(--wood-dk);
+  letter-spacing: 1px;
+}
+.tooltip.visible { display: block; }
+
+/* ════════════════════════════════
+   FLOATING PARTICLES (JS generated)
+════════════════════════════════ */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--parchment-dk);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  animation: particleDrift linear infinite;
+}
+@keyframes particleDrift {
+  0%   { opacity: 0;   transform: translateY(0)    scale(1); }
+  10%  { opacity: .3; }
+  90%  { opacity: .15; }
+  100% { opacity: 0;   transform: translateY(-90px) scale(.4); }
+}
+
+/* ════════════════════════════════
+   BOTTOM BAR & VERSION
+════════════════════════════════ */
+.bottom-bar {
+  position: absolute;
+  bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: var(--ink-lt);
+  letter-spacing: 2px;
+  white-space: nowrap;
+  animation: hintBlink 2s step-end infinite;
+}
+
+.version-tag {
+  position: absolute;
+  bottom: 10px; right: 16px;
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: var(--ink-lt);
+  z-index: 40;
+  opacity: .45;
+  letter-spacing: 1px;
+}
