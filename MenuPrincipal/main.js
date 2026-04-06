@@ -1,81 +1,95 @@
 /* ═══════════════════════════════════════════════
    MINERALIS – main.js
-   Menu interactions & effects
+   Ponto de entrada do jogo.
+   Responsabilidade: inicializar componentes e
+   efeitos visuais globais (partículas, tooltip).
+   Lógica de menu  → components/menu.js
+   Dados das fases → data/phases.js
    ═══════════════════════════════════════════════ */
 
-// ── Element refs ──
-const frame      = document.getElementById('frame');
-const titleBlock = document.getElementById('titleBlock');
-const menuBlock  = document.getElementById('menuBlock');
-const tooltip    = document.getElementById('tooltip');
+// ── Referências globais ──
+const frame   = document.getElementById('frame');
+const tooltip = document.getElementById('tooltip');
 
 // ════════════════════════════════
-// MENU TOGGLE
+// CARDS
+// Renderiza e sincroniza todos os cards do mapa.
 // ════════════════════════════════
 
-/**
- * Opens the menu: hides title block, reveals menu buttons.
- */
-function openMenu() {
-  titleBlock.style.display = 'none';
-  menuBlock.classList.add('visible');
-}
+const Cards = (() => {
 
-/**
- * Closes the menu: hides buttons, restores title block.
- */
-function closeMenu() {
-  menuBlock.classList.remove('visible');
-  titleBlock.style.display = '';
-}
+  /**
+   * Cria todos os cards no mapa dinamicamente a partir de PhasesData + CardsSVG.
+   * Os 3 cards da América do Sul já estão no HTML — os demais são gerados aqui.
+   */
+  function renderizar() {
+    const mapaEl = document.getElementById('frame');
 
-// ════════════════════════════════
-// MENU ACTIONS
-// ════════════════════════════════
+    // IDs já presentes no HTML (América do Sul)
+    const existentes = new Set(['1.1','1.2','1.3']);
 
-function menuAction(action) {
-  // Flash feedback
-  const flash = document.createElement('div');
-  Object.assign(flash.style, {
-    position: 'absolute', inset: '0',
-    background: 'rgba(255,210,80,.12)',
-    zIndex: '999', pointerEvents: 'none',
-    animation: 'menuFlash .4s forwards'
-  });
-  frame.appendChild(flash);
-  flash.addEventListener('animationend', () => flash.remove());
+    PhasesData.forEach(fase => {
+      if (existentes.has(fase.id)) return; // já no HTML
+      if (!CardsSVG[fase.id])      return; // SVG não definido
 
-  switch (action) {
-    case 'nova':
-      console.log('[Mineralis] Nova Jornada iniciada');
-      break;
-    case 'explorar':
-      console.log('[Mineralis] Abrindo mapa de exploração');
-      break;
-    case 'diario':
-      console.log('[Mineralis] Diário de Bordo aberto');
-      break;
-    case 'opcoes':
-      console.log('[Mineralis] Menu de Opções');
-      break;
-    case 'sair':
-      console.log('[Mineralis] Saindo...');
-      break;
+      const card = document.createElement('div');
+      card.className        = 'phase-card locked';
+      card.dataset.phase    = fase.id;
+      card.dataset.tip      = '🔒 ' + fase.nome;
+      card.style.top        = fase.mapPos.top;
+      card.style.left       = fase.mapPos.left;
+      card.innerHTML        = `<div class="card-icon">${CardsSVG[fase.id]}</div>`;
+      card.addEventListener('click', () => selectCard(card));
+
+      mapaEl.appendChild(card);
+    });
   }
-}
+
+  /**
+   * Sincroniza estado visual (locked/unlocked + tooltip) de todos os cards.
+   */
+  function sincronizar() {
+    document.querySelectorAll('.phase-card').forEach(card => {
+      const id   = card.dataset.phase;
+      const fase = PhasesData.find(p => p.id === id);
+      if (!fase) return;
+
+      const desbloqueada = SaveManager.faseDesbloqueada(id);
+
+      if (desbloqueada) {
+        card.classList.remove('locked');
+        card.dataset.tip = fase.nome;
+      } else {
+        card.classList.add('locked');
+        card.dataset.tip = id === '1.1' && !SaveManager.jogoIniciado()
+          ? '🔒 Inicie uma Nova Jornada para explorar'
+          : '🔒 ' + fase.nome;
+      }
+    });
+  }
+
+  return { renderizar, sincronizar };
+
+})();
 
 // ════════════════════════════════
-// CARD SELECTION
+// SELEÇÃO DE CARD
 // ════════════════════════════════
 
 function selectCard(el) {
   if (el.classList.contains('locked')) return;
+
   document.querySelectorAll('.phase-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+
+  const phase = PhasesData.find(p => p.id === el.dataset.phase);
+  if (phase && SaveManager.faseDesbloqueada(phase.id) && phase.caminho) {
+    window.location.href = phase.caminho;
+  }
 }
 
 // ════════════════════════════════
-// TOOLTIP
+// TOOLTIP DOS CARDS
 // ════════════════════════════════
 
 document.querySelectorAll('.phase-card').forEach(card => {
@@ -87,8 +101,8 @@ document.querySelectorAll('.phase-card').forEach(card => {
     const r = frame.getBoundingClientRect();
     let x = e.clientX - r.left + 12;
     let y = e.clientY - r.top  + 12;
-    // prevent tooltip from going off right edge
-    if (x + tooltip.offsetWidth > r.width - 10) x = e.clientX - r.left - tooltip.offsetWidth - 8;
+    if (x + tooltip.offsetWidth > r.width - 10)
+      x = e.clientX - r.left - tooltip.offsetWidth - 8;
     tooltip.style.left = x + 'px';
     tooltip.style.top  = y + 'px';
   });
@@ -96,7 +110,7 @@ document.querySelectorAll('.phase-card').forEach(card => {
 });
 
 // ════════════════════════════════
-// FLOATING DUST PARTICLES
+// PARTÍCULAS DE POEIRA
 // ════════════════════════════════
 
 (function spawnParticles() {
@@ -105,10 +119,10 @@ document.querySelectorAll('.phase-card').forEach(card => {
     p.className = 'particle';
     const size = Math.random() * 4 + 2;
     Object.assign(p.style, {
-      width:  size + 'px',
-      height: size + 'px',
-      left:   Math.random() * 100 + '%',
-      bottom: Math.random() * 35  + '%',
+      width:             size + 'px',
+      height:            size + 'px',
+      left:              Math.random() * 100 + '%',
+      bottom:            Math.random() * 35  + '%',
       animationDuration: (Math.random() * 9 + 5) + 's',
       animationDelay:    (Math.random() * 8)      + 's',
     });
@@ -117,7 +131,7 @@ document.querySelectorAll('.phase-card').forEach(card => {
 })();
 
 // ════════════════════════════════
-// INJECT KEYFRAMES NOT IN CSS
+// KEYFRAMES DINÂMICOS
 // ════════════════════════════════
 
 (function injectKeyframes() {
@@ -129,4 +143,87 @@ document.querySelectorAll('.phase-card').forEach(card => {
     }
   `;
   document.head.appendChild(style);
+})();
+
+// ════════════════════════════════
+// INICIALIZAÇÃO
+// Roda quando a página carrega.
+// ════════════════════════════════
+
+(function init() {
+
+  // Limpa o localStorage do jogo a cada nova sessão do browser.
+  // sessionStorage é apagado ao fechar a aba — se a flag não existe,
+  // é sessão nova e limpamos todo o localStorage do jogo.
+  if (!sessionStorage.getItem('mineralis_session')) {
+    sessionStorage.setItem('mineralis_session', '1');
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('mineralis'))
+      .forEach(k => {
+        localStorage.removeItem(k);
+        console.info(`[Init] Chave "${k}" removida para sessão limpa.`);
+      });
+  }
+
+  Cards.renderizar();
+  Cards.sincronizar();
+
+  // Som: inicia no primeiro sinal de interação do usuário.
+  // mousemove dispara assim que o cursor entra na janela —
+  // antes de qualquer clique, dando sensação de início imediato.
+  function _iniciarAudio() {
+    Audio.iniciarTrilha();
+    document.removeEventListener('mousemove', _iniciarAudio);
+    document.removeEventListener('click',     _iniciarAudio);
+    document.removeEventListener('keydown',   _iniciarAudio);
+  }
+  document.addEventListener('mousemove', _iniciarAudio);
+  document.addEventListener('click',     _iniciarAudio);
+  document.addEventListener('keydown',   _iniciarAudio);
+
+})();
+
+// ════════════════════════════════
+// MODAL CUSTOMIZADO
+// Substitui window.confirm() com visual pixel art.
+// Uso: Modal.confirmar('Mensagem aqui').then(ok => { if(ok) ... })
+// ════════════════════════════════
+
+const Modal = (() => {
+
+  const overlay = document.getElementById('modalOverlay');
+  const msg     = document.getElementById('modalMsg');
+  const btnOk   = document.getElementById('modalConfirm');
+  const btnCan  = document.getElementById('modalCancel');
+
+  /**
+   * Exibe o modal com a mensagem e retorna uma Promise<boolean>.
+   * true  = jogador clicou OK
+   * false = jogador clicou Cancelar
+   */
+  function confirmar(texto, apenasOk = false) {
+    msg.textContent = texto;
+    btnCan.style.display = apenasOk ? 'none' : '';
+    overlay.classList.add('visible');
+
+    return new Promise(resolve => {
+      function _ok() {
+        _fechar(); resolve(true);
+      }
+      function _cancel() {
+        _fechar(); resolve(false);
+      }
+      function _fechar() {
+        overlay.classList.remove('visible');
+        btnOk.removeEventListener('click', _ok);
+        btnCan.removeEventListener('click', _cancel);
+      }
+
+      btnOk.addEventListener('click',  _ok,     { once: true });
+      btnCan.addEventListener('click', _cancel, { once: true });
+    });
+  }
+
+  return { confirmar };
+
 })();

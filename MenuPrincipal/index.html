@@ -47,7 +47,7 @@
     <div class="card-row">
 
       <!-- 1.1 ANDES – DESBLOQUEADA -->
-      <div class="phase-card" data-phase="1.1" data-tip="Fase 1.1 – Minas de Prata dos Andes" onclick="selectCard(this)">
+      <div class="phase-card locked" data-phase="1.1" data-tip="🔒 Inicie uma Nova Jornada para explorar" onclick="selectCard(this)">
         <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
   <!-- Card frame - wooden border -->
   <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
@@ -209,23 +209,8 @@
 
   <!-- Stars rating (3 stars) - bottom area -->
   <!-- Star 1 -->
-  <rect x="27" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="28" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="29" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="26" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="31" y="71" width="1" height="2" fill="#FFD700"/>
   <!-- Star 2 -->
-  <rect x="37" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="38" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="39" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="36" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="41" y="71" width="1" height="2" fill="#FFD700"/>
   <!-- Star 3 -->
-  <rect x="47" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="48" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="49" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="46" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="51" y="71" width="1" height="2" fill="#FFD700"/>
 
   <!-- Corner decorations (pixel art nails/bolts) -->
   <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
@@ -391,21 +376,6 @@
   <rect x="44" y="64" width="1" height="1" fill="#80E8A0"/>
 
   <!-- Stars (3 stars) -->
-  <rect x="27" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="28" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="29" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="26" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="31" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="37" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="38" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="39" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="36" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="41" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="47" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="48" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="49" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="46" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="51" y="71" width="1" height="2" fill="#FFD700"/>
 
   <!-- Corner bolts -->
   <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
@@ -603,26 +573,6 @@
   <rect x="65" y="52" width="1" height="1" fill="#FFD700"/>
 
   <!-- Stars (4 stars) -->
-  <rect x="22" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="23" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="24" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="21" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="26" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="31" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="32" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="33" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="30" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="35" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="40" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="41" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="42" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="39" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="44" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="49" y="70" width="5" height="5" fill="#FFD700"/>
-  <rect x="50" y="69" width="3" height="1" fill="#FFD700"/>
-  <rect x="51" y="68" width="1" height="1" fill="#FFD700"/>
-  <rect x="48" y="71" width="1" height="2" fill="#FFD700"/>
-  <rect x="53" y="71" width="1" height="2" fill="#FFD700"/>
 
   <!-- Corner bolts -->
   <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
@@ -644,7 +594,7 @@
 
     <!-- STATE 1: title button (visible by default) -->
     <div class="title-block" id="titleBlock">
-      <button class="title-btn" id="titleBtn" onclick="openMenu()">
+      <button class="title-btn" id="titleBtn" onclick="Menu.open()">
         <div class="title-btn-inner">
           <span class="title-text">MINERALIS</span>
           <!-- Corvan pixel art – dentro do banner -->
@@ -724,28 +674,96 @@
     <div class="menu-block" id="menuBlock">
       <div class="menu-header">
         <span class="menu-title-text">MINERALIS</span>
-        <button class="menu-close" onclick="closeMenu()" title="Fechar menu">✕</button>
+        <button class="menu-close" onclick="Menu.close()" title="Fechar menu">✕</button>
       </div>
       <div class="menu-divider"></div>
       <div class="menu-btns">
-        <button class="menu-btn" onclick="menuAction('nova')">Nova Jornada</button>
-        <button class="menu-btn" onclick="menuAction('explorar')">Exploração</button>
-        <button class="menu-btn" onclick="menuAction('diario')">Diário de Bordo</button>
-        <button class="menu-btn" onclick="menuAction('opcoes')">Opções</button>
-        <button class="menu-btn btn-sair" onclick="menuAction('sair')">Sair</button>
+        <button class="menu-btn" onclick="Menu.action('nova')">Nova Jornada</button>
+        <button class="menu-btn" onclick="Menu.action('explorar')">Exploração</button>
+        <button class="menu-btn" onclick="Menu.action('diario')">Diário de Bordo</button>
+        <button class="menu-btn" onclick="Menu.action('opcoes')">Opções</button>
+        <button class="menu-btn btn-sair" onclick="Menu.action('sair')">Sair</button>
       </div>
     </div>
 
   </div><!-- /.menu-panel -->
 
+  <!-- ── Corvan no mapa (modo exploração) ── -->
+  <!-- Visível apenas durante a exploração, clicável para voltar ao menu -->
+  <div class="corvan-map" id="corvanMap" onclick="Menu.voltarDoMapa()">
+    <div class="corvan-map-hint">clique para voltar</div>
+    <svg class="corvan-map-svg" viewBox="0 0 32 52" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <rect x="7"  y="3"  width="18" height="2"  fill="#3a2208"/>
+      <rect x="9"  y="1"  width="14" height="4"  fill="#4a2e10"/>
+      <rect x="13" y="0"  width="6"  height="3"  fill="#c8a020"/>
+      <rect x="14" y="0"  width="4"  height="2"  fill="#ffe060"/>
+      <rect x="9"  y="5"  width="14" height="9"  fill="#c88050"/>
+      <rect x="10" y="6"  width="12" height="1"  fill="#a86030"/>
+      <rect x="11" y="8"  width="3"  height="2"  fill="#1a0a04"/>
+      <rect x="18" y="8"  width="3"  height="2"  fill="#1a0a04"/>
+      <rect x="12" y="8"  width="1"  height="1"  fill="#fff"/>
+      <rect x="19" y="8"  width="1"  height="1"  fill="#fff"/>
+      <rect x="14" y="11" width="4"  height="1"  fill="#a86030"/>
+      <rect x="12" y="13" width="8"  height="1"  fill="#7a3820"/>
+      <rect x="13" y="14" width="6"  height="2"  fill="#c88050"/>
+      <rect x="8"  y="16" width="16" height="13" fill="#b82010"/>
+      <rect x="15" y="17" width="2"  height="1"  fill="#8a1008"/>
+      <rect x="15" y="20" width="2"  height="1"  fill="#8a1008"/>
+      <rect x="15" y="23" width="2"  height="1"  fill="#8a1008"/>
+      <rect x="12" y="16" width="3"  height="3"  fill="#d03018"/>
+      <rect x="17" y="16" width="3"  height="3"  fill="#d03018"/>
+      <rect x="8"  y="28" width="16" height="2"  fill="#2a1408"/>
+      <rect x="14" y="28" width="4"  height="2"  fill="#c88020"/>
+      <rect x="9"  y="30" width="14" height="12" fill="#383838"/>
+      <rect x="15" y="36" width="2"  height="6"  fill="#282828"/>
+      <rect x="3"  y="16" width="5"  height="12" fill="#b82010"/>
+      <rect x="3"  y="28" width="5"  height="3"  fill="#a86030"/>
+      <rect x="0"  y="24" width="6"  height="1"  fill="#7a4818"/>
+      <rect x="0"  y="25" width="1"  height="7"  fill="#7a4818"/>
+      <rect x="0"  y="22" width="6"  height="3"  fill="#888888"/>
+      <rect x="4"  y="20" width="2"  height="3"  fill="#aaaaaa"/>
+      <rect x="24" y="16" width="5"  height="12" fill="#b82010"/>
+      <rect x="24" y="28" width="5"  height="3"  fill="#a86030"/>
+      <rect x="26" y="31" width="1"  height="3"  fill="#888888"/>
+      <rect x="24" y="34" width="5"  height="6"  fill="#604010"/>
+      <rect x="25" y="35" width="3"  height="4"  fill="#ffe080"/>
+      <rect x="23" y="33" width="7"  height="8"  fill="#ffcc00" opacity="0.12"/>
+      <rect x="9"  y="42" width="6"  height="4"  fill="#3a1e08"/>
+      <rect x="17" y="42" width="6"  height="4"  fill="#3a1e08"/>
+      <rect x="8"  y="44" width="8"  height="2"  fill="#2a1008"/>
+      <rect x="16" y="44" width="8"  height="2"  fill="#2a1008"/>
+      <circle class="lamp-glow"    cx="16" cy="1"  r="4" fill="#ffe060" opacity="0.25"/>
+      <circle class="lantern-glow" cx="26" cy="37" r="5" fill="#ffcc00" opacity="0.18"/>
+    </svg>
+  </div>
+
   <!-- tooltip -->
   <div class="tooltip" id="tooltip"></div>
 
   <!-- bottom bar -->
-  <div class="bottom-bar">▼ ESCOLHA UMA REGIÃO NO MAPA PARA EXPLORAR ▼</div>
+  <div class="bottom-bar" id="bottomBar">▼ ESCOLHA UMA REGIÃO NO MAPA PARA EXPLORAR ▼</div>
+
+  <!-- ── Modal de confirmação customizado ── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">MINERALIS</span>
+      </div>
+      <div class="modal-divider"></div>
+      <p class="modal-msg" id="modalMsg"></p>
+      <div class="modal-btns">
+        <button class="modal-btn modal-btn-confirm" id="modalConfirm">OK</button>
+        <button class="modal-btn modal-btn-cancel"  id="modalCancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
 </div><!-- /.frame -->
 
+<script src="data/phases.js"></script>
+<script src="data/cards_svg.js"></script>
+<script src="components/audio.js"></script>
+<script src="components/menu.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
