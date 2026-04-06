@@ -134,15 +134,18 @@ body {
 
 .map-badge {
   position: absolute;
-  font-family: 'VT323', monospace;
-  font-size: 11px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
   letter-spacing: 1px;
   color: var(--ink);
-  background: rgba(212,180,131,.65);
-  padding: 1px 5px;
-  z-index: 8;
+  background: rgba(212,180,131,.88);
+  border: 2px solid var(--earth);
+  padding: 4px 8px;
+  z-index: 15;
   pointer-events: none;
   text-transform: uppercase;
+  box-shadow: 2px 2px 0 rgba(107,61,30,.4);
+  text-shadow: 1px 1px 0 rgba(255,220,140,.5);
 }
 
 /* sparkle gems */
@@ -199,9 +202,9 @@ body {
 /* 1.3 Machu Picchu (Peru) – noroeste */
 .phase-card[data-phase="1.3"] { top: 50%; left: 11%; }
 /* 1.2 Amazônia (Brasil) – nordeste */
-.phase-card[data-phase="1.2"] { top: 50%; left: 21%; }
+.phase-card[data-phase="1.2"] { top: 50%; left: 22%; }
 /* 1.1 Andes / Potosí (Bolívia) – sul */
-.phase-card[data-phase="1.1"] { top: 64%; left: 14%; }
+.phase-card[data-phase="1.1"] { top: 64%; left: 15%; }
 
 .card-icon {
   width: 100%; height: 100%;
@@ -748,3 +751,275 @@ body {
   color: var(--parchment-lt);
 }
 .modal-btn-cancel:hover { background: #3a2010; }
+
+/* ════════════════════════════════
+   DIÁRIO DE BORDO
+   GDD: livro aberto, páginas de diário de campo,
+   ilustrações 2D, abas por categoria
+════════════════════════════════ */
+
+/* Overlay de fundo */
+.journal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20,10,4,.78);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.journal-overlay.visible { opacity: 1; }
+
+/* Caixa principal — livro aberto */
+.journal-box {
+  width: 88%;
+  max-width: 860px;
+  height: 82%;
+  max-height: 540px;
+  background: var(--parchment-lt);
+  border: 4px solid var(--earth);
+  box-shadow: 6px 6px 0 var(--wood-dk), 0 0 0 2px var(--parchment-dk);
+  display: flex;
+  flex-direction: column;
+  animation: journalOpen .22s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+  /* Textura de papel */
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 27px,
+      rgba(107,61,30,.06) 27px,
+      rgba(107,61,30,.06) 28px
+    );
+}
+@keyframes journalOpen {
+  from { transform: scale(.9) rotateX(8deg); opacity: 0; }
+  to   { transform: scale(1)  rotateX(0deg); opacity: 1; }
+}
+
+/* ── Header ── */
+.journal-header {
+  background: var(--wood);
+  border-bottom: 3px solid var(--wood-dk);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.journal-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.journal-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--parchment-lt);
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 var(--wood-dk);
+}
+.journal-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: var(--parchment-dk);
+  letter-spacing: 1px;
+}
+.journal-close {
+  background: var(--wood-dk);
+  border: 2px solid var(--earth);
+  color: var(--parchment-lt);
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  width: 30px; height: 30px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.3);
+}
+.journal-close:hover { background: var(--red); }
+
+/* Decoração entre header e abas */
+.journal-header-deco {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  background: var(--parchment-lt);
+  flex-shrink: 0;
+}
+.journal-header-deco span {
+  color: var(--wood-dk);
+  font-size: 12px;
+}
+.journal-deco-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--wood-dk), var(--gold-lt), var(--wood-dk));
+}
+
+/* ── Abas ── */
+.journal-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 3px solid var(--wood-dk);
+  flex-shrink: 0;
+  background: var(--parchment);
+}
+.journal-tab {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--ink-lt);
+  background: var(--parchment-dk);
+  border: 2px solid var(--wood-dk);
+  border-bottom: none;
+  padding: 6px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .1s, color .1s;
+  margin-right: 4px;
+  margin-top: 6px;
+  position: relative;
+  top: 3px;
+}
+.journal-tab:hover {
+  background: var(--parchment-lt);
+  color: var(--ink);
+}
+.journal-tab.ativa {
+  background: var(--parchment-lt);
+  color: var(--ink);
+  border-color: var(--earth);
+  font-size: 19px;
+}
+.journal-tab-count {
+  font-size: 14px;
+  color: var(--gold);
+  background: rgba(107,61,30,.15);
+  padding: 0 5px;
+  border-radius: 2px;
+}
+
+/* ── Corpo scrollável ── */
+.journal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wood-dk) transparent;
+}
+.journal-body::-webkit-scrollbar { width: 6px; }
+.journal-body::-webkit-scrollbar-thumb { background: var(--wood-dk); }
+
+/* Grade de itens */
+.journal-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  transition: opacity .15s;
+}
+.journal-items.fade-out { opacity: 0; }
+
+/* ── Card de item ── */
+.journal-item {
+  background: var(--parchment);
+  border: 2px solid var(--wood);
+  padding: 8px;
+  cursor: default;
+  position: relative;
+  transition: transform .1s, box-shadow .1s;
+  box-shadow: 2px 2px 0 var(--wood-dk);
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Item coletado */
+.journal-item.coletado {
+  cursor: pointer;
+  border-color: var(--earth);
+}
+.journal-item.coletado:hover,
+.journal-item.expandido {
+  transform: translate(-2px,-2px);
+  box-shadow: 4px 4px 0 var(--wood-dk);
+  background: var(--parchment-lt);
+  z-index: 10;
+}
+
+/* Item bloqueado */
+.journal-item.bloqueado {
+  opacity: .45;
+  filter: grayscale(.8);
+}
+.journal-item.bloqueado .journal-item-icon {
+  opacity: .3;
+}
+
+.journal-item-icon {
+  width: 32px; height: 32px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.journal-item-icon svg {
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
+}
+
+.journal-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.journal-item-nome {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: .5px;
+  line-height: 1.1;
+}
+.journal-item-fase {
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+  color: var(--wood);
+  letter-spacing: 1px;
+}
+
+/* Descrição — aparece ao expandir */
+.journal-item-desc {
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: var(--ink-lt);
+  line-height: 1.3;
+  border-top: 1px solid var(--parchment-dk);
+  padding-top: 4px;
+  margin-top: 2px;
+  display: none;
+}
+.journal-item.expandido .journal-item-desc { display: block; }
+
+/* ── Rodapé ── */
+.journal-footer {
+  background: var(--wood);
+  border-top: 3px solid var(--wood-dk);
+  padding: 6px 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.journal-footer-text {
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  color: var(--parchment-dk);
+  letter-spacing: 1px;
+  opacity: .7;
+}

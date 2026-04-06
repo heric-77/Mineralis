@@ -90,24 +90,29 @@ function selectCard(el) {
 
 // ════════════════════════════════
 // TOOLTIP DOS CARDS
+// Usa event delegation no frame para capturar
+// tanto os cards do HTML quanto os gerados via JS
 // ════════════════════════════════
 
-document.querySelectorAll('.phase-card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    tooltip.textContent = card.dataset.tip;
-    tooltip.classList.add('visible');
-  });
-  card.addEventListener('mousemove', e => {
-    const r = frame.getBoundingClientRect();
-    let x = e.clientX - r.left + 12;
-    let y = e.clientY - r.top  + 12;
-    if (x + tooltip.offsetWidth > r.width - 10)
-      x = e.clientX - r.left - tooltip.offsetWidth - 8;
-    tooltip.style.left = x + 'px';
-    tooltip.style.top  = y + 'px';
-  });
-  card.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+frame.addEventListener('mousemove', e => {
+  const card = e.target.closest('.phase-card');
+  if (!card) {
+    tooltip.classList.remove('visible');
+    return;
+  }
+  tooltip.textContent = card.dataset.tip || '';
+  tooltip.classList.add('visible');
+
+  const r = frame.getBoundingClientRect();
+  let x = e.clientX - r.left + 12;
+  let y = e.clientY - r.top  + 12;
+  if (x + tooltip.offsetWidth > r.width - 10)
+    x = e.clientX - r.left - tooltip.offsetWidth - 8;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
 });
+
+frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
 
 // ════════════════════════════════
 // PARTÍCULAS DE POEIRA

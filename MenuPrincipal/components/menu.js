@@ -204,10 +204,9 @@ const Menu = (() => {
 
   function _diario() {
     Audio.clickMenu();
-    _flash();
     close();
-    // TODO: GameRouter.go('journal')
-    console.info('[Menu] Diário de Bordo – em breve.');
+    Journal.abrir();
+    console.info('[Menu] Diário de Bordo aberto.');
   }
 
   function _opcoes() {
