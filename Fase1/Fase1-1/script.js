@@ -600,10 +600,23 @@ class MineVein{
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=34;this.h=34;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
-  draw(){
+  draw(playerX, playerY){
     if(this.done)return;
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-60||sx>W+60)return;
+
+    const TOOL_TYPES=['picareta','lanterna','coca'];
+    const isTool=TOOL_TYPES.includes(this.type);
+
+    // Aura pulsante — ferramentas têm aura dourada maior e mais vibrante
+    if(isTool){
+      const a=0.3+Math.abs(Math.sin(this.t*0.8))*0.5;
+      const glow=ctx.createRadialGradient(sx+17,sy+17,4,sx+17,sy+17,32);
+      glow.addColorStop(0,`rgba(255,220,80,${a})`);
+      glow.addColorStop(1,'rgba(255,200,50,0)');
+      ctx.fillStyle=glow;ctx.fillRect(sx-15,sy-15,64,64);
+    }
+
     ctx.save();ctx.translate(sx+this.w/2,sy+this.h/2);
     if(this.type==='picareta') drawPicareta(0,0,this.t);
     else if(this.type==='lanterna') drawLanterna(0,0,this.t);
@@ -612,6 +625,33 @@ class Col{
     else if(this.type==='estanho') drawEstanho(0,0,this.t);
     else if(this.type==='coca')   drawCoca(0,0,this.t);
     ctx.restore();
+
+    // Prompt [E] para ferramentas quando jogador está próximo
+    if(isTool&&playerX!==undefined){
+      const dist=Math.hypot(playerX+20-(this.x+17), playerY+40-(this.y+17));
+      if(dist<110){
+        const label=this.type==='picareta'?'⛏ Picareta':
+                    this.type==='lanterna'?'🔦 Lanterna':'🌿 Coca';
+        const txt=`[E] Pegar ${label}`;
+        const pulse=0.7+Math.sin(Date.now()/300)*0.3;
+        ctx.font='bold 13px "Courier New"';
+        const tw=ctx.measureText(txt).width+20;
+        const bx=sx+17-tw/2, by=sy-42;
+        // Fundo do balão
+        ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;
+        roundRect(bx,by,tw,24,5);ctx.fill();
+        ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;
+        roundRect(bx,by,tw,24,5);ctx.stroke();
+        // Triângulo apontando para o item
+        ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;
+        ctx.beginPath();ctx.moveTo(sx+10,by+24);ctx.lineTo(sx+24,by+24);ctx.lineTo(sx+17,by+32);ctx.closePath();ctx.fill();
+        ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(sx+10,by+24);ctx.lineTo(sx+17,by+32);ctx.lineTo(sx+24,by+24);ctx.stroke();
+        // Texto
+        ctx.fillStyle=`rgba(240,200,60,${pulse})`;
+        ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
+      }
+    }
   }
 }
 
@@ -793,33 +833,55 @@ class Player{
     }
     if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
 
-    // Collectibles
+    // ── Tipos de coleta:
+    // FERRAMENTAS (picareta, lanterna, coca) → exige [E] quando próximo
+    // MINERAIS    (prata, estanho, tupu)     → automático ao tocar
+    const TOOL_TYPES = ['picareta','lanterna','coca'];
+
     for(const c of level.cols){
-      if(!c.done&&this.overlaps(c)){c.done=true;
-        if(c.type==='picareta'){this.items.push('picareta');sfx('item');burst(c.x+17,c.y+17,'#c0c0d8',12);journalCollect('picareta_basica');
-          showPopup('⛏ PICARETA COLETADA',['Usada para extrair minérios','Ângulo oblíquo preserva o cristal','Essencial nas minas de Potosí','Incas usavam antes dos espanhóis'],'#c0c0d8');}
-        else if(c.type==='lanterna'){this.items.push('lanterna');sfx('item');burst(c.x+17,c.y+17,'#ffe080',12);notify('✦ Lanterna coletada! Registrada no Diário.');}
-        else if(c.type==='prata'){this.score+=20;sfx('prata');burst(c.x+17,c.y+17,'#c0c8d8',10);
-          if(!this.items.includes('prata_ok')){this.items.push('prata_ok');journalCollect('prata');
-            showPopup('✦ PRATA (FRAGMENTO)',['Melhor condutor elétrico e térmico','Liga-se ao estanho formando bronze','Usada pelos Incas em ornamentos','Hoje em circuitos e medicina'],'#c0c8d8');}
-        }
-        else if(c.type==='estanho'){this.score+=15;sfx('prata');burst(c.x+17,c.y+17,'#9aaab8',8);
-          if(!this.items.includes('estanho_ok')){this.items.push('estanho_ok');journalCollect('estanho');
-            showPopup('◆ ESTANHO (FRAGMENTO)',['Metal dúctil, baixo ponto de fusão','Encontrado junto à prata em Potosí','Liga + Cobre = Bronze (5.000 a.C.)','Bolívia: 2° maior reserva mundial'],'#9aaab8');}
-        }
-        else if(c.type==='coca'){this.items.push('coca');sfx('coca');burst(c.x+17,c.y+17,'#3a9a38',10);
-          showPopup('🌿 FOLHAS DE COCA',['Usadas contra o soroche há 4.000 anos','Sacradas para os povos andinos','Reduzem falta de ar na altitude','Mastigar é prática cultural viva'],'#3a9a38');}
+      if(c.done||TOOL_TYPES.includes(c.type)) continue; // ferramentas tratadas no bloco [E]
+      if(!this.overlaps(c)) continue;
+      c.done=true;
+      if(c.type==='prata'){this.score+=20;sfx('prata');burst(c.x+17,c.y+17,'#c0c8d8',10);
+        if(!this.items.includes('prata_ok')){this.items.push('prata_ok');journalCollect('prata');
+          showPopup('✦ PRATA (FRAGMENTO)',['Melhor condutor elétrico e térmico','Liga-se ao estanho formando bronze','Usada pelos Incas em ornamentos','Hoje em circuitos e medicina'],'#c0c8d8');}
+      }
+      else if(c.type==='estanho'){this.score+=15;sfx('prata');burst(c.x+17,c.y+17,'#9aaab8',8);
+        if(!this.items.includes('estanho_ok')){this.items.push('estanho_ok');journalCollect('estanho');
+          showPopup('◆ ESTANHO (FRAGMENTO)',['Metal dúctil, baixo ponto de fusão','Encontrado junto à prata em Potosí','Liga + Cobre = Bronze (5.000 a.C.)','Bolívia: 2° maior reserva mundial'],'#9aaab8');}
+      }
+      else if(c.type==='tupu'){this.items.push('tupu');sfx('unlock');burst(c.x+17,c.y+17,'#c0c8d8',16);
+        journalCollect('mapa_potosi');this.score+=50;
       }
     }
 
     // E key interactions
     if(isE()){
-      // Abre o Diário de Bordo
-      if(!G.dialog) { /* handled by keydown */ }
-      // Usa folhas de coca (ferramenta consumível — independe de seleção)
+      // ── Pegar ferramentas quando próximo ────────────────────────
+      for(const c of level.cols){
+        if(c.done||!TOOL_TYPES.includes(c.type)) continue;
+        if(!this.near({x:c.x,y:c.y,w:c.w,h:c.h},90)) continue;
+        c.done=true;
+        if(c.type==='picareta'){
+          this.items.push('picareta');sfx('item');burst(c.x+17,c.y+17,'#c0c0d8',12);
+          journalCollect('picareta_basica');
+          showPopup('⛏ PICARETA COLETADA',['Extraia minerais das paredes rochosas','Ângulo oblíquo preserva o cristal','Essencial nas minas de Potosí','Equipe-a no Diário [I] para usar'],'#c0c0d8');
+          notify('✦ Picareta coletada! Equipe-a no Diário [I].');
+        } else if(c.type==='lanterna'){
+          this.items.push('lanterna');sfx('item');burst(c.x+17,c.y+17,'#ffe080',14);
+          showPopup('🔦 LANTERNA ENCONTRADA',['Ilumina as paredes de pedra vulcânica','Revela o brilho metálico da prata','Sem lanterna, a mina fica às escuras','Equipe-a no Diário [I] para usar'],'#ffe080');
+          notify('✦ Lanterna coletada! Equipe-a no Diário [I].');
+        } else if(c.type==='coca'){
+          this.items.push('coca');sfx('coca');burst(c.x+17,c.y+17,'#3a9a38',10);
+          showPopup('🌿 FOLHAS DE COCA',['Usadas contra o soroche há 4.000 anos','Sagradas para os povos andinos','Reduzem falta de ar na altitude','[E] para usar quando Soroche estiver alto'],'#3a9a38');
+          notify('✦ Folhas de coca coletadas!');
+        }
+        break;
+      }
+
+      // ── Usar folhas de coca ──────────────────────────────────
       if(this.items.includes('coca')&&this.soroche>20){
         this.items=this.items.filter(i=>i!=='coca');
-        // Remove coca do activeTool se estava equipado
         if(this.activeTool==='coca') this.activeTool=null;
         this.soroche=Math.max(0,this.soroche-60);sfx('coca');
         burst(this.x+20,this.y-20,'#3a9a38',12);notify('✦ Folhas de coca usadas — fôlego recuperado!');
@@ -851,13 +913,16 @@ class Player{
         }
       }
       // Llama
-      if(level.llama&&!level.llama.done&&this.near({x:level.llama.x-50,y:level.llama.y-80,w:100,h:80})){
-        level.llama.done=true;sfx('coca');
-        this.items.push('coca');journalCollect('ceramica_inca'); // closest journal ID
+      if(level.llama&&!level.llama.gifted&&this.near({x:level.llama.x-50,y:level.llama.y-60,w:100,h:60})){
+        level.llama.gifted=true;sfx('coca');
+        // Animação: folhas de coca caindo da lhama
+        for(let i=0;i<12;i++)burst(level.llama.x,level.llama.y-30,'#3a9a38',1,2+Math.random()*2);
+        this.items.push('coca');journalCollect('ceramica_inca');
         showDialog([
-          '"Olá, linda lhama! Estes animais carregavam minérios pelas montanhas a 4.000 metros de altitude. Eram fundamentais para a economia andina."',
-          '"Ela me oferece Folhas de Coca! Os povos andinos as usam há 4.000 anos contra o Soroche — o mal de altitude. É uma planta sagrada."',
-          '"Quando a barra de Soroche atingir o máximo, pressione [E] para mastigar as folhas e recuperar o fôlego. Vamos entrar na mina!"'
+          '"Olá, linda lhama! Estes animais eram sagrados para os Incas — carregavam minérios pelas montanhas a 4.000 metros de altitude."',
+          '"A lhama me olha e me oferece Folhas de Coca. Os povos andinos as usam há mais de 4.000 anos contra o Soroche — o mal de altitude."',
+          '"Dentro da mina, a 4.000 metros, o ar é rarefeito. A barra de Soroche vai subir. Quando ficar vermelha, pressione [E] para mastigar as folhas."',
+          '"Com a Picareta e as Folhas de Coca, estou pronto para entrar. Mas vou precisar de uma Lanterna — deve estar em algum lugar lá dentro!"'
         ],null,'CORVAN','#e0b840');
       }
       // Tupu
@@ -983,67 +1048,102 @@ function drawMineDust(){
 //  Objetivo: coletar picareta + lanterna, interagir com a lhama
 // ═══════════════════════════════════════════════════════════════
 function buildL1(){
-  const FL=600,WW=3200,WH=900;
+  const FL=600,WW=3400,WH=900;
   const plats=[
+    // Chão principal com gaps
     solid(0,FL,400,WH-FL),solid(480,FL,200,WH-FL),solid(760,FL,200,WH-FL),
     solid(1040,FL,220,WH-FL),solid(1340,FL,200,WH-FL),solid(1620,FL,220,WH-FL),
     solid(1920,FL,240,WH-FL),solid(2220,FL,200,WH-FL),solid(2500,FL,220,WH-FL),
-    solid(2780,FL,600,WH-FL),
+    solid(2780,FL,800,WH-FL),
+    // Plataformas flutuantes
     solid(220,FL-180,130,18),solid(520,FL-240,110,18),solid(760,FL-180,130,18),
     solid(1000,FL-230,120,18),solid(1260,FL-180,130,18),solid(1540,FL-250,110,18),
     solid(1760,FL-180,130,18),solid(2040,FL-240,120,18),solid(2320,FL-180,110,18),
     solid(2560,FL-240,120,18),
-    // Stepping stones across gaps
+    // Pedras de passo pelos gaps
     solid(400,FL-36,80,14),solid(660,FL-36,80,14),solid(900,FL-36,80,14),
     solid(1160,FL-36,80,14),solid(1460,FL-36,80,14),solid(1720,FL-36,80,14),
     solid(2040,FL-36,80,14),solid(2360,FL-36,80,14),solid(2640,FL-36,80,14),
-    // Gaps (pits)
+    // ── ALCOVA BAIXA da picareta (x~1480) ──
+    // Teto baixo que cria visual de "passagem baixa" — sem paredes para não bloquear
+    solid(1480,FL-90,200,18),   // teto da passagem (só ~90px de clearance, bem apertado)
+    // Bloco de pedra no fundo da alcova (visual de "encostado na rocha")
+    solid(1680,FL-90,80,90),
   ];
   const bats=[];
-  const llama={x:3020,y:FL-110,done:false};
+  // Lhama sentada no chão: cy = FL-42 (pés tocam o solo exatamente)
+  const llama={x:3060,y:FL-42,gifted:false};
   const cols=[
-    ...[100,240,520,780,1060,1360,1660,1960,2260,2580].map(x=>new Col(x,FL-50,'prata')),
-    new Col(2820,FL-60,'picareta'),
-    new Col(3060,FL-60,'lanterna'),
+    ...[100,240,520,780,1060,1360,1660,1960,2260,2580,2820,3000].map(x=>new Col(x,FL-50,'prata')),
+    // Picareta encostada na parede de pedra, sob o teto baixo
+    new Col(1620,FL-48,'picareta'),
   ];
   const triggers=[
-    new Trigger(3100,FL-200,100,200,'Entrar na Mina',(player,level)=>{
+    new Trigger(3140,FL-200,120,200,'Entrar na Mina',(player,level)=>{
       if(!player.items.includes('picareta')){notify('Colete a Picareta primeiro!');return;}
+      if(!player.items.includes('coca')){notify('Fale com a Lhama para obter as Folhas de Coca!');return;}
       player.interactAnim=40;sfx('unlock');
       showDialog([
-        '"Bem-vindo às alturas de Potosí, Bolívia — a 4.090 metros de altitude. Esta é a Montanha Rica, o Cerro Rico."',
+        '"Bem-vindo às alturas de Potosí, Bolívia — 4.090 metros de altitude. Esta é a Montanha Rica, o Cerro Rico."',
         '"No tempo do Império Inca, a prata extraída aqui decorava templos sagrados. Com os espanhóis, tornou-se a maior fonte de prata do mundo colonial."',
-        '"Entre 1545 e 1825, estima-se que 45.000 toneladas de prata saíram daqui — a ponto de mudar a economia global e financiar a Europa por séculos."',
-        '"Mas o preço humano foi imenso: milhões de trabalhadores morreram nas minas. Vamos entrar e descobrir os segredos desta montanha!"'
-      ],()=>{notify('✦ Picareta e Lanterna prontas. Entrando na mina!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+        '"Entre 1545 e 1825, estima-se que 45.000 toneladas de prata saíram daqui — mudando a economia global e financiando a Europa por séculos."',
+        '"As Folhas de Coca vão nos ajudar contra o Soroche lá dentro. Mas primeiro precisamos encontrar uma lanterna — está em algum lugar na mina!"'
+      ],()=>{notify('✦ Entrando na mina! Encontre a Lanterna lá dentro.');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
     }),
   ];
   return{id:1,bg:'bgext',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
     title:'Cena I — O Início em Potosí',
-    hint:'Colete a ⛏ Picareta e a 🔦 Lanterna. Interaja com a 🦙 Lhama!',
+    hint:'⛏ Picareta na alcova • 🦙 Fale com a Lhama • Entre na mina →',
     plats,bats,cols,triggers,llama,veins:[],
     intro:[
       '"Bem-vindo ao Cerro Rico de Potosí, Bolívia — 4.090 metros de altitude. Uma das maiores jazidas de prata do mundo."',
       '"Os Incas mineravam aqui séculos antes dos espanhóis. A prata era símbolo lunar — dos deuses, não do comércio."',
-      'Colete a Picareta e a Lanterna ao final do caminho. Interaja com a lhama para receber um presente especial!'
+      'Encontre a Picareta na alcova de pedra, converse com a Lhama para obter as Folhas de Coca, e entre na mina!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
       drawStars();drawWind();
-      // Draw llama if not done
-      if(!this.llama.done){
+      // Indica alcova da picareta quando próximo
+      const alcovaCX=1630-cam.x;
+      if(alcovaCX>-200&&alcovaCX<W+200&&!player.items.includes('picareta')){
+        const ay=FL-120-cam.y;
+        const a=0.55+Math.sin(Date.now()/450)*0.45;
+        ctx.fillStyle=`rgba(200,200,220,${a})`;
+        ctx.font='bold 12px "Courier New"';ctx.textAlign='center';
+        ctx.fillText('⛏ alcova →',alcovaCX,ay);ctx.textAlign='left';
+      }
+      // Lhama — sempre visível, muda comportamento após dar coca
+      if(this.llama){
         const lx=this.llama.x-cam.x,ly=this.llama.y-cam.y;
-        if(lx>-100&&lx<W+100)drawLlama(lx,ly,Date.now()/600);
-        // Interaction hint
-        if(Math.abs(player.x-this.llama.x)<120){
-          ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
-          const t2='[E] Cumprimentar a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
-          roundRect(lx-tw/2,ly-120,tw,24,4);ctx.fill();
-          ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,ly-120,tw,24,4);ctx.stroke();
-          ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,ly-103);ctx.textAlign='left';
+        if(lx>-100&&lx<W+100){
+          // Animação extra de felicidade após dar a coca
+          const bobSpeed=this.llama.gifted?400:600;
+          drawLlama(lx,ly,Date.now()/bobSpeed);
+          // Partícula de coração/folha quando gifted e jogador está perto
+          if(this.llama.gifted&&Math.abs(player.x-this.llama.x)<200){
+            const ht=Date.now()/1000;
+            const ha=Math.abs(Math.sin(ht))*0.8;
+            ctx.fillStyle=`rgba(80,200,80,${ha})`;
+            ctx.font='16px serif';ctx.textAlign='center';
+            ctx.fillText('🌿',lx+Math.sin(ht*2)*12,ly-80+Math.sin(ht*1.5)*10);
+            ctx.textAlign='left';
+          }
+          // Prompt [E] — só antes de interagir
+          if(!this.llama.gifted&&Math.abs(player.x-this.llama.x)<140){
+            ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
+            const t2='[E] Cumprimentar a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
+            roundRect(lx-tw/2,ly-90,tw,24,4);ctx.fill();
+            ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,ly-90,tw,24,4);ctx.stroke();
+            ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,ly-73);ctx.textAlign='left';
+          }
+          // Após interagir: label "Tchau, Corvan!" discreto
+          if(this.llama.gifted&&Math.abs(player.x-this.llama.x)<200){
+            ctx.fillStyle='rgba(220,185,80,0.65)';ctx.font='12px "Courier New"';
+            ctx.textAlign='center';ctx.fillText('Boa sorte na mina! 🦙',lx,ly-58);ctx.textAlign='left';
+          }
         }
       }
-      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1081,12 +1181,18 @@ function buildL2(){
   ];
   const cols=[
     ...[80,200,460,740,1020,1300,1600,1900,2200,2500,2780,3020,3160].map(x=>new Col(x,FL-50,'prata')),
+    // ── LANTERNA numa plataforma no início da mina ──
+    // Colocada sobre o primeiro suporte de madeira, fácil de achar
+    new Col(160,FL-80,'lanterna'),
   ];
   const bats=[new Bat(600,FL-200,100),new Bat(1200,FL-180,90),new Bat(1900,FL-220,110),new Bat(2600,FL-200,100)];
   const triggers=[
     new Trigger(3100,FL-260,140,260,'Avançar para Cena 3',(player,level)=>{
+      if(!player.activeTool&&!player.items.includes('lanterna')){
+        notify('Encontre a Lanterna na mina antes de avançar!');return;
+      }
       const vDone=level.veins.filter(v=>v.done).length;
-      if(vDone<2){notify(`Mine mais 2 veios de prata! (${vDone}/2)`);return;}
+      if(vDone<2){notify(`Mine mais veios de prata! (${vDone}/2)`);return;}
       sfx('unlock');
       showDialog([
         '"Observe as paredes — esses veios cinza-brilhantes são prata. Ela se infiltrou em fendas rochosas junto com estanho durante atividade vulcânica."',
@@ -1098,18 +1204,18 @@ function buildL2(){
   ];
   return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
     title:'Cena II — Geologia e Solo da Mina',
-    hint:'⛏ [E] nos veios brilhantes para minerar! Soroche aumenta dentro da mina.',
+    hint:'🔦 Ache a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Soroche aumenta!',
     plats,bats,cols,triggers,veins,llama:null,
     intro:[
-      '"Corvan entra na mina. As paredes de pedra vulcânica brilham com veios de prata misturados ao estanho."',
-      '"O Soroche começa a aumentar. A lanterna revela os cristais metálicos — use [E] para minerar os veios brilhantes."',
-      'Minere pelo menos 2 veios de prata e avance para as câmaras mais profundas!'
+      '"Corvan entra na mina. Está escuro — mas há algo brilhando na entrada. Uma lanterna abandonada!"',
+      '"Com a Lanterna em mãos, o caminho se ilumina. Os veios de prata nas paredes ficam visíveis."',
+      'Pegue a 🔦 Lanterna na entrada, equipe-a no Diário [I] e use a ⛏ Picareta nos veios brilhantes!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const v of this.veins)v.tick();for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
       drawMineDust();
       for(const v of this.veins)v.draw();
-      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1196,7 +1302,7 @@ function buildL3(){
         }
       }
       for(const v of this.veins)v.draw();
-      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1246,7 +1352,7 @@ function buildL4(){
       ctx.fillStyle='#8a6030';ctx.fillRect(fx,fy-120,4,120);
       ctx.fillStyle='#c8a020';ctx.fillRect(fx+4,fy-120,40,24);
       ctx.fillStyle='#fff';ctx.font='bold 11px "Courier New"';ctx.fillText('FIM',fx+8,fy-103);
-      for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
