@@ -78,10 +78,11 @@ const Cards = (() => {
 
 function selectCard(el) {
   if (el.classList.contains('locked')) return;
-
+ 
   document.querySelectorAll('.phase-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-
+  Audio.clickMenu();                        // ← NOVO: feedback sonoro
+ 
   const phase = PhasesData.find(p => p.id === el.dataset.phase);
   if (phase && SaveManager.faseDesbloqueada(phase.id) && phase.caminho) {
     window.location.href = phase.caminho;
@@ -169,6 +170,16 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
         console.info(`[Init] Chave "${k}" removida para sessão limpa.`);
       });
   }
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('modalOverlay')?.classList.contains('visible')) return;
+        // fecha o que estiver aberto (em ordem de prioridade)
+        if (typeof Options !== 'undefined' && Options.fechar) { Options.fechar(); return; }
+        if (typeof Journal !== 'undefined' && /* Journal.aberto */ document.querySelector('.journal-overlay')) {
+          Journal.fechar(); return;
+        }
+        if (typeof Menu !== 'undefined') Menu.close();
+      });
 
   Cards.renderizar();
   Cards.sincronizar();

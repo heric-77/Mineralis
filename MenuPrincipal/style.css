@@ -1023,3 +1023,260 @@ body {
   letter-spacing: 1px;
   opacity: .7;
 }
+
+/* ═══════════════════════════════════════════════
+   MINERALIS – Adição ao style.css
+   Bloco: Tela de Opções
+   Cole abaixo das regras do Journal.
+   ═══════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.options-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 10, 4, 0.78);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.options-overlay.visible { opacity: 1; }
+
+/* ── Caixa principal ── */
+.options-box {
+  background: var(--parchment-lt);
+  border: 4px solid var(--earth);
+  border-radius: 2px;
+  width: min(480px, 90%);
+  max-height: 88%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 40px rgba(107,61,30,.35), 0 8px 32px rgba(0,0,0,.7);
+  overflow: hidden;
+  transform: translateY(12px);
+  transition: transform 0.22s ease;
+}
+.options-overlay.visible .options-box { transform: translateY(0); }
+
+/* ── Header ── */
+.options-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  background: var(--parchment);
+  border-bottom: 2px solid var(--parchment-dk);
+}
+.options-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink);
+  letter-spacing: 2px;
+}
+.options-close {
+  background: none;
+  border: 2px solid var(--earth);
+  color: var(--earth);
+  font-size: 14px;
+  width: 26px; height: 26px;
+  cursor: pointer;
+  font-family: 'VT323', monospace;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+.options-close:hover {
+  background: var(--earth);
+  color: var(--parchment-lt);
+}
+
+/* ── Divisor decorativo ── */
+.options-divider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 16px;
+  color: var(--parchment-dk);
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+}
+.options-deco-line {
+  flex: 1;
+  height: 1px;
+  background: var(--parchment-dk);
+}
+
+/* ── Body ── */
+.options-body {
+  overflow-y: auto;
+  padding: 8px 16px 12px;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--parchment-dk) transparent;
+}
+
+/* ── Seção ── */
+.options-section {
+  margin-bottom: 18px;
+}
+.options-section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--earth);
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--parchment-dk);
+}
+
+/* ── Linha de opção ── */
+.options-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.options-label {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  color: var(--ink);
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+/* ── Slider ── */
+.options-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.options-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none; 
+  height: 6px;
+  background: var(--parchment-dk);
+  border: 1px solid var(--earth);
+  border-radius: 0;
+  cursor: pointer;
+  outline: none;
+}
+.options-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px; height: 14px;
+  background: var(--earth);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.options-slider::-webkit-slider-thumb:hover {
+  background: var(--gold);
+}
+.options-slider-val {
+  font-family: 'VT323', monospace;
+  font-size: 17px;
+  color: var(--ink);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ── Toggle ── */
+.options-toggle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 6px 10px;
+  background: var(--parchment);
+  border: 2px solid var(--earth);
+  color: var(--earth);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.options-toggle.ativo {
+  background: var(--earth);
+  color: var(--parchment-lt);
+  border-color: var(--ink);
+}
+.options-toggle:hover {
+  border-color: var(--ink);
+}
+
+/* ── Botões de Idioma ── */
+.options-row-langs { gap: 8px; flex-wrap: wrap; }
+.options-lang-btn {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  padding: 4px 14px;
+  background: var(--parchment);
+  border: 2px solid var(--parchment-dk);
+  color: var(--ink-lt);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.options-lang-btn.ativo {
+  border-color: var(--earth);
+  background: var(--sand);
+  color: var(--ink);
+  font-weight: bold;
+}
+.options-lang-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Botão de perigo ── */
+.options-danger-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 7px 12px;
+  background: var(--parchment);
+  border: 2px solid var(--red);
+  color: var(--red);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s, color 0.15s;
+}
+.options-danger-btn:hover {
+  background: var(--red);
+  color: var(--parchment-lt);
+}
+
+/* ── Créditos ── */
+.options-credits {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: var(--ink-lt);
+  line-height: 1.5;
+  text-align: center;
+}
+.options-credits-name {
+  color: var(--earth);
+  font-size: 18px;
+}
+.options-credits-sep {
+  color: var(--parchment-dk);
+  margin: 4px 0;
+  font-size: 13px;
+}
+.options-version {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--parchment-dk);
+  letter-spacing: 1px;
+}
+
+/* ── Footer ── */
+.options-footer {
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: var(--wood);
+  text-align: center;
+  padding: 8px;
+  border-top: 1px solid var(--parchment-dk);
+  background: var(--parchment);
+}

@@ -347,6 +347,31 @@ const Audio = (() => {
     _duckTimer = setTimeout(_unduckLongo, 1400);
   }
 
+  // Nó de ganho dedicado para SFX (criar junto com duckGain no _getCtx):
+//
+//   gainSFX = ctx.createGain();
+//   gainSFX.gain.value = 1.0;
+//   gainSFX.connect(ctx.destination);
+//
+// E em _nota(), quando destino === c.destination,
+// redirecione para gainSFX em vez de ctx.destination.
+// Assim o volume de efeitos fica controlável.
+ 
+function setVolMusica(valor) {            // valor: 0.0 – 1.0
+  if (!duckGain) return;
+  VOL_NORMAL = valor;                     // atualiza a constante
+  const c = _getCtx();
+  duckGain.gain.cancelScheduledValues(c.currentTime);
+  duckGain.gain.setValueAtTime(valor, c.currentTime);
+}
+ 
+function setVolEfeitos(valor) {           // valor: 0.0 – 1.0
+  if (!gainSFX) return;
+  const c = _getCtx();
+  gainSFX.gain.cancelScheduledValues(c.currentTime);
+  gainSFX.gain.setValueAtTime(valor, c.currentTime);
+}
+ 
   // ════════════════════════════════
   // API PÚBLICA
   // ════════════════════════════════
@@ -357,6 +382,8 @@ const Audio = (() => {
     clickMenu,
     fecharMenu,
     novaJornada,
+    setVolMusica,
+    setVolEfeitos,
   };
 
 })();

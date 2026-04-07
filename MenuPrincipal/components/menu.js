@@ -211,10 +211,8 @@ const Menu = (() => {
 
   function _opcoes() {
     Audio.clickMenu();
-    _flash();
-    close();
-    // TODO: GameRouter.go('options')
-    console.info('[Menu] Opções – em breve.');
+    close();                   // fecha o menu
+    Options.abrir();           // abre a tela de opções
   }
 
   function _sair() {
