@@ -1,31 +1,31 @@
 /* ═══════════════════════════════════════════════════════════
    MINERALIS – Fase 1.3 · O Tesouro do Condor
-   script.js  (v3 – fullscreen + balões + condor aliado + bgs)
+   script.js  (v4 – sprites condor+corvan, spawn patrol, fixes)
    ═══════════════════════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════════════════════
-//  SETUP – canvas preenche toda a janela
+//  SETUP – canvas preenche toda a janela (cover = sem barras)
 // ═══════════════════════════════════════════════════════════
-const W = 1280, H = 720;           // resolução interna do jogo
+const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
 const ctx    = canvas.getContext('2d');
 canvas.width  = W;
 canvas.height = H;
 
+// ── Correção: usa Math.max para cobrir toda a janela ──
 function resize() {
-  // Escala mantendo proporção mas preenchendo o máximo possível
   const scaleW = window.innerWidth  / W;
   const scaleH = window.innerHeight / H;
-  const s = Math.min(scaleW, scaleH);
+  const s  = Math.max(scaleW, scaleH);          // cover: sem barras laterais
   const sw = Math.round(W * s);
   const sh = Math.round(H * s);
   canvas.style.width  = sw + 'px';
   canvas.style.height = sh + 'px';
   wrap.style.width    = sw + 'px';
   wrap.style.height   = sh + 'px';
-  // Centraliza na tela
   wrap.style.position = 'fixed';
+  wrap.style.overflow = 'hidden';
   wrap.style.left     = Math.round((window.innerWidth  - sw) / 2) + 'px';
   wrap.style.top      = Math.round((window.innerHeight - sh) / 2) + 'px';
 }
@@ -51,7 +51,7 @@ function sfx(type) {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  ASSETS
+//  ASSETS – adicionado sprite do condor
 // ═══════════════════════════════════════════════════════════
 const IMG = {}, SPRITES = {};
 const ASSETS = [
@@ -62,9 +62,10 @@ const ASSETS = [
   ['walk','Sprite_Caminhando.PNG'],
   ['idle','Respirando_Levemente.PNG'],
   ['hurt','Soroche_-_Ofegante.PNG'],
-  ['lant','Sprite_com_lanterna.PNG'],
+  ['lant','Sprite_com_lanterna.PNG'],       // Corvan com lanterna
   ['talk','Falando.PNG'],
   ['dig', 'Escavando.PNG'],
+  ['condor','condor_sprite_sheet.png'],     // ← NOVO: sprite do condor
 ];
 
 function makeSprite(img, threshold = 28) {
@@ -83,20 +84,26 @@ function makeSprite(img, threshold = 28) {
 }
 
 const SPRITE_INFO = {
-  walk:{ n:6, ox:8,  oy:0,  fw:84,  fh:200 },
-  idle:{ n:4, ox:24, oy:80, fw:120, fh:440 },
-  hurt:{ n:4, ox:36, oy:19, fw:172, fh:352 },
-  lant:{ n:6, ox:11, oy:17, fw:183, fh:175 },
-  talk:{ n:2, ox:25, oy:17, fw:184, fh:376 },
-  dig :{ n:6, ox:0,  oy:0,  fw:245, fh:400 },
+  walk:  { n:6, ox:8,  oy:0,  fw:84,  fh:200 },
+  idle:  { n:4, ox:24, oy:80, fw:120, fh:440 },
+  hurt:  { n:4, ox:36, oy:19, fw:172, fh:352 },
+  lant:  { n:6, ox:11, oy:17, fw:183, fh:175 },
+  talk:  { n:2, ox:25, oy:17, fw:184, fh:376 },
+  dig :  { n:6, ox:0,  oy:0,  fw:245, fh:400 },
+  // Condor: sprite sheet 4 colunas × 3 linhas
+  // Linha 0 = pousado/idle, usada para companion e title screen
+  // Ajuste fw/fh se as dimensões reais da imagem forem diferentes
+  condor:{ n:4, ox:0,  oy:0,  fw:336, fh:168 },
 };
+
+const SPRITE_KEYS_TO_PROCESS = ['walk','idle','hurt','lant','talk','dig','condor'];
 
 let assetsLoaded = 0, totalAssets = ASSETS.length, gameReady = false;
 ASSETS.forEach(([key,src]) => {
   const img = new Image();
   img.onload = () => {
     IMG[key] = img;
-    if (['walk','idle','hurt','lant','talk','dig'].includes(key)) SPRITES[key] = makeSprite(img);
+    if (SPRITE_KEYS_TO_PROCESS.includes(key)) SPRITES[key] = makeSprite(img);
     if (++assetsLoaded >= totalAssets) { gameReady = true; startGame(); }
   };
   img.onerror = () => { IMG[key]=null; if (++assetsLoaded >= totalAssets) { gameReady=true; startGame(); } };
@@ -111,8 +118,6 @@ window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
   keys[e.code]=true;
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
-  if(e.code==='Escape'&&INV.open)INV.close();
 });
 window.addEventListener('keyup', e => delete keys[e.code]);
 
@@ -127,151 +132,6 @@ const isR=()=>keys['ArrowRight']||keys['KeyD']||TOUCH.r;
 const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){ for(const k in jp) delete jp[k]; }
-
-// ══════════════════════════════════════════════════════════════
-//  CATÁLOGO DE ITENS — Fase 1.3 (O Tesouro do Condor)
-// ══════════════════════════════════════════════════════════════
-const ITEM_DEFS = {
-  lantern: {
-    cat:'ferramenta', nome:'Lanterna', icon:'🔦', journalId:'lupa_geologica',
-    desc:'Ilumina a mina e revela o Intihuatana.\nNecessária para abrir portões de pedra.',
-    drawHand:'right',
-  },
-  stone: {
-    cat:'ferramenta', nome:'Pedra da Constelação', icon:'💎', journalId:null,
-    desc:'Peça da constelação do Condor.\nColete 3 para alinhar o painel astronômico.',
-    drawHand:'left', multiple:true,
-  },
-  tumi: {
-    cat:'artefato', nome:'Tupu de Ouro (Tumi)', icon:'🗡', journalId:'relevo_inca',
-    desc:'Faca cerimonial Inca de ouro, prata e turquesa.\nUsada em rituais de oferenda ao sol.',
-  },
-  gold: {
-    cat:'minerio', nome:'Ouro Inca', icon:'🥇', journalId:'prata',
-    desc:'Moedas e fragmentos de ouro Inca.\nPara os Incas, o ouro era símbolo do sol — Inti.',
-  },
-};
-
-const INV = {
-  open:false, tab:0, cursor:0,
-  TABS:[
-    {id:'ferramenta',label:'🔧 Ferramentas',color:'#f0c040'},
-    {id:'minerio',   label:'⛏ Minérios',   color:'#d4a017'},
-    {id:'artefato',  label:'🏺 Artefatos',  color:'#c08840'},
-  ],
-  tabItems(player){
-    const cat=this.TABS[this.tab].id;
-    const out=[];
-    for(const [id,def] of Object.entries(ITEM_DEFS)){
-      if(def.cat!==cat) continue;
-      if(def.multiple){
-        const cnt=player.items.filter(i=>i===id).length;
-        if(cnt>0) out.push({id,...def,count:cnt});
-      } else if(player.items.includes(id)){
-        out.push({id,...def,count:1});
-      }
-    }
-    return out;
-  },
-  toggle(player){
-    this.open=!this.open;
-    if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}
-    G.dialog=this.open;
-  },
-  close(){this.open=false;G.dialog=false;},
-  navigate(player){
-    if(!this.open)return false;
-    if(jp['ArrowLeft']||jp['KeyA']){this.tab=(this.tab+2)%3;this.cursor=0;return true;}
-    if(jp['ArrowRight']||jp['KeyD']){this.tab=(this.tab+1)%3;this.cursor=0;return true;}
-    const items=this.tabItems(player);
-    if(jp['ArrowUp']  ||jp['KeyW']){this.cursor=Math.max(0,this.cursor-1);return true;}
-    if(jp['ArrowDown']||jp['KeyS']){this.cursor=Math.min(items.length-1,this.cursor+1);return true;}
-    if(isE()&&items.length>0&&this.tab===0){
-      const item=items[this.cursor];
-      player.activeTool=(player.activeTool===item.id)?null:item.id;
-      return true;
-    }
-    return false;
-  },
-  draw(player){
-    if(!this.open)return;
-    ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,0,W,H);
-    const PW=780,PH=480,PX=(W-PW)/2,PY=(H-PH)/2;
-    ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=20;
-    ctx.fillStyle='rgba(8,4,0,0.97)';roundRect(PX,PY,PW,PH,16);ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.strokeStyle='#8a6820';ctx.lineWidth=2.5;roundRect(PX,PY,PW,PH,16);ctx.stroke();
-    ctx.strokeStyle='rgba(200,160,40,0.2)';ctx.lineWidth=1;roundRect(PX+4,PY+4,PW-8,PH-8,12);ctx.stroke();
-    ctx.fillStyle='#f0c040';ctx.font='bold 16px "Courier New"';
-    ctx.textAlign='center';ctx.fillText('📔  DIÁRIO DE BORDO',W/2,PY+28);ctx.textAlign='left';
-    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+16,PY+38,PW-32,1);
-    const TAB_W=PW/3,TAB_Y=PY+44;
-    this.TABS.forEach((tab,i)=>{
-      const tx=PX+i*TAB_W,active=(i===this.tab);
-      ctx.fillStyle=active?'rgba(200,160,40,0.18)':'rgba(0,0,0,0.3)';
-      ctx.fillRect(tx+2,TAB_Y,TAB_W-4,34);
-      ctx.fillStyle=active?tab.color:'#666';
-      ctx.font=(active?'bold ':'')+'13px "Courier New"';
-      ctx.textAlign='center';ctx.fillText(tab.label,tx+TAB_W/2,TAB_Y+22);ctx.textAlign='left';
-      if(active){ctx.fillStyle=tab.color;ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3);}
-    });
-    const CY=TAB_Y+40,CH=PH-(CY-PY)-50;
-    const items=this.tabItems(player);
-    const COL_W=260,DESC_X=PX+280;
-    if(items.length===0){
-      ctx.fillStyle='#554';ctx.font='14px "Courier New"';ctx.textAlign='center';
-      ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
-      ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
-      ctx.textAlign='left';
-    } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
-        if(selected){
-          ctx.fillStyle='rgba(200,160,40,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();
-          ctx.strokeStyle='#f0c040';ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();
-        }
-        ctx.font='22px serif';ctx.fillText(item.icon,PX+28,iy+20);
-        const countStr=item.count>1?` ×${item.count}`:'';
-        ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
-        ctx.fillStyle=equipped?'#ffe060':(selected?'#f0e8c0':'#aaa');
-        ctx.fillText(item.nome+countStr,PX+62,iy+14);
-        if(equipped){
-          ctx.fillStyle='rgba(200,160,40,0.22)';roundRect(PX+62,iy+20,80,16,4);ctx.fill();
-          ctx.font='10px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);
-        }
-      });
-      const sel=items[this.cursor];
-      if(sel){
-        ctx.fillStyle='rgba(200,160,40,0.08)';roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
-        ctx.font='44px serif';ctx.textAlign='center';ctx.fillText(sel.icon,DESC_X+(PW-DESC_X+PX-16)/2,CY+68);ctx.textAlign='left';
-        ctx.font='bold 15px "Courier New"';ctx.fillStyle='#f0c040';
-        ctx.textAlign='center';ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+98);
-        const catLabel={ferramenta:'🔧 Ferramenta',minerio:'⛏ Minério',artefato:'🏺 Artefato'};
-        ctx.font='11px "Courier New"';ctx.fillStyle='#888';
-        ctx.fillText(catLabel[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+116);ctx.textAlign='left';
-        ctx.fillStyle='rgba(200,160,40,0.25)';ctx.fillRect(DESC_X+20,CY+124,PW-DESC_X+PX-56,1);
-        const descLines=sel.desc.split('\n');
-        ctx.font='13px "Courier New"';ctx.fillStyle='#f0e8c0';
-        descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+144+i*22);});
-        ctx.textAlign='left';
-        if(sel.cat==='ferramenta'){
-          const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar';
-          ctx.fillStyle=player.activeTool===sel.id?'rgba(180,60,20,0.3)':'rgba(200,160,40,0.2)';
-          roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();
-          ctx.strokeStyle=player.activeTool===sel.id?'#c04020':'#f0c040';ctx.lineWidth=1.5;
-          roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke();
-          ctx.font='bold 13px "Courier New"';ctx.fillStyle=player.activeTool===sel.id?'#e06040':'#f0c040';
-          ctx.textAlign='center';ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left';
-        }
-      }
-    }
-    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(PX,PY+PH-38,PW,38);
-    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+16,PY+PH-39,PW-32,1);
-    ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.textAlign='center';
-    ctx.fillText('◀ ▶ Abas   ↑ ↓ Navegar   E Equipar/Desequipar   I Fechar',W/2,PY+PH-14);
-    ctx.textAlign='left';
-  }
-};
 
 // ═══════════════════════════════════════════════════════════
 //  SPRITES
@@ -410,11 +270,10 @@ function roundRect(x,y,w,h,r){
 }
 
 // ═══════════════════════════════════════════════════════════
-//  SISTEMA DE BALÕES DE DIÁLOGO (canvas – acima do personagem)
+//  SISTEMA DE BALÕES DE DIÁLOGO
 // ═══════════════════════════════════════════════════════════
 function wrapText(text, maxW) {
   ctx.font = '15px "Courier New"';
-  // Split on explicit newlines first
   const paragraphs = text.split('\n');
   const result = [];
   for (const para of paragraphs) {
@@ -434,7 +293,7 @@ const BUBBLE = {
   active: false,
   queue: [],
   cb: null,
-  lines: [],       // wrapped lines of current message
+  lines: [],
   speakerTxt: 'CORVAN',
   faceFrame: 0,
 
@@ -464,7 +323,6 @@ const BUBBLE = {
     if (!this.active) return;
     this.faceFrame += 0.08;
 
-    // Posição do balão — acima do personagem na tela
     const FONT    = '15px "Courier New"';
     const NAMEFNT = 'bold 12px "Courier New"';
     ctx.font = FONT;
@@ -477,33 +335,24 @@ const BUBBLE = {
     const bubW = faceW + pad + textAreaW + pad*2;
     const bubH = Math.max(faceH, this.lines.length*lineH + 30) + pad*2;
 
-    // Posição X centrada no personagem (na tela)
     const pcx = player.x - cam.x + player.w/2;
     const pcy = player.y - cam.y;
 
     let bx = pcx - bubW/2;
-    let by = pcy - bubH - 28; // acima do personagem
+    let by = pcy - bubH - 28;
 
-    // Clamp dentro da tela
     bx = Math.max(12, Math.min(bx, W - bubW - 12));
-    by = Math.max(12, by);
-    if (by + bubH + 28 > pcy) by = pcy - bubH - 28; // se ainda caber
-    by = Math.max(12, by);
+    if (by < 40) by = pcy + player.h + 10;
+    by = Math.max(40, Math.min(by, H - bubH - 10));
 
-    // Sombra
     ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=12;
-
-    // Fundo do balão
     ctx.fillStyle='rgba(6,3,0,0.94)';
     roundRect(bx,by,bubW,bubH,14); ctx.fill();
-
     ctx.shadowBlur=0;
 
-    // Borda dourada
     ctx.strokeStyle='#c8a020'; ctx.lineWidth=2.5;
     roundRect(bx,by,bubW,bubH,14); ctx.stroke();
 
-    // Cauda do balão (aponta para o jogador)
     const tailBaseX = Math.max(bx+30, Math.min(pcx, bx+bubW-30));
     const tailTopY  = by + bubH;
     const tailTipX  = pcx;
@@ -516,7 +365,6 @@ const BUBBLE = {
     ctx.lineTo(tailTipX, tailTipY);
     ctx.closePath(); ctx.fill();
 
-    // Bordas da cauda
     ctx.strokeStyle='#c8a020'; ctx.lineWidth=2;
     ctx.beginPath();
     ctx.moveTo(tailBaseX-14, tailTopY);
@@ -524,7 +372,6 @@ const BUBBLE = {
     ctx.lineTo(tailBaseX+14, tailTopY);
     ctx.stroke();
 
-    // Face do Corvan (mini pixel)
     const fx = bx+pad, fy = by+pad;
     if (SPRITES['idle']||SPRITES['talk']) {
       const key = 'talk';
@@ -542,25 +389,20 @@ const BUBBLE = {
         ctx.restore();
       }
     } else {
-      // Fallback avatar
       ctx.fillStyle='#c8845a'; ctx.fillRect(fx+8,fy+4,40,50);
     }
-    // Círculo ao redor da face
     ctx.strokeStyle='rgba(200,160,32,0.5)'; ctx.lineWidth=1.5;
     ctx.strokeRect(fx,fy,faceW,faceH);
 
-    // Nome do falante
     const tx = fx + faceW + pad;
     ctx.font = NAMEFNT;
     ctx.fillStyle='#f0c040';
     ctx.fillText(this.speakerTxt, tx, by+pad+14);
 
-    // Texto
     ctx.font = FONT;
     ctx.fillStyle='#f0e8c0';
     this.lines.forEach((l,i)=>ctx.fillText(l, tx, by+pad+36+i*lineH));
 
-    // Dica "continuar"
     const pulse = 0.55+Math.sin(Date.now()/400)*0.45;
     ctx.fillStyle=`rgba(200,160,32,${pulse})`;
     ctx.font='12px "Courier New"';
@@ -571,10 +413,10 @@ const BUBBLE = {
 };
 
 function showDialog(lines, cb, speaker='CORVAN') { BUBBLE.show(lines, cb, speaker); }
-function checkDlg() { if (G.dialog && !INV.open && isE()) BUBBLE.advance(); }
+function checkDlg() { if (G.dialog && isE()) BUBBLE.advance(); }
 
 // ═══════════════════════════════════════════════════════════
-//  NOTIFICATION (canvas, sem HTML extra)
+//  NOTIFICATION
 // ═══════════════════════════════════════════════════════════
 let notifText='', notifAlpha=0, notifTimer=0;
 function notify(msg, ms=2800){
@@ -601,11 +443,14 @@ function drawNotif(){
 }
 
 // ═══════════════════════════════════════════════════════════
-//  ENEMY (guardiões e cobras — sem condor aqui)
+//  ENEMY — patrulha baseada em spawnX (não em distância do player)
+//  Assim os inimigos se movem desde o início, sem precisar do player perto
 // ═══════════════════════════════════════════════════════════
 class Enemy {
   constructor(x,y,type,patrol){
-    this.x=x; this.y=y; this.type=type;
+    this.x=x; this.y=y;
+    this.spawnX=x;         // ← posição de spawn fixa para a patrulha
+    this.type=type;
     this.w=type==='snake'?60:36;
     this.h=type==='snake'?24:60;
     this.patrol=patrol; this.vx=1.4; this.facing=1; this.dead=false; this.frame=0;
@@ -624,7 +469,8 @@ class Enemy {
       if(p.type==='spike'||p.type==='water'||p.type==='_dead') continue;
       if(edge>p.x&&edge<p.x+p.w&&this.y+this.h+2>=p.y&&this.y+this.h+2<=p.y+12) onEdge=true;
     }
-    if((onG&&!onEdge)||Math.abs(this.x-player.x)>this.patrol) this.vx=-this.vx;
+    // ← Usa spawnX ao invés de player.x: inimigos patrulham desde o início
+    if((onG&&!onEdge)||Math.abs(this.x-this.spawnX)>this.patrol) this.vx=-this.vx;
     this.facing=this.vx>0?1:-1;
   }
   draw(){
@@ -654,12 +500,12 @@ class Enemy {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  CONDOR ALIADO — voa como companheiro, não ataca
+//  CONDOR ALIADO — usa sprite se disponível, fallback procedural
 // ═══════════════════════════════════════════════════════════
 class CondorCompanion {
   constructor(){
     this.x=400; this.y=200;
-    this.angle=0;    // ângulo da órbita
+    this.angle=0;
     this.frame=0;
     this.sparkT=0;
     this.sparks=[];
@@ -672,15 +518,12 @@ class CondorCompanion {
     this.angle+=0.018;
     this.sparkT++;
 
-    // Voa em órbita elegante acima e à frente do jogador
     const orbitR = 110;
     const orbitX = player.x + Math.cos(this.angle)*orbitR*1.3;
     const orbitY = player.y - 160 + Math.sin(this.angle)*orbitR*0.5;
-    // Transição suave (lerp)
     this.x += (orbitX - this.x) * 0.04;
     this.y += (orbitY - this.y) * 0.04;
 
-    // Partículas douradas que o condor deixa para trás
     if(this.sparkT%12===0){
       this.sparks.push({
         x: this.x, y: this.y,
@@ -697,7 +540,7 @@ class CondorCompanion {
   }
 
   draw(){
-    // Partículas
+    // Partículas douradas
     for(const s of this.sparks){
       ctx.save();
       ctx.globalAlpha=(s.life/s.max)*0.7;
@@ -709,47 +552,40 @@ class CondorCompanion {
     const sx=this.x-cam.x, sy=this.y-cam.y;
     if(sx<-120||sx>W+120) return;
 
-    const flap=Math.sin(this.frame*Math.PI/1.8)*16;
-    ctx.save(); ctx.translate(sx,sy);
-
-    // Brilho dourado ao redor
-    const glow=ctx.createRadialGradient(0,0,0,0,0,55);
-    glow.addColorStop(0,'rgba(255,210,60,0.22)');
+    // Brilho dourado
+    ctx.save();
+    const glow=ctx.createRadialGradient(sx,sy,0,sx,sy,70);
+    glow.addColorStop(0,'rgba(255,210,60,0.25)');
     glow.addColorStop(1,'rgba(255,180,0,0)');
-    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,55,0,Math.PI*2); ctx.fill();
-
-    // Asas (cor dourado-escuro, amigável)
-    ctx.fillStyle='#2a2010';
-    ctx.beginPath(); ctx.ellipse(-46,flap,44,10,Math.PI/8,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse( 46,-flap,44,10,-Math.PI/8,0,Math.PI*2); ctx.fill();
-
-    // Corpo
-    ctx.fillStyle='#201808';
-    ctx.beginPath(); ctx.ellipse(0,0,18,13,0,0,Math.PI*2); ctx.fill();
-
-    // Peito branco (símbolo de paz / mensageiro)
-    ctx.strokeStyle='rgba(255,240,200,0.9)'; ctx.lineWidth=2.5;
-    ctx.beginPath(); ctx.arc(0,3,11,Math.PI,0); ctx.stroke();
-
-    // Cabeça
-    ctx.fillStyle='#181408'; ctx.beginPath(); ctx.arc(0,-16,10,0,Math.PI*2); ctx.fill();
-
-    // Olho brilhante (amigável — âmbar quente)
-    ctx.fillStyle='#f0a020'; ctx.beginPath(); ctx.arc(5,-18,4,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#fff';    ctx.beginPath(); ctx.arc(6,-19,1.5,0,Math.PI*2); ctx.fill();
-
-    // Bico dourado
-    ctx.fillStyle='#d4a020'; ctx.fillRect(10,-20,11,4);
-    ctx.fillStyle='#f0c040'; ctx.fillRect(12,-19,7,2);
-
-    // Auréola suave (condor sagrado)
-    ctx.strokeStyle='rgba(255,215,60,0.18)'; ctx.lineWidth=4;
-    ctx.beginPath(); ctx.arc(0,-18,18,0,Math.PI*2); ctx.stroke();
-
+    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(sx,sy,70,0,Math.PI*2); ctx.fill();
     ctx.restore();
+
+    // ── Usa o sprite do condor se carregado ──
+    if(SPRITES['condor']){
+      const dw=140, dh=70;
+      const flipLeft = Math.cos(this.angle) < 0;
+      drawSprite('condor', Math.floor(this.frame)%4, sx-dw/2, sy-dh/2, dw, dh, flipLeft);
+    } else {
+      // Fallback procedural
+      const flap=Math.sin(this.frame*Math.PI/1.8)*16;
+      ctx.save(); ctx.translate(sx,sy);
+      ctx.fillStyle='#2a2010';
+      ctx.beginPath(); ctx.ellipse(-46,flap,44,10,Math.PI/8,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 46,-flap,44,10,-Math.PI/8,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#201808';
+      ctx.beginPath(); ctx.ellipse(0,0,18,13,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='rgba(255,240,200,0.9)'; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(0,3,11,Math.PI,0); ctx.stroke();
+      ctx.fillStyle='#181408'; ctx.beginPath(); ctx.arc(0,-16,10,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#f0a020'; ctx.beginPath(); ctx.arc(5,-18,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff';    ctx.beginPath(); ctx.arc(6,-19,1.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#d4a020'; ctx.fillRect(10,-20,11,4);
+      ctx.strokeStyle='rgba(255,215,60,0.18)'; ctx.lineWidth=4;
+      ctx.beginPath(); ctx.arc(0,-18,18,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
   }
 
-  // O condor mostra um balão de texto especial
   speak(msg){
     showDialog(msg, null, '✦ CONDOR');
   }
@@ -821,7 +657,6 @@ class Player{
     this.frame=0; this.ft=0; this.state='idle';
     this.coyote=0; this.jbuf=0; this.onMoving=null;
     this.items=[]; this.score=0;
-    this.activeTool=null;
     this.soroche=0; this.sorocheAnim=0; this.interactAnim=0;
   }
 
@@ -890,7 +725,8 @@ class Player{
     for(const p of plats){
       if(p.type==='spike'||p.type==='water'||p.type==='_dead') continue;
       if(this.overlaps(p)){
-        if(this.y+this.h*0.5<=p.y) continue; // permite escalar bordas
+        // só permite "subir degrau" se os pés estiverem a menos de 4px do topo
+        if(this.y+this.h <= p.y+4) continue;
         if(this.vx>0) this.x=p.x-this.w; else this.x=p.x+p.w;
         this.vx=0;
       }
@@ -901,8 +737,17 @@ class Player{
       if(p.type==='spike'||p.type==='water'||p.type==='_dead') continue;
       if(p.type==='trapdoor'&&this.vy<0) continue;
       if(this.overlaps(p)){
-        if(this.vy>=0){this.y=p.y-this.h;this.vy=0;this.onG=true;if(p.moving)this.onMoving=p;if(p.type==='trapdoor'&&p.crumble===undefined)p.crumble=70;}
-        else{this.y=p.y+p.h;this.vy=Math.abs(this.vy)*0.2;}
+        if(this.vy>=0){
+          this.y=p.y-this.h; this.vy=0; this.onG=true;
+          if(p.moving) this.onMoving=p;
+          if(p.type==='trapdoor'&&p.crumble===undefined) p.crumble=70;
+        } else {
+          // só bate no teto se os pés estavam abaixo da base da plataforma
+          // evita teletransportar o jogador ao bater no LADO de blocos altos
+          if(this.y+this.h > p.y+p.h-4){
+            this.y=p.y+p.h; this.vy=Math.abs(this.vy)*0.2;
+          }
+        }
       }
     }
   }
@@ -956,28 +801,25 @@ class Player{
 }
 
 // ═══════════════════════════════════════════════════════════
-//  BACKGROUNDS — imagem cobrindo toda a tela, estática
+//  BACKGROUNDS
 // ═══════════════════════════════════════════════════════════
 function drawBg(bgKey){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
-    // Cover: mantém proporção, preenche o canvas inteiro
     const scale=Math.max(W/img.naturalWidth, H/img.naturalHeight);
     const sw=img.naturalWidth*scale, sh=img.naturalHeight*scale;
     ctx.drawImage(img,(W-sw)/2,(H-sh)/2,sw,sh);
   } else {
-    // Fallback gradiente
     const fb={bg01:'#4a8fd4',bg02:'#c04020',bg03:'#1a1208',bg04:'#0a0808'};
     const grd=ctx.createLinearGradient(0,0,0,H);
     grd.addColorStop(0,fb[bgKey]||'#111'); grd.addColorStop(1,'#0a0600');
     ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
   }
-  // Overlay suave para legibilidade
   ctx.fillStyle='rgba(0,0,0,0.28)'; ctx.fillRect(0,0,W,H);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  LEVEL 1 — O Observatório das Nuvens  (Cena 01 – dia)
+//  LEVEL 1 — Espinhos realocados: chão + plataformas
 // ═══════════════════════════════════════════════════════════
 function buildL1(){
   const FL=580,WW=3600,WH=900;
@@ -998,7 +840,9 @@ function buildL1(){
     movH(2240,FL-36,80,2240,2310,2.0),movH(2520,FL-36,80,2520,2580,1.8),
     movH(2800,FL-36,80,2800,2860,2.2),movH(3080,FL-36,80,3080,3180,2.0),
     trap(640,FL-80,100),trap(1180,FL-80,100),
-    spike(530,FL+8,30),spike(790,FL+8,30),
+    spike(455,FL-20,25), spike(560,FL-20,25),
+    spike(818,FL-20,25), spike(1025,FL-20,25),
+    spike(430,FL-278,30), spike(880,FL-298,30), spike(1330,FL-318,30),
   ];
   const enemies=[
     new Enemy(660,FL-44,'guardian',60),new Enemy(1180,FL-44,'snake',80),
@@ -1011,18 +855,14 @@ function buildL1(){
   ];
   const triggers=[
     new Trigger(3380,FL-300,200,300,'Acender o Intihuatana',(player,level)=>{
-      if(player.activeTool!=='lantern'){
-        if(player.items.includes('lantern'))notify('Equipe a Lanterna no Diário [I]!');
-        else notify('Colete a Lanterna primeiro!');
-        return;
-      }
-      player.interactAnim=40; sfx('unlock');
+      if(!player.items.includes('lantern')){notify('Colete a Lanterna primeiro!');return;}
+      player.interactAnim=90; sfx('unlock');            // ← comemorando mais tempo
       showDialog([
         '"Chegamos ao Vale Sagrado. O verdadeiro \'ouro\' não era apenas o metal — era o domínio do tempo e das estrelas."',
         '"Os Incas construíram Machu Picchu numa altitude de 2.430 metros. Cada pedra foi colocada com precisão milimétrica, sem uso de cimento."',
         '"O Intihuatana é um relógio solar de pedra. Ao alinhar a luz com a picareta, você revela a câmara oculta."',
         'O portão de pedra range e se abre. A câmara das constelações aguarda!'
-      ],()=>{notify('✦ Portão aberto! Próxima cena desbloqueada!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+      ],()=>{notify('✦ Portão aberto! Próxima cena desbloqueada!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);}); // ← 4 s
     }),
   ];
   return{
@@ -1042,14 +882,13 @@ function buildL1(){
       ctx.fillStyle='#b09060';ctx.fillRect(ix-20,iy-60,40,60);
       ctx.fillStyle='#d0b070';ctx.fillRect(ix-30,iy-20,60,20);
       for(const e of this.enemies)e.draw();
-      for(const c of this.cols)c.draw();
-      for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
 
 // ═══════════════════════════════════════════════════════════
-//  LEVEL 2 — Engenharia e Astronomia  (Cena 02 – pôr do sol)
+//  LEVEL 2 — Mais inimigos no chão e nas plataformas
 // ═══════════════════════════════════════════════════════════
 function buildL2(){
   const FL=580,WW=3400,WH=900;
@@ -1072,9 +911,27 @@ function buildL2(){
     solid(2850,FL-320,200,WH-FL+320),
   ];
   [600,1100,1800,2300].forEach(x=>rockZones.push({x,done:false}));
+
   const enemies=[
-    new Enemy(500,FL-44,'guardian',70),new Enemy(1060,FL-44,'snake',80),
-    new Enemy(1600,FL-44,'guardian',90),new Enemy(2200,FL-44,'snake',70),
+    // ── Inimigos no chão ──
+    new Enemy(500,FL-44,'guardian',70),
+    new Enemy(780,FL-44,'snake',60),
+    new Enemy(1060,FL-44,'snake',80),
+    new Enemy(1360,FL-44,'guardian',70),
+    new Enemy(1600,FL-44,'guardian',90),
+    new Enemy(1900,FL-44,'snake',80),
+    new Enemy(2200,FL-44,'snake',70),
+    new Enemy(2550,FL-44,'guardian',80),
+    // ── Inimigos nas plataformas ──
+    new Enemy(200, FL-180-60,'guardian',45),    // plat(160,FL-180)
+    new Enemy(620, FL-200-24,'snake',  50),     // plat(580,FL-200)
+    new Enemy(1060,FL-180-60,'guardian',45),    // plat(1040,FL-180)
+    new Enemy(1510,FL-200-60,'guardian',45),    // plat(1480,FL-200)
+    new Enemy(2030,FL-200-60,'guardian',45),    // plat(2000,FL-200)
+    new Enemy(2510,FL-220-24,'snake',  50),     // plat(2480,FL-220)
+    new Enemy(400, FL-280-24,'snake',  45),     // plat(380,FL-280)
+    new Enemy(820, FL-280-60,'guardian',45),    // plat(800,FL-280)
+    new Enemy(1300,FL-300-24,'snake',  45),     // plat(1280,FL-300)
   ];
   const cols=[
     ...[80,240,480,720,960,1180,1440,1680,1960,2220,2500,2700].map(x=>new Col(x,FL-50,'gold')),
@@ -1084,13 +941,13 @@ function buildL2(){
     new Trigger(2860,FL-400,180,400,'Alinhar Constelação',(player,level)=>{
       const n=player.items.filter(i=>i==='stone').length;
       if(n<3){notify(`Colete as 3 pedras! (${n}/3)`);return;}
-      player.interactAnim=40;sfx('stone');sfx('unlock');
+      player.interactAnim=90;sfx('stone');sfx('unlock');
       showDialog([
         '"Veja como estas pedras se encaixam. Nem uma lâmina de faca passa entre elas — e resistem a terremotos há 600 anos."',
         '"Os Incas dominavam a astronomia. Usavam as posições das estrelas para definir datas de plantio e colheita com precisão máxima."',
         '"A constelação do Condor marca o início do ciclo sagrado. Três estrelas, três pedras — como estão no céu, assim ficam na terra."',
         'A câmara secreta se abre com um eco profundo de pedra sobre pedra. O Tumi aguarda!'
-      ],()=>{notify('✦ Constelação alinhada! Câmara aberta!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+      ],()=>{notify('✦ Constelação alinhada! Câmara aberta!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);}); // ← 4 s
     }),
   ];
   return{
@@ -1143,7 +1000,7 @@ function buildL2(){
 }
 
 // ═══════════════════════════════════════════════════════════
-//  LEVEL 3 — A Relíquia de Ouro e Prata  (Cena 03 – mina)
+//  LEVEL 3 — Água corrigida (width uniforme)
 // ═══════════════════════════════════════════════════════════
 function buildL3(){
   const FL=580,WW=3600,WH=900;
@@ -1162,18 +1019,21 @@ function buildL3(){
     movH(2150,FL-36,100,2150,2260,2.2),movH(2690,FL-36,100,2690,2790,2.0),
     movV(2870,FL-100,100,FL-220,FL-36,2.0),
     trap(1100,FL-50,110),
-    water(280,FL,100,WH-FL),water(520,FL,100,WH-FL),water(760,FL,80,WH-FL),
-    water(1000,FL,100,WH-FL),water(1240,FL,120,WH-FL),water(1524,FL,106,WH-FL),
-    water(1760,FL,110,WH-FL),water(2150,FL,110,WH-FL),water(2424,FL,116,WH-FL),
+    // ── Águas: largura e posição agora uniformes ──
+    water(280,FL,100,WH-FL), water(520,FL,100,WH-FL),
+    water(740,FL,100,WH-FL),                           // ← corrigido: era 760,w=80
+    water(1000,FL,100,WH-FL),water(1240,FL,120,WH-FL),
+    water(1524,FL,106,WH-FL),water(1760,FL,110,WH-FL),
+    water(2150,FL,110,WH-FL),water(2424,FL,116,WH-FL),
     water(2684,FL,106,WH-FL),water(2990,FL,110,WH-FL),
-    // Escadaria do altar — acessível (fix da parede)
+    // Escadaria do altar
     solid(2990,FL-80, 120,80),
     solid(3030,FL-160,110,80),
     solid(3060,FL-240,140,80),
-    solid(3100,FL-300,180,18),    // step A  topo y=280
-    solid(3200,FL-360,200,18),    // step B  topo y=220
-    solid(3320,FL-420,360,18),    // step C  topo y=160  ← Tumi aqui
-    solid(3100,FL-240,580,WH-FL+240), // corpo visual do altar (y=340+)
+    solid(3100,FL-300,180,18),
+    solid(3200,FL-360,200,18),
+    solid(3320,FL-420,360,18),
+    solid(3100,FL-240,580,WH-FL+240),
   ];
   const enemies=[
     new Enemy(420,FL-44,'guardian',60),new Enemy(900,FL-44,'guardian',80),
@@ -1188,17 +1048,13 @@ function buildL3(){
   const triggers=[
     new Trigger(3400,FL-480,200,480,'Pegar o Tumi',(player,level)=>{
       if(!player.items.includes('tumi')){notify('Colete o Tumi dourado primeiro!');return;}
-      if(player.activeTool&&player.activeTool!=='tumi'&&!player.items.includes('tumi')){
-        notify('Equipe o Tumi no Diário [I]!');
-        return;
-      }
-      player.interactAnim=40;sfx('unlock');
+      player.interactAnim=90;sfx('unlock');
       showDialog([
         '"A água era sagrada para os Incas. Eles criaram sistemas de irrigação e canais que funcionam até hoje — após 600 anos."',
         '"Este é o Tumi — faca cerimonial de liga de ouro e prata, incrustada com turquesa. Usada em rituais de oferenda ao sol."',
         '"Não use a picareta aqui. Para revelar o compartimento secreto, a lanterna reflete a luz no símbolo do condor na pedra."',
         'Você segurou o Tumi dourado. A luz do altar brilha ao seu redor. Suba ao Templo do Sol!'
-      ],()=>{notify('✦ Tumi encontrado! Vá ao Templo do Sol!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+      ],()=>{notify('✦ Tumi encontrado! Vá ao Templo do Sol!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);}); // ← 4 s
     }),
   ];
   return{
@@ -1228,41 +1084,63 @@ function buildL3(){
 }
 
 // ═══════════════════════════════════════════════════════════
-//  LEVEL 4 — O Voo do Condor  (Cena 04 – interior do templo)
-//  Condor é ALIADO: voa ao lado, não ataca, guia o jogador
+//  LEVEL 4 — Mais adversidades; templo ajustado; moedas acessíveis
+//  Condor é ALIADO: voa ao lado, não ataca
 // ═══════════════════════════════════════════════════════════
 function buildL4(){
   const FL=620,WW=3200,WH=900;
   const plats=[
+    // Chão
     solid(0,FL,380,WH-FL),solid(460,FL,320,WH-FL),solid(870,FL,360,WH-FL),
     solid(1330,FL,380,WH-FL),solid(1810,FL,400,WH-FL),solid(2320,FL,680,WH-FL),
+    // Plataformas elevadas
     solid(200,FL-140,160,18),solid(400,FL-240,140,18),solid(600,FL-180,155,18),
     solid(840,FL-260,140,18),solid(1060,FL-200,155,18),solid(1280,FL-310,130,18),
     solid(1540,FL-200,175,18),solid(1760,FL-280,150,18),solid(2050,FL-180,160,18),
-    // Degraus do Templo do Sol
+    // ── Templo do Sol redesenhado: cume acessível (y=200) ──
     solid(2380,FL-80, 560,80),
     solid(2440,FL-160,500,80),
     solid(2510,FL-240,440,80),
-    solid(2590,FL-320,380,80),
-    solid(2680,FL-400,320,80),
-    solid(2780,FL-480,260,80),
-    solid(2890,FL-560,200,80),  // cume
+    solid(2590,FL-300,380,18),   // step 4, topo y = FL-300 = 320
+    solid(2680,FL-360,320,18),   // step 5, topo y = FL-360 = 260
+    solid(2780,FL-420,260,18),   // CUME, topo y = FL-420 = 200  ← acessível
+    // Plataformas móveis
     movH(440,FL-180,120,440,730,2.2),
     movH(1380,FL-150,110,1380,1680,2.0),
     movH(2240,FL-140,110,2240,2380,1.8),
+    // Trapdoors
     trap(340,FL-80,110),trap(1100,FL-90,100),trap(2100,FL-80,110),
-    spike(380,FL+8,80),spike(790,FL+8,80),spike(1290,FL+8,80),spike(1770,FL+8,80),spike(2280,FL+8,40),
+    // ── Espinhos realocados: no chão entre os gaps e em cima das plataformas ──
+    // Chão
+    spike(395,FL-20,50),  spike(810,FL-20,50),  spike(1250,FL-20,50),
+    spike(1730,FL-20,50), spike(2250,FL-20,60),
+    // Plataformas
+    spike(430,FL-260,36), spike(870,FL-280,36),
+    spike(1080,FL-220,36),spike(1790,FL-300,36),
   ];
 
-  // ── Condor aliado ──
   const condor=new CondorCompanion();
 
-  const cols=[
-    ...[100,200,430,640,900,1100,1340,1560,1820,2060,2380,2480,2580,2680,2780,2890].map(x=>new Col(x,FL-50,'gold')),
-    new Col(2920,FL-600,'gold'),new Col(2970,FL-600,'gold'),new Col(3020,FL-600,'gold'),
+  // ── Mais inimigos para aumentar dificuldade ──
+  const enemies=[
+    new Enemy(200, FL-44,'guardian',60),
+    new Enemy(680, FL-44,'snake',  70),
+    new Enemy(1100,FL-44,'guardian',80),
+    new Enemy(1600,FL-44,'snake',  70),
+    new Enemy(2050,FL-44,'guardian',80),
+    // Nas plataformas
+    new Enemy(440, FL-140-60,'guardian',45),  // plat(200,FL-140)
+    new Enemy(640, FL-180-24,'snake',  50),   // plat(600,FL-180)
+    new Enemy(1310,FL-310-60,'guardian',40),  // plat(1280,FL-310)
+    new Enemy(1790,FL-280-24,'snake',  50),   // plat(1760,FL-280)
+    new Enemy(1080,FL-200-24,'snake',  45),   // plat(1060,FL-200)
+    new Enemy(1560,FL-200-60,'guardian',45),  // plat(1540,FL-200)
   ];
 
-  // Falas do condor em pontos do caminho (x > threshold)
+  const cols=[
+    ...[100,200,900,1100,1340,1560,1820,2060,2380,2480].map(x=>new Col(x,FL-50,'gold')),
+  ];
+
   const condorMessages=[
     {x:600,  shown:false, text:'"Sou o mensageiro dos deuses Incas. Sigo seu caminho até o cume — vá em frente!"'},
     {x:1400, shown:false, text:'"Os Incas acreditavam que o Condor conecta o mundo dos vivos ao mundo espiritual."'},
@@ -1271,9 +1149,9 @@ function buildL4(){
   ];
 
   const triggers=[
-    new Trigger(2890,FL-620,200,620,'Completar a Fase!',(player,level)=>{
+    new Trigger(2780,FL-460,240,460,'Completar a Fase!',(player,level)=>{
       level.triggers[0].done=true;
-      player.interactAnim=40;sfx('unlock');
+      player.interactAnim=120;sfx('unlock');           // ← comemoração longa
       showDialog([
         '"O Condor era o mensageiro dos deuses Incas — unindo o Hanan Pacha (mundo superior) ao Kay Pacha (mundo terreno)."',
         '"Machu Picchu foi abandonada pelos Incas no século XVI, após a chegada dos colonizadores espanhóis."',
@@ -1288,7 +1166,7 @@ function buildL4(){
     id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
     title:'Cena IV — O Voo do Condor',
     hint:'Siga o Condor sagrado e escale o Templo do Sol! Use [E] no cume.',
-    plats,enemies:[],cols,triggers,condor,condorMessages,
+    plats,enemies,cols,triggers,condor,condorMessages,
     intro:[
       '"O Condor sagrado aparece para guiar você ao cume. Ele não é inimigo — é o mensageiro dos Incas."',
       '"Escale os degraus do Templo do Sol. O Condor voa ao seu lado durante toda a jornada."',
@@ -1296,9 +1174,8 @@ function buildL4(){
     ],
     update(player){
       tickMoving(this.plats);tickTrapdoors(this.plats);
-      // Condor aliado acompanha o jogador
+      for(const e of this.enemies)e.update(this.plats,player);
       if(!G.dialog) this.condor.update(player);
-      // Falas contextuais do condor
       for(const cm of this.condorMessages){
         if(!cm.shown&&player.x>cm.x&&!G.dialog){
           cm.shown=true;
@@ -1312,8 +1189,8 @@ function buildL4(){
       sg.addColorStop(0,'rgba(255,160,0,0.14)');sg.addColorStop(1,'rgba(255,80,0,0)');
       ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);
       this.condor.draw();
-      for(const c of this.cols)c.draw();
-      for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();
+      for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1334,27 +1211,14 @@ function drawHUD(player,level){
   ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#f0c040';ctx.font='bold 15px "Courier New"';
   ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  // Slot ferramenta ativa
-  const tY=44;
-  ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,tY,140,28,4);ctx.fill();
-  ctx.strokeStyle=player.activeTool?'#f0c040':'#444';ctx.lineWidth=1.5;roundRect(16,tY,140,28,4);ctx.stroke();
-  if(player.activeTool&&ITEM_DEFS[player.activeTool]){
-    const def=ITEM_DEFS[player.activeTool];
-    ctx.font='14px serif';ctx.fillText(def.icon,24,tY+20);
-    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText(def.nome,42,tY+20);
-  } else {ctx.font='11px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',22,tY+20);}
-  ctx.fillStyle='rgba(200,160,40,0.15)';roundRect(162,tY,46,28,4);ctx.fill();
-  ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;roundRect(162,tY,46,28,4);ctx.stroke();
-  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#c0a030';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  // Inventário lado direito
   let ix=W-16;const inv=[];
   if(player.items.includes('tumi'))    inv.push('🗡 TUMI');
   if(player.items.includes('lantern')) inv.push('🔦 LANTERNA');
   const sc=player.items.filter(i=>i==='stone').length;
   if(sc>0) inv.push('💎 '+sc+'/3');
-  for(const it of inv){ctx.fillStyle='#f0c040';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,tY+20);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
+  for(const it of inv){ctx.fillStyle='#f0c040';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,48);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
   if(player.soroche>40){
-    const pct=(player.soroche-40)/60,bW=120,bX=16,bY=76;
+    const pct=(player.soroche-40)/60,bW=120,bX=16,bY=44;
     ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(bX,bY,bW,12);
     ctx.fillStyle=`hsl(${30-pct*30},100%,50%)`;ctx.fillRect(bX,bY,bW*pct,12);
     ctx.strokeStyle='#f0a020';ctx.lineWidth=1;ctx.strokeRect(bX,bY,bW,12);
@@ -1370,15 +1234,43 @@ function drawHUD(player,level){
 }
 
 // ═══════════════════════════════════════════════════════════
-//  TELAS TITLE / DEATH / COMPLETE
+//  TITLE SCREEN
+//  – Corvan REMOVIDO da capa
+//  – Condor voa pela tela (sprite ou procedural)
+//  – Cobras animadas no rodapé
 // ═══════════════════════════════════════════════════════════
+
+
 function drawTitle(){
   const bg=IMG['bg01'];
   if(bg&&bg.complete&&bg.naturalWidth>0){ ctx.globalAlpha=0.55; drawBg('bg01'); ctx.globalAlpha=1; }
   else{ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#060300');g.addColorStop(1,'#180e00');ctx.fillStyle=g;ctx.fillRect(0,0,W,H); }
   ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
+
+  // Estrelas
   for(let i=0;i<150;i++){const sx=(i*137.5)%W,sy=(i*83.7)%380;ctx.fillStyle=`rgba(255,248,210,${.2+Math.sin(Date.now()/1100+i)*.2})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
-  if(SPRITES['talk']){const info=SPRITE_INFO['talk'],dh=200,dw=info.fw/info.fh*dh;drawSprite('talk',Math.floor(Date.now()/600)%2,W/2-dw/2-80,180,dw,dh);}
+
+  // ── Condor voa pela tela (sprite se disponível) ──
+  const condorPeriod = 14000; // ms por travessia
+  const condorT  = (Date.now() % condorPeriod) / condorPeriod;
+  const condorX  = condorT * (W + 280) - 140;
+  const condorY  = 160 + Math.sin(Date.now()/1100) * 30;
+  const condorFr = Math.floor(Date.now()/220) % 4;
+  if(SPRITES['condor']){
+    drawSprite('condor', condorFr, condorX, condorY, 150, 75, false);
+  } else {
+    // Fallback procedural
+    ctx.save(); ctx.translate(condorX+75, condorY+37);
+    const fl=Math.sin(Date.now()/120)*14;
+    ctx.fillStyle='#2a2010';
+    ctx.beginPath();ctx.ellipse(-44,fl,40,9,Math.PI/8,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(44,-fl,40,9,-Math.PI/8,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#201808';ctx.beginPath();ctx.ellipse(0,0,16,11,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#f0a020';ctx.beginPath();ctx.arc(4,-14,4,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+
+  // Títulos e textos
   ctx.textAlign='center';
   ctx.shadowColor='#f0c040';ctx.shadowBlur=40;
   ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O TESOURO DO CONDOR',W/2,155);
@@ -1438,7 +1330,6 @@ const G={
   nextLevel(){
     this._storedItems=[...this.player.items];
     this._storedScore=this.player.score;
-    this._storedTool=this.player.activeTool;
     if(this.lvIdx+1<LEVELS.length) this.load(this.lvIdx+1);
     else this.state='complete';
   },
@@ -1461,30 +1352,16 @@ const G={
     if(this.state==='title')    {drawTitle();return;}
     if(this.state==='complete') {drawComplete();return;}
 
-    // 1) Background estático (imagem de cena)
     drawBg(this.level.bg);
-
-    // 2) Plataformas
     for(const p of this.level.plats) drawPlatform(p);
-
-    // 3) Entidades e extras do level
     this.level.draw(this.player);
-
-    // 4) Partículas
     drawParticles();
-
-    // 5) Jogador
     this.player.draw();
 
     if(this.state==='dead'){drawDeath();return;}
 
-    // 6) HUD
     drawHUD(this.player,this.level);
-
-    // 7) Balão de diálogo (por cima de tudo)
     BUBBLE.draw(this.player);
-
-    // 8) Notificação
     drawNotif();
   }
 };
