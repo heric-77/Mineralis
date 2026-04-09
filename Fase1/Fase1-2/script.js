@@ -271,6 +271,8 @@ function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-c
 
 // ── Physics ────────────────────────────────────────────────────
 const GRAV=0.46, PSPD=4.5, JUMPF=-12.2, MAXFALL=16;
+const RUN_ACCEL=0.78, AIR_ACCEL=0.44, GROUND_FRICTION=0.72, AIR_FRICTION=0.92;
+const JUMP_CUT=0.55, COYOTE_FRAMES=8, JUMP_BUFFER_FRAMES=10;
 
 // ── Tile themes ────────────────────────────────────────────────
 const TILE_THEMES={
@@ -647,29 +649,76 @@ class Enemy{
     this.x=x;this.y=y;this.type=type;
     this.w=type==='piranha'?28:(type==='caiman'?70:44);
     this.h=type==='piranha'?18:(type==='caiman'?28:76);
-    this.patrol=patrol;this.vx=type==='piranha'?2:1.4;
+    this.patrol=patrol;this.vx=type==='piranha'?2:2.1;
     this.facing=1;this.dead=false;this.frame=0;
+    this.spawnX=x;this.spawnY=y;this.waterZone=null;this.landZone=null;
   }
   update(plats,player){
     if(this.dead)return; this.frame+=0.08;
     if(this.type==='piranha'){
+      const cx=this.x+this.w/2;
+      const waters=plats.filter(p=>p.type==='river'||p.type==='mudwater');
+      const containing=waters.find(p=>cx>=p.x&&cx<=p.x+p.w);
+      if(containing)this.waterZone=containing;
+      else if(!this.waterZone){
+        this.waterZone=waters.reduce((best,p)=>{
+          const mid=p.x+p.w/2;
+          if(!best)return p;
+          return Math.abs(mid-this.spawnX)<Math.abs((best.x+best.w/2)-this.spawnX)?p:best;
+        },null);
+      }
+
       this.x+=this.vx;
-      if(Math.abs(this.x-player.x)>this.patrol)this.vx=-this.vx;
-      this.y+=Math.sin(Date.now()/400+this.x/20)*0.9;
+      const zone=this.waterZone;
+      if(zone){
+        const left=Math.max(zone.x+8, this.spawnX-this.patrol);
+        const right=Math.min(zone.x+zone.w-this.w-8, this.spawnX+this.patrol);
+        if(this.x<=left){this.x=left;this.vx=Math.abs(this.vx);}
+        if(this.x>=right){this.x=right;this.vx=-Math.abs(this.vx);}
+
+        const top=zone.y+10;
+        const bottom=zone.y+zone.h-this.h-10;
+        const swimBase=Math.min(bottom, Math.max(top, this.spawnY));
+        this.y=Math.max(top, Math.min(bottom, swimBase+Math.sin(this.frame*2+this.spawnX/30)*6));
+      } else {
+        if(Math.abs(this.x-this.spawnX)>this.patrol)this.vx=-this.vx;
+        this.y=this.spawnY+Math.sin(this.frame*2+this.spawnX/30)*6;
+      }
       this.facing=this.vx>0?1:-1;return;
     }
+    const grounds=plats.filter(p=>p.type==='solid'||p.type==='trapdoor');
+    const standing=grounds.find(p=>
+      this.spawnX+this.w/2>=p.x&&this.spawnX+this.w/2<=p.x+p.w&&Math.abs(this.spawnY+this.h-p.y)<=18
+    );
+    if(standing)this.landZone=standing;
+    else if(!this.landZone){
+      this.landZone=grounds.reduce((best,p)=>{
+        const mid=p.x+p.w/2;
+        if(!best)return p;
+        return Math.abs(mid-this.spawnX)<Math.abs((best.x+best.w/2)-this.spawnX)?p:best;
+      },null);
+    }
+
     this.x+=this.vx;
+    const zone=this.landZone;
     let onG=false;
-    for(const p of plats){
-      if(p.type==='river'||p.type==='mudwater'||p.type==='_dead')continue;
-      if(this.x+this.w>p.x&&this.x<p.x+p.w&&this.y+this.h>=p.y&&this.y+this.h<=p.y+10)onG=true;
+    let onEdge=false;
+    if(zone){
+      this.y=zone.y-this.h;
+      onG=this.x+this.w>zone.x&&this.x<zone.x+zone.w;
+      const edge=this.vx>0?this.x+this.w:this.x;
+      onEdge=edge>zone.x+6&&edge<zone.x+zone.w-6;
+      const left=Math.max(zone.x, this.spawnX-this.patrol);
+      const right=Math.min(zone.x+zone.w-this.w, this.spawnX+this.patrol);
+      if(this.x<=left){this.x=left;this.vx=Math.abs(this.vx);}
+      if(this.x>=right){this.x=right;this.vx=-Math.abs(this.vx);}
+      if(right-left<18){
+        const center=zone.x+(zone.w-this.w)/2;
+        this.x=center;
+        this.vx=this.facing>=0?2.1:-2.1;
+      }
     }
-    const edge=this.vx>0?this.x+this.w:this.x;let onEdge=false;
-    for(const p of plats){
-      if(p.type==='river'||p.type==='mudwater'||p.type==='_dead')continue;
-      if(edge>p.x&&edge<p.x+p.w&&this.y+this.h+2>=p.y&&this.y+this.h+2<=p.y+12)onEdge=true;
-    }
-    if((onG&&!onEdge)||Math.abs(this.x-player.x)>this.patrol)this.vx=-this.vx;
+    if((onG&&!onEdge)||Math.abs(this.x-this.spawnX)>this.patrol)this.vx=-this.vx;
     this.facing=this.vx>0?1:-1;
   }
   draw(){
@@ -705,6 +754,12 @@ class Enemy{
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=36;this.h=36;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
+  collectRect(){
+    if(this.type==='gold'){
+      return {x:this.x-10,y:this.y-12,w:this.w+20,h:this.h+24};
+    }
+    return this;
+  }
   draw(){
     if(this.done)return;
     const sx=this.x-cam.x,sy=this.y-cam.y;
@@ -805,43 +860,83 @@ class Player{
     this.hp=3;this.maxHp=3;this.inv=0;this.dead=false;
     this.frame=0;this.walkT=0;this.state='idle';
     this.coyote=0;this.jbuf=0;this.onMoving=null;
+    this.prevX=x;this.prevY=y;this.jumpHeld=false;this.groundPlatform=null;
     this.items=[];this.score=0;
     this.activeTool=null;
     this.heat=0;this.heatAnim=0;
     this.interactAnim=0;
+    this.mudInv=0;this.inMudwater=false;this.mudFlash=0;
   }
   overlaps(r){return this.x<r.x+r.w&&this.x+this.w>r.x&&this.y<r.y+r.h&&this.y+this.h>r.y;}
   near(r,d=80){return Math.abs(this.x+20-(r.x+r.w/2))<r.w/2+d&&Math.abs(this.y+40-(r.y+r.h/2))<r.h/2+d;}
+  goldNear(col){
+    const area=col.collectRect();
+    return this.overlaps(area) || this.near(area,20);
+  }
+  mudwaterNear(p){
+    const area={x:p.x-8,y:p.y-10,w:p.w+16,h:p.h+16};
+    return this.overlaps(area);
+  }
 
   update(level){
     if(INV.open){INV.navigate(this);return;}
     if(G.dialog||panning.active)return;
+    this.prevX=this.x;this.prevY=this.y;
     if(isR()||isL())this.heat=Math.min(100,this.heat+0.06);
     else            this.heat=Math.max(0,this.heat-0.25);
     if(this.heat>=100)this.heatAnim=Math.min(80,this.heatAnim+1);
     else              this.heatAnim=Math.max(0,this.heatAnim-2);
     const sm=this.heat>=100?0.6:1.0;
 
-    if(isL()){this.vx=-PSPD*sm;this.facing=-1;}
-    else if(isR()){this.vx=PSPD*sm;this.facing=1;}
-    else this.vx*=0.7;
+    const moveDir=(isR()?1:0)-(isL()?1:0);
+    const accel=this.onG?RUN_ACCEL:AIR_ACCEL;
+    const maxSpeed=PSPD*sm;
+    if(moveDir!==0){
+      this.vx+=moveDir*accel*sm;
+      this.vx=Math.max(-maxSpeed,Math.min(maxSpeed,this.vx));
+      this.facing=moveDir;
+    } else {
+      this.vx*=this.onG?GROUND_FRICTION:AIR_FRICTION;
+      if(Math.abs(this.vx)<0.05)this.vx=0;
+    }
 
-    if(this.onG)this.coyote=8;else if(this.coyote>0)this.coyote--;
-    if(isJ())this.jbuf=10;if(this.jbuf>0)this.jbuf--;
-    if(this.jbuf>0&&(this.onG||this.coyote>0)){this.vy=JUMPF;this.onG=false;this.coyote=0;this.jbuf=0;sfx('jump');}
+    if(this.onG)this.coyote=COYOTE_FRAMES;else if(this.coyote>0)this.coyote--;
+    const jumpPressed=isJ();
+    if(jumpPressed)this.jbuf=JUMP_BUFFER_FRAMES;
+    if(this.jbuf>0)this.jbuf--;
+    if(this.jbuf>0&&(this.onG||this.coyote>0)){
+      this.vy=JUMPF;this.onG=false;this.coyote=0;this.jbuf=0;this.groundPlatform=null;sfx('jump');
+    }
+    const jumpDown=keys['ArrowUp']||keys['KeyW']||keys['Space']||TOUCH.j;
+    if(!jumpDown&&this.jumpHeld&&this.vy<0)this.vy*=JUMP_CUT;
+    this.jumpHeld=jumpDown;
 
-    if(this.onMoving){this.x+=this.onMoving.vx||0;this.y+=this.onMoving.vy||0;}
-    this.onMoving=null;
+    if(this.groundPlatform){
+      this.x+=this.groundPlatform.vx||0;
+      this.y+=this.groundPlatform.vy||0;
+    }
+    this.groundPlatform=null;
     this.vy=Math.min(this.vy+GRAV,MAXFALL);
     this.x+=this.vx;this._colX(level.plats);
     this.onG=false;
     this.y+=this.vy;this._colY(level.plats);
     this.x=Math.max(0,this.x);
+    this.inMudwater=false;
+
+    for(const p of level.plats){
+      if(p.type==='mudwater'&&this.mudwaterNear(p)){
+        this.inMudwater=true;
+        this.mudFlash=Math.min(18,this.mudFlash+2);
+        if(this.mudInv<=0){
+          this._hurtMudwater(1);
+          notify('⚠ Água contaminada! Mercúrio!',1600);
+        }
+      }
+    }
 
     if(!this.inv){
       for(const p of level.plats){
         if(p.type==='river'&&this.overlaps(p)){splashBurst(this.x+20,p.y);this._hurt(2,level);}
-        if(p.type==='mudwater'&&this.overlaps(p)){this._hurt(3,level);notify('⚠ Água contaminada! Mercúrio!');}
       }
       for(const e of level.enemies){
         if(!e.dead&&this.overlaps(e)){
@@ -851,9 +946,12 @@ class Player{
       }
     }
     if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
+    if(this.mudInv>0)this.mudInv--;
+    if(!this.inMudwater)this.mudFlash=Math.max(0,this.mudFlash-1);
 
     for(const c of level.cols){
-      if(!c.done&&this.overlaps(c)){c.done=true;
+      const canCollect = c.type==='gold' ? this.goldNear(c) : this.overlaps(c);
+      if(!c.done&&canCollect){c.done=true;
         if(c.type==='gold'){
           this.score+=15;sfx('gold');burst(c.x+18,c.y+18,'#d4a017',10);
           // Register first gold in journal
@@ -877,15 +975,23 @@ class Player{
         for(const ds of level.digSpots){
           if(!ds.done&&this.near({x:ds.x-32,y:ds.y-32,w:64,h:64})){
             if(ds.revealed&&!ds.done){
-              ds.done=true;this.items.push('urna');sfx('unlock');burst(ds.x,ds.y,'#cc2200',14);
-              journalCollect('vaso_amazônico');
-              showDialog([
-                '"Este vaso sobreviveu a séculos de umidade amazônica — é cerâmica Marajoara. Foi criado na Ilha de Marajó, no Pará."',
-                '"A cultura Marajoara (400–1300 d.C.) enterrava seus mortos em urnas cerâmicas elaboradas, com padrões geométricos representando serpentes e o ciclo da vida."',
-                '"Para os povos amazônicos originais, o ouro era divindade, símbolo do sol. Não havia conceito de propriedade individual dos recursos da floresta."',
-                '"A corrida do ouro moderna destruiu em décadas o que esses povos preservaram por milênios. O verdadeiro tesouro não brilha — é a memória desta floresta."'
-              ],()=>{notify('✦ Urna Marajoara arquivada no Diário de Bordo!');},
-              'CORVAN','#78d840');
+              ds.done=true;
+              if(!this.items.includes('urna'))this.items.push('urna');
+              sfx('unlock');burst(ds.x,ds.y,'#cc2200',14);
+              const firstUrna=!this.items.includes('urna_memoria');
+              if(firstUrna){
+                this.items.push('urna_memoria');
+                journalCollect('vaso_amazônico');
+                showDialog([
+                  '"Este vaso sobreviveu a séculos de umidade amazônica — é cerâmica Marajoara. Foi criado na Ilha de Marajó, no Pará."',
+                  '"A cultura Marajoara (400–1300 d.C.) enterrava seus mortos em urnas cerâmicas elaboradas, com padrões geométricos representando serpentes e o ciclo da vida."',
+                  '"Para os povos amazônicos originais, o ouro era divindade, símbolo do sol. Não havia conceito de propriedade individual dos recursos da floresta."',
+                  '"A corrida do ouro moderna destruiu em décadas o que esses povos preservaram por milênios. O verdadeiro tesouro não brilha — é a memória desta floresta."'
+                ],()=>{notify('✦ Urna Marajoara arquivada no Diário de Bordo!');},
+                'CORVAN','#78d840');
+              } else {
+                notify('Achei outra!',1800);
+              }
             } else if(this.activeTool==='pa'){
               ds.tryDig();
             } else {
@@ -900,7 +1006,7 @@ class Player{
       // Garimpar — exige Bateia equipada
       if(level.panZones&&this.activeTool==='bateia'&&!panning.active){
         for(const pz of level.panZones){
-          if(!pz.done&&Math.abs(this.x-pz.x)<90){
+          if(!pz.done&&Math.abs(this.x+this.w/2-pz.x)<120){
             pz.done=true;sfx('bateia');
             startPanning(this.x+20,this.y,()=>{
               this.score+=25;burst(this.x+20,this.y-40,'#d4a017',14);
@@ -910,7 +1016,7 @@ class Player{
         }
       } else if(level.panZones&&this.activeTool!=='bateia'){
         for(const pz of level.panZones){
-          if(!pz.done&&Math.abs(this.x-pz.x)<90){
+          if(!pz.done&&Math.abs(this.x+this.w/2-pz.x)<120){
             if(this.items.includes('bateia')) notify('Equipe a Bateia no Diário [I] para garimpar!');
             else notify('Colete a Bateia para garimpar!');
             break;
@@ -930,19 +1036,47 @@ class Player{
 
   _colX(plats){
     for(const p of plats){if(p.type==='river'||p.type==='mudwater'||p.type==='_dead')continue;
-      if(this.overlaps(p)){if(this.y+this.h*0.5<=p.y)continue;
-        if(this.vx>0)this.x=p.x-this.w;else this.x=p.x+p.w;this.vx=0;}}
+      if(!this.overlaps(p))continue;
+      if(this.prevY+this.h<=p.y+2||this.prevY>=p.y+p.h-2)continue;
+      if(this.prevX+this.w<=p.x){
+        this.x=p.x-this.w;
+      } else if(this.prevX>=p.x+p.w){
+        this.x=p.x+p.w;
+      } else if(this.vx>0){
+        this.x=p.x-this.w;
+      } else if(this.vx<0){
+        this.x=p.x+p.w;
+      }
+      this.vx=0;
+    }
   }
   _colY(plats){
     for(const p of plats){if(p.type==='river'||p.type==='mudwater'||p.type==='_dead')continue;
       if(p.type==='trapdoor'&&this.vy<0)continue;
-      if(this.overlaps(p)){
-        if(this.vy>=0){this.y=p.y-this.h;this.vy=0;this.onG=true;if(p.moving)this.onMoving=p;if(p.type==='trapdoor'&&p.crumble===undefined)p.crumble=70;}
-        else{this.y=p.y+p.h;this.vy=Math.abs(this.vy)*0.2;}}}
+      if(!this.overlaps(p))continue;
+      const wasAbove=this.prevY+this.h<=p.y+4;
+      const wasBelow=this.prevY>=p.y+p.h-4;
+      if(this.vy>=0&&wasAbove){
+        this.y=p.y-this.h;this.vy=0;this.onG=true;this.groundPlatform=p.moving?p:null;
+        if(p.type==='trapdoor'&&p.crumble===undefined)p.crumble=70;
+      } else if(this.vy<0&&wasBelow){
+        this.y=p.y+p.h;this.vy=0;
+      } else if(this.vy>=0){
+        this.y=p.y-this.h;this.vy=0;this.onG=true;this.groundPlatform=p.moving?p:null;
+      } else {
+        this.y=p.y+p.h;this.vy=0;
+      }
+    }
   }
   _hurt(dmg,level){
     if(this.inv>0)return;this.hp-=dmg;this.inv=80;
     burst(this.x+20,this.y+40,'#ff4040',10);sfx('hit');
+    if(this.hp<=0){this.hp=0;this.dead=true;}
+  }
+  _hurtMudwater(dmg){
+    this.hp-=dmg;this.mudInv=36;this.mudFlash=18;
+    burst(this.x+20,this.y+44,'rgba(170,140,30,0.9)',8,2.4);
+    sfx('hit');
     if(this.hp<=0){this.hp=0;this.dead=true;}
   }
 
@@ -971,6 +1105,14 @@ class Player{
     }
     // Invincibility flash
     if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
+    if(this.inMudwater||this.mudFlash>0){
+      const alpha=this.inMudwater?0.24:Math.min(0.2,this.mudFlash/90);
+      ctx.fillStyle=`rgba(175,145,40,${alpha})`;
+      ctx.fillRect(this.x-cam.x-2,this.y-cam.y+this.h*0.42,this.w+4,this.h*0.58);
+      ctx.strokeStyle=`rgba(220,195,90,${Math.min(0.5,alpha+0.12)})`;
+      ctx.lineWidth=2;
+      ctx.strokeRect(this.x-cam.x-1,this.y-cam.y+this.h*0.48,this.w+2,this.h*0.44);
+    }
     // Heat overlay
     if(this.heatAnim>0){
       const a=this.heatAnim/80*0.4;ctx.fillStyle=`rgba(40,20,0,${a})`;ctx.fillRect(0,0,W,H);
@@ -1111,15 +1253,33 @@ function buildL2(){
     river(2800,FL,140,WH-FL),
   ];
   const enemies=[
-    new Enemy(420,FL-20,'piranha',60),new Enemy(680,FL-20,'piranha',50),
+    new Enemy(316,FL-20,'piranha',34),new Enemy(575,FL-20,'piranha',28),
     new Enemy(1000,FL-44,'caiman',80),new Enemy(1350,FL-20,'piranha',70),
-    new Enemy(2400,FL-20,'piranha',60),
+    new Enemy(2266,FL-20,'piranha',48),
     new Enemy(2600,FL-44,'caiman',80),
   ];
-  const goldRivers=[310,560,830,1050,1350,1650,1930,2250,2560,2850];
   const cols=[
-    ...goldRivers.map(x=>new Col(x,FL-22,'gold')),
-    ...[120,240,500,760,1100,1400,1700,2000,2300,2620].map(x=>new Col(x,FL-50,'gold')),
+    new Col(120,FL-50,'gold'),
+    new Col(240,FL-210,'gold'),
+    new Col(310,FL-92,'gold'),
+    new Col(500,FL-88,'gold'),
+    new Col(560,FL-270,'gold'),
+    new Col(760,FL-210,'gold'),
+    new Col(830,FL-92,'gold'),
+    new Col(1050,FL-256,'gold'),
+    new Col(1100,FL-74,'gold'),
+    new Col(1350,FL-92,'gold'),
+    new Col(1400,FL-220,'gold'),
+    new Col(1650,FL-272,'gold'),
+    new Col(1700,FL-84,'gold'),
+    new Col(1930,FL-90,'gold'),
+    new Col(2000,FL-210,'gold'),
+    new Col(2250,FL-256,'gold'),
+    new Col(2300,FL-84,'gold'),
+    new Col(2560,FL-92,'gold'),
+    new Col(2620,FL-220,'gold'),
+    new Col(2850,FL-208,'gold'),
+    new Col(3050,FL-84,'gold'),
   ];
   const panZones=[{x:1290,done:false},{x:2070,done:false},{x:2930,done:false}];
   const triggers=[
@@ -1155,7 +1315,7 @@ function buildL2(){
             ctx.fillStyle=`rgba(212,160,23,${a})`;ctx.beginPath();ctx.arc(px,FL-cam.y-12,16,0,Math.PI*2);ctx.fill();
             ctx.fillStyle='#fff';ctx.font='bold 13px "Courier New"';ctx.textAlign='center';ctx.fillText('⚓',px,FL-cam.y-5);ctx.textAlign='left';
             // hint
-            if(Math.abs(player.x-pz.x)<90){
+            if(Math.abs(player.x+player.w/2-pz.x)<120){
               ctx.font='11px "Courier New"';ctx.fillStyle='rgba(100,220,60,0.8)';
               ctx.textAlign='center';const ht=player.activeTool==='bateia'?'[E] Garimpar':'Equipe Bateia [I]';
               ctx.fillText(ht,px,FL-cam.y-28);ctx.textAlign='left';
@@ -1271,7 +1431,11 @@ function buildL4(){
   const cols=[
     ...[100,220,460,740,1000,1280,1600,1900,2240].map(x=>new Col(x,FL-50,'gold')),
   ];
-  const digSpots=[new DigSpot(2570,FL-40),new DigSpot(2670,FL-40),new DigSpot(2780,FL-20)];
+  const digSpots=[
+    new DigSpot(1035,FL-18),
+    new DigSpot(1925,FL-16),
+    new DigSpot(2680,FL-18),
+  ];
   const triggers=[
     new Trigger(2860,FL-180,180,180,'Concluir Fase 1.2',(player,level)=>{
       if(!player.items.includes('urna')){notify('Colete a Urna Marajoara primeiro!');return;}
