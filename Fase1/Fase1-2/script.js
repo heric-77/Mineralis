@@ -1,9 +1,3 @@
-/* ═══════════════════════════════════════════════════════════
-   MINERALIS – Fase 1.2 · O Ouro dos Rios
-   script.js  (v2 – Corvan oficial do menu, save integrado, diário)
-   ═══════════════════════════════════════════════════════════ */
-
-// ── SAVE / JOURNAL integration (mesmos IDs do menu) ──────────
 const SAVE_KEY = 'mineralis_save_v2';
 function saveRead() {
   try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { return {}; }
@@ -19,7 +13,6 @@ function unlockPhase(id) {
   s.fases[id].desbloqueada = true;
   saveWrite(s);
 }
-/** Registra item coletado no Diário de Bordo (igual a Journal.coletar) */
 function journalCollect(id) {
   const s = saveRead();
   if (!s.coletados) s.coletados = {};
@@ -30,8 +23,7 @@ function journalCollect(id) {
   }
 }
 
-// ── Itens desta fase para o Diário ───────────────────────────
-// IDs correspondentes ao journal.js do menu
+
 const JOURNAL_ITEMS = {
   bateia:       { id:'bateia',        tipo:'ferramenta', nome:'Bateia' },
   pa:           { id:'pa_exploradora',tipo:'ferramenta', nome:'Pá Exploradora' },
@@ -39,7 +31,6 @@ const JOURNAL_ITEMS = {
   vaso:         { id:'vaso_amazônico',tipo:'artefato',   nome:'Vaso Amazônico' },
 };
 
-// ── Setup ─────────────────────────────────────────────────────
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
@@ -57,7 +48,6 @@ function resize() {
 }
 resize(); window.addEventListener('resize', resize);
 
-// ── Audio ─────────────────────────────────────────────────────
 let AC;
 try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
 function sfx(type) {
@@ -74,7 +64,6 @@ function sfx(type) {
   o.start(t); o.stop(t+.6);
 }
 
-// ── Assets ────────────────────────────────────────────────────
 const IMG = {};
 let assetsLoaded = 0, totalAssets = 4, gameReady = false;
 ['bg01','bg02','bg03','bg04'].forEach((key,i) => {
@@ -85,7 +74,6 @@ let assetsLoaded = 0, totalAssets = 4, gameReady = false;
   img.src = src;
 });
 
-// ── Input ──────────────────────────────────────────────────────
 const keys={}, jp={};
 window.addEventListener('keydown',e=>{ if(!keys[e.code])jp[e.code]=true; keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
@@ -104,11 +92,8 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){for(const k in jp)delete jp[k];}
 
-// ══════════════════════════════════════════════════════════════
-//  CATÁLOGO DE ITENS — Fase 1.2 (O Ouro dos Rios)
-// ══════════════════════════════════════════════════════════════
+
 const ITEM_DEFS = {
-  // ── FERRAMENTAS ──
   bateia: {
     cat:'ferramenta', nome:'Bateia', icon:'🥌', journalId:'bateia',
     desc:'Separa ouro pesado do sedimento leve.\nUse [E] nas zonas ⚓ para garimpar.',
@@ -124,19 +109,16 @@ const ITEM_DEFS = {
     desc:'Revela itens ocultos nas sombras da selva.\nNecessária para encontrar a Urna Marajoara.',
     drawHand:'right',
   },
-  // ── MINÉRIOS ──
   ouro_aluvial: {
     cat:'minerio', nome:'Ouro Aluvial', icon:'💛', journalId:'ouro_aluvial',
     desc:'Depositado nos rios por erosão milenar.\nDensidade: 19,3 g/cm³ — 19× mais pesado que a água.',
   },
-  // ── ARTEFATOS ──
   urna: {
     cat:'artefato', nome:'Urna Marajoara', icon:'🏺', journalId:'vaso_amazônico',
     desc:'Cerâmica de 1.000 anos da Ilha de Marajó.\nEvidência de civilizações amazônicas avançadas.',
   },
 };
 
-// ── Inventário in-game — Diário de Bordo ──────────────────────
 const INV = {
   open:false, tab:0, cursor:0,
   TABS:[
@@ -179,11 +161,9 @@ const INV = {
     ctx.shadowBlur=0;
     ctx.strokeStyle='#3a7820';ctx.lineWidth=2.5;roundRect(PX,PY,PW,PH,16);ctx.stroke();
     ctx.strokeStyle='rgba(80,200,80,0.2)';ctx.lineWidth=1;roundRect(PX+4,PY+4,PW-8,PH-8,12);ctx.stroke();
-    // Título
     ctx.fillStyle='#78d840';ctx.font='bold 16px "Courier New"';
     ctx.textAlign='center';ctx.fillText('📔  DIÁRIO DE BORDO',W/2,PY+28);ctx.textAlign='left';
     ctx.fillStyle='rgba(80,200,80,0.3)';ctx.fillRect(PX+16,PY+38,PW-32,1);
-    // Abas
     const TAB_W=PW/3,TAB_Y=PY+44;
     this.TABS.forEach((tab,i)=>{
       const tx=PX+i*TAB_W,active=(i===this.tab);
@@ -194,7 +174,6 @@ const INV = {
       ctx.textAlign='center';ctx.fillText(tab.label,tx+TAB_W/2,TAB_Y+22);ctx.textAlign='left';
       if(active){ctx.fillStyle=tab.color;ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3);}
     });
-    // Conteúdo
     const CY=TAB_Y+40,CH=PH-(CY-PY)-50;
     const items=this.tabItems(player);
     const COL_W=260,DESC_X=PX+280;
@@ -252,7 +231,6 @@ const INV = {
   }
 };
 
-// ── Particles ──────────────────────────────────────────────────
 let particles=[];
 function burst(x,y,color,n=8,spd=3.5){
   for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2+Math.random()*.5;
@@ -265,16 +243,13 @@ function splashBurst(x,y){
 function tickParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;if(p.life<=0)particles.splice(i,1);}}
 function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
 
-// ── Camera ─────────────────────────────────────────────────────
 const cam={x:0,y:0};
 function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-cam.x)*0.12;}
 
-// ── Physics ────────────────────────────────────────────────────
 const GRAV=0.46, PSPD=4.5, JUMPF=-12.2, MAXFALL=16;
 const RUN_ACCEL=0.78, AIR_ACCEL=0.44, GROUND_FRICTION=0.72, AIR_FRICTION=0.92;
 const JUMP_CUT=0.55, COYOTE_FRAMES=8, JUMP_BUFFER_FRAMES=10;
 
-// ── Tile themes ────────────────────────────────────────────────
 const TILE_THEMES={
   1:{top:'#4a9a28',body:'#5a3a18',dark:'#3a2008'},
   2:{top:'#4a9a28',body:'#6a4a20',dark:'#3a2808'},
@@ -283,7 +258,6 @@ const TILE_THEMES={
 };
 let tileTheme=TILE_THEMES[1];
 
-// ── Platform factory ───────────────────────────────────────────
 function solid(x,y,w,h)         {return{type:'solid',x,y,w,h};}
 function movH(x,y,w,x0,x1,spd) {return{type:'solid',moving:true,x,y,w,h:18,x0,x1,spd,vx:spd,vy:0};}
 function trap(x,y,w)            {return{type:'trapdoor',x,y,w,h:14};}
@@ -302,7 +276,6 @@ function tickTrapdoors(plats){
     if(p.crumble!==undefined){p.crumble--;if(p.crumble<=0){p.crumble=undefined;p.type='_dead';}}}
 }
 
-// ── Draw platform ──────────────────────────────────────────────
 function drawPlatform(p){
   const sx=p.x-cam.x,sy=p.y-cam.y;
   if(sx>W+80||sx+p.w<-80||sy>H+40||sy+p.h<-40)return;
@@ -340,7 +313,6 @@ function drawPlatform(p){
     ctx.fillStyle='#7a5020';ctx.fillRect(sx,sy,p.w,3);
     ctx.globalAlpha=1;return;
   }
-  // Log platform
   if(p.log){
     ctx.fillStyle='#6a3810';ctx.fillRect(sx,sy,p.w,p.h);
     ctx.fillStyle='#8a5020';ctx.fillRect(sx,sy,p.w,4);
@@ -349,7 +321,6 @@ function drawPlatform(p){
     if(p.moving){ctx.fillStyle='rgba(80,200,80,0.35)';ctx.fillRect(sx,sy,p.w,4);}
     return;
   }
-  // Solid
   const ts=24,cols=Math.ceil(p.w/ts),rows=Math.ceil(p.h/ts);
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
@@ -366,7 +337,6 @@ function drawPlatform(p){
   if(p.moving){ctx.fillStyle='rgba(80,200,80,0.35)';ctx.fillRect(sx,sy,p.w,4);}
 }
 
-// ── Rounded rect ───────────────────────────────────────────────
 function roundRect(x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
   ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
@@ -374,10 +344,7 @@ function roundRect(x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
-// ══════════════════════════════════════════════════════════════
-//  CORVAN — pixel art idêntico ao menu principal
-//  ViewBox 0 0 32 52 → desenhado em canvas com ctx.fillRect
-// ══════════════════════════════════════════════════════════════
+
 function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const S=scale;
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
@@ -426,11 +393,9 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   ctx.globalAlpha=1;ctx.restore();
 }
 
-// ── Walk animation helper
 function corvanFrame(t){return Math.sin(t)*2;}
 
-//  ITEMS — pixel art no canvas
-// ══════════════════════════════════════════════════════════════
+
 function drawBateia(cx,cy,bobT=0,scale=1){
   ctx.save(); ctx.translate(cx, cy+Math.sin(bobT)*4);
   const S=scale;
@@ -1535,9 +1500,9 @@ function drawTitle(){
   ctx.fillStyle='rgba(0,10,0,0.56)';ctx.fillRect(0,0,W,H);
   drawFireflies();
   // Draw Corvan large on title (scale 5, centered)
-  const TS=5;
-  const cx=W/2-16*TS, cy=160;
-  drawCorvan(cx,cy,TS,false,Date.now()/400);
+  //const TS=5;
+  //const cx=W/2-16*TS, cy=160;
+  //drawCorvan(cx,cy,TS,false,Date.now()/400);
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('O OURO DOS RIOS',W/2,148);

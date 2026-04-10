@@ -1,34 +1,10 @@
-/* ═══════════════════════════════════════════════
-   MINERALIS – components/audio.js
-   Motor de som usando Web Audio API (sem arquivos externos).
-
-   GDD:
-   • Trilha ambiente orquestral leve — flautas, harpas, violinos
-   • Tema de exploração global: melodia cativante e suave,
-     remete à viagem e descoberta
-   • Música adaptativa: ducking (reduz volume) quando SFX tocam
-   • Jingles curtos e alegres para desbloqueios
-   • Clicks suaves para navegação de UI
-
-   ARQUITETURA:
-   ┌─────────────────────────────────────────┐
-   │  Osciladores → gainNota                 │
-   │  gainNota    → gainTrilha (master BG)   │
-   │  gainTrilha  → duckGain  → destination  │
-   │                                         │
-   │  SFX         → ctx.destination (direto) │
-   │  SFX dispara duck() no duckGain         │
-   └─────────────────────────────────────────┘
-   ═══════════════════════════════════════════════ */
-
 const Audio = (() => {
 
-  // ── Contexto e nós principais ──
-  let ctx        = null;
-  let duckGain   = null;   // controla o volume da trilha (ducking)
-  let gainTrilha = null;   // master da trilha de fundo
 
-  // Estado da trilha
+  let ctx        = null;
+  let duckGain   = null; 
+  let gainTrilha = null;  
+
   let trilhaAtiva   = false;
   let trilhaTimeout = null;
 
@@ -36,10 +12,6 @@ const Audio = (() => {
   const VOL_DUCK     = 0.10;
   const DUCK_SPEED   = 0.25;
   const UNDUCK_SPEED = 1.2;
-
-  // ════════════════════════════════
-  // CONTEXTO
-  // ════════════════════════════════
 
   function _getCtx() {
     if (!ctx) {
@@ -57,9 +29,6 @@ const Audio = (() => {
     return ctx;
   }
 
-  // ════════════════════════════════
-  // DUCKING
-  // ════════════════════════════════
 
   let _duckTimer = null;
 
@@ -89,9 +58,7 @@ const Audio = (() => {
     duckGain.gain.linearRampToValueAtTime(VOL_NORMAL, c.currentTime + 2.5);
   }
 
-  // ════════════════════════════════
-  // UTILITÁRIOS INTERNOS
-  // ════════════════════════════════
+
 
   function _nota(freq, start, duration, type, volume, attack, release, destino) {
     const c    = _getCtx();
@@ -185,18 +152,6 @@ const Audio = (() => {
     osc.stop(start + duration);
   }
 
-  // ════════════════════════════════
-  // TRILHA DO MENU PRINCIPAL
-  //
-  // GDD: "Tema Principal (Exploração Global) —
-  // melodia cativante mas suave que remete à
-  // ideia de viagem e descoberta"
-  //
-  // Tonalidade: Ré maior (caloroso, aventureiro)
-  // Instrumentos: harpa (arpejo) + flauta (melodia)
-  //               + cordas (harmonia) + baixo (harpa grave)
-  // Ciclo: 16 segundos, loop suave
-  // ════════════════════════════════
 
   const N = {
     D3: 146.8, A3: 220.0,
@@ -208,7 +163,6 @@ const Audio = (() => {
     const c = _getCtx();
     const t = c.currentTime + offset;
 
-    // Arpejo de harpa — harmonia
     const arpejos = [
       [N.D3,  0.0], [N.A3,  0.5], [N.D4,  1.0], [N.Fs4, 1.5],
       [N.A4,  2.0], [N.Fs4, 2.5], [N.D4,  3.0], [N.A3,  3.5],
@@ -221,7 +175,6 @@ const Audio = (() => {
     ];
     arpejos.forEach(([f, s]) => _notaHarpa(f, t + s, 0.55, 0.12));
 
-    // Melodia — flauta
     const melodia = [
       [N.Fs4, 1.0,  0.8 ],
       [N.A4,  2.0,  0.6 ],
@@ -241,7 +194,6 @@ const Audio = (() => {
     ];
     melodia.forEach(([f, s, d]) => _notaFlauta(f, t + s, d, 0.18));
 
-    // Cordas — sustentação dos acordes
     const cordas = [
       [N.D4,  0.0,  4.0, 0.10],
       [N.Fs4, 0.0,  4.0, 0.07],
@@ -254,7 +206,6 @@ const Audio = (() => {
     ];
     cordas.forEach(([f, s, d, v]) => _notaCorda(f, t + s, d, v));
 
-    // Baixo — harpa grave
     const baixo = [
       [N.D3,  0.0, 1.5, 0.18],
       [N.D3,  4.0, 1.5, 0.18],
@@ -263,10 +214,6 @@ const Audio = (() => {
     ];
     baixo.forEach(([f, s, d, v]) => _notaHarpa(f, t + s, d, v));
   }
-
-  // ════════════════════════════════
-  // API: TRILHA
-  // ════════════════════════════════
 
   function iniciarTrilha() {
     if (trilhaAtiva) return;
@@ -294,10 +241,6 @@ const Audio = (() => {
     gainTrilha.gain.linearRampToValueAtTime(0, c.currentTime + 1.5);
   }
 
-  // ════════════════════════════════
-  // API: SONS DE UI
-  // ════════════════════════════════
-
   function clickMenu() {
     const c = _getCtx();
     const t = c.currentTime;
@@ -314,9 +257,6 @@ const Audio = (() => {
     _duck();
   }
 
-  // ════════════════════════════════
-  // API: JINGLE NOVA JORNADA
-  // ════════════════════════════════
 
   function novaJornada() {
     const c    = _getCtx();
@@ -343,38 +283,23 @@ const Audio = (() => {
 
     _nota(1318.5, t + 1.05, 0.7, 'sine', 0.08, 0.01, 0.55, dest);
 
-    // Unduck longo após o jingle terminar
     _duckTimer = setTimeout(_unduckLongo, 1400);
   }
-
-  // Nó de ganho dedicado para SFX (criar junto com duckGain no _getCtx):
-//
-//   gainSFX = ctx.createGain();
-//   gainSFX.gain.value = 1.0;
-//   gainSFX.connect(ctx.destination);
-//
-// E em _nota(), quando destino === c.destination,
-// redirecione para gainSFX em vez de ctx.destination.
-// Assim o volume de efeitos fica controlável.
  
-function setVolMusica(valor) {            // valor: 0.0 – 1.0
+function setVolMusica(valor) {         
   if (!duckGain) return;
-  VOL_NORMAL = valor;                     // atualiza a constante
+  VOL_NORMAL = valor;                    
   const c = _getCtx();
   duckGain.gain.cancelScheduledValues(c.currentTime);
   duckGain.gain.setValueAtTime(valor, c.currentTime);
 }
  
-function setVolEfeitos(valor) {           // valor: 0.0 – 1.0
+function setVolEfeitos(valor) {           
   if (!gainSFX) return;
   const c = _getCtx();
   gainSFX.gain.cancelScheduledValues(c.currentTime);
   gainSFX.gain.setValueAtTime(valor, c.currentTime);
 }
- 
-  // ════════════════════════════════
-  // API PÚBLICA
-  // ════════════════════════════════
 
   return {
     iniciarTrilha,

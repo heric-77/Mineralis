@@ -1,27 +1,7 @@
-/* ═══════════════════════════════════════════════
-   MINERALIS – screens/journal.js
-   Diário de Bordo — inventário do explorador.
-   Guarda e exibe itens coletados em 3 categorias:
-   • Ferramentas
-   • Minérios
-   • Artefatos Antigos
-
-   GDD: "visual de livro aberto, páginas de diário
-   de campo, ilustrações 2D detalhadas, abas por
-   categoria, progressão visual com silhuetas."
-   ═══════════════════════════════════════════════ */
-
 const Journal = (() => {
 
-  // ── Estado ──
-  let abaAtiva = 'minerios'; // 'ferramentas' | 'minerios' | 'artefatos'
+  let abaAtiva = 'minerios';
   let overlay  = null;
-
-  // ════════════════════════════════
-  // DADOS DOS ITENS
-  // Cada item tem: id, nome, desc, fase, tipo, icone (SVG inline)
-  // desbloqueado: controlado pelo SaveManager
-  // ════════════════════════════════
 
   const ITENS = {
     ferramentas: [
@@ -63,10 +43,6 @@ const Journal = (() => {
     ],
   };
 
-  // ════════════════════════════════
-  // ÍCONES SVG dos itens (pixel art 24×24)
-  // ════════════════════════════════
-
   const ICONES = {
     // FERRAMENTAS
     picareta_basica:  `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="2" y="10" width="14" height="2" fill="#7a4818"/><rect x="2" y="11" width="1" height="8" fill="#7a4818"/><rect x="2" y="8" width="10" height="4" fill="#888"/><rect x="10" y="6" width="3" height="4" fill="#aaa"/><rect x="11" y="5" width="2" height="2" fill="#ccc"/></svg>`,
@@ -104,9 +80,6 @@ const Journal = (() => {
     pearl_aboriginal: `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="6" y="11" width="2" height="2" fill="#e8d8c0"/><rect x="10" y="10" width="2" height="2" fill="#f0e0c8"/><rect x="14" y="11" width="2" height="2" fill="#e8d8c0"/><rect x="8" y="13" width="2" height="2" fill="#d8c8b0"/><rect x="12" y="13" width="2" height="2" fill="#e0d0b8"/><rect x="4" y="12" width="16" height="1" fill="#8b4513" opacity="0.5"/><rect x="10" y="12" width="2" height="2" fill="#fff" opacity="0.5"/></svg>`,
   };
 
-  // ════════════════════════════════
-  // RENDER
-  // ════════════════════════════════
 
   function _renderAba(tipo) {
     const itens    = ITENS[tipo] || [];
@@ -140,9 +113,6 @@ const Journal = (() => {
     return `${found}/${total}`;
   }
 
-  // ════════════════════════════════
-  // ABRIR / FECHAR
-  // ════════════════════════════════
 
   function abrir() {
     if (overlay) return;
@@ -153,16 +123,13 @@ const Journal = (() => {
     overlay.innerHTML = _buildHTML();
     document.getElementById('frame').appendChild(overlay);
 
-    // Animação de entrada
     requestAnimationFrame(() => overlay.classList.add('visible'));
 
-    // Eventos
     overlay.querySelector('#journalClose').addEventListener('click', fechar);
     overlay.querySelectorAll('.journal-tab').forEach(tab => {
       tab.addEventListener('click', () => _trocarAba(tab.dataset.aba));
     });
 
-    // Fechar clicando fora
     overlay.addEventListener('click', e => {
       if (e.target === overlay) fechar();
     });
@@ -183,12 +150,10 @@ const Journal = (() => {
     abaAtiva = novaAba;
     Audio.clickMenu();
 
-    // Atualiza tabs
     overlay.querySelectorAll('.journal-tab').forEach(t => {
       t.classList.toggle('ativa', t.dataset.aba === abaAtiva);
     });
 
-    // Atualiza conteúdo com animação
     const content = overlay.querySelector('.journal-items');
     content.classList.add('fade-out');
     setTimeout(() => {
@@ -253,11 +218,6 @@ const Journal = (() => {
       </div>`;
   }
 
-  // ════════════════════════════════
-  // API: adicionar item coletado
-  // Chamado pelas fases quando um item é encontrado
-  // Exemplo: Journal.coletar('ouro_aluvial')
-  // ════════════════════════════════
 
   function coletar(id) {
     try {

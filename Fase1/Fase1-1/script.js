@@ -1235,7 +1235,6 @@ function drawTitle(){
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#888';ctx.font='13px "Courier New"';
   ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,494);
-  ctx.fillText('📚 Minerais e artefatos coletados vão para o Diário de Bordo!',W/2,516);
   ctx.textAlign='left';
 }
 function drawDeath(){
