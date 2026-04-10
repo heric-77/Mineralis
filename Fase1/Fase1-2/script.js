@@ -64,9 +64,11 @@ function sfx(type) {
 }
 
 const IMG = {};
-let assetsLoaded = 0, totalAssets = 4, gameReady = false;
-['bg01','bg02','bg03','bg04'].forEach((key,i) => {
-  const src = `Fase 1.2 - Cena 0${i+1}.PNG`;
+let assetsLoaded = 0, totalAssets = 5, gameReady = false; // Aumentado para 5 ativos
+[['bg01','Fase 1.2 - Cena 01.PNG'],['bg02','Fase 1.2 - Cena 02.PNG'],
+ ['bg03','Fase 1.2 - Cena 03.PNG'],['bg04','Fase 1.2 - Cena 04.PNG'],
+ ['bgext','Fase 1.2 - Cena 01.PNG'], // Usando a cena 1 como fundo da capa
+ ['capa','1_2_amazonia.svg']].forEach(([key,src]) => {
   const img = new Image();
   img.onload  = () => { IMG[key]=img; if (++assetsLoaded>=totalAssets){gameReady=true;startGame();} };
   img.onerror = () => { IMG[key]=null; if (++assetsLoaded>=totalAssets){gameReady=true;startGame();} };
@@ -1406,21 +1408,30 @@ function drawHUD(player,level){
 }
 
 function drawTitle(){
-  const bg=IMG['bg01'];
-  if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.5;drawBg('bg01');ctx.globalAlpha=1;}
-  else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a3010');g.addColorStop(1,'#0a1c08');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+  const bg=IMG['bgext'];
+  if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.5;drawBg('bgext');ctx.globalAlpha=1;}
+  else{ctx.fillStyle='#0a1c08';ctx.fillRect(0,0,W,H);}
   ctx.fillStyle='rgba(0,10,0,0.56)';ctx.fillRect(0,0,W,H);
   drawFireflies();
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
-  ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('O OURO DOS RIOS',W/2,160);
+  ctx.fillStyle='#78d840';
+  ctx.font='bold 48px "Courier New"'; 
+  ctx.fillText('O OURO DOS RIOS',W/2,150); 
   ctx.shadowBlur=0;
-  ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,200);
-  ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+  ctx.fillStyle='#a8d860';
+  ctx.font='19px "Courier New"';
+  ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,195)
+  if(IMG.capa) {
+    const imgW = 220; 
+    const imgH = 220;
+    ctx.drawImage(IMG.capa, W/2 - imgW/2, 215, imgW, imgH);
+  }
+  ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;
+  ctx.font='19px "Courier New"';
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,485); // Empurrado para baixo da imagem
   ctx.fillStyle='#888';ctx.font='13px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Escavar',W/2,494);
-  ctx.fillText('Itens coletados serão arquivados no Diário de Bordo!',W/2,516);
+  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Escavar',W/2,520);
   ctx.textAlign='left';
 }
 
