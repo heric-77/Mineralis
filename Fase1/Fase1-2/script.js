@@ -1500,9 +1500,9 @@ function drawTitle(){
   ctx.fillStyle='rgba(0,10,0,0.56)';ctx.fillRect(0,0,W,H);
   drawFireflies();
   // Draw Corvan large on title (scale 5, centered)
-  const TS=5;
-  const cx=W/2-16*TS, cy=160;
-  drawCorvan(cx,cy,TS,false,Date.now()/400);
+  //const TS=5;
+  //const cx=W/2-16*TS, cy=160;
+  //drawCorvan(cx,cy,TS,false,Date.now()/400);
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('O OURO DOS RIOS',W/2,148);
