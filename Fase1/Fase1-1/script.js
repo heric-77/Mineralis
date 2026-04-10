@@ -1080,6 +1080,8 @@ function buildL3(){
   const tupu={x:3180,y:FL-80,done:false};
   const cols=[
     ...[80,200,380,640,900,1180,1460,1740,2020,2300,2580,2860,3060,3200].map(x=>new Col(x,FL-50,'prata')),
+    new Col(600,FL-90,'coca'),
+    new Col(1800,FL-90,'coca'),
   ];
   const bats=[new Bat(480,FL-220,90),new Bat(900,FL-200,80),new Bat(1360,FL-220,90),
                new Bat(1800,FL-200,80),new Bat(2300,FL-220,90),new Bat(2800,FL-200,80)];
@@ -1145,14 +1147,14 @@ function buildL4(){
   const triggers=[
     new Trigger(2200,FL-200,160,200,'Completar Fase 1.1',(player,level)=>{
       if(!player.items.includes('tupu')){notify('Volte e encontre o Tupu de Prata!');return;}
-      player.interactAnim=40;sfx('unlock');
+      level.triggers[0].done=true;player.interactAnim=40;sfx('unlock');
       showDialog([
         '"Consegui! Este Tupu de Prata viajou séculos. A mineração excessiva deixou cicatrizes profundas nesta montanha — o Cerro Rico está oco por dentro."',
         '"Como guardião, meu trabalho é extrair o conhecimento sem apagar a história. A prata, para os Incas, era arte e espiritualidade. Para os colonizadores, era poder."',
         '"Esta diferença mudou o mundo: financiou guerras europeias, criou o sistema econômico global moderno e custou milhões de vidas indígenas e africanas escravizadas."',
         '"Itens registrados no Diário de Bordo. Nossa próxima parada: a Serra Pelada, na Amazônia brasileira — onde o ouro esconde segredos igualmente profundos."',
         '🏆 FASE 1.1 CONCLUÍDA! O Segredo de Potosí foi desvendado!'
-      ],()=>{unlockPhase('1.2');G.state='complete';});
+      ],()=>{unlockPhase('1.2');BUBBLE.active=false;G.dialog=false;G.state='complete';});
     }),
   ];
   return{id:4,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
@@ -1283,11 +1285,12 @@ const G={
     if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
     this.dialog=false;this.state='playing';this.timeOnLevel=0;
     BUBBLE.active=false;popup.active=false;
-    setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},900);
+    for(const k in jp)delete jp[k];
+    setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},1200);
   },
   nextLevel(){this._storedItems=[...this.player.items];this._storedScore=this.player.score;
     this._storedTool=this.player.activeTool;
-    if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);else this.state='complete';},
+    if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);else{BUBBLE.active=false;this.dialog=false;this.state='complete';}},
   update(){
     if(this.state!=='playing')return;this.timeOnLevel++;
     checkDlg();updateCam(this.player.x,this.level.W);
