@@ -73,7 +73,7 @@ const IMG = {};
 let assetsLoaded = 0, totalAssets = 5, gameReady = false; // Aumentado para 5 ativos
 [['bg01','Fase 1.2 - Cena 01.PNG'],['bg02','Fase 1.2 - Cena 02.PNG'],
  ['bg03','Fase 1.2 - Cena 03.PNG'],['bg04','Fase 1.2 - Cena 04.PNG'],
- ['bgext','Fase 1.2 - Cena 01.PNG'], // Usando a cena 1 como fundo da capa
+ ['bgext','Fase 1.2 - Cena 01.PNG'],
  ['capa','1_2_amazonia.svg']].forEach(([key,src]) => {
   const img = new Image();
   img.onload  = () => { IMG[key]=img; if (++assetsLoaded>=totalAssets){gameReady=true;startGame();} };

@@ -1236,11 +1236,11 @@ function drawTitle(){
   ctx.textAlign='center';
   ctx.shadowColor='#e0b840'; ctx.shadowBlur=40;
   ctx.fillStyle='#e0b840'; ctx.font='bold 46px "Courier New"';
-  ctx.fillText('O SEGREDO DE POTOSÍ', W/2, 160); // Subi um pouco o título (era 220)
+  ctx.fillText('O SEGREDO DE POTOSÍ', W/2, 150);
   
   ctx.shadowBlur=0;
   ctx.fillStyle='#c8a060'; ctx.font='19px "Courier New"';
-  ctx.fillText('Fase 1.1  —  Potosí, Bolívia', W/2, 200); // Subi o subtítulo (era 270)
+  ctx.fillText('Fase 1.1  —  Potosí, Bolívia', W/2, 195);
 
   if(IMG.capa) {
     const imgW = 220;
@@ -1250,7 +1250,7 @@ function drawTitle(){
 
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`; 
   ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀', W/2, 500); // Ajustado para baixo da imagem
+  ctx.fillText('▶  Pressione ENTER para começar  ◀', W/2, 500)
   
   ctx.fillStyle='#888'; ctx.font='13px "Courier New"';
   ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar', W/2, 540);
