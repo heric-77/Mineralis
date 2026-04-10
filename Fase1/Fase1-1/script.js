@@ -37,8 +37,8 @@ function sfx(type){
 }
 
 const IMG={};
-let assetsLoaded=0,totalAssets=3,gameReady=false;
-[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01-04.JPG']].forEach(([key,src])=>{
+let assetsLoaded=0,totalAssets=4,gameReady=false;
+[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01-04.JPG'],['bgcena0102','Cena01-02.svg']].forEach(([key,src])=>{
   const img=new Image();
   img.onload=()=>{IMG[key]=img;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
@@ -659,7 +659,7 @@ function drawNotif(){
 
 class Player{
   constructor(x,y){
-    this.x=x;this.y=y;this.w=40;this.h=82;
+    this.x=x;this.y=y;this.w=32;this.h=68;
     this.vx=0;this.vy=0;this.onG=false;this.facing=1;
     this.hp=3;this.maxHp=3;this.inv=0;this.dead=false;
     this.walkT=0;this.state='idle';
@@ -826,8 +826,8 @@ class Player{
 
   draw(){
     if(this.dead)return;
-    const S=1.5,CW=32*S,FOOT_Y=46*S;
-    const dx=this.x-cam.x+this.w/2-CW/2;
+    const S=1.5,FOOT_Y=46*S;
+    const dx=this.x-cam.x+this.w/2-16*S;
     const dy=this.y-cam.y+this.h-FOOT_Y;
     const flip=this.facing===-1;
     const wf=this.state==='run'?this.walkT:(this.state==='idle'?Date.now()/800:0);
@@ -853,7 +853,7 @@ function drawBg(bgKey,dark=false){
     const sc=Math.max(W/img.naturalWidth,H/img.naturalHeight);
     ctx.drawImage(img,(W-img.naturalWidth*sc)/2,(H-img.naturalHeight*sc)/2,img.naturalWidth*sc,img.naturalHeight*sc);
   } else {
-    const fb={bg01:'#0a0e2a',bg02:'#1a0e08',bgext:'#0a0e2a'};
+    const fb={bg01:'#0a0e2a',bg02:'#1a0e08',bgext:'#0a0e2a',bgcena0102:'#0a0e2a'};
     const grd=ctx.createLinearGradient(0,0,0,H);
     grd.addColorStop(0,fb[bgKey]||'#111');grd.addColorStop(1,'#050308');
     ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
@@ -936,7 +936,7 @@ function buildL1(){
       ],()=>{notify('✦ Entrando na mina! Encontre a Lanterna lá dentro.');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
     }),
   ];
-  return{id:1,bg:'bgext',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
+  return{id:1,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
     title:'Cena I — O Início em Potosí',
     hint:'⛏ Picareta na alcova • 🦙 Fale com a Lhama • Entre na mina →',
     plats,bats,cols,triggers,llama,veins:[],
@@ -1155,7 +1155,7 @@ function buildL4(){
       ],()=>{unlockPhase('1.2');G.state='complete';});
     }),
   ];
-  return{id:4,bg:'bgext',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
+  return{id:4,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
     title:'Cena IV — A Saída de Potosí',
     hint:'Chegue ao marco final para concluir a Fase 1.1!',
     plats,bats:[],cols,triggers,veins:[],llama:null,
@@ -1177,6 +1177,7 @@ function buildL4(){
 
 function drawHUD(player,level){
   ctx.fillStyle='rgba(8,4,0,0.68)';ctx.fillRect(0,0,W,38);
+  // Hearts
   for(let i=0;i<player.maxHp;i++){
     ctx.fillStyle=i<player.hp?'#c83020':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
@@ -1235,6 +1236,7 @@ function drawTitle(){
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#888';ctx.font='13px "Courier New"';
   ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,494);
+  ctx.fillText('📚 Minerais e artefatos coletados vão para o Diário de Bordo!',W/2,516);
   ctx.textAlign='left';
 }
 function drawDeath(){
@@ -1257,6 +1259,7 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
   ctx.fillStyle='#e0b840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.1 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
+  // Draw Corvan + Tupu
   drawCorvan(W/2-160,200,4,false,Date.now()/300);
   ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawTupu(0,0,Date.now()/1000);ctx.restore();
   ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Segredo de Potosí foi desvendado!',W/2,196);
