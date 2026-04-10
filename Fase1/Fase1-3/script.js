@@ -1,11 +1,3 @@
-/* ═══════════════════════════════════════════════════════════
-   MINERALIS – Fase 1.3 · O Tesouro do Condor
-   script.js  (v4 – sprites condor+corvan, spawn patrol, fixes)
-   ═══════════════════════════════════════════════════════════ */
-
-// ═══════════════════════════════════════════════════════════
-//  SETUP – canvas preenche toda a janela (cover = sem barras)
-// ═══════════════════════════════════════════════════════════
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
@@ -13,7 +5,6 @@ const ctx    = canvas.getContext('2d');
 canvas.width  = W;
 canvas.height = H;
 
-// ── Correção: usa Math.max para cobrir toda a janela ──
 function resize() {
   const scaleW = window.innerWidth  / W;
   const scaleH = window.innerHeight / H;
@@ -32,7 +23,6 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-// ── Web Audio ──────────────────────────────────────────────
 let AC;
 try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
 function sfx(type) {
@@ -50,9 +40,7 @@ function sfx(type) {
   o.start(t); o.stop(t+.6);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  ASSETS – adicionado sprite do condor
-// ═══════════════════════════════════════════════════════════
+
 const IMG = {}, SPRITES = {};
 const ASSETS = [
   ['bg01','Fase 1.3 - Cena 01.PNG'],
@@ -62,10 +50,11 @@ const ASSETS = [
   ['walk','Sprite_Caminhando.PNG'],
   ['idle','Respirando_Levemente.PNG'],
   ['hurt','Soroche_-_Ofegante.PNG'],
-  ['lant','Sprite_com_lanterna.PNG'],       // Corvan com lanterna
+  ['lant','Sprite_com_lanterna.PNG'],
   ['talk','Falando.PNG'],
   ['dig', 'Escavando.PNG'],
-  ['condor','condor_sprite_sheet.png'],     // ← NOVO: sprite do condor
+  ['condor','condor_sprite_sheet.png'], 
+  ['capa', '1_3_machu_pichu.svg'],
 ];
 
 function makeSprite(img, threshold = 28) {
@@ -90,9 +79,6 @@ const SPRITE_INFO = {
   lant:  { n:6, ox:11, oy:17, fw:183, fh:175 },
   talk:  { n:2, ox:25, oy:17, fw:184, fh:376 },
   dig :  { n:6, ox:0,  oy:0,  fw:245, fh:400 },
-  // Condor: sprite sheet 4 colunas × 3 linhas
-  // Linha 0 = pousado/idle, usada para companion e title screen
-  // Ajuste fw/fh se as dimensões reais da imagem forem diferentes
   condor:{ n:4, ox:0,  oy:0,  fw:336, fh:168 },
 };
 
@@ -106,13 +92,15 @@ ASSETS.forEach(([key,src]) => {
     if (SPRITE_KEYS_TO_PROCESS.includes(key)) SPRITES[key] = makeSprite(img);
     if (++assetsLoaded >= totalAssets) { gameReady = true; startGame(); }
   };
-  img.onerror = () => { IMG[key]=null; if (++assetsLoaded >= totalAssets) { gameReady=true; startGame(); } };
+  img.onerror = () => { 
+    console.error("Erro ao carregar o arquivo:", src); // Verifique isso no F12 se não carregar
+    IMG[key]=null; 
+    if (++assetsLoaded >= totalAssets) { gameReady=true; startGame(); } 
+  };
   img.src = src;
 });
 
-// ═══════════════════════════════════════════════════════════
-//  INPUT
-// ═══════════════════════════════════════════════════════════
+
 const keys={}, jp={};
 window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
@@ -133,9 +121,7 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){ for(const k in jp) delete jp[k]; }
 
-// ═══════════════════════════════════════════════════════════
-//  SPRITES
-// ═══════════════════════════════════════════════════════════
+
 function drawSprite(key, frame, dx, dy, dw, dh, flipX=false, alpha=1) {
   const spr=SPRITES[key]; if(!spr) return false;
   const info=SPRITE_INFO[key];
@@ -160,9 +146,7 @@ function drawFaceSprite(frame, talk=false){
   const dw=info.fw*scale; c2.drawImage(spr,sx,info.oy,info.fw,showH,(80-dw)/2,0,dw,96);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  PARTICLES
-// ═══════════════════════════════════════════════════════════
+
 let particles=[];
 function burst(x,y,color,n=8,spd=3.5){
   for(let i=0;i<n;i++){
@@ -173,9 +157,7 @@ function burst(x,y,color,n=8,spd=3.5){
 function tickParticles(){ for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life--;if(p.life<=0)particles.splice(i,1);} }
 function drawParticles(){ for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1; }
 
-// ═══════════════════════════════════════════════════════════
-//  CAMERA
-// ═══════════════════════════════════════════════════════════
+
 const cam={x:0,y:0};
 function updateCam(px,worldW){
   const target=px-W/2+24;
@@ -1233,12 +1215,6 @@ function drawHUD(player,level){
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  TITLE SCREEN
-//  – Corvan REMOVIDO da capa
-//  – Condor voa pela tela (sprite ou procedural)
-//  – Cobras animadas no rodapé
-// ═══════════════════════════════════════════════════════════
 
 
 function drawTitle(){
@@ -1250,34 +1226,36 @@ function drawTitle(){
   // Estrelas
   for(let i=0;i<150;i++){const sx=(i*137.5)%W,sy=(i*83.7)%380;ctx.fillStyle=`rgba(255,248,210,${.2+Math.sin(Date.now()/1100+i)*.2})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
 
-  // ── Condor voa pela tela (sprite se disponível) ──
-  const condorPeriod = 14000; // ms por travessia
+  if(IMG['capa']) {
+    const imgSize = 250;
+    ctx.drawImage(IMG['capa'], W/2 - imgSize/2, 210, imgSize, imgSize);
+  }
+
+  const condorPeriod = 14000;
   const condorT  = (Date.now() % condorPeriod) / condorPeriod;
   const condorX  = condorT * (W + 280) - 140;
   const condorY  = 160 + Math.sin(Date.now()/1100) * 30;
   const condorFr = Math.floor(Date.now()/220) % 4;
   if(SPRITES['condor']){
     drawSprite('condor', condorFr, condorX, condorY, 150, 75, false);
-  } else {
-    // Fallback procedural
-    ctx.save(); ctx.translate(condorX+75, condorY+37);
-    const fl=Math.sin(Date.now()/120)*14;
-    ctx.fillStyle='#2a2010';
-    ctx.beginPath();ctx.ellipse(-44,fl,40,9,Math.PI/8,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(44,-fl,40,9,-Math.PI/8,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#201808';ctx.beginPath();ctx.ellipse(0,0,16,11,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#f0a020';ctx.beginPath();ctx.arc(4,-14,4,0,Math.PI*2);ctx.fill();
-    ctx.restore();
   }
 
-  // Títulos e textos
   ctx.textAlign='center';
   ctx.shadowColor='#f0c040';ctx.shadowBlur=40;
-  ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O TESOURO DO CONDOR',W/2,155);
+  ctx.fillStyle='#f0c040';ctx.font='bold 48px "Courier New"';
+  ctx.fillText('O TESOURO DO CONDOR',W/2,150); 
+  
   ctx.shadowBlur=0;
-  ctx.fillStyle='#c8a846';ctx.font='22px "Courier New"';ctx.fillText('Fase 1.3  —  Machu Picchu, Peru',W/2,210);
-  ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='20px "Courier New"';ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
-  ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,500);ctx.fillText('Soroche: não corra demais na altitude!',W/2,524);
+  ctx.fillStyle='#c8a846';ctx.font='22px "Courier New"';
+  ctx.fillText('Fase 1.3 — Machu Picchu, Peru',W/2,185);
+
+  ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;
+  ctx.font='20px "Courier New"';
+  ctx.fillText('▶ Pressione ENTER para começar ◀',W/2,485);
+  
+  ctx.fillStyle='#888';ctx.font='14px "Courier New"';
+  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,525);
+  ctx.fillText('Soroche: não corra demais na altitude!',W/2,548);
   ctx.textAlign='left';
 }
 
@@ -1304,9 +1282,7 @@ function drawComplete(){
   ctx.font='64px serif';ctx.fillText('🏆',W/2-32,540);ctx.textAlign='left';
 }
 
-// ═══════════════════════════════════════════════════════════
-//  GAME STATE
-// ═══════════════════════════════════════════════════════════
+
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',

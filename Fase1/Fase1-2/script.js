@@ -37,13 +37,19 @@ const ctx    = canvas.getContext('2d');
 canvas.width = W; canvas.height = H;
 
 function resize() {
-  const s  = Math.min(window.innerWidth / W, window.innerHeight / H);
-  const sw = Math.round(W * s), sh = Math.round(H * s);
-  canvas.style.width  = sw + 'px'; canvas.style.height = sh + 'px';
+  const scaleW = window.innerWidth  / W;
+  const scaleH = window.innerHeight / H;
+  const s  = Math.max(scaleW, scaleH);          
+  const sw = Math.round(W * s);
+  const sh = Math.round(H * s);
+  canvas.style.width  = sw + 'px';
+  canvas.style.height = sh + 'px';
+  wrap.style.width    = sw + 'px';
+  wrap.style.height   = sh + 'px';
   wrap.style.position = 'fixed';
-  wrap.style.left = Math.round((window.innerWidth  - sw) / 2) + 'px';
-  wrap.style.top  = Math.round((window.innerHeight - sh) / 2) + 'px';
-  wrap.style.width = sw + 'px'; wrap.style.height = sh + 'px';
+  wrap.style.overflow = 'hidden';
+  wrap.style.left     = Math.round((window.innerWidth  - sw) / 2) + 'px';
+  wrap.style.top      = Math.round((window.innerHeight - sh) / 2) + 'px';
 }
 resize(); window.addEventListener('resize', resize);
 
