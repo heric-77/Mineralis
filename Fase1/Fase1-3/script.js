@@ -1,11 +1,5 @@
-/* ═══════════════════════════════════════════════════════════
-   MINERALIS – Fase 1.3 · O Tesouro do Condor
-   script.js  (v4 – sprites condor+corvan, spawn patrol, fixes)
-   ═══════════════════════════════════════════════════════════ */
 
-// ═══════════════════════════════════════════════════════════
-//  SETUP – canvas preenche toda a janela (cover = sem barras)
-// ═══════════════════════════════════════════════════════════
+
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
@@ -13,11 +7,10 @@ const ctx    = canvas.getContext('2d');
 canvas.width  = W;
 canvas.height = H;
 
-// ── Correção: usa Math.max para cobrir toda a janela ──
 function resize() {
   const scaleW = window.innerWidth  / W;
   const scaleH = window.innerHeight / H;
-  const s  = Math.max(scaleW, scaleH);          // cover: sem barras laterais
+  const s  = Math.max(scaleW, scaleH);
   const sw = Math.round(W * s);
   const sh = Math.round(H * s);
   canvas.style.width  = sw + 'px';
@@ -32,7 +25,6 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-// ── Web Audio ──────────────────────────────────────────────
 let AC;
 try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
 function sfx(type) {
@@ -50,9 +42,28 @@ function sfx(type) {
   o.start(t); o.stop(t+.6);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  ASSETS – adicionado sprite do condor
-// ═══════════════════════════════════════════════════════════
+
+// ── Save / Menu integration ───────────────────────────────────
+const SAVE_KEY = 'mineralis_save_v2';
+function _salvarFase(score, deaths){
+  const estrelas = deaths===0?4 : deaths<=2?3 : deaths<=5?2 : 1;
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    const save = raw ? JSON.parse(raw) : {versao:1,iniciado:true,fases:{}};
+    if(!save.fases) save.fases = {};
+    if(!save.fases['1.3']) save.fases['1.3'] = {desbloqueada:true,estrelas:0};
+    save.fases['1.3'].estrelas = Math.max(save.fases['1.3'].estrelas||0, estrelas);
+    save.fases['1.3'].desbloqueada = true;
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    console.info('[Fase1-3] Progresso salvo — estrelas:', estrelas);
+  }catch(e){}
+}
+function _voltarAoMenu(){
+  _salvarFase(G.player?.score||0, G.deaths);
+  // Volta para o menu principal (pasta pai MenuPrincipal)
+  window.location.href = '../../MenuPrincipal/index.html';
+}
+
 const IMG = {}, SPRITES = {};
 const ASSETS = [
   ['bg01','Fase 1.3 - Cena 01.PNG'],
@@ -62,10 +73,10 @@ const ASSETS = [
   ['walk','Sprite_Caminhando.PNG'],
   ['idle','Respirando_Levemente.PNG'],
   ['hurt','Soroche_-_Ofegante.PNG'],
-  ['lant','Sprite_com_lanterna.PNG'],       // Corvan com lanterna
+  ['lant','Sprite_com_lanterna.PNG'],
   ['talk','Falando.PNG'],
   ['dig', 'Escavando.PNG'],
-  ['condor','condor_sprite_sheet.png'],     // ← NOVO: sprite do condor
+  ['condor','condor_sprite_sheet.png'],
 ];
 
 function makeSprite(img, threshold = 28) {
@@ -90,9 +101,7 @@ const SPRITE_INFO = {
   lant:  { n:6, ox:11, oy:17, fw:183, fh:175 },
   talk:  { n:2, ox:25, oy:17, fw:184, fh:376 },
   dig :  { n:6, ox:0,  oy:0,  fw:245, fh:400 },
-  // Condor: sprite sheet 4 colunas × 3 linhas
-  // Linha 0 = pousado/idle, usada para companion e title screen
-  // Ajuste fw/fh se as dimensões reais da imagem forem diferentes
+
   condor:{ n:4, ox:0,  oy:0,  fw:336, fh:168 },
 };
 
@@ -110,14 +119,13 @@ ASSETS.forEach(([key,src]) => {
   img.src = src;
 });
 
-// ═══════════════════════════════════════════════════════════
-//  INPUT
-// ═══════════════════════════════════════════════════════════
 const keys={}, jp={};
 window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
   keys[e.code]=true;
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if(e.code==='Escape'&&INV.open)INV.close();
 });
 window.addEventListener('keyup', e => delete keys[e.code]);
 
@@ -133,9 +141,6 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){ for(const k in jp) delete jp[k]; }
 
-// ═══════════════════════════════════════════════════════════
-//  SPRITES
-// ═══════════════════════════════════════════════════════════
 function drawSprite(key, frame, dx, dy, dw, dh, flipX=false, alpha=1) {
   const spr=SPRITES[key]; if(!spr) return false;
   const info=SPRITE_INFO[key];
@@ -160,9 +165,6 @@ function drawFaceSprite(frame, talk=false){
   const dw=info.fw*scale; c2.drawImage(spr,sx,info.oy,info.fw,showH,(80-dw)/2,0,dw,96);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  PARTICLES
-// ═══════════════════════════════════════════════════════════
 let particles=[];
 function burst(x,y,color,n=8,spd=3.5){
   for(let i=0;i<n;i++){
@@ -173,9 +175,6 @@ function burst(x,y,color,n=8,spd=3.5){
 function tickParticles(){ for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life--;if(p.life<=0)particles.splice(i,1);} }
 function drawParticles(){ for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1; }
 
-// ═══════════════════════════════════════════════════════════
-//  CAMERA
-// ═══════════════════════════════════════════════════════════
 const cam={x:0,y:0};
 function updateCam(px,worldW){
   const target=px-W/2+24;
@@ -183,14 +182,8 @@ function updateCam(px,worldW){
   cam.x+=(clamped-cam.x)*0.12;
 }
 
-// ═══════════════════════════════════════════════════════════
-//  PHYSICS CONSTANTS
-// ═══════════════════════════════════════════════════════════
 const GRAV=0.46, PSPD=4.6, JUMPF=-12.4, MAXFALL=16;
 
-// ═══════════════════════════════════════════════════════════
-//  TILE THEMES
-// ═══════════════════════════════════════════════════════════
 const TILE_THEMES={
   1:{top:'#b09060',body:'#8a6a3a',dark:'#5a3a18'},
   2:{top:'#5a4835',body:'#3a2818',dark:'#22180e'},
@@ -199,9 +192,6 @@ const TILE_THEMES={
 };
 let tileTheme=TILE_THEMES[1];
 
-// ═══════════════════════════════════════════════════════════
-//  PLATFORM FACTORY & RENDER
-// ═══════════════════════════════════════════════════════════
 function solid(x,y,w,h){ return {type:'solid',x,y,w,h}; }
 function movH(x,y,w,x0,x1,spd){ return {type:'solid',moving:true,x,y,w,h:18,x0,x1,spd,vx:spd,vy:0}; }
 function movV(x,y,w,y0,y1,spd){ return {type:'solid',moving:true,x,y,w,h:18,y0,y1,spd,vx:0,vy:spd}; }
@@ -257,9 +247,6 @@ function drawPlatform(p){
   if(p.moving){ ctx.fillStyle='rgba(240,192,64,0.35)'; ctx.fillRect(sx,sy,p.w,4); }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  HELPER: ROUNDED RECT
-// ═══════════════════════════════════════════════════════════
 function roundRect(x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
@@ -269,9 +256,6 @@ function roundRect(x,y,w,h,r){
   ctx.closePath();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SISTEMA DE BALÕES DE DIÁLOGO
-// ═══════════════════════════════════════════════════════════
 function wrapText(text, maxW) {
   ctx.font = '15px "Courier New"';
   const paragraphs = text.split('\n');
@@ -287,6 +271,172 @@ function wrapText(text, maxW) {
     if (line) result.push(line);
   }
   return result;
+}
+
+
+// ── Catálogo de itens — Fase 1.3 ─────────────────────────────
+// Catálogo COMPLETO de todas as fases — IDs = journalId do menu
+const ITEM_DEFS = {
+  // ─── FERRAMENTAS ───────────────────────────────────────────────
+  picareta_basica:  { cat:'ferramenta', nome:'Picareta Básica',       icon:'⛏', fase:'1.1',
+    desc:'Extrai minérios das paredes rochosas.\nEssencial nas minas de Potosí.' },
+  pa_exploradora:   { cat:'ferramenta', nome:'Pá Exploradora',        icon:'🪏', fase:'1.2',
+    desc:'Escava solo aluvial amazônico.\nUsada para encontrar artefatos enterrados.' },
+  bateia:           { cat:'ferramenta', nome:'Bateia',                 icon:'🥌', fase:'1.2',
+    desc:'Separa ouro pesado do sedimento leve.\nUsada há 2.000 anos na Amazônia.' },
+  lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.3',
+    desc:'Ilumina a mina e revela símbolos ocultos.\nNecessária para abrir portões de pedra.' },
+  pedra_constelacao:{ cat:'ferramenta', nome:'Pedra da Constelação',  icon:'💎', fase:'1.3',
+    desc:'Peça da constelação do Condor.\nColete 3 para alinhar o painel astronômico.',
+    multiple:true },
+  // ─── MINÉRIOS ──────────────────────────────────────────────────
+  prata:            { cat:'minerio',   nome:'Prata',                   icon:'◆', fase:'1.1',
+    desc:'Melhor condutor elétrico e térmico.\nUsada pelos Incas como arte e símbolo lunar.' },
+  estanho:          { cat:'minerio',   nome:'Estanho',                 icon:'◈', fase:'1.1',
+    desc:'Liga-se ao cobre formando bronze desde 3.000 a.C.\nBolívia: 2ª maior reserva mundial.' },
+  ouro_aluvial:     { cat:'minerio',   nome:'Ouro Aluvial',            icon:'💛', fase:'1.2',
+    desc:'Depositado nos rios por erosão milenar.\n19× mais pesado que a água.' },
+  tumi_dourado:     { cat:'minerio',   nome:'Ouro Inca',               icon:'🥇', fase:'1.3',
+    desc:'Para os Incas, o ouro era o sol materializado.\nNão era moeda — era divindade.' },
+  // ─── ARTEFATOS ─────────────────────────────────────────────────
+  ceramica_inca:    { cat:'artefato',  nome:'Cerâmica Inca',           icon:'🏺', fase:'1.1',
+    desc:'Vasilha ritual do Império Inca.\nPadrões geométricos representando o cosmos.' },
+  mapa_potosi:      { cat:'artefato',  nome:'Tupu de Prata',           icon:'✦', fase:'1.1',
+    desc:'Fivela ornamental da nobreza Inca.\nA prata tinha valor espiritual, não econômico.' },
+  vaso_amazônico:   { cat:'artefato',  nome:'Urna Marajoara',          icon:'🫙', fase:'1.2',
+    desc:'Cerâmica de 1.000 anos da Ilha de Marajó.\nEvidência de civilizações amazônicas avançadas.' },
+  relevo_inca:      { cat:'artefato',  nome:'Tumi — Faca Cerimonial',  icon:'🗡', fase:'1.3',
+    desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
+};
+
+// Mapa: tipo coletado no jogo → journalId no catálogo
+const TIPO_TO_JOURNAL = {
+  lantern:'lanterna_arqueologa', stone:'pedra_constelacao',
+  tumi:'relevo_inca', gold:'tumi_dourado',
+};
+
+const INV = {
+  open:false, tab:0, cursor:0,
+  TABS:[
+    {id:'ferramenta',label:'🔧 Ferramentas',color:'#f0c040'},
+    {id:'minerio',   label:'⛏ Minérios',   color:'#d4a017'},
+    {id:'artefato',  label:'🏺 Artefatos',  color:'#c08840'},
+  ],
+  tabItems(player){
+    const cat=this.TABS[this.tab].id;
+    // Lê todos os itens coletados em QUALQUER fase do localStorage
+    let coletados={};
+    try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);coletados=j.coletados||{};}}catch(e){}
+    // Adiciona também itens coletados NESTA sessão (ainda não gravados)
+    for(const tipo of player.items){
+      const jid=TIPO_TO_JOURNAL[tipo]||tipo;
+      coletados[jid]=true;
+    }
+    // Pedras múltiplas: conta quantas o player tem na sessão atual
+    const stoneCount=player.items.filter(i=>i==='stone').length;
+    const out=[];
+    for(const [id,def] of Object.entries(ITEM_DEFS)){
+      if(def.cat!==cat) continue;
+      if(def.multiple){
+        if(stoneCount>0) out.push({id,...def,count:stoneCount});
+      } else if(coletados[id]){
+        out.push({id,...def,count:1});
+      }
+    }
+    return out;
+  },
+  toggle(player){ this.open=!this.open; if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));} G.dialog=this.open; },
+  close(){ this.open=false; G.dialog=false; },
+  navigate(player){
+    if(!this.open)return false;
+    if(jp['ArrowLeft']||jp['KeyA']){this.tab=(this.tab+2)%3;this.cursor=0;return true;}
+    if(jp['ArrowRight']||jp['KeyD']){this.tab=(this.tab+1)%3;this.cursor=0;return true;}
+    const items=this.tabItems(player);
+    if(jp['ArrowUp']  ||jp['KeyW']){this.cursor=Math.max(0,this.cursor-1);return true;}
+    if(jp['ArrowDown']||jp['KeyS']){this.cursor=Math.min(items.length-1,this.cursor+1);return true;}
+    if(isE()&&items.length>0&&this.tab===0){
+      const item=items[this.cursor];
+      player.activeTool=(player.activeTool===item.id)?null:item.id;
+      return true;
+    }
+    return false;
+  },
+  draw(player){
+    if(!this.open)return;
+    ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,0,W,H);
+    const PW=780,PH=480,PX=(W-PW)/2,PY=(H-PH)/2;
+    ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=20;
+    ctx.fillStyle='rgba(8,4,0,0.97)';_roundRect(PX,PY,PW,PH,16);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='#8a6820';ctx.lineWidth=2.5;_roundRect(PX,PY,PW,PH,16);ctx.stroke();
+    ctx.fillStyle='#f0c040';ctx.font='bold 16px "Courier New"';
+    ctx.textAlign='center';ctx.fillText('📔  DIÁRIO DE BORDO',W/2,PY+28);ctx.textAlign='left';
+    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+16,PY+38,PW-32,1);
+    const TAB_W=PW/3,TAB_Y=PY+44;
+    this.TABS.forEach((tab,i)=>{
+      const tx=PX+i*TAB_W,active=(i===this.tab);
+      ctx.fillStyle=active?'rgba(200,160,40,0.18)':'rgba(0,0,0,0.3)';
+      ctx.fillRect(tx+2,TAB_Y,TAB_W-4,34);
+      ctx.fillStyle=active?tab.color:'#666';
+      ctx.font=(active?'bold ':'')+'13px "Courier New"';
+      ctx.textAlign='center';ctx.fillText(tab.label,tx+TAB_W/2,TAB_Y+22);ctx.textAlign='left';
+      if(active){ctx.fillStyle=tab.color;ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3);}
+    });
+    const CY=TAB_Y+40,CH=PH-(CY-PY)-50;
+    const items=this.tabItems(player);
+    const COL_W=260,DESC_X=PX+280;
+    if(items.length===0){
+      ctx.fillStyle='#554';ctx.font='14px "Courier New"';ctx.textAlign='center';
+      ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
+      ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
+      ctx.textAlign='left';
+    } else {
+      items.forEach((item,i)=>{
+        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
+        if(selected){ctx.fillStyle='rgba(200,160,40,0.18)';_roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#f0c040';ctx.lineWidth=1.5;_roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
+        const cnt=item.count>1?' ×'+item.count:'';
+        ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20);
+        ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
+        ctx.fillStyle=equipped?'#ffe060':(selected?'#f0e8c0':'#aaa');
+        ctx.fillText(item.nome+cnt,PX+62,iy+14);
+        if(equipped){ctx.fillStyle='rgba(200,160,40,0.22)';_roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
+      });
+      const sel=items[this.cursor];
+      if(sel){
+        ctx.fillStyle='rgba(200,160,40,0.08)';_roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
+        ctx.font='44px serif';ctx.textAlign='center';ctx.fillText(sel.icon,DESC_X+(PW-DESC_X+PX-16)/2,CY+68);
+        ctx.font='bold 15px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+98);
+        const catLabel={ferramenta:'🔧 Ferramenta',minerio:'⛏ Minério',artefato:'🏺 Artefato'};
+        ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.fillText(catLabel[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+116);
+        ctx.textAlign='left';
+        ctx.fillStyle='rgba(200,160,40,0.25)';ctx.fillRect(DESC_X+20,CY+124,PW-DESC_X+PX-56,1);
+        const descLines=sel.desc.split('\n');
+        ctx.font='13px "Courier New"';ctx.fillStyle='#f0e8c0';
+        descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+144+i*22);});
+        ctx.textAlign='left';
+        if(sel.cat==='ferramenta'){
+          const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar';
+          ctx.fillStyle=player.activeTool===sel.id?'rgba(180,60,20,0.3)':'rgba(200,160,40,0.2)';
+          _roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();
+          ctx.strokeStyle=player.activeTool===sel.id?'#c04020':'#f0c040';ctx.lineWidth=1.5;_roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke();
+          ctx.font='bold 13px "Courier New"';ctx.fillStyle=player.activeTool===sel.id?'#e06040':'#f0c040';
+          ctx.textAlign='center';ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left';
+        }
+      }
+    }
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(PX,PY+PH-38,PW,38);
+    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+16,PY+PH-39,PW-32,1);
+    ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.textAlign='center';
+    ctx.fillText('◀ ▶ Abas   ↑ ↓ Navegar   E Equipar/Desequipar   I Fechar',W/2,PY+PH-14);
+    ctx.textAlign='left';
+  }
+};
+
+function _roundRect(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
 const BUBBLE = {
@@ -413,11 +563,8 @@ const BUBBLE = {
 };
 
 function showDialog(lines, cb, speaker='CORVAN') { BUBBLE.show(lines, cb, speaker); }
-function checkDlg() { if (G.dialog && isE()) BUBBLE.advance(); }
+function checkDlg() { if (G.dialog && !INV.open && isE()) BUBBLE.advance(); }
 
-// ═══════════════════════════════════════════════════════════
-//  NOTIFICATION
-// ═══════════════════════════════════════════════════════════
 let notifText='', notifAlpha=0, notifTimer=0;
 function notify(msg, ms=2800){
   notifText=msg; notifTimer=ms; notifAlpha=1;
@@ -442,14 +589,10 @@ function drawNotif(){
   ctx.restore();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  ENEMY — patrulha baseada em spawnX (não em distância do player)
-//  Assim os inimigos se movem desde o início, sem precisar do player perto
-// ═══════════════════════════════════════════════════════════
 class Enemy {
   constructor(x,y,type,patrol){
     this.x=x; this.y=y;
-    this.spawnX=x;         // ← posição de spawn fixa para a patrulha
+    this.spawnX=x;
     this.type=type;
     this.w=type==='snake'?60:36;
     this.h=type==='snake'?24:60;
@@ -469,7 +612,7 @@ class Enemy {
       if(p.type==='spike'||p.type==='water'||p.type==='_dead') continue;
       if(edge>p.x&&edge<p.x+p.w&&this.y+this.h+2>=p.y&&this.y+this.h+2<=p.y+12) onEdge=true;
     }
-    // ← Usa spawnX ao invés de player.x: inimigos patrulham desde o início
+
     if((onG&&!onEdge)||Math.abs(this.x-this.spawnX)>this.patrol) this.vx=-this.vx;
     this.facing=this.vx>0?1:-1;
   }
@@ -499,9 +642,6 @@ class Enemy {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  CONDOR ALIADO — usa sprite se disponível, fallback procedural
-// ═══════════════════════════════════════════════════════════
 class CondorCompanion {
   constructor(){
     this.x=400; this.y=200;
@@ -540,7 +680,7 @@ class CondorCompanion {
   }
 
   draw(){
-    // Partículas douradas
+
     for(const s of this.sparks){
       ctx.save();
       ctx.globalAlpha=(s.life/s.max)*0.7;
@@ -552,7 +692,6 @@ class CondorCompanion {
     const sx=this.x-cam.x, sy=this.y-cam.y;
     if(sx<-120||sx>W+120) return;
 
-    // Brilho dourado
     ctx.save();
     const glow=ctx.createRadialGradient(sx,sy,0,sx,sy,70);
     glow.addColorStop(0,'rgba(255,210,60,0.25)');
@@ -560,13 +699,12 @@ class CondorCompanion {
     ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(sx,sy,70,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // ── Usa o sprite do condor se carregado ──
     if(SPRITES['condor']){
       const dw=140, dh=70;
       const flipLeft = Math.cos(this.angle) < 0;
       drawSprite('condor', Math.floor(this.frame)%4, sx-dw/2, sy-dh/2, dw, dh, flipLeft);
     } else {
-      // Fallback procedural
+
       const flap=Math.sin(this.frame*Math.PI/1.8)*16;
       ctx.save(); ctx.translate(sx,sy);
       ctx.fillStyle='#2a2010';
@@ -591,9 +729,6 @@ class CondorCompanion {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  COLLECTIBLE
-// ═══════════════════════════════════════════════════════════
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=30;this.h=30;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
@@ -627,9 +762,6 @@ class Col{
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  TRIGGER
-// ═══════════════════════════════════════════════════════════
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
   draw(px,py){
@@ -646,14 +778,12 @@ class Trigger{
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  PLAYER
-// ═══════════════════════════════════════════════════════════
 class Player{
   constructor(x,y){
     this.x=x; this.y=y; this.w=40; this.h=80;
     this.vx=0; this.vy=0; this.onG=false; this.facing=1;
     this.hp=3; this.maxHp=3; this.inv=0; this.dead=false;
+    this.activeTool=null;
     this.frame=0; this.ft=0; this.state='idle';
     this.coyote=0; this.jbuf=0; this.onMoving=null;
     this.items=[]; this.score=0;
@@ -707,10 +837,10 @@ class Player{
       if(!c.done&&this.overlaps(c)){
         c.done=true;
         if(c.type==='gold'){this.score+=10;sfx('coin');burst(c.x+15,c.y+15,'#f0c040');}
-        else{this.items.push(c.type);sfx('item');burst(c.x+15,c.y+15,'#f0c040',12);}
+        else{this.items.push(c.type);sfx('item');burst(c.x+15,c.y+15,'#f0c040',12);_journalColetar(c.type);}
       }
     }
-    if(isE()){for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}}
+    if(isE()&&this.onG){for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}}
     if(this.y>level.H+200) this._hurt(3,level);
 
     if(!this.onG&&this.vy<0)     this.state='jump';
@@ -725,7 +855,7 @@ class Player{
     for(const p of plats){
       if(p.type==='spike'||p.type==='water'||p.type==='_dead') continue;
       if(this.overlaps(p)){
-        // só permite "subir degrau" se os pés estiverem a menos de 4px do topo
+
         if(this.y+this.h <= p.y+4) continue;
         if(this.vx>0) this.x=p.x-this.w; else this.x=p.x+p.w;
         this.vx=0;
@@ -742,8 +872,7 @@ class Player{
           if(p.moving) this.onMoving=p;
           if(p.type==='trapdoor'&&p.crumble===undefined) p.crumble=70;
         } else {
-          // só bate no teto se os pés estavam abaixo da base da plataforma
-          // evita teletransportar o jogador ao bater no LADO de blocos altos
+
           if(this.y+this.h > p.y+p.h-4){
             this.y=p.y+p.h; this.vy=Math.abs(this.vy)*0.2;
           }
@@ -800,9 +929,6 @@ class Player{
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  BACKGROUNDS
-// ═══════════════════════════════════════════════════════════
 function drawBg(bgKey){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
@@ -818,9 +944,6 @@ function drawBg(bgKey){
   ctx.fillStyle='rgba(0,0,0,0.28)'; ctx.fillRect(0,0,W,H);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  LEVEL 1 — Espinhos realocados: chão + plataformas
-// ═══════════════════════════════════════════════════════════
 function buildL1(){
   const FL=580,WW=3600,WH=900;
   const plats=[
@@ -856,13 +979,13 @@ function buildL1(){
   const triggers=[
     new Trigger(3380,FL-300,200,300,'Acender o Intihuatana',(player,level)=>{
       if(!player.items.includes('lantern')){notify('Colete a Lanterna primeiro!');return;}
-      player.interactAnim=90; sfx('unlock');            // ← comemorando mais tempo
+      player.interactAnim=90; sfx('unlock');
       showDialog([
         '"Chegamos ao Vale Sagrado. O verdadeiro \'ouro\' não era apenas o metal — era o domínio do tempo e das estrelas."',
         '"Os Incas construíram Machu Picchu numa altitude de 2.430 metros. Cada pedra foi colocada com precisão milimétrica, sem uso de cimento."',
         '"O Intihuatana é um relógio solar de pedra. Ao alinhar a luz com a picareta, você revela a câmara oculta."',
         'O portão de pedra range e se abre. A câmara das constelações aguarda!'
-      ],()=>{notify('✦ Portão aberto! Próxima cena desbloqueada!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);}); // ← 4 s
+      ],()=>{notify('✦ Portão aberto! Próxima cena desbloqueada!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);});
     }),
   ];
   return{
@@ -887,9 +1010,6 @@ function buildL1(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════
-//  LEVEL 2 — Mais inimigos no chão e nas plataformas
-// ═══════════════════════════════════════════════════════════
 function buildL2(){
   const FL=580,WW=3400,WH=900;
   const rocks=[],rockZones=[];
@@ -913,7 +1033,7 @@ function buildL2(){
   [600,1100,1800,2300].forEach(x=>rockZones.push({x,done:false}));
 
   const enemies=[
-    // ── Inimigos no chão ──
+
     new Enemy(500,FL-44,'guardian',70),
     new Enemy(780,FL-44,'snake',60),
     new Enemy(1060,FL-44,'snake',80),
@@ -922,16 +1042,16 @@ function buildL2(){
     new Enemy(1900,FL-44,'snake',80),
     new Enemy(2200,FL-44,'snake',70),
     new Enemy(2550,FL-44,'guardian',80),
-    // ── Inimigos nas plataformas ──
-    new Enemy(200, FL-180-60,'guardian',45),    // plat(160,FL-180)
-    new Enemy(620, FL-200-24,'snake',  50),     // plat(580,FL-200)
-    new Enemy(1060,FL-180-60,'guardian',45),    // plat(1040,FL-180)
-    new Enemy(1510,FL-200-60,'guardian',45),    // plat(1480,FL-200)
-    new Enemy(2030,FL-200-60,'guardian',45),    // plat(2000,FL-200)
-    new Enemy(2510,FL-220-24,'snake',  50),     // plat(2480,FL-220)
-    new Enemy(400, FL-280-24,'snake',  45),     // plat(380,FL-280)
-    new Enemy(820, FL-280-60,'guardian',45),    // plat(800,FL-280)
-    new Enemy(1300,FL-300-24,'snake',  45),     // plat(1280,FL-300)
+
+    new Enemy(200, FL-180-60,'guardian',45),
+    new Enemy(620, FL-200-24,'snake',  50),
+    new Enemy(1060,FL-180-60,'guardian',45),
+    new Enemy(1510,FL-200-60,'guardian',45),
+    new Enemy(2030,FL-200-60,'guardian',45),
+    new Enemy(2510,FL-220-24,'snake',  50),
+    new Enemy(400, FL-280-24,'snake',  45),
+    new Enemy(820, FL-280-60,'guardian',45),
+    new Enemy(1300,FL-300-24,'snake',  45),
   ];
   const cols=[
     ...[80,240,480,720,960,1180,1440,1680,1960,2220,2500,2700].map(x=>new Col(x,FL-50,'gold')),
@@ -947,7 +1067,7 @@ function buildL2(){
         '"Os Incas dominavam a astronomia. Usavam as posições das estrelas para definir datas de plantio e colheita com precisão máxima."',
         '"A constelação do Condor marca o início do ciclo sagrado. Três estrelas, três pedras — como estão no céu, assim ficam na terra."',
         'A câmara secreta se abre com um eco profundo de pedra sobre pedra. O Tumi aguarda!'
-      ],()=>{notify('✦ Constelação alinhada! Câmara aberta!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);}); // ← 4 s
+      ],()=>{notify('✦ Constelação alinhada! Câmara aberta!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);});
     }),
   ];
   return{
@@ -999,9 +1119,6 @@ function buildL2(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════
-//  LEVEL 3 — Água corrigida (width uniforme)
-// ═══════════════════════════════════════════════════════════
 function buildL3(){
   const FL=580,WW=3600,WH=900;
   const plats=[
@@ -1019,14 +1136,14 @@ function buildL3(){
     movH(2150,FL-36,100,2150,2260,2.2),movH(2690,FL-36,100,2690,2790,2.0),
     movV(2870,FL-100,100,FL-220,FL-36,2.0),
     trap(1100,FL-50,110),
-    // ── Águas: largura e posição agora uniformes ──
+
     water(280,FL,100,WH-FL), water(520,FL,100,WH-FL),
-    water(740,FL,100,WH-FL),                           // ← corrigido: era 760,w=80
+    water(740,FL,100,WH-FL),
     water(1000,FL,100,WH-FL),water(1240,FL,120,WH-FL),
     water(1524,FL,106,WH-FL),water(1760,FL,110,WH-FL),
     water(2150,FL,110,WH-FL),water(2424,FL,116,WH-FL),
     water(2684,FL,106,WH-FL),water(2990,FL,110,WH-FL),
-    // Escadaria do altar
+
     solid(2990,FL-80, 120,80),
     solid(3030,FL-160,110,80),
     solid(3060,FL-240,140,80),
@@ -1054,7 +1171,7 @@ function buildL3(){
         '"Este é o Tumi — faca cerimonial de liga de ouro e prata, incrustada com turquesa. Usada em rituais de oferenda ao sol."',
         '"Não use a picareta aqui. Para revelar o compartimento secreto, a lanterna reflete a luz no símbolo do condor na pedra."',
         'Você segurou o Tumi dourado. A luz do altar brilha ao seu redor. Suba ao Templo do Sol!'
-      ],()=>{notify('✦ Tumi encontrado! Vá ao Templo do Sol!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);}); // ← 4 s
+      ],()=>{notify('✦ Tumi encontrado! Vá ao Templo do Sol!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);});
     }),
   ];
   return{
@@ -1083,58 +1200,52 @@ function buildL3(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════
-//  LEVEL 4 — Mais adversidades; templo ajustado; moedas acessíveis
-//  Condor é ALIADO: voa ao lado, não ataca
-// ═══════════════════════════════════════════════════════════
 function buildL4(){
   const FL=620,WW=3200,WH=900;
   const plats=[
-    // Chão
+
     solid(0,FL,380,WH-FL),solid(460,FL,320,WH-FL),solid(870,FL,360,WH-FL),
     solid(1330,FL,380,WH-FL),solid(1810,FL,400,WH-FL),solid(2320,FL,680,WH-FL),
-    // Plataformas elevadas
+
     solid(200,FL-140,160,18),solid(400,FL-240,140,18),solid(600,FL-180,155,18),
     solid(840,FL-260,140,18),solid(1060,FL-200,155,18),solid(1280,FL-310,130,18),
     solid(1540,FL-200,175,18),solid(1760,FL-280,150,18),solid(2050,FL-180,160,18),
-    // ── Templo do Sol redesenhado: cume acessível (y=200) ──
+
     solid(2380,FL-80, 560,80),
     solid(2440,FL-160,500,80),
     solid(2510,FL-240,440,80),
-    solid(2590,FL-300,380,18),   // step 4, topo y = FL-300 = 320
-    solid(2680,FL-360,320,18),   // step 5, topo y = FL-360 = 260
-    solid(2780,FL-420,260,18),   // CUME, topo y = FL-420 = 200  ← acessível
-    // Plataformas móveis
+    solid(2590,FL-300,380,18),
+    solid(2680,FL-360,320,18),
+    solid(2780,FL-420,260,18),
+
     movH(440,FL-180,120,440,730,2.2),
     movH(1380,FL-150,110,1380,1680,2.0),
     movH(2240,FL-140,110,2240,2380,1.8),
-    // Trapdoors
+
     trap(340,FL-80,110),trap(1100,FL-90,100),trap(2100,FL-80,110),
-    // ── Espinhos realocados: no chão entre os gaps e em cima das plataformas ──
-    // Chão
+
     spike(395,FL-20,50),  spike(810,FL-20,50),  spike(1250,FL-20,50),
     spike(1730,FL-20,50), spike(2250,FL-20,60),
-    // Plataformas
+
     spike(430,FL-260,36), spike(870,FL-280,36),
     spike(1080,FL-220,36),spike(1790,FL-300,36),
   ];
 
   const condor=new CondorCompanion();
 
-  // ── Mais inimigos para aumentar dificuldade ──
   const enemies=[
     new Enemy(200, FL-44,'guardian',60),
     new Enemy(680, FL-44,'snake',  70),
     new Enemy(1100,FL-44,'guardian',80),
     new Enemy(1600,FL-44,'snake',  70),
     new Enemy(2050,FL-44,'guardian',80),
-    // Nas plataformas
-    new Enemy(440, FL-140-60,'guardian',45),  // plat(200,FL-140)
-    new Enemy(640, FL-180-24,'snake',  50),   // plat(600,FL-180)
-    new Enemy(1310,FL-310-60,'guardian',40),  // plat(1280,FL-310)
-    new Enemy(1790,FL-280-24,'snake',  50),   // plat(1760,FL-280)
-    new Enemy(1080,FL-200-24,'snake',  45),   // plat(1060,FL-200)
-    new Enemy(1560,FL-200-60,'guardian',45),  // plat(1540,FL-200)
+
+    new Enemy(440, FL-140-60,'guardian',45),
+    new Enemy(640, FL-180-24,'snake',  50),
+    new Enemy(1310,FL-310-60,'guardian',40),
+    new Enemy(1790,FL-280-24,'snake',  50),
+    new Enemy(1080,FL-200-24,'snake',  45),
+    new Enemy(1560,FL-200-60,'guardian',45),
   ];
 
   const cols=[
@@ -1151,14 +1262,14 @@ function buildL4(){
   const triggers=[
     new Trigger(2780,FL-460,240,460,'Completar a Fase!',(player,level)=>{
       level.triggers[0].done=true;
-      player.interactAnim=120;sfx('unlock');           // ← comemoração longa
+      player.interactAnim=120;sfx('unlock');
       showDialog([
         '"O Condor era o mensageiro dos deuses Incas — unindo o Hanan Pacha (mundo superior) ao Kay Pacha (mundo terreno)."',
         '"Machu Picchu foi abandonada pelos Incas no século XVI, após a chegada dos colonizadores espanhóis."',
         '"A cidade permaneceu oculta por séculos, protegida pelas nuvens e pela floresta, até ser redescoberta em 1911 por Hiram Bingham."',
         'Descobertas: ✦ Lanterna do Arqueólogo ✦ Pedras da Constelação ✦ Tumi de Ouro e Turquesa',
         '🏆 FASE 1.3 CONCLUÍDA! A sabedoria do Vale Sagrado foi preservada. Próximo destino: América do Norte!'
-      ],()=>{G.state='complete';});
+      ],()=>{_salvarProgresso(G.player?.score||0,G.deaths);G.state='complete';});
     }),
   ];
 
@@ -1195,9 +1306,6 @@ function buildL4(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════
-//  HUD
-// ═══════════════════════════════════════════════════════════
 function drawHUD(player,level){
   ctx.fillStyle='rgba(0,0,0,0.62)';ctx.fillRect(0,0,W,38);
   for(let i=0;i<player.maxHp;i++){
@@ -1211,12 +1319,25 @@ function drawHUD(player,level){
   ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#f0c040';ctx.font='bold 15px "Courier New"';
   ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
+  // Slot ferramenta ativa
+  const tY=44;
+  ctx.fillStyle='rgba(0,0,0,0.5)';_roundRect(16,tY,140,28,4);ctx.fill();
+  ctx.strokeStyle=player.activeTool?'#f0c040':'#444';ctx.lineWidth=1.5;_roundRect(16,tY,140,28,4);ctx.stroke();
+  if(player.activeTool&&ITEM_DEFS[player.activeTool]){
+    const def=ITEM_DEFS[player.activeTool];
+    ctx.font='14px serif';ctx.fillText(def.icon,24,tY+20);
+    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText(def.nome,42,tY+20);
+  } else {ctx.font='11px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',22,tY+20);}
+  ctx.fillStyle='rgba(200,160,40,0.15)';_roundRect(162,tY,46,28,4);ctx.fill();
+  ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;_roundRect(162,tY,46,28,4);ctx.stroke();
+  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#c0a030';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
+  // Inventário lado direito
   let ix=W-16;const inv=[];
   if(player.items.includes('tumi'))    inv.push('🗡 TUMI');
   if(player.items.includes('lantern')) inv.push('🔦 LANTERNA');
   const sc=player.items.filter(i=>i==='stone').length;
   if(sc>0) inv.push('💎 '+sc+'/3');
-  for(const it of inv){ctx.fillStyle='#f0c040';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,48);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
+  for(const it of inv){ctx.fillStyle='#f0c040';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,tY+20);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
   if(player.soroche>40){
     const pct=(player.soroche-40)/60,bW=120,bX=16,bY=44;
     ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(bX,bY,bW,12);
@@ -1233,25 +1354,15 @@ function drawHUD(player,level){
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  TITLE SCREEN
-//  – Corvan REMOVIDO da capa
-//  – Condor voa pela tela (sprite ou procedural)
-//  – Cobras animadas no rodapé
-// ═══════════════════════════════════════════════════════════
-
-
 function drawTitle(){
   const bg=IMG['bg01'];
   if(bg&&bg.complete&&bg.naturalWidth>0){ ctx.globalAlpha=0.55; drawBg('bg01'); ctx.globalAlpha=1; }
   else{ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#060300');g.addColorStop(1,'#180e00');ctx.fillStyle=g;ctx.fillRect(0,0,W,H); }
   ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
 
-  // Estrelas
   for(let i=0;i<150;i++){const sx=(i*137.5)%W,sy=(i*83.7)%380;ctx.fillStyle=`rgba(255,248,210,${.2+Math.sin(Date.now()/1100+i)*.2})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
 
-  // ── Condor voa pela tela (sprite se disponível) ──
-  const condorPeriod = 14000; // ms por travessia
+  const condorPeriod = 14000;
   const condorT  = (Date.now() % condorPeriod) / condorPeriod;
   const condorX  = condorT * (W + 280) - 140;
   const condorY  = 160 + Math.sin(Date.now()/1100) * 30;
@@ -1259,7 +1370,7 @@ function drawTitle(){
   if(SPRITES['condor']){
     drawSprite('condor', condorFr, condorX, condorY, 150, 75, false);
   } else {
-    // Fallback procedural
+
     ctx.save(); ctx.translate(condorX+75, condorY+37);
     const fl=Math.sin(Date.now()/120)*14;
     ctx.fillStyle='#2a2010';
@@ -1270,7 +1381,6 @@ function drawTitle(){
     ctx.restore();
   }
 
-  // Títulos e textos
   ctx.textAlign='center';
   ctx.shadowColor='#f0c040';ctx.shadowBlur=40;
   ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O TESOURO DO CONDOR',W/2,155);
@@ -1300,20 +1410,17 @@ function drawComplete(){
   const lines=['✦  Faca Cerimonial Tumi — ouro, prata e turquesa','✦  Intihuatana — o relógio solar Inca revelado','✦  Constelação do Condor — geometria das estrelas','✦  Sistema de irrigação do Vale Sagrado'];
   ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,250+i*30));
   ctx.fillStyle='#f0c040';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
-  ctx.fillStyle=`rgba(240,192,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('Pressione ENTER para jogar novamente',W/2,450);
+  ctx.fillStyle=`rgba(240,192,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('▶  ENTER ou M — Voltar ao Menu Principal  ◀',W/2,450);
   ctx.font='64px serif';ctx.fillText('🏆',W/2-32,540);ctx.textAlign='left';
 }
 
-// ═══════════════════════════════════════════════════════════
-//  GAME STATE
-// ═══════════════════════════════════════════════════════════
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',
   lvIdx:0,level:null,player:null,
   dialog:false,
   deaths:0,timeOnLevel:0,
-  _storedItems:[],_storedScore:0,
+  _storedItems:[],_storedScore:0,_storedTool:null,
 
   load(idx){
     this.lvIdx=idx;particles=[];
@@ -1321,7 +1428,7 @@ const G={
     this.level=LEVELS[idx]();
     cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
-    if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;}
+    if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
     this.dialog=false;this.state='playing';this.timeOnLevel=0;
     BUBBLE.active=false;
     setTimeout(()=>{if(this.state==='playing') showDialog(this.level.intro,null);},900);
@@ -1330,6 +1437,7 @@ const G={
   nextLevel(){
     this._storedItems=[...this.player.items];
     this._storedScore=this.player.score;
+    this._storedTool=this.player.activeTool;
     if(this.lvIdx+1<LEVELS.length) this.load(this.lvIdx+1);
     else this.state='complete';
   },
@@ -1363,25 +1471,46 @@ const G={
     drawHUD(this.player,this.level);
     BUBBLE.draw(this.player);
     drawNotif();
+    INV.draw(this.player);
   }
 };
 
-// ═══════════════════════════════════════════════════════════
-//  LOOP
-// ═══════════════════════════════════════════════════════════
+function _journalColetar(tipo){
+  const id=TIPO_TO_JOURNAL[tipo]||tipo; if(!id) return;
+  try{
+    const raw=localStorage.getItem('mineralis_save_v2');
+    const save=raw?JSON.parse(raw):{};
+    if(!save.coletados) save.coletados={};
+    if(!save.coletados[id]){save.coletados[id]=true;localStorage.setItem('mineralis_save_v2',JSON.stringify(save));}
+  }catch(e){}
+}
+
+function _salvarProgresso(score,deaths){
+  const estrelas=deaths===0?4:deaths<=2?3:deaths<=5?2:1;
+  try{
+    const raw=localStorage.getItem('mineralis_save_v2');
+    const save=raw?JSON.parse(raw):{versao:1,iniciado:true,fases:{}};
+    if(!save.fases) save.fases={};
+    if(!save.fases['1.3']) save.fases['1.3']={desbloqueada:true,estrelas:0};
+    save.fases['1.3'].estrelas=Math.max(save.fases['1.3'].estrelas||0,estrelas);
+    save.fases['1.3'].desbloqueada=true;
+    localStorage.setItem('mineralis_save_v2',JSON.stringify(save));
+  }catch(e){}
+}
+
 function startGame(){G.load(0);G.state='title';loop();}
 
 function loop(){
   requestAnimationFrame(loop);
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
   if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
-  if(G.state==='complete' && jp['Enter']){G.deaths=0;G._storedItems=[];G._storedScore=0;G.state='title';}
+  if(G.state==='complete' &&(jp['Enter']||jp['KeyM'])) _voltarAoMenu();
+  if(G.state==='complete' && jp['KeyM'])  _voltarAoMenu();
   G.update();
   G.draw();
   clearJP();
 }
 
-// Loading screen
 if(!gameReady){
   (function loadLoop(){
     if(gameReady) return;
