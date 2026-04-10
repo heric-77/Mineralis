@@ -37,8 +37,8 @@ function sfx(type){
 }
 
 const IMG={};
-let assetsLoaded=0,totalAssets=3,gameReady=false;
-[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01-04.JPG']].forEach(([key,src])=>{
+let assetsLoaded=0, totalAssets=4, gameReady=false; // Atualizado para 4
+[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01-04.JPG'],['capa','1_1_andes.svg']].forEach(([key,src])=>{
   const img=new Image();
   img.onload=()=>{IMG[key]=img;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
@@ -937,13 +937,12 @@ function buildL1(){
     }),
   ];
   return{id:1,bg:'bgext',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
-    title:'Cena I — O Início em Potosí',
-    hint:'⛏ Picareta na alcova • 🦙 Fale com a Lhama • Entre na mina →',
+    title:'O Início em Potosí',
+    hint:'⛏ Colete a Picareta na alcova • 🦙 Interaja com a Lhama • Entre na mina →',
     plats,bats,cols,triggers,llama,veins:[],
     intro:[
-      '"Bem-vindo ao Cerro Rico de Potosí, Bolívia — 4.090 metros de altitude. Uma das maiores jazidas de prata do mundo."',
+      '"Bem-vindo ao Cerro Rico de Potosí, Bolívia, estamos há 4.090 metros de altitude. Uma das maiores jazidas de prata do mundo."',
       '"Os Incas mineravam aqui séculos antes dos espanhóis. A prata era símbolo lunar — dos deuses, não do comércio."',
-      'Encontre a Picareta na alcova de pedra, converse com a Lhama para obter as Folhas de Coca, e entre na mina!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
@@ -1038,8 +1037,8 @@ function buildL2(){
     hint:'🔦 Ache a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Soroche aumenta!',
     plats,bats,cols,triggers,veins,llama:null,
     intro:[
-      '"Corvan entra na mina. Está escuro — mas há algo brilhando na entrada. Uma lanterna abandonada!"',
-      '"Com a Lanterna em mãos, o caminho se ilumina. Os veios de prata nas paredes ficam visíveis."',
+      '"Entramos na Mina! Está escuro — mas há algo brilhando na entrada. É uma lanterna abandonada!"',
+      '"Agora o caminho está iluminado e podemos ver os veios de prata nas paredes."',
       'Pegue a 🔦 Lanterna na entrada, equipe-a no Diário [I] e use a ⛏ Picareta nos veios brilhantes!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const v of this.veins)v.tick();for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
@@ -1178,14 +1177,14 @@ function buildL4(){
 function drawHUD(player,level){
   ctx.fillStyle='rgba(8,4,0,0.68)';ctx.fillRect(0,0,W,38);
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#c83020':'#334';
+    ctx.fillStyle=i<player.hp?'#e0b840':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
     ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  ctx.fillStyle='rgba(220,185,80,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#e0b840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
+  ctx.fillStyle='rgba(220,185,80,.9)';ctx.font='24px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
+  ctx.fillStyle='#e0b840';ctx.font='bold 20px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
 
   const toolY=44;
   ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,toolY,130,30,4);ctx.fill();
@@ -1219,24 +1218,38 @@ function drawHUD(player,level){
   if(G.timeOnLevel<600){
     ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(8,H-44,440,28);
     ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';
-    ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar   [Stomp morcegos]',14,H-25);
+    ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',14,H-25);
   }
 }
 
 function drawTitle(){
-  drawBg('bgext');ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
+  drawBg('bgext'); ctx.fillStyle='rgba(0,0,0,0.52)'; ctx.fillRect(0,0,W,H);
   drawStars();
+  
   ctx.textAlign='center';
-  ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
-  ctx.fillStyle='#e0b840';ctx.font='bold 46px "Courier New"';ctx.fillText('O SEGREDO DE POTOSÍ',W/2,220);
+  ctx.shadowColor='#e0b840'; ctx.shadowBlur=40;
+  ctx.fillStyle='#e0b840'; ctx.font='bold 46px "Courier New"';
+  ctx.fillText('O SEGREDO DE POTOSÍ', W/2, 160); // Subi um pouco o título (era 220)
+  
   ctx.shadowBlur=0;
-  ctx.fillStyle='#c8a060';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.1  —  Potosí, Bolívia',W/2,270);
-  ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
-  ctx.fillStyle='#888';ctx.font='13px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,494);
+  ctx.fillStyle='#c8a060'; ctx.font='19px "Courier New"';
+  ctx.fillText('Fase 1.1  —  Potosí, Bolívia', W/2, 200); // Subi o subtítulo (era 270)
+
+  if(IMG.capa) {
+    const imgW = 220;
+    const imgH = 220;
+    ctx.drawImage(IMG.capa, W/2 - imgW/2, 230, imgW, imgH);
+  }
+
+  ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`; 
+  ctx.font='19px "Courier New"';
+  ctx.fillText('▶  Pressione ENTER para começar  ◀', W/2, 500); // Ajustado para baixo da imagem
+  
+  ctx.fillStyle='#888'; ctx.font='13px "Courier New"';
+  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar', W/2, 540);
   ctx.textAlign='left';
 }
+
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;

@@ -5,7 +5,6 @@ function saveRead() {
 function saveWrite(data) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch {}
 }
-/** Desbloqueia próxima fase no menu (igual a SaveManager.desbloquearFase) */
 function unlockPhase(id) {
   const s = saveRead();
   if (!s.fases) s.fases = {};
@@ -301,7 +300,6 @@ function drawPlatform(p){
     const t2=Date.now()/2200;
     ctx.fillStyle='rgba(120,80,30,0.3)';
     for(let i=0;i<3;i++)ctx.fillRect(sx+i*(p.w/3)+Math.sin(t2+i)*10,sy+6,28,4);
-    // Toxic bubbles
     ctx.fillStyle='rgba(180,200,20,0.5)';
     for(let i=0;i<3;i++){const bx=sx+((i*p.w/3+Date.now()/50)%p.w);ctx.beginPath();ctx.arc(bx,sy+4+Math.sin(Date.now()/600+i)*6,4,0,Math.PI*2);ctx.fill();}
     return;
@@ -331,7 +329,6 @@ function drawPlatform(p){
     }
   }
   ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,4);
-  // Grass tufts
   ctx.fillStyle='rgba(80,160,40,0.55)';
   for(let i=0;i<Math.floor(p.w/16);i++)ctx.fillRect(sx+i*16+4,sy-3,4,5);
   if(p.moving){ctx.fillStyle='rgba(80,200,80,0.35)';ctx.fillRect(sx,sy,p.w,4);}
@@ -353,21 +350,17 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const showBateia=(activeTool==='bateia');
   const showPa=(activeTool==='pa');
   const showLantern=(activeTool==='lanterna');
-  // Hat + lamp
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
   r(13,0,6,3,'#c8a020');r(14,0,4,2,'#ffe060');
-  // Head
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Shirt + belt + pants
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
   r(8,28,16,2,'#2a1408');r(14,28,4,2,'#c88020');
   r(9,30,14,12,'#383838');r(15,36,2,6,'#282828');
-  // Braço esquerdo
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
   if(showBateia){
     const wb=Math.sin(frame*0.15)*1.2;
@@ -379,13 +372,11 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
     r(0,22,4,1,'#8a5820');r(-1,23,1,8,'#8a5820');
     r(-4,20,9,6,'#9090a8');r(-4,20,9,2,'#b0b0c8');
   }
-  // Braço direito
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
   if(showLantern){
     r(26,31,1,3,'#888888');r(24,34,5,6,'#604010');r(25,35,3,4,'#ffe080');
     r(23,33,7,8,'#ffcc00',0.12*lb);
   }
-  // Boots
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
   ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
@@ -399,19 +390,15 @@ function corvanFrame(t){return Math.sin(t)*2;}
 function drawBateia(cx,cy,bobT=0,scale=1){
   ctx.save(); ctx.translate(cx, cy+Math.sin(bobT)*4);
   const S=scale;
-  // Wooden rim
   ctx.fillStyle='#7a4010'; ctx.beginPath(); ctx.ellipse(0,0,28*S,14*S,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#8b5018'; ctx.beginPath(); ctx.ellipse(0,0,26*S,12*S,0,0,Math.PI*2); ctx.fill();
-  // Metal ring
   ctx.strokeStyle='#8a9ba8'; ctx.lineWidth=3*S;
   ctx.beginPath(); ctx.ellipse(0,0,28*S,14*S,0,0,Math.PI*2); ctx.stroke();
   ctx.strokeStyle='#b0c4cc'; ctx.lineWidth=1.5*S;
   ctx.beginPath(); ctx.ellipse(0,1*S,26*S,12*S,0,0,Math.PI*2); ctx.stroke();
-  // Interior
   ctx.fillStyle='#5a6670'; ctx.beginPath(); ctx.ellipse(0,1*S,20*S,9*S,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#6b7880'; ctx.beginPath(); ctx.ellipse(0,1*S,16*S,7*S,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='rgba(154,176,184,0.5)'; ctx.beginPath(); ctx.ellipse(-4*S,-1*S,5*S,2.5*S,-0.4,0,Math.PI*2); ctx.fill();
-  // Wood grain lines
   ctx.strokeStyle='rgba(90,48,8,0.35)'; ctx.lineWidth=2*S;
   ctx.beginPath(); ctx.ellipse(0,0,22*S,11*S,0,0.2,1.0); ctx.stroke();
   ctx.restore();
@@ -419,11 +406,9 @@ function drawBateia(cx,cy,bobT=0,scale=1){
 
 function drawGoldNugget(cx,cy,bobT=0,sz=1){
   ctx.save(); ctx.translate(cx, cy+Math.sin(bobT)*5);
-  // Glow
   const glow=ctx.createRadialGradient(0,0,0,0,0,22*sz);
   glow.addColorStop(0,'rgba(255,210,50,0.4)'); glow.addColorStop(1,'rgba(255,180,0,0)');
   ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,22*sz,0,Math.PI*2); ctx.fill();
-  // Body – irregular nugget shape
   ctx.fillStyle='#c9920f';
   ctx.beginPath(); ctx.moveTo(-8*sz,-6*sz); ctx.lineTo(0,-11*sz); ctx.lineTo(10*sz,-5*sz);
   ctx.lineTo(12*sz,2*sz); ctx.lineTo(6*sz,11*sz); ctx.lineTo(-4*sz,12*sz);
@@ -431,10 +416,8 @@ function drawGoldNugget(cx,cy,bobT=0,sz=1){
   ctx.fillStyle='#e8a820';
   ctx.beginPath(); ctx.moveTo(-7*sz,-5*sz); ctx.lineTo(-1*sz,-9*sz); ctx.lineTo(8*sz,-4*sz);
   ctx.lineTo(10*sz,2*sz); ctx.lineTo(5*sz,9*sz); ctx.lineTo(-4*sz,9*sz); ctx.closePath(); ctx.fill();
-  // Highlight
   ctx.fillStyle='#f0c040'; ctx.beginPath(); ctx.ellipse(-2*sz,-3*sz,4*sz,3*sz,0.4,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='rgba(255,255,200,0.7)'; ctx.beginPath(); ctx.arc(-3*sz,-5*sz,2*sz,0,Math.PI*2); ctx.fill();
-  // Animated glint
   const ga=Math.abs(Math.sin(Date.now()/400+cx*0.01));
   ctx.strokeStyle=`rgba(255,255,200,${ga*0.9})`; ctx.lineWidth=2*sz;
   ctx.beginPath(); ctx.moveTo(4*sz,-7*sz); ctx.lineTo(9*sz,-12*sz); ctx.stroke();
@@ -448,22 +431,16 @@ function drawUrna(cx,cy,bobT=0,buried=false){
     glow.addColorStop(0,'rgba(180,60,20,0.32)'); glow.addColorStop(1,'rgba(180,50,0,0)');
     ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,34,0,Math.PI*2); ctx.fill();
   }
-  // Body globular
   ctx.fillStyle='#aa1a00'; ctx.beginPath(); ctx.ellipse(0,5,15,20,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#cc2200'; ctx.beginPath(); ctx.ellipse(-2,3,13,17,-0.1,0,Math.PI*2); ctx.fill();
-  // Grey sheen top
   ctx.fillStyle='#888'; ctx.beginPath(); ctx.ellipse(0,-7,10,6,0,0,Math.PI*2); ctx.fill();
-  // Mouth ring
   ctx.fillStyle='#eee'; ctx.beginPath(); ctx.ellipse(0,-14,9,3.5,0,0,Math.PI*2); ctx.fill();
-  // Marajoara labirinto pattern
   ctx.strokeStyle='#fff'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(-12,2); ctx.lineTo(-7,-2); ctx.lineTo(-2,2); ctx.lineTo(3,-2); ctx.lineTo(8,2); ctx.lineTo(13,-2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(-12,9); ctx.lineTo(-7,5); ctx.lineTo(-2,9); ctx.lineTo(3,5); ctx.lineTo(8,9); ctx.lineTo(13,5); ctx.stroke();
-  // Handles
   ctx.fillStyle='#880a00'; ctx.fillRect(-20,0,5,12); ctx.fillRect(15,0,5,12);
   ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
   ctx.strokeRect(-20,0,5,12); ctx.strokeRect(15,0,5,12);
-  // Snake dots
   ctx.fillStyle='#6a0000';
   for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(-6+i*4,16,2.5,0,Math.PI*2);ctx.fill();}
   if(buried){ctx.fillStyle='rgba(60,35,10,0.5)';ctx.fillRect(-22,-24,44,28);}
@@ -483,7 +460,6 @@ function drawPa(cx,cy,bobT=0){
   ctx.restore();
 }
 
-// ── BUBBLE DIALOG ─────────────────────────────────────────────
 function wrapText(text, maxW) {
   ctx.font='15px "Courier New"';
   const pars=text.split('\n'), result=[];
@@ -500,10 +476,10 @@ function wrapText(text, maxW) {
 }
 
 const BUBBLE={
-  active:false,queue:[],cb:null,lines:[],speakerTxt:'CORVAN',speakerColor:'#78d840',faceFrame:0,
+  active:false,queue:[],cb:null,lines:[],speakerTxt:'',speakerColor:'#78d840',faceFrame:0,
   show(messages,cb,speaker='CORVAN',color='#78d840'){
-    this.queue=[...messages];this.cb=cb;this.active=true;
-    this.speakerTxt=speaker;this.speakerColor=color;G.dialog=true;this._next();
+   this.queue=[...messages];this.cb=cb;this.active=true;
+   this.speakerTxt=speaker;this.speakerColor=color;G.dialog=true;this._next();
   },
   _next(){
     if(!this.queue.length){this.active=false;G.dialog=false;if(this.cb){const f=this.cb;this.cb=null;f();}return;}
@@ -512,28 +488,22 @@ const BUBBLE={
   advance(){if(this.active)this._next();},
   draw(player){
     if(!this.active)return;
-    this.faceFrame+=0.06;
     ctx.font='15px "Courier New"';
-    const lineH=22,pad=16,textAreaW=470;
-    const CORVAN_W=64, CORVAN_H=104; // Corvan pixel at scale 2
-    const bubW=CORVAN_W+pad*2+textAreaW+pad;
-    const bubH=Math.max(CORVAN_H, this.lines.length*lineH+32)+pad*2;
+    const lineH=22,pad=20,textAreaW=560;
+    const bubW=textAreaW+pad*2;
+    const bubH=this.lines.length*lineH+80;
     const pcx=player.x-cam.x+player.w/2, pcy=player.y-cam.y;
     let bx=Math.max(10,Math.min(pcx-bubW/2, W-bubW-10));
     let by=Math.max(10, pcy-bubH-32);
 
-    // Shadow + background
     ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=14;
     ctx.fillStyle='rgba(4,14,4,0.95)'; roundRect(bx,by,bubW,bubH,14); ctx.fill();
     ctx.shadowBlur=0;
-    // Border
     ctx.strokeStyle=this.speakerColor; ctx.lineWidth=2.5;
     roundRect(bx,by,bubW,bubH,14); ctx.stroke();
-    // Inner decorative line
     ctx.strokeStyle=`rgba(120,216,64,0.2)`; ctx.lineWidth=1;
     roundRect(bx+4,by+4,bubW-8,bubH-8,10); ctx.stroke();
 
-    // Tail pointing to player
     const tailBX=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
     const tailTY=by+bubH, tailTipY=Math.min(pcy,tailTY+38);
     ctx.fillStyle='rgba(4,14,4,0.95)';
@@ -541,28 +511,13 @@ const BUBBLE={
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(tailBX-14,tailTY);ctx.lineTo(pcx,tailTipY);ctx.lineTo(tailBX+14,tailTY);ctx.stroke();
 
-    // Corvan face (SVG pixel art redrawn on canvas at scale 2)
-    const SCALE = 2;
-    const fx = bx+pad, fy = by+pad;
-    // Clip to face area
-    ctx.save();
-    ctx.beginPath();ctx.rect(fx, fy, CORVAN_W, CORVAN_H);ctx.clip();
-    drawCorvan(fx, fy, SCALE, false, this.faceFrame*8);
-    ctx.restore();
-    // Frame border around Corvan
-    ctx.strokeStyle='rgba(80,200,80,0.45)';ctx.lineWidth=1.5;
-    ctx.strokeRect(fx,fy,CORVAN_W,CORVAN_H);
-
-    // Speaker name
-    const tx=fx+CORVAN_W+pad;
+    const tx=bx+pad;
     ctx.font='bold 12px "Courier New"';ctx.fillStyle=this.speakerColor;
     ctx.fillText(this.speakerTxt, tx, by+pad+14);
 
-    // Text body
     ctx.font='15px "Courier New"';ctx.fillStyle='#e8f8e0';
     this.lines.forEach((l,i)=>ctx.fillText(l, tx, by+pad+36+i*lineH));
 
-    // Continue hint
     const pulse=0.5+Math.sin(Date.now()/400)*0.5;
     ctx.fillStyle=`rgba(80,200,80,${pulse})`;
     ctx.font='12px "Courier New"';ctx.textAlign='right';
@@ -573,7 +528,6 @@ const BUBBLE={
 function showDialog(msgs,cb,speaker='CORVAN',color='#78d840'){BUBBLE.show(msgs,cb,speaker,color);}
 function checkDlg(){if(G.dialog&&!INV.open&&isE())BUBBLE.advance();}
 
-// ── Info popup (mineral/artefact card) ────────────────────────
 let popup={active:false,timer:0,title:'',lines:[],color:'#f0c040',icon:''};
 function showPopup(title,lines,color,icon,ms=6500){popup={active:true,timer:ms,title,lines,color,icon};}
 function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.timer<=0)popup.active=false;}}
@@ -594,7 +548,6 @@ function drawPopup(){
   ctx.textAlign='left';ctx.restore();
 }
 
-// ── Notification ───────────────────────────────────────────────
 let notifText='',notifAlpha=0,notifTimer=0;
 function notify(msg,ms=2800){notifText=msg;notifTimer=ms;notifAlpha=1;}
 function tickNotif(){if(notifTimer>0){notifTimer-=16;if(notifTimer<=0)notifAlpha=0;else notifAlpha=Math.min(1,notifTimer/300);}}
@@ -608,7 +561,7 @@ function drawNotif(){
   ctx.restore();
 }
 
-// ── ENEMY ──────────────────────────────────────────────────────
+
 class Enemy{
   constructor(x,y,type,patrol){
     this.x=x;this.y=y;this.type=type;
@@ -715,7 +668,7 @@ class Enemy{
   }
 }
 
-// ── Collectible ────────────────────────────────────────────────
+
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=36;this.h=36;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
@@ -738,7 +691,6 @@ class Col{
   }
 }
 
-// ── Trigger ────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
   draw(px,py){
@@ -754,7 +706,6 @@ class Trigger{
   }
 }
 
-// ── Dig Spot (urna buried) ─────────────────────────────────────
 class DigSpot{
   constructor(x,y){this.x=x;this.y=y;this.progress=0;this.revealed=false;this.done=false;this.glowT=0;}
   tick(){this.glowT+=0.04;}
@@ -772,7 +723,6 @@ class DigSpot{
     if(!this.revealed){
       const a=Math.abs(Math.sin(this.glowT))*0.4+0.1;
       ctx.fillStyle=`rgba(180,80,20,${a})`;ctx.beginPath();ctx.arc(sx,sy,20,0,Math.PI*2);ctx.fill();
-      // shard hint
       ctx.fillStyle='rgba(160,60,20,0.55)';ctx.fillRect(sx-9,sy-5,13,7);
       ctx.fillStyle='rgba(120,216,64,0.85)';ctx.font='bold 12px "Courier New"';
       ctx.textAlign='center';ctx.fillText('[E] Escavar',sx,sy-30);ctx.textAlign='left';
@@ -789,7 +739,6 @@ class DigSpot{
   }
 }
 
-// ── Panning mini-game ──────────────────────────────────────────
 let panning={active:false,timer:0,px:0,py:0,cb:null};
 function startPanning(x,y,cb){panning={active:true,timer:0,px:x,py:y,cb};}
 function tickPanning(){if(!panning.active)return;panning.timer+=16;if(panning.timer>=2200){panning.active=false;if(panning.cb)panning.cb();}}
@@ -800,24 +749,20 @@ function drawPanning(){
   ctx.save();ctx.translate(sx,sy);
   const swirl=Math.sin(panning.timer/110)*0.45; ctx.rotate(swirl);
   drawBateia(0,0,0,1.3);
-  // Water swirl
   const t=panning.timer/200;
   ctx.strokeStyle='rgba(74,176,208,0.75)';ctx.lineWidth=2.5;
   for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(0,4,(10+i*5)*prog,t+i,t+i+Math.PI*1.5);ctx.stroke();}
-  // Gold sparks if >50%
   if(prog>0.5){
     for(let i=0;i<4;i++){const a=t+i*Math.PI/2;
       ctx.fillStyle='rgba(212,160,23,0.9)';ctx.beginPath();ctx.arc(Math.cos(a)*9,4+Math.sin(a)*5,3.5,0,Math.PI*2);ctx.fill();}
   }
   ctx.restore();
-  // Progress bar
   ctx.fillStyle='rgba(0,22,0,0.82)';ctx.fillRect(sx-54,sy-54,108,13);
   ctx.fillStyle='#d4a017';ctx.fillRect(sx-54,sy-54,108*prog,13);
   ctx.strokeStyle='#78d840';ctx.lineWidth=1.5;ctx.strokeRect(sx-54,sy-54,108,13);
   ctx.fillStyle='#78d840';ctx.font='11px "Courier New"';ctx.textAlign='center';ctx.fillText('Garimpar...',sx,sy-58);ctx.textAlign='left';
 }
 
-// ── PLAYER ─────────────────────────────────────────────────────
 class Player{
   constructor(x,y){
     this.x=x;this.y=y;this.w=40;this.h=82;
@@ -919,7 +864,6 @@ class Player{
       if(!c.done&&canCollect){c.done=true;
         if(c.type==='gold'){
           this.score+=15;sfx('gold');burst(c.x+18,c.y+18,'#d4a017',10);
-          // Register first gold in journal
           if(!this.items.includes('ouro_aluvial_ok')){this.items.push('ouro_aluvial_ok');journalCollect('ouro_aluvial');
             showPopup('⭐ OURO ALUVIAL ENCONTRADO',['Metal 19× mais pesado que a água','Depositado nos rios por erosão','Serra Pelada: 100mil garimpeiros em 1980','Uma grama → fio de kilômetros'],'#d4a017');}
         } else if(c.type==='bateia'){
@@ -935,7 +879,6 @@ class Player{
     }
 
     if(isE()){
-      // Escavar urna — exige Pá equipada
       if(level.digSpots){
         for(const ds of level.digSpots){
           if(!ds.done&&this.near({x:ds.x-32,y:ds.y-32,w:64,h:64})){
@@ -953,14 +896,13 @@ class Player{
                   '"Para os povos amazônicos originais, o ouro era divindade, símbolo do sol. Não havia conceito de propriedade individual dos recursos da floresta."',
                   '"A corrida do ouro moderna destruiu em décadas o que esses povos preservaram por milênios. O verdadeiro tesouro não brilha — é a memória desta floresta."'
                 ],()=>{notify('✦ Urna Marajoara arquivada no Diário de Bordo!');},
-                'CORVAN','#78d840');
+                '#78d840');
               } else {
                 notify('Achei outra!',1800);
               }
             } else if(this.activeTool==='pa'){
               ds.tryDig();
             } else {
-              // Feedback se não tiver pá equipada
               if(this.items.includes('pa')) notify('Equipe a Pá no Diário [I] para escavar!');
               else notify('Colete a Pá Exploradora para escavar!');
             }
@@ -968,7 +910,6 @@ class Player{
           }
         }
       }
-      // Garimpar — exige Bateia equipada
       if(level.panZones&&this.activeTool==='bateia'&&!panning.active){
         for(const pz of level.panZones){
           if(!pz.done&&Math.abs(this.x+this.w/2-pz.x)<120){
@@ -1047,28 +988,24 @@ class Player{
 
   draw(){
     if(this.dead)return;
-    // S=1.5 → Corvan fica 48×78px total, mas pés terminam em viewBox y=46 → 46×1.5=69px
     const S = 1.5;
-    const CW = 32*S;           // 48px largura
-    const FOOT_Y = 46*S;       // 69px — onde ficam os pés no desenho
+    const CW = 32*S;           
+    const FOOT_Y = 46*S;       
     const dx = this.x - cam.x + this.w/2 - CW/2;
-    const dy = this.y - cam.y + this.h - FOOT_Y; // pés tocam exatamente o chão
+    const dy = this.y - cam.y + this.h - FOOT_Y; 
 
     const flip = this.facing===-1;
-    // Walk frame for arm/leg bob
     const wf = this.state==='run' ? this.walkT : (this.state==='idle' ? Date.now()/800 : 0);
 
     ctx.save();
     drawCorvan(dx, dy, S, flip, wf, this.activeTool);
     ctx.restore();
-    // Glow quando carregando urna ou bateia
     if(this.activeTool==='bateia'||this.items.includes('urna')){
       const gx=this.x-cam.x+(flip?-10:this.w+12),gy=this.y-cam.y+this.h*0.6;
       const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,80);
       lg.addColorStop(0,'rgba(255,200,80,0.2)');lg.addColorStop(1,'rgba(255,200,80,0)');
       ctx.fillStyle=lg;ctx.fillRect(gx-80,gy-80,160,160);
     }
-    // Invincibility flash
     if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
     if(this.inMudwater||this.mudFlash>0){
       const alpha=this.inMudwater?0.24:Math.min(0.2,this.mudFlash/90);
@@ -1078,7 +1015,6 @@ class Player{
       ctx.lineWidth=2;
       ctx.strokeRect(this.x-cam.x-1,this.y-cam.y+this.h*0.48,this.w+2,this.h*0.44);
     }
-    // Heat overlay
     if(this.heatAnim>0){
       const a=this.heatAnim/80*0.4;ctx.fillStyle=`rgba(40,20,0,${a})`;ctx.fillRect(0,0,W,H);
       if(this.heatAnim>40){ctx.fillStyle=`rgba(255,120,0,${(this.heatAnim-40)/40*0.55})`;
@@ -1087,7 +1023,6 @@ class Player{
   }
 }
 
-// ── Backgrounds ────────────────────────────────────────────────
 function drawBg(bgKey,murky=false){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
@@ -1101,7 +1036,6 @@ function drawBg(bgKey,murky=false){
   ctx.fillStyle=murky?'rgba(20,10,0,0.42)':'rgba(0,10,0,0.22)';ctx.fillRect(0,0,W,H);
 }
 
-// ── Ambient effects ────────────────────────────────────────────
 let rainDrops=[];
 function initRain(){rainDrops=[];for(let i=0;i<120;i++)rainDrops.push({x:Math.random()*W,y:Math.random()*H,spd:7+Math.random()*5});}
 initRain();
@@ -1125,11 +1059,7 @@ function drawFireflies(){
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 1 — A Entrada na Selva
-//  Cena 01: Rio sinuoso, floresta densa, sol visível
-//  Objetivo: coletar Pá + Bateia
-// ══════════════════════════════════════════════════════════════
+
 function buildL1(){
   const FL=540,WW=3400,WH=860;
   const plats=[
@@ -1192,10 +1122,7 @@ function buildL1(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 2 — Geologia Aluvial e Ciclo da Água
-//  Cena 02: meio terra/meio rio, sedimento, mini-game bateia
-// ══════════════════════════════════════════════════════════════
+
 function buildL2(){
   const FL=540,WW=3600,WH=860;
   const plats=[
@@ -1279,7 +1206,6 @@ function buildL2(){
             const a=0.5+Math.sin(Date.now()/400)*0.45;
             ctx.fillStyle=`rgba(212,160,23,${a})`;ctx.beginPath();ctx.arc(px,FL-cam.y-12,16,0,Math.PI*2);ctx.fill();
             ctx.fillStyle='#fff';ctx.font='bold 13px "Courier New"';ctx.textAlign='center';ctx.fillText('⚓',px,FL-cam.y-5);ctx.textAlign='left';
-            // hint
             if(Math.abs(player.x+player.w/2-pz.x)<120){
               ctx.font='11px "Courier New"';ctx.fillStyle='rgba(100,220,60,0.8)';
               ctx.textAlign='center';const ht=player.activeTool==='bateia'?'[E] Garimpar':'Equipe Bateia [I]';
@@ -1294,10 +1220,7 @@ function buildL2(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 3 — A Coleta e o Impacto Ambiental
-//  Cena 03: Chuva, água turva/contaminada, alerta de mercúrio
-// ══════════════════════════════════════════════════════════════
+
 function buildL3(){
   const FL=540,WW=3800,WH=860;
   const plats=[
@@ -1314,12 +1237,9 @@ function buildL3(){
     logPlatform(1940,FL-36,80),logPlatform(2240,FL-36,80),logPlatform(2540,FL-36,80),
     logPlatform(2840,FL-36,80),logPlatform(3160,FL-36,80),
     movH(1080,FL-100,85,1080,1200,2.0),movH(1900,FL-100,85,1900,2060,2.0),movH(2540,FL-100,85,2540,2680,1.8),
-    // Clean river first section
     river(300,FL,80,WH-FL),river(570,FL,90,WH-FL),river(820,FL,80,WH-FL),river(1060,FL,80,WH-FL),
-    // Contaminated
     mudwater(1340,FL,140,WH-FL),mudwater(1640,FL,140,WH-FL),mudwater(1940,FL,140,WH-FL),
     mudwater(2240,FL,140,WH-FL),mudwater(2540,FL,140,WH-FL),
-    // Clean again
     river(2840,FL,140,WH-FL),river(3160,FL,120,WH-FL),
     trap(1200,FL-60,110),
   ];
@@ -1367,10 +1287,7 @@ function buildL3(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 4 — Relíquias Perdidas e Conclusão
-//  Cena 04: Pôr do sol, vaga-lumes, escavação da Urna Marajoara
-// ══════════════════════════════════════════════════════════════
+
 function buildL4(){
   const FL=540,WW=3000,WH=860;
   const plats=[
@@ -1409,9 +1326,8 @@ function buildL4(){
         '"Você encontrou a Urna Funerária Marajoara. Com mais de 1.000 anos, ela prova que povos sofisticados habitavam a Amazônia muito antes da colonização europeia."',
         '"A cultura Marajoara (400–1300 d.C.) criava cerâmicas elaboradas para rituais funerários com padrões que representavam o ciclo da vida e os espíritos da floresta."',
         '"Para eles, o ouro era o sol materializado. Não havia mineração destrutiva — apenas coleta cuidadosa do que a terra oferecia, em equilíbrio com a floresta."',
-        '"Você preservou essa memória. A Fase 1.2 está completa — itens registrados no Diário de Bordo. Próxima parada: Machu Picchu e o Tesouro do Condor!"'
+        '"Você preservou essa memória. Nossa próxima parada: Machu Picchu: o Tesouro do Condor!"'
       ],()=>{
-        // ── Unlock próximas fases e arquivar no save ──
         unlockPhase('1.3');
         G.state='complete';
       });
@@ -1448,7 +1364,6 @@ function buildL4(){
   };
 }
 
-// ── HUD ────────────────────────────────────────────────────────
 function drawHUD(player,level){
   ctx.fillStyle='rgba(0,22,0,0.68)';ctx.fillRect(0,0,W,38);
   for(let i=0;i<player.maxHp;i++){
@@ -1460,7 +1375,6 @@ function drawHUD(player,level){
   }
   ctx.fillStyle='rgba(120,216,64,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#78d840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  // Slot ferramenta ativa
   const tY=44;
   ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,tY,140,28,4);ctx.fill();
   ctx.strokeStyle=player.activeTool?'#78d840':'#444';ctx.lineWidth=1.5;roundRect(16,tY,140,28,4);ctx.stroke();
@@ -1472,7 +1386,6 @@ function drawHUD(player,level){
   ctx.fillStyle='rgba(80,200,80,0.15)';roundRect(162,tY,46,28,4);ctx.fill();
   ctx.strokeStyle='#2a5a18';ctx.lineWidth=1.5;roundRect(162,tY,46,28,4);ctx.stroke();
   ctx.font='bold 11px "Courier New"';ctx.fillStyle='#5a9830';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  // Inventário lado direito
   let ix=W-16;const inv=[];
   if(player.items.includes('urna'))   inv.push('🏺 URNA');
   if(player.items.includes('bateia')) inv.push('🥌 BATEIA');
@@ -1492,22 +1405,17 @@ function drawHUD(player,level){
   }
 }
 
-// ── Screens ────────────────────────────────────────────────────
 function drawTitle(){
   const bg=IMG['bg01'];
   if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.5;drawBg('bg01');ctx.globalAlpha=1;}
   else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a3010');g.addColorStop(1,'#0a1c08');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   ctx.fillStyle='rgba(0,10,0,0.56)';ctx.fillRect(0,0,W,H);
   drawFireflies();
-  // Draw Corvan large on title (scale 5, centered)
-  //const TS=5;
-  //const cx=W/2-16*TS, cy=160;
-  //drawCorvan(cx,cy,TS,false,Date.now()/400);
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
-  ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('O OURO DOS RIOS',W/2,148);
+  ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('O OURO DOS RIOS',W/2,160);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,204);
+  ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,200);
   ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#888';ctx.font='13px "Courier New"';
@@ -1536,7 +1444,6 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.2 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  // Corvan + Urna side by side
   drawCorvan(W/2-160,200,4,false,Date.now()/300);
   ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawUrna(0,0,Date.now()/1000,false);ctx.restore();
 
@@ -1555,7 +1462,7 @@ function drawComplete(){
   ctx.textAlign='left';
 }
 
-// ── Game state ──────────────────────────────────────────────────
+
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
@@ -1602,7 +1509,7 @@ const G={
   }
 };
 
-// ── Loop ─────────────────────────────────────────────────────
+
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
@@ -1612,7 +1519,7 @@ function loop(){
   G.update();G.draw();clearJP();
 }
 
-// Loading screen
+
 if(!gameReady){(function loadLoop(){
   if(gameReady)return;requestAnimationFrame(loadLoop);
   ctx.fillStyle='#0a1808';ctx.fillRect(0,0,W,H);
