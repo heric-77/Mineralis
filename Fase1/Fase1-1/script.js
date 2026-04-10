@@ -682,7 +682,7 @@ class Player{
     }
     if(this.soroche>=100)this.sorocheAnim=Math.min(80,this.sorocheAnim+1);
     else this.sorocheAnim=Math.max(0,this.sorocheAnim-2);
-    if(this.soroche>=100&&this.sorocheAnim>40&&this.inv===0&&Math.random()<0.008)this._hurt(1,level);
+    if(this.soroche>=100&&this.sorocheAnim>40&&this.inv===0&&Math.random()<0.008)this._hurt(1,level,'soroche');
     const sm=this.soroche>=80?0.65:1.0;
 
     if(isL()){this.vx=-PSPD*sm;this.facing=-1;}
@@ -701,11 +701,11 @@ class Player{
     this.x=Math.max(0,this.x);
 
     if(!this.inv){
-      for(const p of level.plats){if(p.type==='spike'&&this.overlaps(p))this._hurt(2,level);}
+      for(const p of level.plats){if(p.type==='spike'&&this.overlaps(p))this._hurt(2,level,'espinho');}
       for(const e of level.bats||[]){
         if(!e.dead&&this.overlaps(e)){
           if(this.vy>2&&this.y+this.h<e.y+e.h*0.5){e.dead=true;this.vy=-8;burst(e.x+14,e.y,'#e0b840',10);sfx('prata');}
-          else{this._hurt(1,level);this.vy=-6;this.vx=(this.x<e.x?-6:6);}
+          else{this._hurt(1,level,'morcego');this.vy=-6;this.vx=(this.x<e.x?-6:6);}
         }
       }
     }
@@ -806,7 +806,7 @@ class Player{
       for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}
     }
 
-    if(this.y>level.H+200)this._hurt(3,level);
+    if(this.y>level.H+200)this._hurt(3,level,'queda');
     if(!this.onG&&this.vy<0)this.state='jump';
     else if(!this.onG&&this.vy>0)this.state='fall';
     else if(Math.abs(this.vx)>0.5)this.state='run';
@@ -822,7 +822,7 @@ class Player{
     if(this.overlaps(p)){
       if(this.vy>=0){this.y=p.y-this.h;this.vy=0;this.onG=true;if(p.moving)this.onMoving=p;if(p.type==='trapdoor'&&p.crumble===undefined)p.crumble=70;}
       else{this.y=p.y+p.h;this.vy=Math.abs(this.vy)*0.2;}}}}
-  _hurt(dmg,level){if(this.inv>0)return;this.hp-=dmg;this.inv=80;burst(this.x+20,this.y+40,'#ff4040',10);sfx('hit');if(this.hp<=0){this.hp=0;this.dead=true;}}
+  _hurt(dmg,level,cause='queda'){if(this.inv>0)return;this.hp-=dmg;this.inv=80;burst(this.x+20,this.y+40,'#ff4040',10);sfx('hit');if(this.hp<=0){this.hp=0;this.dead=true;this.deathCause=cause;}}
 
   draw(){
     if(this.dead)return;
@@ -1240,9 +1240,14 @@ function drawTitle(){
 }
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msg=cause==='soroche'?'SOROCHE!':cause==='morcego'?'FOI O MORCEGO!':cause==='espinho'?'QUE ESPINHO!':'VOCÊ CAIU!';
+  const sub=cause==='soroche'?'O mal de altitude te venceu. Use as folhas de coca!':cause==='morcego'?'Um morcego te derrubou. Pule sobre eles!':cause==='espinho'?'Cuidado com os espinhos!':'Você caiu no abismo.';
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
-  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);
-  ctx.shadowBlur=0;drawCorvan(W/2-24,H/2-20,3,false,Date.now()/200);
+  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
+  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);ctx.textAlign='left';
 }
