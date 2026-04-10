@@ -1,36 +1,17 @@
-/* ═══════════════════════════════════════════════
-   MINERALIS – main.js
-   Ponto de entrada do jogo.
-   Responsabilidade: inicializar componentes e
-   efeitos visuais globais (partículas, tooltip).
-   Lógica de menu  → components/menu.js
-   Dados das fases → data/phases.js
-   ═══════════════════════════════════════════════ */
-
-// ── Referências globais ──
 const frame   = document.getElementById('frame');
 const tooltip = document.getElementById('tooltip');
 
-// ════════════════════════════════
-// CARDS
-// Renderiza e sincroniza todos os cards do mapa.
-// ════════════════════════════════
-
 const Cards = (() => {
 
-  /**
-   * Cria todos os cards no mapa dinamicamente a partir de PhasesData + CardsSVG.
-   * Os 3 cards da América do Sul já estão no HTML — os demais são gerados aqui.
-   */
+
   function renderizar() {
     const mapaEl = document.getElementById('frame');
 
-    // IDs já presentes no HTML (América do Sul)
     const existentes = new Set(['1.1','1.2','1.3']);
 
     PhasesData.forEach(fase => {
-      if (existentes.has(fase.id)) return; // já no HTML
-      if (!CardsSVG[fase.id])      return; // SVG não definido
+      if (existentes.has(fase.id)) return; 
+      if (!CardsSVG[fase.id])      return;
 
       const card = document.createElement('div');
       card.className        = 'phase-card locked';
@@ -45,9 +26,7 @@ const Cards = (() => {
     });
   }
 
-  /**
-   * Sincroniza estado visual (locked/unlocked + tooltip) de todos os cards.
-   */
+
   function sincronizar() {
     document.querySelectorAll('.phase-card').forEach(card => {
       const id   = card.dataset.phase;
@@ -72,9 +51,7 @@ const Cards = (() => {
 
 })();
 
-// ════════════════════════════════
-// SELEÇÃO DE CARD
-// ════════════════════════════════
+
 
 function selectCard(el) {
   if (el.classList.contains('locked')) return;
@@ -89,11 +66,6 @@ function selectCard(el) {
   }
 }
 
-// ════════════════════════════════
-// TOOLTIP DOS CARDS
-// Usa event delegation no frame para capturar
-// tanto os cards do HTML quanto os gerados via JS
-// ════════════════════════════════
 
 frame.addEventListener('mousemove', e => {
   const card = e.target.closest('.phase-card');
@@ -115,9 +87,7 @@ frame.addEventListener('mousemove', e => {
 
 frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
 
-// ════════════════════════════════
-// PARTÍCULAS DE POEIRA
-// ════════════════════════════════
+
 
 (function spawnParticles() {
   for (let i = 0; i < 24; i++) {
@@ -136,9 +106,7 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
   }
 })();
 
-// ════════════════════════════════
-// KEYFRAMES DINÂMICOS
-// ════════════════════════════════
+
 
 (function injectKeyframes() {
   const style = document.createElement('style');
@@ -151,16 +119,12 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
   document.head.appendChild(style);
 })();
 
-// ════════════════════════════════
-// INICIALIZAÇÃO
-// Roda quando a página carrega.
-// ════════════════════════════════
+
+
 
 (function init() {
 
-  // Limpa o localStorage do jogo a cada nova sessão do browser.
-  // sessionStorage é apagado ao fechar a aba — se a flag não existe,
-  // é sessão nova e limpamos todo o localStorage do jogo.
+
   if (!sessionStorage.getItem('mineralis_session')) {
     sessionStorage.setItem('mineralis_session', '1');
     Object.keys(localStorage)
@@ -173,9 +137,9 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
       document.addEventListener('keydown', e => {
         if (e.key !== 'Escape') return;
         if (document.getElementById('modalOverlay')?.classList.contains('visible')) return;
-        // fecha o que estiver aberto (em ordem de prioridade)
+  
         if (typeof Options !== 'undefined' && Options.fechar) { Options.fechar(); return; }
-        if (typeof Journal !== 'undefined' && /* Journal.aberto */ document.querySelector('.journal-overlay')) {
+        if (typeof Journal !== 'undefined' && document.querySelector('.journal-overlay')) {
           Journal.fechar(); return;
         }
         if (typeof Menu !== 'undefined') Menu.close();
@@ -184,9 +148,7 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
   Cards.renderizar();
   Cards.sincronizar();
 
-  // Som: inicia no primeiro sinal de interação do usuário.
-  // mousemove dispara assim que o cursor entra na janela —
-  // antes de qualquer clique, dando sensação de início imediato.
+
   function _iniciarAudio() {
     Audio.iniciarTrilha();
     document.removeEventListener('mousemove', _iniciarAudio);
@@ -199,11 +161,6 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
 
 })();
 
-// ════════════════════════════════
-// MODAL CUSTOMIZADO
-// Substitui window.confirm() com visual pixel art.
-// Uso: Modal.confirmar('Mensagem aqui').then(ok => { if(ok) ... })
-// ════════════════════════════════
 
 const Modal = (() => {
 
@@ -212,11 +169,7 @@ const Modal = (() => {
   const btnOk   = document.getElementById('modalConfirm');
   const btnCan  = document.getElementById('modalCancel');
 
-  /**
-   * Exibe o modal com a mensagem e retorna uma Promise<boolean>.
-   * true  = jogador clicou OK
-   * false = jogador clicou Cancelar
-   */
+
   function confirmar(texto, apenasOk = false) {
     msg.textContent = texto;
     btnCan.style.display = apenasOk ? 'none' : '';
