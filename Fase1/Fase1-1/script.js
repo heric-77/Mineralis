@@ -1,16 +1,9 @@
-/* ═══════════════════════════════════════════════════════════
-   MINERALIS – Fase 1.1 · O Segredo de Potosí
-   script.js  (Corvan oficial, save integrado, diário de bordo)
-   ═══════════════════════════════════════════════════════════ */
-
-// ── Save / Journal ────────────────────────────────────────────
 const SAVE_KEY = 'mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
 function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
-// ── Canvas Setup ──────────────────────────────────────────────
 const W=1280,H=720;
 const wrap=document.getElementById('wrap');
 const canvas=document.getElementById('c');
@@ -28,7 +21,6 @@ function resize(){
 }
 resize();window.addEventListener('resize',resize);
 
-// ── Audio ─────────────────────────────────────────────────────
 let AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
 function sfx(type){
   if(!AC)return;if(AC.state==='suspended')AC.resume();
@@ -44,7 +36,6 @@ function sfx(type){
   o.start(t);o.stop(t+.6);
 }
 
-// ── Assets ────────────────────────────────────────────────────
 const IMG={};
 let assetsLoaded=0,totalAssets=3,gameReady=false;
 [['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01-04.JPG']].forEach(([key,src])=>{
@@ -54,11 +45,9 @@ let assetsLoaded=0,totalAssets=3,gameReady=false;
   img.src=src;
 });
 
-// ── Input ─────────────────────────────────────────────────────
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  // Abre/fecha o Diário de Bordo com I ou Tab
   if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
 });
@@ -74,17 +63,12 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){for(const k in jp)delete jp[k];}
 
-// ══════════════════════════════════════════════════════════════
-//  CATÁLOGO DE ITENS — categorização para o Diário de Bordo
-//  Usado tanto pelo inventário in-game quanto pelo journal.js do menu
-// ══════════════════════════════════════════════════════════════
 const ITEM_DEFS = {
-  // ── FERRAMENTAS (selecionáveis, afetam o visual do Corvan) ──
   picareta: {
     cat:'ferramenta', nome:'Picareta Básica', icon:'⛏',
     journalId:'picareta_basica',
     desc:'Extrai veios de prata e estanho das paredes.\nUse [E] próximo a um veio brilhante.',
-    drawHand:'left',   // qual mão aparece no Corvan
+    drawHand:'left',  
   },
   lanterna: {
     cat:'ferramenta', nome:'Lanterna', icon:'🔦',
@@ -98,7 +82,6 @@ const ITEM_DEFS = {
     desc:'Sagradas para os povos andinos há 4.000 anos.\nUse [E] para recuperar o fôlego do Soroche.',
     drawHand:'left', consumivel:true,
   },
-  // ── MINÉRIOS (coletáveis, não selecionáveis como ferramenta) ──
   prata: {
     cat:'minerio', nome:'Prata', icon:'◆',
     journalId:'prata',
@@ -109,7 +92,6 @@ const ITEM_DEFS = {
     journalId:'estanho',
     desc:'Liga-se ao cobre formando bronze desde 3.000 a.C.\nBolívia possui a 2ª maior reserva mundial.',
   },
-  // ── ARTEFATOS (coletáveis históricos) ──
   tupu: {
     cat:'artefato', nome:'Tupu de Prata', icon:'✦',
     journalId:'mapa_potosi',
@@ -117,17 +99,15 @@ const ITEM_DEFS = {
   },
 };
 
-// ── Inventário in-game (Diário de Bordo simplificado) ─────────
 const INV = {
   open: false,
-  tab: 0,         // 0=ferramentas 1=minérios 2=artefatos
-  cursor: 0,      // índice do item selecionado na aba atual
+  tab: 0,         
+  cursor: 0,      
   TABS: [
     { id:'ferramenta', label:'🔧 Ferramentas', color:'#e0b840' },
     { id:'minerio',    label:'⛏ Minérios',    color:'#c0c8d8' },
     { id:'artefato',   label:'🏺 Artefatos',   color:'#d4a060' },
   ],
-  // Retorna itens da aba atual que o jogador possui
   tabItems(player) {
     const cat = this.TABS[this.tab].id;
     return Object.entries(ITEM_DEFS)
@@ -137,7 +117,7 @@ const INV = {
   toggle(player) {
     this.open = !this.open;
     if (this.open) { this.cursor = Math.min(this.cursor, Math.max(0, this.tabItems(player).length-1)); }
-    G.dialog = this.open;   // pausa o jogo
+    G.dialog = this.open;   
   },
   close() { this.open = false; G.dialog = false; },
   isUpKey()   { return jp['ArrowUp']   || jp['KeyW']; },
@@ -152,7 +132,6 @@ const INV = {
     if (this.isUpKey())   { this.cursor = Math.max(0, this.cursor-1); return true; }
     if (this.isDownKey()) { this.cursor = Math.min(items.length-1, this.cursor+1); return true; }
     if (isE() && items.length > 0 && this.tab === 0) {
-      // Equipa/desequipa a ferramenta selecionada
       const item = items[this.cursor];
       if (player.activeTool === item.id) player.activeTool = null;
       else player.activeTool = item.id;
@@ -163,25 +142,21 @@ const INV = {
 
   draw(player) {
     if (!this.open) return;
-    // ── Fundo escurecido ──
     ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(0,0,W,H);
 
     const PW=780, PH=480;
     const PX=(W-PW)/2, PY=(H-PH)/2;
 
-    // ── Painel principal ──
     ctx.shadowColor='rgba(0,0,0,0.7)'; ctx.shadowBlur=20;
     ctx.fillStyle='rgba(10,6,2,0.97)'; roundRect(PX,PY,PW,PH,16); ctx.fill();
     ctx.shadowBlur=0;
     ctx.strokeStyle='#8a6820'; ctx.lineWidth=2.5; roundRect(PX,PY,PW,PH,16); ctx.stroke();
     ctx.strokeStyle='rgba(200,160,40,0.2)'; ctx.lineWidth=1; roundRect(PX+4,PY+4,PW-8,PH-8,12); ctx.stroke();
 
-    // ── Título ──
     ctx.fillStyle='#e0b840'; ctx.font='bold 16px "Courier New"';
     ctx.textAlign='center'; ctx.fillText('📔  DIÁRIO DE BORDO',W/2,PY+28); ctx.textAlign='left';
     ctx.fillStyle='rgba(200,160,40,0.3)'; ctx.fillRect(PX+16,PY+38,PW-32,1);
 
-    // ── Abas ──
     const TAB_W=PW/3, TAB_Y=PY+44;
     this.TABS.forEach((tab,i)=>{
       const tx=PX+i*TAB_W, active=(i===this.tab);
@@ -193,7 +168,6 @@ const INV = {
       if(active){ ctx.fillStyle=tab.color; ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3); }
     });
 
-    // ── Área de conteúdo ──
     const CY=TAB_Y+40, CH=PH-(CY-PY)-50;
     const items = this.tabItems(player);
     const COL_W=260, DESC_X=PX+280, DESC_Y=CY+20;
@@ -205,25 +179,20 @@ const INV = {
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
       ctx.textAlign='left';
     } else {
-      // Lista de itens (coluna esquerda)
       items.forEach((item,i)=>{
         const iy=CY+16+i*52;
         const selected=(i===this.cursor);
         const equipped=(player.activeTool===item.id);
-        // Fundo do item
         if(selected){
           ctx.fillStyle='rgba(200,160,40,0.18)';
           roundRect(PX+16,iy-10,COL_W,46,8); ctx.fill();
           ctx.strokeStyle='#e0b840'; ctx.lineWidth=1.5;
           roundRect(PX+16,iy-10,COL_W,46,8); ctx.stroke();
         }
-        // Ícone
         ctx.font='24px serif'; ctx.fillText(item.icon,PX+28,iy+22);
-        // Nome
         ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
         ctx.fillStyle=equipped?'#f0c840':(selected?'#e8d8a0':'#aaa');
         ctx.fillText(item.nome,PX+62,iy+16);
-        // Badge "EQUIPADO" ou "CONSUMÍVEL"
         if(equipped){
           ctx.fillStyle='rgba(200,160,40,0.22)';
           roundRect(PX+62,iy+20,80,16,4); ctx.fill();
@@ -235,27 +204,20 @@ const INV = {
         }
       });
 
-      // Detalhes do item selecionado (coluna direita)
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(200,160,40,0.08)'; roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8); ctx.fill();
-        // Ícone grande
         ctx.font='48px serif'; ctx.textAlign='center'; ctx.fillText(sel.icon,DESC_X+(PW-DESC_X+PX-16)/2,CY+70); ctx.textAlign='left';
-        // Nome
         ctx.font='bold 15px "Courier New"'; ctx.fillStyle='#e0b840';
         ctx.textAlign='center'; ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+100); ctx.textAlign='left';
-        // Categoria
         const catLabel={ferramenta:'🔧 Ferramenta',minerio:'⛏ Minério',artefato:'🏺 Artefato'};
         ctx.font='11px "Courier New"'; ctx.fillStyle='#888';
         ctx.textAlign='center'; ctx.fillText(catLabel[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+118); ctx.textAlign='left';
-        // Separador
         ctx.fillStyle='rgba(200,160,40,0.25)'; ctx.fillRect(DESC_X+20,CY+126,PW-DESC_X+PX-56,1);
-        // Descrição
         const descLines=sel.desc.split('\n');
         ctx.font='13px "Courier New"'; ctx.fillStyle='#d8c898';
         descLines.forEach((l,i)=>{ ctx.textAlign='center'; ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+146+i*22); });
         ctx.textAlign='left';
-        // Botão de ação (só ferramentas)
         if(sel.cat==='ferramenta'){
           const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar';
           const btnColor=player.activeTool===sel.id?'rgba(180,60,20,0.3)':'rgba(200,160,40,0.2)';
@@ -269,7 +231,6 @@ const INV = {
       }
     }
 
-    // ── Rodapé de controles ──
     ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(PX,PY+PH-38,PW,38);
     ctx.fillStyle='rgba(200,160,40,0.3)'; ctx.fillRect(PX+16,PY+PH-39,PW-32,1);
     ctx.font='11px "Courier New"'; ctx.fillStyle='#888'; ctx.textAlign='center';
@@ -278,7 +239,6 @@ const INV = {
   }
 };
 
-// ── Particles ─────────────────────────────────────────────────
 let particles=[];
 function burst(x,y,color,n=8,spd=3.2){
   for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2+Math.random()*.5;
@@ -287,23 +247,19 @@ function burst(x,y,color,n=8,spd=3.2){
 function tickParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;if(p.life<=0)particles.splice(i,1);}}
 function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
 
-// ── Camera ────────────────────────────────────────────────────
 const cam={x:0,y:0};
 function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-cam.x)*0.12;}
 
-// ── Physics ───────────────────────────────────────────────────
 const GRAV=0.46,PSPD=4.5,JUMPF=-12.2,MAXFALL=16;
 
-// ── Tile themes (Andes stone) ──────────────────────────────────
 const TILE_THEMES={
-  1:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},  // Exterior – terra andina
-  2:{top:'#7a6858',body:'#4a3828',dark:'#2a1810'},  // Mina – pedra escura
-  3:{top:'#6a5848',body:'#3a2818',dark:'#1a1008'},  // Mina funda
-  4:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},  // Saída – exterior
+  1:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},  
+  2:{top:'#7a6858',body:'#4a3828',dark:'#2a1810'},  
+  3:{top:'#6a5848',body:'#3a2818',dark:'#1a1008'},  
+  4:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},  
 };
 let tileTheme=TILE_THEMES[1];
 
-// ── Platform factory ──────────────────────────────────────────
 function solid(x,y,w,h){return{type:'solid',x,y,w,h};}
 function movH(x,y,w,x0,x1,spd){return{type:'solid',moving:true,x,y,w,h:16,x0,x1,spd,vx:spd,vy:0};}
 function trap(x,y,w){return{type:'trapdoor',x,y,w,h:14};}
@@ -335,13 +291,11 @@ function drawPlatform(p){
     }
   }
   ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,4);
-  // Stone texture tufts
   ctx.fillStyle='rgba(180,160,120,0.3)';
   for(let i=0;i<Math.floor(p.w/20);i++)ctx.fillRect(sx+i*20+4,sy-2,6,4);
   if(p.moving){ctx.fillStyle='rgba(200,180,100,0.35)';ctx.fillRect(sx,sy,p.w,4);}
 }
 
-// ── Rounded rect ──────────────────────────────────────────────
 function roundRect(x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
   ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
@@ -349,12 +303,7 @@ function roundRect(x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
-// ══════════════════════════════════════════════════════════════
-//  CORVAN — pixel art idêntico ao menu (viewBox 32×52)
-// ══════════════════════════════════════════════════════════════
 function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
-  // activeTool: null=mãos livres | 'picareta'=picareta na esq | 'lanterna'=lanterna na dir
-  //             'coca'=coca na esq | qualquer outro=mãos livres mas lamparina acesa
   const S=scale;
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
   const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
@@ -362,74 +311,51 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const showPickaxe = activeTool==='picareta';
   const showLantern = activeTool==='lanterna';
   const showCoca    = activeTool==='coca';
-  // Hat
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
-  // Lamp (sempre no chapéu — é parte do design base do Corvan)
   r(13,0,6,3,'#c8a020');r(14,0,4,2,'#ffe060');
-  // Head
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
-  // Neck
   r(13,14,6,2,'#c88050');
-  // Shirt
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
-  // Belt
   r(8,28,16,2,'#2a1408');r(14,28,4,2,'#c88020');
-  // Pants
   r(9,30,14,12,'#383838');r(15,36,2,6,'#282828');
-  // Braço esquerdo
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
   if(showPickaxe){
-    // Picareta na mão esquerda
     const wb=Math.sin(frame*0.2)*1.5;
     r(0,24+wb,6,1,'#7a4818');r(0,25+wb,1,7,'#7a4818');
     r(0,22+wb,6,3,'#888888');r(4,20+wb,2,3,'#aaaaaa');
   } else if(showCoca){
-    // Folhas de coca — mão esquerda levantada
     r(1,22,5,10,'#b82010');r(1,32,5,3,'#a86030');
-    // Mini folha na mão
     ctx.fillStyle='#2a7a28';ctx.globalAlpha=0.9;
     ctx.beginPath();ctx.ellipse(2.5*S,30*S,3*S,5*S,-0.3,0,Math.PI*2);ctx.fill();
     ctx.beginPath();ctx.ellipse(5*S,28*S,3*S,5*S,0.3,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=1;
   }
-  // Braço direito
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
   if(showLantern){
-    // Lanterna na mão direita
     r(26,31,1,3,'#888888');r(24,34,5,6,'#604010');r(25,35,3,4,'#ffe080');
     r(23,33,7,8,'#ffcc00',0.12*lb);
   }
-  // Boots
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
-  // Glow da lamparina do chapéu (sempre presente)
   ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
-  // Glow da lanterna (só se equipada)
   if(showLantern){
     ctx.fillStyle='#ffcc00';ctx.globalAlpha=0.18*lb;ctx.beginPath();ctx.arc(26*S,37*S,5*S,0,Math.PI*2);ctx.fill();
   }
   ctx.globalAlpha=1;ctx.restore();
 }
 
-// ══════════════════════════════════════════════════════════════
-//  ITEMS — pixel art Andes
-// ══════════════════════════════════════════════════════════════
 function drawPicareta(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  // Handle
   ctx.fillStyle='#8a5820';ctx.fillRect(-3,-24,6,28);
   ctx.fillStyle='#aa7030';ctx.fillRect(-2,-22,4,24);
-  // Head
   ctx.fillStyle='#9090a8';ctx.fillRect(-14,-26,28,8);
   ctx.fillStyle='#b0b0c8';ctx.fillRect(-14,-26,28,3);
-  // Tips
   ctx.fillStyle='#c0c0d8';ctx.fillRect(-16,-24,4,6);ctx.fillRect(12,-24,4,6);
   ctx.fillStyle='rgba(255,255,255,0.5)';ctx.beginPath();ctx.arc(-12,-22,2,0,Math.PI*2);ctx.fill();
-  // Glow
   const gg=ctx.createRadialGradient(0,-22,0,0,-22,18);
   gg.addColorStop(0,'rgba(180,180,220,0.2)');gg.addColorStop(1,'rgba(180,180,220,0)');
   ctx.fillStyle=gg;ctx.beginPath();ctx.arc(0,-22,18,0,Math.PI*2);ctx.fill();
@@ -449,20 +375,16 @@ function drawLanterna(cx,cy,bobT=0){
 
 function drawPrata(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  // Glow silver
   const glow=ctx.createRadialGradient(0,0,0,0,0,22);
   glow.addColorStop(0,'rgba(200,210,230,0.45)');glow.addColorStop(1,'rgba(180,200,220,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
-  // Fragment shape
   ctx.fillStyle='#9090a8';
   ctx.beginPath();ctx.moveTo(-8,-10);ctx.lineTo(2,-14);ctx.lineTo(12,-6);ctx.lineTo(14,4);
   ctx.lineTo(6,12);ctx.lineTo(-6,10);ctx.lineTo(-12,2);ctx.closePath();ctx.fill();
   ctx.fillStyle='#b8b8d0';
   ctx.beginPath();ctx.moveTo(-6,-8);ctx.lineTo(0,-12);ctx.lineTo(10,-4);ctx.lineTo(12,4);
   ctx.lineTo(4,10);ctx.lineTo(-4,8);ctx.closePath();ctx.fill();
-  // Highlight
   ctx.fillStyle='rgba(255,255,255,0.7)';ctx.beginPath();ctx.ellipse(-2,-4,4,3,0.4,0,Math.PI*2);ctx.fill();
-  // Shine
   const sa=Math.abs(Math.sin(Date.now()/500));
   ctx.strokeStyle=`rgba(255,255,255,${sa*0.9})`;ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(4,-8);ctx.lineTo(8,-12);ctx.stroke();
@@ -471,26 +393,18 @@ function drawPrata(cx,cy,bobT=0){
 
 function drawTupu(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+(Math.sin(bobT)*5));
-  // Glow
   const glow=ctx.createRadialGradient(0,0,0,0,0,30);
   glow.addColorStop(0,'rgba(200,210,240,0.38)');glow.addColorStop(1,'rgba(180,200,220,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,30,0,Math.PI*2);ctx.fill();
-  // T-shape (Tupu – ornamental silver pin)
   ctx.fillStyle='#9090b8';
-  // Top bar (horizontal)
   ctx.fillRect(-16,-14,32,8);
-  // Shaft (vertical pin)
   ctx.fillRect(-4,-6,8,28);
-  // Silver highlights
   ctx.fillStyle='#c0c0d8';ctx.fillRect(-14,-13,28,3);
   ctx.fillStyle='#d8d8f0';ctx.fillRect(-12,-12,8,4);
-  // Tip point
   ctx.fillStyle='#aaaacc';
   ctx.beginPath();ctx.moveTo(-4,22);ctx.lineTo(4,22);ctx.lineTo(0,30);ctx.closePath();ctx.fill();
-  // Turquoise inlay
   ctx.fillStyle='#28a890';ctx.beginPath();ctx.arc(0,-10,5,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='rgba(255,255,255,0.5)';ctx.beginPath();ctx.arc(-2,-12,2,0,Math.PI*2);ctx.fill();
-  // Side gems
   ctx.fillStyle='#28a890';ctx.beginPath();ctx.arc(-10,-10,3,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(10,-10,3,0,Math.PI*2);ctx.fill();
   ctx.restore();
@@ -509,7 +423,6 @@ function drawEstanho(cx,cy,bobT=0){
 
 function drawCoca(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  // Small green leaves bundle
   ctx.fillStyle='#2a7a28';
   ctx.beginPath();ctx.ellipse(-6,2,8,5,-0.3,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.ellipse(6,2,8,5,0.3,0,Math.PI*2);ctx.fill();
@@ -517,7 +430,6 @@ function drawCoca(cx,cy,bobT=0){
   ctx.fillStyle='#3a9a38';
   ctx.beginPath();ctx.ellipse(-5,1,5,3,-0.3,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.ellipse(0,-3,4,6,0,0,Math.PI*2);ctx.fill();
-  // Vein
   ctx.strokeStyle='rgba(80,160,60,0.7)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(0,4);ctx.stroke();
   ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(-5,2);ctx.stroke();
@@ -525,39 +437,27 @@ function drawCoca(cx,cy,bobT=0){
   ctx.restore();
 }
 
-// ── LLAMA NPC ─────────────────────────────────────────────────
 function drawLlama(cx,cy,frame=0){
   ctx.save();ctx.translate(cx,cy);
   const bob=Math.sin(frame)*2;
-  // Legs
   ctx.fillStyle='#d8c8a0';
   ctx.fillRect(-22,20,8,22);ctx.fillRect(-10,20,8,22);
   ctx.fillRect(4,20,8,22);ctx.fillRect(16,20,8,22);
-  // Body
   ctx.fillStyle='#e8d8b0';ctx.fillRect(-24,-10,48,32);
-  // Neck
   ctx.fillStyle='#e0d0a8';ctx.fillRect(-6,-38+bob,12,32);
-  // Head
   ctx.fillStyle='#e8d8b0';ctx.fillRect(-10,-52+bob,20,16);
-  // Ears
   ctx.fillStyle='#d0c098';ctx.fillRect(-10,-64+bob,6,14);ctx.fillRect(4,-64+bob,6,14);
-  // Eyes
   ctx.fillStyle='#2a1808';ctx.fillRect(-5,-48+bob,4,4);ctx.fillRect(1,-48+bob,4,4);
-  // Nose
   ctx.fillStyle='#c8b088';ctx.fillRect(-4,-42+bob,8,4);
-  // Snout dots
   ctx.fillStyle='#7a5030';ctx.fillRect(-3,-41+bob,3,2);ctx.fillRect(1,-41+bob,3,2);
-  // Woolly texture
   ctx.fillStyle='rgba(255,250,230,0.4)';
   for(let i=0;i<6;i++)for(let j=0;j<3;j++)ctx.fillRect(-22+i*8+j%2*2,-8+j*10,6,6);
-  // Saddle decoration
   ctx.fillStyle='#c83010';ctx.fillRect(-18,0,36,8);
   ctx.fillStyle='#f0c040';
   for(let i=0;i<5;i++)ctx.fillRect(-14+i*8,2,4,4);
   ctx.restore();
 }
 
-// ── Mine Vein (silver deposit) ────────────────────────────────
 class MineVein{
   constructor(x,y,type='prata'){
     this.x=x;this.y=y;this.type=type;this.progress=0;
@@ -575,15 +475,12 @@ class MineVein{
     if(this.done)return;
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-60||sx>W+60)return;
-    // Vein in wall
     const a=0.6+Math.abs(Math.sin(this.glowT))*0.4;
     ctx.fillStyle=`rgba(${this.type==='estanho'?'130,145,155':'180,190,210'},${a})`;
-    // Irregular vein shape
     ctx.beginPath();ctx.moveTo(sx-16,sy-6);ctx.lineTo(sx-4,sy-12);ctx.lineTo(sx+10,sy-8);
     ctx.lineTo(sx+18,sy+4);ctx.lineTo(sx+8,sy+10);ctx.lineTo(sx-6,sy+8);ctx.lineTo(sx-14,sy+2);ctx.closePath();ctx.fill();
     ctx.fillStyle=`rgba(220,230,250,${a*0.6})`;
     ctx.beginPath();ctx.ellipse(sx-2,sy-2,6,4,0.3,0,Math.PI*2);ctx.fill();
-    // Interaction hint
     if(!this.done){
       const ha=0.5+Math.sin(Date.now()/400)*0.5;
       ctx.fillStyle=`rgba(200,210,240,${ha*0.8})`;ctx.font='bold 12px "Courier New"';
@@ -596,7 +493,6 @@ class MineVein{
   }
 }
 
-// ── Collectible ───────────────────────────────────────────────
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=34;this.h=34;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
@@ -608,7 +504,6 @@ class Col{
     const TOOL_TYPES=['picareta','lanterna','coca'];
     const isTool=TOOL_TYPES.includes(this.type);
 
-    // Aura pulsante — ferramentas têm aura dourada maior e mais vibrante
     if(isTool){
       const a=0.3+Math.abs(Math.sin(this.t*0.8))*0.5;
       const glow=ctx.createRadialGradient(sx+17,sy+17,4,sx+17,sy+17,32);
@@ -626,7 +521,6 @@ class Col{
     else if(this.type==='coca')   drawCoca(0,0,this.t);
     ctx.restore();
 
-    // Prompt [E] para ferramentas quando jogador está próximo
     if(isTool&&playerX!==undefined){
       const dist=Math.hypot(playerX+20-(this.x+17), playerY+40-(this.y+17));
       if(dist<110){
@@ -637,17 +531,14 @@ class Col{
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
         const bx=sx+17-tw/2, by=sy-42;
-        // Fundo do balão
         ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;
         roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;
         roundRect(bx,by,tw,24,5);ctx.stroke();
-        // Triângulo apontando para o item
         ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;
         ctx.beginPath();ctx.moveTo(sx+10,by+24);ctx.lineTo(sx+24,by+24);ctx.lineTo(sx+17,by+32);ctx.closePath();ctx.fill();
         ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;
         ctx.beginPath();ctx.moveTo(sx+10,by+24);ctx.lineTo(sx+17,by+32);ctx.lineTo(sx+24,by+24);ctx.stroke();
-        // Texto
         ctx.fillStyle=`rgba(240,200,60,${pulse})`;
         ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
       }
@@ -655,7 +546,6 @@ class Col{
   }
 }
 
-// ── Trigger ───────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
   draw(px,py){
@@ -671,7 +561,6 @@ class Trigger{
   }
 }
 
-// ── Bat enemy ─────────────────────────────────────────────────
 class Bat{
   constructor(x,y,patrol){this.x=x;this.y=y;this.patrol=patrol;this.vx=1.4;this.vy=0;this.baseY=y;this.frame=0;this.dead=false;this.w=28;this.h=18;}
   update(player){
@@ -694,7 +583,6 @@ class Bat{
   }
 }
 
-// ── BUBBLE dialog ─────────────────────────────────────────────
 function wrapText(text,maxW){
   ctx.font='15px "Courier New"';
   const pars=text.split('\n'),result=[];
@@ -721,17 +609,14 @@ const BUBBLE={
     ctx.shadowBlur=0;
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2.5;roundRect(bx,by,bubW,bubH,14);ctx.stroke();
     ctx.strokeStyle=`rgba(200,160,40,0.2)`;ctx.lineWidth=1;roundRect(bx+4,by+4,bubW-8,bubH-8,10);ctx.stroke();
-    // Tail
     const tbx=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
     const tty=by+bubH,tipy=Math.min(pcy,tty+38);
     ctx.fillStyle='rgba(8,4,0,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(pcx,tipy);ctx.lineTo(tbx+14,tty);ctx.stroke();
-    // Corvan face
     const fx=bx+pad,fy=by+pad;
     ctx.save();ctx.beginPath();ctx.rect(fx,fy,CW,CH);ctx.clip();
     drawCorvan(fx,fy,SCALE,false,this.faceFrame*8);ctx.restore();
     ctx.strokeStyle='rgba(200,160,40,0.45)';ctx.lineWidth=1.5;ctx.strokeRect(fx,fy,CW,CH);
-    // Text
     const tx=fx+CW+pad;
     ctx.font='bold 12px "Courier New"';ctx.fillStyle=this.speakerColor;ctx.fillText(this.speakerTxt,tx,by+pad+14);
     ctx.font='15px "Courier New"';ctx.fillStyle='#f0e8c0';
@@ -744,7 +629,6 @@ const BUBBLE={
 function showDialog(msgs,cb,speaker='CORVAN',color='#e0b840'){BUBBLE.show(msgs,cb,speaker,color);}
 function checkDlg(){if(G.dialog&&!INV.open&&isE())BUBBLE.advance();}
 
-// ── Info popup ────────────────────────────────────────────────
 let popup={active:false,timer:0,title:'',lines:[],color:'#c0c0d8'};
 function showPopup(title,lines,color,ms=6500){popup={active:true,timer:ms,title,lines,color};}
 function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.timer<=0)popup.active=false;}}
@@ -763,7 +647,6 @@ function drawPopup(){
   ctx.textAlign='left';ctx.restore();
 }
 
-// ── Notification ──────────────────────────────────────────────
 let notifText='',notifAlpha=0,notifTimer=0;
 function notify(msg,ms=2800){notifText=msg;notifTimer=ms;notifAlpha=1;}
 function tickNotif(){if(notifTimer>0){notifTimer-=16;if(notifTimer<=0)notifAlpha=0;else notifAlpha=Math.min(1,notifTimer/300);}}
@@ -776,7 +659,6 @@ function drawNotif(){
   ctx.restore();
 }
 
-// ── PLAYER ────────────────────────────────────────────────────
 class Player{
   constructor(x,y){
     this.x=x;this.y=y;this.w=40;this.h=82;
@@ -785,18 +667,16 @@ class Player{
     this.walkT=0;this.state='idle';
     this.coyote=0;this.jbuf=0;this.onMoving=null;
     this.items=[];this.score=0;
-    this.activeTool=null;  // ferramenta selecionada no Diário de Bordo
-    this.soroche=0;this.sorocheAnim=0;  // altitude sickness
+    this.activeTool=null;  
+    this.soroche=0;this.sorocheAnim=0;  
     this.interactAnim=0;
   }
   overlaps(r){return this.x<r.x+r.w&&this.x+this.w>r.x&&this.y<r.y+r.h&&this.y+this.h>r.y;}
   near(r,d=80){return Math.abs(this.x+20-(r.x+r.w/2))<r.w/2+d&&Math.abs(this.y+40-(r.y+r.h/2))<r.h/2+d;}
 
   update(level){
-    // Inventário aberto: navega com setas, não move o player
     if(INV.open){ INV.navigate(this); return; }
     if(G.dialog)return;
-    // Soroche fills when underground (levels 2,3); coca leaves reduce it
     if(level.underground){
       this.soroche=Math.min(100,this.soroche+(isR()||isL()?0.10:0.04));
     } else {
@@ -833,13 +713,10 @@ class Player{
     }
     if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
 
-    // ── Tipos de coleta:
-    // FERRAMENTAS (picareta, lanterna, coca) → exige [E] quando próximo
-    // MINERAIS    (prata, estanho, tupu)     → automático ao tocar
     const TOOL_TYPES = ['picareta','lanterna','coca'];
 
     for(const c of level.cols){
-      if(c.done||TOOL_TYPES.includes(c.type)) continue; // ferramentas tratadas no bloco [E]
+      if(c.done||TOOL_TYPES.includes(c.type)) continue; 
       if(!this.overlaps(c)) continue;
       c.done=true;
       if(c.type==='prata'){this.score+=20;sfx('prata');burst(c.x+17,c.y+17,'#c0c8d8',10);
@@ -855,9 +732,7 @@ class Player{
       }
     }
 
-    // E key interactions
     if(isE()){
-      // ── Pegar ferramentas quando próximo ────────────────────────
       for(const c of level.cols){
         if(c.done||!TOOL_TYPES.includes(c.type)) continue;
         if(!this.near({x:c.x,y:c.y,w:c.w,h:c.h},90)) continue;
@@ -879,14 +754,12 @@ class Player{
         break;
       }
 
-      // ── Usar folhas de coca ──────────────────────────────────
       if(this.items.includes('coca')&&this.soroche>20){
         this.items=this.items.filter(i=>i!=='coca');
         if(this.activeTool==='coca') this.activeTool=null;
         this.soroche=Math.max(0,this.soroche-60);sfx('coca');
         burst(this.x+20,this.y-20,'#3a9a38',12);notify('✦ Folhas de coca usadas — fôlego recuperado!');
       }
-      // Mine veins — exige picareta equipada
       if(level.veins&&this.activeTool==='picareta'){
         for(const v of level.veins){
           if(!v.done&&this.near({x:v.x-28,y:v.y-28,w:56,h:56})){
@@ -903,7 +776,6 @@ class Player{
           }
         }
       } else if(level.veins&&this.activeTool!=='picareta'){
-        // Feedback se tentar minerar sem picareta equipada
         for(const v of level.veins){
           if(!v.done&&this.near({x:v.x-28,y:v.y-28,w:56,h:56})){
             if(this.items.includes('picareta')) notify('Equipe a Picareta no Diário [I]!');
@@ -912,10 +784,8 @@ class Player{
           }
         }
       }
-      // Llama
       if(level.llama&&!level.llama.gifted&&this.near({x:level.llama.x-50,y:level.llama.y-60,w:100,h:60})){
         level.llama.gifted=true;sfx('coca');
-        // Animação: folhas de coca caindo da lhama
         for(let i=0;i<12;i++)burst(level.llama.x,level.llama.y-30,'#3a9a38',1,2+Math.random()*2);
         this.items.push('coca');journalCollect('ceramica_inca');
         showDialog([
@@ -925,7 +795,6 @@ class Player{
           '"Com a Picareta e as Folhas de Coca, estou pronto para entrar. Mas vou precisar de uma Lanterna — deve estar em algum lugar lá dentro!"'
         ],null,'CORVAN','#e0b840');
       }
-      // Tupu
       if(level.tupu&&!level.tupu.done&&this.near({x:level.tupu.x-30,y:level.tupu.y-30,w:60,h:60})){
         level.tupu.done=true;this.items.push('tupu');sfx('unlock');burst(level.tupu.x,level.tupu.y,'#c0c0d8',16);
         journalCollect('mapa_potosi');
@@ -936,7 +805,6 @@ class Player{
           '"Preservar este artefato é preservar a memória de quem cuidou destas montanhas por séculos antes da colonização."'
         ],null,'CORVAN','#e0b840');
       }
-      // Regular triggers
       for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}
     }
 
@@ -965,9 +833,7 @@ class Player{
     const dy=this.y-cam.y+this.h-FOOT_Y;
     const flip=this.facing===-1;
     const wf=this.state==='run'?this.walkT:(this.state==='idle'?Date.now()/800:0);
-    // Passa a ferramenta ativa para o desenho do Corvan
     ctx.save();drawCorvan(dx,dy,S,flip,wf,this.activeTool);ctx.restore();
-    // Glow da lanterna quando equipada E underground
     if(this.activeTool==='lanterna'){
       const gx=this.x-cam.x+(flip?-12:this.w+14),gy=this.y-cam.y+this.h*0.6;
       const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,120);
@@ -975,7 +841,6 @@ class Player{
       ctx.fillStyle=lg;ctx.fillRect(gx-120,gy-120,240,240);
     }
     if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
-    // Soroche overlay
     if(this.sorocheAnim>0){
       const a=this.sorocheAnim/80*0.45;ctx.fillStyle=`rgba(20,10,40,${a})`;ctx.fillRect(0,0,W,H);
       if(this.sorocheAnim>40){ctx.fillStyle=`rgba(120,80,200,${(this.sorocheAnim-40)/40*0.6})`;
@@ -984,7 +849,6 @@ class Player{
   }
 }
 
-// ── Backgrounds ───────────────────────────────────────────────
 function drawBg(bgKey,dark=false){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
@@ -1000,9 +864,8 @@ function drawBg(bgKey,dark=false){
   ctx.fillStyle=`rgba(0,0,0,${ovAlpha})`;ctx.fillRect(0,0,W,H);
 }
 
-// Lantern darkness effect (underground with lantern)
 function drawDarkness(player){
-  if(player.activeTool!=='lanterna')return; // escuridão só revelada com lanterna equipada
+  if(player.activeTool!=='lanterna')return;
   const px=player.x-cam.x+player.w/2,py=player.y-cam.y+player.h*0.5;
   const darkCanvas=document.createElement('canvas');darkCanvas.width=W;darkCanvas.height=H;
   const dc=darkCanvas.getContext('2d');
@@ -1014,7 +877,6 @@ function drawDarkness(player){
   ctx.drawImage(darkCanvas,0,0);
 }
 
-// Star effect (exterior at night)
 let stars=Array.from({length:80},()=>({x:Math.random()*W,y:Math.random()*200,sz:Math.random()<0.2?2:1,br:Math.random()>0.7}));
 function drawStars(){
   for(const s of stars){
@@ -1024,7 +886,6 @@ function drawStars(){
   }
 }
 
-// Wind particles (exterior)
 let windP=[];function initWind(){windP=[];for(let i=0;i<30;i++)windP.push({x:Math.random()*W,y:100+Math.random()*300,spd:1+Math.random()*2});}
 initWind();
 function drawWind(){
@@ -1033,7 +894,6 @@ function drawWind(){
     ctx.beginPath();ctx.moveTo(w.x,w.y);ctx.lineTo(w.x+40,w.y+2);ctx.stroke();}
 }
 
-// Mine dust particles (interior)
 let mineP=[];function initMineDust(){mineP=[];for(let i=0;i<20;i++)mineP.push({x:Math.random()*3600,y:200+Math.random()*300,a:Math.random(),t:Math.random()*Math.PI*2});}
 initMineDust();
 function drawMineDust(){
@@ -1042,40 +902,27 @@ function drawMineDust(){
     ctx.fillStyle=`rgba(180,160,140,${p.a})`;ctx.beginPath();ctx.arc(sx,p.y-cam.y,2,0,Math.PI*2);ctx.fill();}
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LEVEL 1 — Início / Exterior Noturno
-//  Background: Cena01 (noite, entrada da mina, montanhas)
-//  Objetivo: coletar picareta + lanterna, interagir com a lhama
-// ═══════════════════════════════════════════════════════════════
 function buildL1(){
   const FL=600,WW=3400,WH=900;
   const plats=[
-    // Chão principal com gaps
     solid(0,FL,400,WH-FL),solid(480,FL,200,WH-FL),solid(760,FL,200,WH-FL),
     solid(1040,FL,220,WH-FL),solid(1340,FL,200,WH-FL),solid(1620,FL,220,WH-FL),
     solid(1920,FL,240,WH-FL),solid(2220,FL,200,WH-FL),solid(2500,FL,220,WH-FL),
     solid(2780,FL,800,WH-FL),
-    // Plataformas flutuantes
     solid(220,FL-180,130,18),solid(520,FL-240,110,18),solid(760,FL-180,130,18),
     solid(1000,FL-230,120,18),solid(1260,FL-180,130,18),solid(1540,FL-250,110,18),
     solid(1760,FL-180,130,18),solid(2040,FL-240,120,18),solid(2320,FL-180,110,18),
     solid(2560,FL-240,120,18),
-    // Pedras de passo pelos gaps
     solid(400,FL-36,80,14),solid(660,FL-36,80,14),solid(900,FL-36,80,14),
     solid(1160,FL-36,80,14),solid(1460,FL-36,80,14),solid(1720,FL-36,80,14),
     solid(2040,FL-36,80,14),solid(2360,FL-36,80,14),solid(2640,FL-36,80,14),
-    // ── ALCOVA BAIXA da picareta (x~1480) ──
-    // Teto baixo que cria visual de "passagem baixa" — sem paredes para não bloquear
-    solid(1480,FL-90,200,18),   // teto da passagem (só ~90px de clearance, bem apertado)
-    // Bloco de pedra no fundo da alcova (visual de "encostado na rocha")
+    solid(1480,FL-90,200,18),   
     solid(1680,FL-90,80,90),
   ];
   const bats=[];
-  // Lhama sentada no chão: cy = FL-42 (pés tocam o solo exatamente)
   const llama={x:3060,y:FL-42,gifted:false};
   const cols=[
     ...[100,240,520,780,1060,1360,1660,1960,2260,2580,2820,3000].map(x=>new Col(x,FL-50,'prata')),
-    // Picareta encostada na parede de pedra, sob o teto baixo
     new Col(1620,FL-48,'picareta'),
   ];
   const triggers=[
@@ -1103,7 +950,6 @@ function buildL1(){
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
       drawStars();drawWind();
-      // Indica alcova da picareta quando próximo
       const alcovaCX=1630-cam.x;
       if(alcovaCX>-200&&alcovaCX<W+200&&!player.items.includes('picareta')){
         const ay=FL-120-cam.y;
@@ -1112,14 +958,11 @@ function buildL1(){
         ctx.font='bold 12px "Courier New"';ctx.textAlign='center';
         ctx.fillText('⛏ alcova →',alcovaCX,ay);ctx.textAlign='left';
       }
-      // Lhama — sempre visível, muda comportamento após dar coca
       if(this.llama){
         const lx=this.llama.x-cam.x,ly=this.llama.y-cam.y;
         if(lx>-100&&lx<W+100){
-          // Animação extra de felicidade após dar a coca
           const bobSpeed=this.llama.gifted?400:600;
           drawLlama(lx,ly,Date.now()/bobSpeed);
-          // Partícula de coração/folha quando gifted e jogador está perto
           if(this.llama.gifted&&Math.abs(player.x-this.llama.x)<200){
             const ht=Date.now()/1000;
             const ha=Math.abs(Math.sin(ht))*0.8;
@@ -1128,7 +971,6 @@ function buildL1(){
             ctx.fillText('🌿',lx+Math.sin(ht*2)*12,ly-80+Math.sin(ht*1.5)*10);
             ctx.textAlign='left';
           }
-          // Prompt [E] — só antes de interagir
           if(!this.llama.gifted&&Math.abs(player.x-this.llama.x)<140){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
             const t2='[E] Cumprimentar a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
@@ -1136,7 +978,6 @@ function buildL1(){
             ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,ly-90,tw,24,4);ctx.stroke();
             ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,ly-73);ctx.textAlign='left';
           }
-          // Após interagir: label "Tchau, Corvan!" discreto
           if(this.llama.gifted&&Math.abs(player.x-this.llama.x)<200){
             ctx.fillStyle='rgba(220,185,80,0.65)';ctx.font='12px "Courier New"';
             ctx.textAlign='center';ctx.fillText('Boa sorte na mina! 🦙',lx,ly-58);ctx.textAlign='left';
@@ -1148,11 +989,6 @@ function buildL1(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LEVEL 2 — Geologia e Solo (Interior Raso)
-//  Background: Cena02 (interior escuro da mina)
-//  Objetivo: popup da prata + 2 veios de prata + 1 estanho
-// ═══════════════════════════════════════════════════════════════
 function buildL2(){
   const FL=600,WW=3400,WH=900;
   const plats=[
@@ -1168,7 +1004,6 @@ function buildL2(){
     solid(1180,FL-36,80,14),solid(1460,FL-36,80,14),solid(1760,FL-36,80,14),
     solid(2060,FL-36,80,14),solid(2360,FL-36,80,14),solid(2640,FL-36,80,14),
     solid(2920,FL-36,80,14),
-    // Mine shaft platforms
     solid(620,FL-120,80,18),solid(1100,FL-140,80,18),
     movH(1800,FL-100,90,1800,1960,2.0),movH(2500,FL-120,90,2500,2640,1.8),
     trap(1540,FL-80,110),
@@ -1181,8 +1016,6 @@ function buildL2(){
   ];
   const cols=[
     ...[80,200,460,740,1020,1300,1600,1900,2200,2500,2780,3020,3160].map(x=>new Col(x,FL-50,'prata')),
-    // ── LANTERNA numa plataforma no início da mina ──
-    // Colocada sobre o primeiro suporte de madeira, fácil de achar
     new Col(160,FL-80,'lanterna'),
   ];
   const bats=[new Bat(600,FL-200,100),new Bat(1200,FL-180,90),new Bat(1900,FL-220,110),new Bat(2600,FL-200,100)];
@@ -1220,11 +1053,6 @@ function buildL2(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LEVEL 3 — A Coleta / Câmaras Profundas
-//  Background: Cena02 (mais escuro)
-//  Objetivo: minerar 3 veios + encontrar o Tupu de Prata
-// ═══════════════════════════════════════════════════════════════
 function buildL3(){
   const FL=580,WW=3600,WH=900;
   const plats=[
@@ -1284,11 +1112,9 @@ function buildL3(){
       for(const v of this.veins)v.tick();for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
       drawMineDust();
-      // Tupu on altar
       if(!this.tupu.done){
         const tx=this.tupu.x-cam.x,ty=this.tupu.y-cam.y;
         if(tx>-80&&tx<W+80){
-          // Altar block
           ctx.fillStyle='#6a5040';ctx.fillRect(tx-30,ty,60,30);
           ctx.fillStyle='#8a6850';ctx.fillRect(tx-30,ty,60,5);
           drawTupu(tx,ty-10,Date.now()/600);
@@ -1307,11 +1133,6 @@ function buildL3(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LEVEL 4 — Conclusão / Exterior (saída da mina)
-//  Background: Cena01 (exterior de madrugada)
-//  Objetivo: dialog final + unlock Fase 1-2
-// ═══════════════════════════════════════════════════════════════
 function buildL4(){
   const FL=600,WW=2400,WH=900;
   const plats=[
@@ -1347,7 +1168,6 @@ function buildL4(){
     update(player){for(const c of this.cols)c.tick();},
     draw(player){
       drawStars();drawWind();
-      // Finish flag
       const fx=2240-cam.x,fy=FL-cam.y;
       ctx.fillStyle='#8a6030';ctx.fillRect(fx,fy-120,4,120);
       ctx.fillStyle='#c8a020';ctx.fillRect(fx+4,fy-120,40,24);
@@ -1357,7 +1177,6 @@ function buildL4(){
   };
 }
 
-// ── HUD ───────────────────────────────────────────────────────
 function drawHUD(player,level){
   ctx.fillStyle='rgba(8,4,0,0.68)';ctx.fillRect(0,0,W,38);
   // Hearts
@@ -1371,7 +1190,6 @@ function drawHUD(player,level){
   ctx.fillStyle='rgba(220,185,80,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#e0b840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
 
-  // ── Slot de ferramenta ativa ──────────────────────────────
   const toolY=44;
   ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,toolY,130,30,4);ctx.fill();
   ctx.strokeStyle=player.activeTool?'#e0b840':'#444';ctx.lineWidth=1.5;roundRect(16,toolY,130,30,4);ctx.stroke();
@@ -1382,19 +1200,16 @@ function drawHUD(player,level){
   } else {
     ctx.font='12px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',24,toolY+21);
   }
-  // Botão [I] para abrir Diário
   ctx.fillStyle='rgba(200,160,40,0.15)';roundRect(152,toolY,52,30,4);ctx.fill();
   ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;roundRect(152,toolY,52,30,4);ctx.stroke();
   ctx.font='bold 12px "Courier New"';ctx.fillStyle='#c0a030';ctx.textAlign='center';ctx.fillText('[I]',178,toolY+21);ctx.textAlign='left';
 
-  // ── Inventário coletados (lado direito) ─────────────────
   let ix=W-16;const inv=[];
   if(player.items.includes('tupu'))    inv.push('✦ TUPU');
   if(player.items.includes('picareta'))inv.push('⛏ PICARETA');
   if(player.items.includes('lanterna'))inv.push('🔦 LANTERNA');
   if(player.items.includes('coca'))    inv.push('🌿 COCA');
   for(const it of inv){ctx.fillStyle='#e0b840';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,toolY+21);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
-  // Soroche meter
   if(player.soroche>20||level.underground){
     const pct=player.soroche/100,bW=140,bX=16,bY=44;
     ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(bX,bY,bW,12);
@@ -1411,7 +1226,6 @@ function drawHUD(player,level){
   }
 }
 
-// ── Screens ───────────────────────────────────────────────────
 function drawTitle(){
   drawBg('bgext');ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
   drawStars();
@@ -1454,7 +1268,6 @@ function drawComplete(){
   ctx.fillText('Pressione ENTER para voltar ao início',W/2,458);ctx.textAlign='left';
 }
 
-// ── Game State ────────────────────────────────────────────────
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
@@ -1492,11 +1305,10 @@ const G={
     if(this.state==='dead'){drawDeath();return;}
     drawHUD(this.player,this.level);
     drawPopup();BUBBLE.draw(this.player);drawNotif();
-    INV.draw(this.player);  // painel do Diário de Bordo (por cima de tudo)
+    INV.draw(this.player); 
   }
 };
 
-// ── Loop ──────────────────────────────────────────────────────
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
