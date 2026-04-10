@@ -1,9 +1,3 @@
-/* ═══════════════════════════════════════════════
-   MINERALIS – data/cards_svg.js
-   SVGs inline de todos os cards de fase.
-   Carregados dinamicamente pelo Cards.renderizar()
-   ═══════════════════════════════════════════════ */
-
 const CardsSVG = {
 
   // ── AMÉRICA DO NORTE ──

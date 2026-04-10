@@ -1,37 +1,16 @@
-/* ═══════════════════════════════════════════════
-   MINERALIS – screens/options.js
-   Tela de Opções — pixel art, estilo diário.
-
-   Seções:
-   • Volume da Música  (slider)
-   • Volume dos Efeitos (slider)
-   • Silenciar tudo    (toggle)
-   • Idioma            (PT-BR ativo / EN futuro)
-   • Créditos          (equipe)
-   • Zerar Progresso   (com confirmação Modal)
-
-   Persiste configurações em localStorage
-   ('mineralis_options_v1').
-   ═══════════════════════════════════════════════ */
-
 const Options = (() => {
 
-  // ── Chave de persistência ──
   const OPT_KEY = 'mineralis_options_v1';
 
-  // ── Estado padrão ──
   const DEFAULTS = {
-    volMusica:  80,   // 0–100
-    volEfeitos: 80,   // 0–100
+    volMusica:  80,   
+    volEfeitos: 80,  
     mudo:       false,
     idioma:     'pt-BR',
   };
 
   let overlay = null;
 
-  // ════════════════════════════════
-  // PERSISTÊNCIA
-  // ════════════════════════════════
 
   function _loadOpts() {
     try {
@@ -46,14 +25,6 @@ const Options = (() => {
     } catch { console.warn('[Options] Não foi possível salvar opções.'); }
   }
 
-  // ════════════════════════════════
-  // APLICA OPÇÕES NO MOTOR DE ÁUDIO
-  // Requer que audio.js exponha:
-  //   Audio.setVolMusica(0–1)
-  //   Audio.setVolEfeitos(0–1)
-  //   Audio.setMudo(bool)
-  // (ver patch em audio.js abaixo)
-  // ════════════════════════════════
 
   function _aplicarAudio(opts) {
     if (typeof Audio === 'undefined') return;
@@ -63,15 +34,10 @@ const Options = (() => {
     if (Audio.setVolEfeitos) Audio.setVolEfeitos(sfx);
   }
 
-  // Carrega e aplica ao inicializar (chamado pelo main.js após init)
   function inicializar() {
     const opts = _loadOpts();
     _aplicarAudio(opts);
   }
-
-  // ════════════════════════════════
-  // HTML DA TELA
-  // ════════════════════════════════
 
   function _buildHTML(opts) {
     return `
@@ -177,17 +143,11 @@ const Options = (() => {
       </div>`;
   }
 
-  // ════════════════════════════════
-  // EVENTOS
-  // ════════════════════════════════
-
   function _bindEventos() {
     const opts = _loadOpts();
 
-    // Fechar
     document.getElementById('optionsClose').addEventListener('click', fechar);
 
-    // Slider Música
     const slMusica = document.getElementById('sliderMusica');
     const valMusica = document.getElementById('valMusica');
     slMusica.addEventListener('input', () => {
@@ -199,7 +159,6 @@ const Options = (() => {
       _aplicarAudio(cur);
     });
 
-    // Slider Efeitos
     const slEfeitos = document.getElementById('sliderEfeitos');
     const valEfeitos = document.getElementById('valEfeitos');
     slEfeitos.addEventListener('input', () => {
@@ -209,11 +168,9 @@ const Options = (() => {
       cur.volEfeitos = v;
       _saveOpts(cur);
       _aplicarAudio(cur);
-      // Toca um clique de preview para sentir o volume
       if (typeof Audio !== 'undefined' && Audio.clickMenu) Audio.clickMenu();
     });
 
-    // Toggle Mudo
     const btnMudo = document.getElementById('btnMudo');
     btnMudo.addEventListener('click', () => {
       const cur  = _loadOpts();
@@ -225,7 +182,6 @@ const Options = (() => {
       btnMudo.classList.toggle('ativo', cur.mudo);
     });
 
-    // Botão Zerar Dados
     document.getElementById('btnZerar').addEventListener('click', () => {
       fechar();
       Modal.confirmar('⚠ Isso apagará TODO o progresso salvo.\nDeseja continuar?')
@@ -237,33 +193,27 @@ const Options = (() => {
         });
     });
 
-    // ESC fecha
     overlay._escHandler = (e) => {
       if (e.key === 'Escape') fechar();
     };
     document.addEventListener('keydown', overlay._escHandler);
   }
 
-  // ════════════════════════════════
-  // ABRIR / FECHAR
-  // ════════════════════════════════
 
   function abrir() {
-    if (overlay) return; // já aberto
+    if (overlay) return; 
 
     const opts = _loadOpts();
     overlay = document.createElement('div');
     overlay.className = 'options-overlay';
     overlay.innerHTML = _buildHTML(opts);
 
-    // Click fora fecha
     overlay.addEventListener('click', e => {
       if (e.target === overlay) fechar();
     });
 
     document.getElementById('frame').appendChild(overlay);
 
-    // Força reflow para a animação de entrada funcionar
     requestAnimationFrame(() => overlay.classList.add('visible'));
 
     _bindEventos();

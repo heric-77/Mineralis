@@ -1,22 +1,7 @@
-/* ═══════════════════════════════════════════════
-   MINERALIS – components/menu.js
-   Responsável por:
-   • Abrir / fechar o menu
-   • Executar as ações de cada botão
-   • SaveManager: ler e gravar progresso no localStorage
-   ═══════════════════════════════════════════════ */
-
-// ════════════════════════════════
-// SAVE MANAGER
-// Centraliza toda leitura/escrita do localStorage.
-// Outros arquivos usam SaveManager.get/set/unlock.
-// ════════════════════════════════
-
 const SaveManager = (() => {
 
   const SAVE_KEY = 'mineralis_save_v2';
 
-  /** Retorna o objeto de save completo (ou cria um vazio). */
   function _load() {
     try {
       const raw = localStorage.getItem(SAVE_KEY);
@@ -26,7 +11,6 @@ const SaveManager = (() => {
     }
   }
 
-  /** Grava o objeto de save. */
   function _save(data) {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
@@ -35,28 +19,22 @@ const SaveManager = (() => {
     }
   }
 
-  /** Retorna true se o jogador já iniciou uma jornada. */
   function jogoIniciado() {
     const save = _load();
     return !!(save && save.iniciado);
   }
 
-  /** Retorna true se a fase com o id dado está desbloqueada no save. */
   function faseDesbloqueada(id) {
     const save = _load();
     return !!(save && save.fases && save.fases[id] && save.fases[id].desbloqueada);
   }
 
-  /** Retorna as estrelas de uma fase (0–4). */
   function estrelasDaFase(id) {
     const save = _load();
     return save?.fases?.[id]?.estrelas ?? 0;
   }
 
-  /**
-   * Inicia uma nova jornada:
-   * reseta o save e desbloqueia apenas a fase 1.1.
-   */
+
   function iniciarNovaJornada() {
     const save = {
       versao: 1,
@@ -71,10 +49,7 @@ const SaveManager = (() => {
     console.info('[SaveManager] Nova jornada iniciada.');
   }
 
-  /**
-   * Desbloqueia uma fase específica (chamado ao completar outra).
-   * Exemplo: SaveManager.desbloquearFase('1.2')
-   */
+
   function desbloquearFase(id) {
     const save = _load();
     if (!save) return;
@@ -84,14 +59,10 @@ const SaveManager = (() => {
     console.info(`[SaveManager] Fase ${id} desbloqueada.`);
   }
 
-  /**
-   * Grava as estrelas obtidas numa fase.
-   * Exemplo: SaveManager.gravarEstrelas('1.1', 3)
-   */
+
   function gravarEstrelas(id, qtd) {
     const save = _load();
     if (!save?.fases?.[id]) return;
-    // Nunca reduz estrelas já conquistadas
     save.fases[id].estrelas = Math.max(save.fases[id].estrelas, qtd);
     _save(save);
   }
@@ -108,17 +79,12 @@ const SaveManager = (() => {
 })();
 
 
-// ════════════════════════════════
-// MENU
-// ════════════════════════════════
-
 const Menu = (() => {
 
   const titleBlock = document.getElementById('titleBlock');
   const menuBlock  = document.getElementById('menuBlock');
   const frame      = document.getElementById('frame');
 
-  // ── Abrir / Fechar ──
 
   function open() {
     Audio.clickMenu();
@@ -132,7 +98,6 @@ const Menu = (() => {
     titleBlock.style.display = '';
   }
 
-  // ── Flash de feedback ──
 
   function _flash() {
     const el = document.createElement('div');
@@ -146,7 +111,6 @@ const Menu = (() => {
     el.addEventListener('animationend', () => el.remove());
   }
 
-  // ── Ações ──
 
   function _novaJornada() {
     if (SaveManager.jogoIniciado()) {
@@ -192,10 +156,7 @@ const Menu = (() => {
     console.info('[Menu] Modo exploração ativo.');
   }
 
-  /**
-   * Volta do modo exploração ao clicar no Corvan no mapa.
-   * Exposta na API pública para o onclick do HTML.
-   */
+ 
   function voltarDoMapa() {
     Audio.clickMenu();
     document.getElementById('frame').classList.remove('explore-mode');
@@ -211,8 +172,8 @@ const Menu = (() => {
 
   function _opcoes() {
     Audio.clickMenu();
-    close();                   // fecha o menu
-    Options.abrir();           // abre a tela de opções
+    close();                   
+    Options.abrir();           
   }
 
   function _sair() {
@@ -222,7 +183,7 @@ const Menu = (() => {
       });
   }
 
-  /** Dispatcher único — chamado pelo HTML via Menu.action('nova') */
+
   function action(key) {
     const actions = {
       nova:     _novaJornada,

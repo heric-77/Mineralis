@@ -12,13 +12,11 @@
 
 <div class="frame" id="frame">
 
-  <!-- ── corner ornaments ── -->
   <div class="corner corner--tl"></div>
   <div class="corner corner--tr"></div>
   <div class="corner corner--bl"></div>
   <div class="corner corner--br"></div>
 
-  <!-- ── world map background ── -->
   <div class="map-layer">
     <div class="landmass lm-na"></div>
     <div class="landmass lm-sa"></div>
@@ -33,7 +31,6 @@
     <span class="map-badge" style="top:20%;left:76%">ÁSIA</span>
     <span class="map-badge" style="top:65%;left:88%">OCEANIA</span>
 
-    <!-- sparkle gems -->
     <div class="sparkle" style="top:20%;left:30%;animation-delay:.3s"></div>
     <div class="sparkle" style="top:45%;left:55%;animation-delay:.9s"></div>
     <div class="sparkle" style="top:15%;left:62%;animation-delay:1.5s"></div>
@@ -43,31 +40,25 @@
     <div class="sparkle" style="top:72%;left:48%;animation-delay:1.8s"></div>
   </div>
 
-  <!-- ── phase cards (left) ── -->
   <div class="cards">
     <div class="card-row">
 
-      <!-- 1.1 ANDES – DESBLOQUEADA -->
       <div class="phase-card locked" data-phase="1.1" data-tip="🔒 Inicie uma Nova Jornada para explorar" onclick="selectCard(this)">
         <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
-  <!-- Card frame - wooden border -->
   <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
   <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
   <rect x="3" y="3" width="74" height="74" fill="#1a0f08"/>
 
-  <!-- Inner frame highlight -->
   <rect x="3" y="3" width="74" height="1" fill="#6B3A1F"/>
   <rect x="3" y="3" width="1" height="74" fill="#6B3A1F"/>
   <rect x="3" y="76" width="74" height="1" fill="#0d0804"/>
   <rect x="76" y="3" width="1" height="74" fill="#0d0804"/>
 
-  <!-- Sky gradient - high altitude -->
   <rect x="4" y="4" width="72" height="45" fill="#1B3A6B"/>
   <rect x="4" y="4" width="72" height="8" fill="#2B5EA7"/>
   <rect x="4" y="12" width="72" height="6" fill="#224F8A"/>
   <rect x="4" y="18" width="72" height="5" fill="#1E4575"/>
 
-  <!-- Sun -->
   <rect x="60" y="6" width="6" height="6" fill="#FFD700"/>
   <rect x="61" y="5" width="4" height="1" fill="#FFD700"/>
   <rect x="61" y="12" width="4" height="1" fill="#FFD700"/>
@@ -76,35 +67,28 @@
   <rect x="60" y="6" width="1" height="1" fill="#FFF176"/>
   <rect x="64" y="6" width="1" height="1" fill="#FFF176"/>
 
-  <!-- Condor silhouette -->
   <rect x="30" y="10" width="2" height="1" fill="#111111"/>
   <rect x="29" y="11" width="4" height="1" fill="#111111"/>
   <rect x="28" y="12" width="6" height="1" fill="#111111"/>
   <rect x="31" y="10" width="1" height="3" fill="#111111"/>
 
-  <!-- Background mountains (far) -->
-  <!-- Mountain 1 far left -->
   <rect x="4" y="26" width="4" height="23" fill="#3A5078"/>
   <rect x="6" y="23" width="4" height="26" fill="#3A5078"/>
   <rect x="8" y="20" width="4" height="29" fill="#3A5078"/>
   <rect x="10" y="23" width="3" height="26" fill="#3A5078"/>
   <rect x="11" y="26" width="2" height="23" fill="#3A5078"/>
-  <!-- Snow cap far -->
   <rect x="8" y="20" width="4" height="2" fill="#C8D8E8"/>
   <rect x="9" y="19" width="2" height="1" fill="#C8D8E8"/>
 
-  <!-- Mountain 2 far center -->
   <rect x="28" y="22" width="5" height="27" fill="#2E4468"/>
   <rect x="30" y="19" width="5" height="30" fill="#2E4468"/>
   <rect x="32" y="16" width="5" height="33" fill="#2E4468"/>
   <rect x="34" y="19" width="4" height="30" fill="#2E4468"/>
   <rect x="36" y="22" width="3" height="27" fill="#2E4468"/>
-  <!-- Snow cap -->
   <rect x="32" y="16" width="5" height="2" fill="#DDEEFF"/>
   <rect x="33" y="15" width="3" height="1" fill="#DDEEFF"/>
   <rect x="34" y="14" width="1" height="1" fill="#FFFFFF"/>
 
-  <!-- Mountain 3 far right -->
   <rect x="58" y="24" width="4" height="25" fill="#3A5078"/>
   <rect x="60" y="21" width="4" height="28" fill="#3A5078"/>
   <rect x="62" y="18" width="4" height="31" fill="#3A5078"/>
@@ -114,8 +98,6 @@
   <rect x="62" y="18" width="4" height="2" fill="#C8D8E8"/>
   <rect x="63" y="17" width="2" height="1" fill="#C8D8E8"/>
 
-  <!-- Main mountain (foreground) -->
-  <!-- Mountain body -->
   <rect x="4" y="35" width="72" height="14" fill="#5C4020"/>
   <rect x="10" y="30" width="60" height="19" fill="#5C4020"/>
   <rect x="18" y="26" width="44" height="23" fill="#5C4020"/>
@@ -123,12 +105,10 @@
   <rect x="32" y="21" width="16" height="28" fill="#6B4D28"/>
   <rect x="36" y="19" width="8" height="30" fill="#7A5A30"/>
 
-  <!-- Mountain shading -->
   <rect x="36" y="19" width="3" height="30" fill="#8B6835"/>
   <rect x="26" y="23" width="6" height="26" fill="#7A5A30"/>
   <rect x="50" y="25" width="8" height="24" fill="#4A3318"/>
 
-  <!-- Snow cap main mountain -->
   <rect x="34" y="19" width="12" height="3" fill="#E8F0FF"/>
   <rect x="35" y="17" width="10" height="2" fill="#F0F8FF"/>
   <rect x="36" y="15" width="8" height="2" fill="#FFFFFF"/>
@@ -136,35 +116,28 @@
   <rect x="38" y="12" width="4" height="1" fill="#FFFFFF"/>
   <rect x="39" y="11" width="2" height="1" fill="#E8F0FF"/>
 
-  <!-- Rock details on mountain -->
   <rect x="20" y="35" width="3" height="2" fill="#3D2810"/>
   <rect x="52" y="33" width="3" height="2" fill="#3D2810"/>
   <rect x="30" y="40" width="2" height="2" fill="#3D2810"/>
   <rect x="44" y="38" width="2" height="2" fill="#3D2810"/>
 
-  <!-- Mine entrance -->
   <rect x="14" y="41" width="8" height="8" fill="#1A0F05"/>
   <rect x="15" y="40" width="6" height="9" fill="#1A0F05"/>
   <rect x="15" y="39" width="6" height="1" fill="#8B6835"/>
-  <!-- Mine support beams -->
   <rect x="14" y="39" width="2" height="10" fill="#6B4520"/>
   <rect x="20" y="39" width="2" height="10" fill="#6B4520"/>
   <rect x="14" y="39" width="8" height="2" fill="#7A5228"/>
-  <!-- Mine glow -->
   <rect x="16" y="42" width="4" height="4" fill="#2A1A08"/>
   <rect x="17" y="43" width="2" height="2" fill="#332010"/>
 
-  <!-- Ground/rocky terrain -->
   <rect x="4" y="49" width="72" height="27" fill="#4A3318"/>
   <rect x="4" y="49" width="72" height="2" fill="#5C4020"/>
 
-  <!-- Rock formations ground -->
   <rect x="4" y="52" width="8" height="5" fill="#3D2810"/>
   <rect x="6" y="50" width="5" height="7" fill="#3D2810"/>
   <rect x="60" y="52" width="8" height="5" fill="#3D2810"/>
   <rect x="62" y="50" width="5" height="7" fill="#3D2810"/>
 
-  <!-- Silver ore veins in ground -->
   <rect x="10" y="55" width="3" height="2" fill="#A8B8C8"/>
   <rect x="11" y="54" width="2" height="4" fill="#B8C8D8"/>
   <rect x="25" y="57" width="2" height="3" fill="#A8B8C8"/>
@@ -172,48 +145,35 @@
   <rect x="55" y="58" width="2" height="2" fill="#B0C0D0"/>
   <rect x="65" y="54" width="3" height="3" fill="#A8B8C8"/>
 
-  <!-- Corvan character (small pixel) -->
-  <!-- Body -->
+
   <rect x="34" y="48" width="4" height="6" fill="#B22222"/>
-  <!-- Head -->
   <rect x="34" y="46" width="4" height="2" fill="#D4956A"/>
-  <!-- Hat -->
   <rect x="33" y="44" width="6" height="2" fill="#5C3A1E"/>
   <rect x="34" y="43" width="4" height="1" fill="#5C3A1E"/>
-  <!-- Hat lamp -->
   <rect x="36" y="43" width="2" height="1" fill="#FFD700"/>
-  <!-- Legs -->
   <rect x="34" y="54" width="2" height="2" fill="#3D2810"/>
   <rect x="36" y="54" width="2" height="2" fill="#3D2810"/>
-  <!-- Pickaxe -->
   <rect x="38" y="49" width="4" height="1" fill="#8B6835"/>
   <rect x="41" y="48" width="2" height="2" fill="#999"/>
 
-  <!-- Llama (iconic Andes) -->
   <rect x="22" y="51" width="2" height="4" fill="#D4B896"/>
   <rect x="22" y="49" width="3" height="2" fill="#D4B896"/>
-  <rect x="24" y="48" width="1" height="1" fill="#D4B896"/><!-- neck -->
-  <rect x="24" y="47" width="2" height="1" fill="#C8A882"/><!-- head -->
-  <rect x="24" y="50" width="4" height="3" fill="#D4B896"/><!-- body -->
+  <rect x="24" y="48" width="1" height="1" fill="#D4B896"/>
+  <rect x="24" y="47" width="2" height="1" fill="#C8A882"/>
+  <rect x="24" y="50" width="4" height="3" fill="#D4B896"/>
   <rect x="26" y="53" width="1" height="2" fill="#C8A882"/>
   <rect x="27" y="53" width="1" height="2" fill="#C8A882"/>
 
-  <!-- Ground dirt details -->
   <rect x="35" y="60" width="10" height="1" fill="#3D2810"/>
   <rect x="20" y="62" width="8" height="1" fill="#3D2810"/>
   <rect x="50" y="61" width="8" height="1" fill="#3D2810"/>
 
-  <!-- Scattered silver nuggets -->
   <rect x="40" y="58" width="2" height="2" fill="#C0C8D0"/>
   <rect x="48" y="60" width="2" height="1" fill="#B8C0C8"/>
   <rect x="16" y="61" width="2" height="2" fill="#C0C8D0"/>
 
-  <!-- Stars rating (3 stars) - bottom area -->
-  <!-- Star 1 -->
-  <!-- Star 2 -->
-  <!-- Star 3 -->
 
-  <!-- Corner decorations (pixel art nails/bolts) -->
+
   <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
   <rect x="73" y="4" width="3" height="3" fill="#C8A060"/>
   <rect x="4" y="73" width="3" height="3" fill="#C8A060"/>
@@ -225,10 +185,8 @@
 </svg></div>
       </div>
 
-      <!-- 1.2 AMAZÔNIA – BLOQUEADA -->
       <div class="phase-card locked" data-phase="1.2" data-tip="🔒 Complete os Andes para desbloquear">
         <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
-  <!-- Card frame -->
   <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
   <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
   <rect x="3" y="3" width="74" height="74" fill="#1a0f08"/>
@@ -237,19 +195,15 @@
   <rect x="3" y="76" width="74" height="1" fill="#0d0804"/>
   <rect x="76" y="3" width="1" height="74" fill="#0d0804"/>
 
-  <!-- Sky - dense jungle canopy blocks most sky -->
   <rect x="4" y="4" width="72" height="20" fill="#1A3D1A"/>
   <rect x="4" y="4" width="72" height="6" fill="#2A5C2A"/>
 
-  <!-- Sunbeams through canopy -->
   <rect x="20" y="4" width="3" height="30" fill="#3A6B1A" opacity="0.5"/>
   <rect x="22" y="4" width="1" height="25" fill="#7AB828" opacity="0.3"/>
   <rect x="45" y="4" width="4" height="28" fill="#3A6B1A" opacity="0.5"/>
   <rect x="47" y="4" width="2" height="22" fill="#8AC830" opacity="0.3"/>
   <rect x="62" y="4" width="3" height="20" fill="#3A6B1A" opacity="0.4"/>
 
-  <!-- Background jungle canopy (far) -->
-  <!-- Tree tops far -->
   <rect x="4" y="8" width="12" height="16" fill="#1E4D1E"/>
   <rect x="6" y="6" width="8" height="18" fill="#256325"/>
   <rect x="8" y="4" width="6" height="20" fill="#2A7A2A"/>
@@ -264,29 +218,24 @@
   <rect x="62" y="8" width="10" height="16" fill="#1E4D1E"/>
   <rect x="64" y="5" width="8" height="19" fill="#256325"/>
 
-  <!-- Hanging vines -->
   <rect x="12" y="4" width="1" height="30" fill="#3D6B20"/>
   <rect x="13" y="4" width="1" height="25" fill="#2E5518"/>
   <rect x="35" y="4" width="1" height="28" fill="#3D6B20"/>
   <rect x="36" y="4" width="1" height="22" fill="#2E5518"/>
   <rect x="58" y="4" width="1" height="26" fill="#3D6B20"/>
   <rect x="70" y="4" width="1" height="20" fill="#2E5518"/>
-  <!-- Vine leaves -->
   <rect x="11" y="18" width="3" height="2" fill="#4A8028"/>
   <rect x="11" y="25" width="3" height="2" fill="#4A8028"/>
   <rect x="34" y="15" width="3" height="2" fill="#4A8028"/>
   <rect x="34" y="22" width="3" height="2" fill="#4A8028"/>
   <rect x="57" y="17" width="3" height="2" fill="#4A8028"/>
 
-  <!-- Jungle floor vegetation -->
   <rect x="4" y="34" width="72" height="15" fill="#2A5C1E"/>
   <rect x="4" y="34" width="72" height="4" fill="#3A7028"/>
 
-  <!-- Large jungle leaves foreground -->
   <rect x="4" y="30" width="14" height="8" fill="#3A8020"/>
   <rect x="4" y="28" width="10" height="10" fill="#4A9030"/>
   <rect x="6" y="26" width="7" height="12" fill="#5AA040"/>
-  <!-- Leaf detail -->
   <rect x="7" y="27" width="1" height="10" fill="#3A8020"/>
 
   <rect x="60" y="29" width="16" height="9" fill="#3A8020"/>
@@ -294,61 +243,48 @@
   <rect x="66" y="25" width="8" height="13" fill="#5AA040"/>
   <rect x="70" y="26" width="1" height="11" fill="#3A8020"/>
 
-  <!-- River - muddy gold rush river -->
   <rect x="4" y="49" width="72" height="12" fill="#6B4E2A"/>
   <rect x="4" y="50" width="72" height="2" fill="#7A5C35"/>
   <rect x="4" y="52" width="72" height="2" fill="#5C3F1E"/>
-  <!-- Water shimmer -->
   <rect x="8" y="50" width="4" height="1" fill="#8A7040"/>
   <rect x="20" y="52" width="6" height="1" fill="#7A6030"/>
   <rect x="40" y="51" width="8" height="1" fill="#8A7040"/>
   <rect x="58" y="53" width="5" height="1" fill="#7A6030"/>
 
-  <!-- Gold nuggets in river -->
   <rect x="15" y="53" width="3" height="2" fill="#FFD700"/>
   <rect x="16" y="52" width="2" height="4" fill="#FFC800"/>
   <rect x="30" y="54" width="2" height="2" fill="#FFD700"/>
   <rect x="50" y="53" width="3" height="2" fill="#FFD700"/>
   <rect x="51" y="52" width="2" height="3" fill="#FFC800"/>
   <rect x="63" y="54" width="2" height="2" fill="#FFD700"/>
-  <!-- Gold shimmer -->
   <rect x="15" y="53" width="1" height="1" fill="#FFEC60"/>
   <rect x="50" y="53" width="1" height="1" fill="#FFEC60"/>
 
-  <!-- Sluice box (gold panning equipment) -->
   <rect x="36" y="48" width="12" height="4" fill="#8B6835"/>
   <rect x="36" y="48" width="12" height="1" fill="#A07840"/>
   <rect x="36" y="48" width="1" height="4" fill="#6B4820"/>
   <rect x="47" y="48" width="1" height="4" fill="#6B4820"/>
-  <!-- Riffle bars in sluice -->
   <rect x="38" y="49" width="1" height="3" fill="#6B4820"/>
   <rect x="40" y="49" width="1" height="3" fill="#6B4820"/>
   <rect x="42" y="49" width="1" height="3" fill="#6B4820"/>
   <rect x="44" y="49" width="1" height="3" fill="#6B4820"/>
   <rect x="46" y="49" width="1" height="3" fill="#6B4820"/>
 
-  <!-- Corvan panning for gold -->
-  <!-- Body -->
+
   <rect x="34" y="46" width="4" height="5" fill="#B22222"/>
-  <!-- Head -->
   <rect x="34" y="44" width="4" height="2" fill="#D4956A"/>
-  <!-- Hat -->
   <rect x="33" y="42" width="6" height="2" fill="#5C3A1E"/>
   <rect x="34" y="41" width="4" height="1" fill="#5C3A1E"/>
   <rect x="36" y="41" width="2" height="1" fill="#FFD700"/>
-  <!-- Arms extended with pan -->
   <rect x="30" y="47" width="4" height="1" fill="#D4956A"/>
-  <rect x="28" y="46" width="4" height="3" fill="#7A5A30"/><!-- pan -->
+  <rect x="28" y="46" width="4" height="3" fill="#7A5A30"/>
   <rect x="28" y="46" width="4" height="1" fill="#8B6835"/>
-  <!-- Legs -->
   <rect x="34" y="51" width="2" height="2" fill="#3D2810"/>
   <rect x="36" y="51" width="2" height="2" fill="#3D2810"/>
 
-  <!-- Ancient pottery artifacts -->
   <rect x="10" y="55" width="4" height="5" fill="#8B4513"/>
   <rect x="9" y="56" width="6" height="3" fill="#A0522D"/>
   <rect x="10" y="55" width="4" height="1" fill="#6B3510"/>
-  <!-- Pottery design -->
   <rect x="10" y="57" width="1" height="1" fill="#5C2808"/>
   <rect x="12" y="57" width="1" height="1" fill="#5C2808"/>
 
@@ -356,29 +292,22 @@
   <rect x="64" y="57" width="6" height="2" fill="#A0522D"/>
   <rect x="65" y="56" width="4" height="1" fill="#6B3510"/>
 
-  <!-- Ground - muddy river bank -->
   <rect x="4" y="61" width="72" height="15" fill="#4A3318"/>
   <rect x="4" y="61" width="72" height="2" fill="#5C4020"/>
 
-  <!-- Mud/dirt patches -->
   <rect x="4" y="63" width="12" height="4" fill="#3D2810"/>
   <rect x="20" y="64" width="8" height="3" fill="#3D2810"/>
   <rect x="55" y="63" width="10" height="4" fill="#3D2810"/>
 
-  <!-- More gold scattered on bank -->
   <rect x="8" y="64" width="2" height="2" fill="#FFD700"/>
   <rect x="55" y="65" width="2" height="2" fill="#FFD700"/>
   <rect x="70" y="63" width="2" height="2" fill="#FFD700"/>
   <rect x="8" y="64" width="1" height="1" fill="#FFEC60"/>
 
-  <!-- Gems (gemas) -->
   <rect x="44" y="64" width="3" height="3" fill="#50C878"/>
   <rect x="45" y="63" width="1" height="5" fill="#3DAF65"/>
   <rect x="44" y="64" width="1" height="1" fill="#80E8A0"/>
 
-  <!-- Stars (3 stars) -->
-
-  <!-- Corner bolts -->
   <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
   <rect x="73" y="4" width="3" height="3" fill="#C8A060"/>
   <rect x="4" y="73" width="3" height="3" fill="#C8A060"/>
@@ -393,10 +322,9 @@
     </div>
     <div class="card-row">
 
-      <!-- 1.3 MACHU PICCHU – BLOQUEADA -->
+
       <div class="phase-card locked" data-phase="1.3" data-tip="🔒 Complete os Andes para desbloquear">
         <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
-  <!-- Card frame -->
   <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
   <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
   <rect x="3" y="3" width="74" height="74" fill="#1a0f08"/>
@@ -405,18 +333,15 @@
   <rect x="3" y="76" width="74" height="1" fill="#0d0804"/>
   <rect x="76" y="3" width="1" height="74" fill="#0d0804"/>
 
-  <!-- Sky - misty mountain sky -->
   <rect x="4" y="4" width="72" height="35" fill="#4A6B8A"/>
   <rect x="4" y="4" width="72" height="10" fill="#5A7FA0"/>
   <rect x="4" y="10" width="72" height="8" fill="#4E7090"/>
 
-  <!-- Sun halo through mist -->
   <rect x="55" y="5" width="8" height="8" fill="#8AAABF"/>
   <rect x="56" y="4" width="6" height="10" fill="#7A9AAF"/>
   <rect x="57" y="5" width="4" height="8" fill="#C8DCE8"/>
   <rect x="58" y="6" width="2" height="6" fill="#E8F0F8"/>
 
-  <!-- Mist/clouds wrapping mountains -->
   <rect x="4" y="16" width="20" height="5" fill="#6A8AA0"/>
   <rect x="4" y="18" width="15" height="4" fill="#7A9AB0"/>
   <rect x="30" y="14" width="25" height="4" fill="#6A8AA0"/>
@@ -424,7 +349,6 @@
   <rect x="60" y="15" width="16" height="5" fill="#6A8AA0"/>
   <rect x="62" y="17" width="14" height="4" fill="#7A9AB0"/>
 
-  <!-- Background mountains - green peaks (Andes) -->
   <rect x="4" y="20" width="8" height="19" fill="#3D6B3D"/>
   <rect x="6" y="16" width="8" height="23" fill="#4A7A4A"/>
   <rect x="8" y="13" width="8" height="26" fill="#527A52"/>
@@ -436,7 +360,6 @@
   <rect x="26" y="11" width="8" height="28" fill="#527A52"/>
   <rect x="28" y="14" width="6" height="25" fill="#4A7A4A"/>
   <rect x="30" y="18" width="6" height="21" fill="#3D6B3D"/>
-  <!-- Snow on this peak -->
   <rect x="26" y="11" width="8" height="3" fill="#D8E8F0"/>
   <rect x="27" y="10" width="6" height="1" fill="#E8F4FF"/>
   <rect x="28" y="9" width="4" height="1" fill="#FFFFFF"/>
@@ -446,7 +369,6 @@
   <rect x="56" y="10" width="8" height="29" fill="#527A52"/>
   <rect x="58" y="13" width="7" height="26" fill="#4A7A4A"/>
   <rect x="61" y="17" width="6" height="22" fill="#3D6B3D"/>
-  <!-- Snow -->
   <rect x="56" y="10" width="8" height="3" fill="#D8E8F0"/>
   <rect x="57" y="9" width="6" height="1" fill="#E8F4FF"/>
 
@@ -454,32 +376,24 @@
   <rect x="68" y="14" width="8" height="25" fill="#4A7A4A"/>
   <rect x="68" y="11" width="8" height="28" fill="#527A52"/>
 
-  <!-- Green mountain/hill where ruins sit -->
   <rect x="4" y="35" width="72" height="14" fill="#4A7020"/>
   <rect x="4" y="31" width="72" height="8" fill="#527828"/>
   <rect x="10" y="28" width="60" height="11" fill="#5C8030"/>
   <rect x="18" y="26" width="44" height="13" fill="#5C8030"/>
 
-  <!-- Terraced agriculture (Inca terraces!) -->
-  <!-- Terrace 1 -->
   <rect x="4" y="38" width="72" height="3" fill="#6A9038"/>
   <rect x="4" y="38" width="72" height="1" fill="#7AA040"/>
   <rect x="4" y="40" width="72" height="1" fill="#4A7020"/>
-  <!-- Terrace 2 -->
   <rect x="4" y="42" width="72" height="3" fill="#5C8830"/>
   <rect x="4" y="42" width="72" height="1" fill="#6A9838"/>
   <rect x="4" y="44" width="72" height="1" fill="#3D6818"/>
-  <!-- Terrace walls (stone) -->
   <rect x="4" y="41" width="72" height="1" fill="#8A7055"/>
   <rect x="4" y="45" width="72" height="1" fill="#7A6045"/>
 
-  <!-- Inca ruins - stone buildings -->
-  <!-- Main temple structure -->
   <rect x="18" y="22" width="44" height="16" fill="#8A8070"/>
   <rect x="20" y="20" width="40" height="18" fill="#9A9080"/>
   <rect x="22" y="18" width="36" height="20" fill="#A8A090"/>
 
-  <!-- Stone texture/bricks -->
   <rect x="22" y="18" width="6" height="3" fill="#989080"/>
   <rect x="28" y="18" width="6" height="3" fill="#A0988A"/>
   <rect x="34" y="18" width="6" height="3" fill="#989080"/>
@@ -499,33 +413,26 @@
   <rect x="46" y="24" width="6" height="3" fill="#989080"/>
   <rect x="52" y="24" width="6" height="3" fill="#A0988A"/>
 
-  <!-- Temple doorway -->
   <rect x="36" y="27" width="8" height="11" fill="#2A1E10"/>
   <rect x="37" y="26" width="6" height="12" fill="#2A1E10"/>
-  <!-- Door arch (trapezoidal Inca style) -->
   <rect x="37" y="26" width="6" height="1" fill="#7A6848"/>
   <rect x="36" y="27" width="1" height="10" fill="#7A6848"/>
   <rect x="43" y="27" width="1" height="10" fill="#7A6848"/>
 
-  <!-- Gold detail on temple -->
   <rect x="24" y="19" width="2" height="1" fill="#FFD700"/>
   <rect x="32" y="19" width="2" height="1" fill="#FFD700"/>
   <rect x="46" y="19" width="2" height="1" fill="#FFD700"/>
   <rect x="54" y="19" width="2" height="1" fill="#FFD700"/>
 
-  <!-- Smaller ruins left -->
   <rect x="4" y="30" width="14" height="9" fill="#8A8070"/>
   <rect x="5" y="29" width="12" height="10" fill="#9A9080"/>
-  <!-- Brick detail -->
   <rect x="5" y="29" width="4" height="2" fill="#A0988A"/>
   <rect x="9" y="29" width="4" height="2" fill="#989080"/>
   <rect x="5" y="31" width="4" height="2" fill="#989080"/>
   <rect x="9" y="31" width="4" height="2" fill="#A0988A"/>
-  <!-- Window -->
   <rect x="6" y="33" width="4" height="4" fill="#2A1E10"/>
   <rect x="6" y="33" width="4" height="1" fill="#7A6848"/>
 
-  <!-- Smaller ruins right -->
   <rect x="62" y="30" width="14" height="9" fill="#8A8070"/>
   <rect x="63" y="29" width="12" height="10" fill="#9A9080"/>
   <rect x="63" y="29" width="4" height="2" fill="#A0988A"/>
@@ -535,7 +442,6 @@
   <rect x="70" y="33" width="4" height="4" fill="#2A1E10"/>
   <rect x="70" y="33" width="4" height="1" fill="#7A6848"/>
 
-  <!-- Corvan examining wall with artifacts -->
   <rect x="48" y="30" width="4" height="5" fill="#B22222"/>
   <rect x="48" y="28" width="4" height="2" fill="#D4956A"/>
   <rect x="47" y="26" width="6" height="2" fill="#5C3A1E"/>
@@ -543,10 +449,8 @@
   <rect x="50" y="25" width="2" height="1" fill="#FFD700"/>
   <rect x="48" y="35" width="2" height="2" fill="#3D2810"/>
   <rect x="50" y="35" width="2" height="2" fill="#3D2810"/>
-  <!-- Arm reaching to wall -->
   <rect x="52" y="30" width="3" height="1" fill="#D4956A"/>
 
-  <!-- Gold artifacts scattered -->
   <rect x="14" y="37" width="3" height="3" fill="#FFD700"/>
   <rect x="15" y="36" width="2" height="5" fill="#FFC800"/>
   <rect x="14" y="37" width="1" height="1" fill="#FFEC60"/>
@@ -554,16 +458,13 @@
   <rect x="60" y="36" width="3" height="3" fill="#FFD700"/>
   <rect x="61" y="35" width="2" height="5" fill="#FFC800"/>
 
-  <!-- Ground area below terraces -->
   <rect x="4" y="46" width="72" height="20" fill="#4A3318"/>
   <rect x="4" y="46" width="72" height="2" fill="#5C4020"/>
 
-  <!-- Stone steps -->
   <rect x="30" y="46" width="20" height="2" fill="#7A7060"/>
   <rect x="32" y="48" width="16" height="2" fill="#8A8070"/>
   <rect x="34" y="50" width="12" height="2" fill="#9A9080"/>
 
-  <!-- Pottery/artifacts on ground -->
   <rect x="8" y="50" width="4" height="5" fill="#8B4513"/>
   <rect x="7" y="51" width="6" height="3" fill="#A0522D"/>
   <rect x="8" y="50" width="4" height="1" fill="#6B3510"/>
@@ -573,9 +474,6 @@
   <rect x="63" y="52" width="6" height="2" fill="#A0522D"/>
   <rect x="65" y="52" width="1" height="1" fill="#FFD700"/>
 
-  <!-- Stars (4 stars) -->
-
-  <!-- Corner bolts -->
   <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
   <rect x="73" y="4" width="3" height="3" fill="#C8A060"/>
   <rect x="4" y="73" width="3" height="3" fill="#C8A060"/>
@@ -590,78 +488,53 @@
     </div>
   </div>
 
-  <!-- ── central panel ── -->
   <div class="menu-panel" id="menuPanel">
 
-    <!-- STATE 1: title button (visible by default) -->
     <div class="title-block" id="titleBlock">
       <button class="title-btn" id="titleBtn" onclick="Menu.open()">
         <div class="title-btn-inner">
           <span class="title-text">MINERALIS</span>
-          <!-- Corvan pixel art – dentro do banner -->
           <div class="corvan-wrap">
             <svg class="corvan-svg" viewBox="0 0 32 52" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-              <!-- ── HAT ── -->
-              <rect x="7"  y="3"  width="18" height="2"  fill="#3a2208"/><!-- brim -->
-              <rect x="9"  y="1"  width="14" height="4"  fill="#4a2e10"/><!-- crown -->
-              <!-- lamp -->
+              <rect x="7"  y="3"  width="18" height="2"  fill="#3a2208"/>
+              <rect x="9"  y="1"  width="14" height="4"  fill="#4a2e10"/>
               <rect x="13" y="0"  width="6"  height="3"  fill="#c8a020"/>
               <rect x="14" y="0"  width="4"  height="2"  fill="#ffe060"/>
-              <!-- ── HEAD ── -->
               <rect x="9"  y="5"  width="14" height="9"  fill="#c88050"/>
-              <rect x="10" y="6"  width="12" height="1"  fill="#a86030"/><!-- brow shadow -->
-              <!-- eyes -->
+              <rect x="10" y="6"  width="12" height="1"  fill="#a86030"/>
               <rect x="11" y="8"  width="3"  height="2"  fill="#1a0a04"/>
               <rect x="18" y="8"  width="3"  height="2"  fill="#1a0a04"/>
               <rect x="12" y="8"  width="1"  height="1"  fill="#fff"/>
               <rect x="19" y="8"  width="1"  height="1"  fill="#fff"/>
-              <!-- nose -->
               <rect x="14" y="11" width="4"  height="1"  fill="#a86030"/>
-              <!-- mouth -->
               <rect x="12" y="13" width="8"  height="1"  fill="#7a3820"/>
-              <!-- ── NECK ── -->
               <rect x="13" y="14" width="6"  height="2"  fill="#c88050"/>
-              <!-- ── SHIRT (red) ── -->
               <rect x="8"  y="16" width="16" height="13" fill="#b82010"/>
-              <!-- shirt buttons -->
               <rect x="15" y="17" width="2"  height="1"  fill="#8a1008"/>
               <rect x="15" y="20" width="2"  height="1"  fill="#8a1008"/>
               <rect x="15" y="23" width="2"  height="1"  fill="#8a1008"/>
-              <!-- collar -->
               <rect x="12" y="16" width="3"  height="3"  fill="#d03018"/>
               <rect x="17" y="16" width="3"  height="3"  fill="#d03018"/>
-              <!-- ── BELT ── -->
               <rect x="8"  y="28" width="16" height="2"  fill="#2a1408"/>
-              <rect x="14" y="28" width="4"  height="2"  fill="#c88020"/><!-- buckle -->
-              <!-- ── PANTS ── -->
+              <rect x="14" y="28" width="4"  height="2"  fill="#c88020"/>
               <rect x="9"  y="30" width="14" height="12" fill="#383838"/>
-              <rect x="15" y="36" width="2"  height="6"  fill="#282828"/><!-- split -->
-              <!-- ── LEFT ARM + PICKAXE ── -->
+              <rect x="15" y="36" width="2"  height="6"  fill="#282828"/>
               <rect x="3"  y="16" width="5"  height="12" fill="#b82010"/>
-              <rect x="3"  y="28" width="5"  height="3"  fill="#a86030"/><!-- hand -->
-              <!-- pickaxe handle -->
+              <rect x="3"  y="28" width="5"  height="3"  fill="#a86030"/>
               <rect x="0"  y="24" width="6"  height="1"  fill="#7a4818"/>
               <rect x="0"  y="25" width="1"  height="7"  fill="#7a4818"/>
-              <!-- pickaxe head -->
               <rect x="0"  y="22" width="6"  height="3"  fill="#888888"/>
               <rect x="4"  y="20" width="2"  height="3"  fill="#aaaaaa"/>
-              <!-- ── RIGHT ARM + LANTERN ── -->
               <rect x="24" y="16" width="5"  height="12" fill="#b82010"/>
-              <rect x="24" y="28" width="5"  height="3"  fill="#a86030"/><!-- hand -->
-              <!-- lantern handle -->
+              <rect x="24" y="28" width="5"  height="3"  fill="#a86030"/>
               <rect x="26" y="31" width="1"  height="3"  fill="#888888"/>
-              <!-- lantern body -->
               <rect x="24" y="34" width="5"  height="6"  fill="#604010"/>
-              <!-- lantern glass (glowing) -->
               <rect x="25" y="35" width="3"  height="4"  fill="#ffe080"/>
-              <!-- lantern glow halo -->
               <rect x="23" y="33" width="7"  height="8"  fill="#ffcc00" opacity="0.12"/>
-              <!-- ── BOOTS ── -->
               <rect x="9"  y="42" width="6"  height="4"  fill="#3a1e08"/>
               <rect x="17" y="42" width="6"  height="4"  fill="#3a1e08"/>
-              <rect x="8"  y="44" width="8"  height="2"  fill="#2a1008"/><!-- sole L -->
-              <rect x="16" y="44" width="8"  height="2"  fill="#2a1008"/><!-- sole R -->
-              <!-- ── GLOW EFFECTS ── -->
+              <rect x="8"  y="44" width="8"  height="2"  fill="#2a1008"/>
+              <rect x="16" y="44" width="8"  height="2"  fill="#2a1008"/>
               <circle class="lamp-glow"    cx="16" cy="1"  r="4" fill="#ffe060" opacity="0.25"/>
               <circle class="lantern-glow" cx="26" cy="37" r="5" fill="#ffcc00" opacity="0.18"/>
             </svg>
@@ -671,7 +544,6 @@
       <p class="title-hint">▼ clique para explorar ▼</p>
     </div>
 
-    <!-- STATE 2: menu buttons (hidden initially) -->
     <div class="menu-block" id="menuBlock">
       <div class="menu-header">
         <span class="menu-title-text">MINERALIS</span>
@@ -687,10 +559,7 @@
       </div>
     </div>
 
-  </div><!-- /.menu-panel -->
-
-  <!-- ── Corvan no mapa (modo exploração) ── -->
-  <!-- Visível apenas durante a exploração, clicável para voltar ao menu -->
+  </div>
   <div class="corvan-map" id="corvanMap" onclick="Menu.voltarDoMapa()">
     <div class="corvan-map-hint">clique para voltar</div>
     <svg class="corvan-map-svg" viewBox="0 0 32 52" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
@@ -738,13 +607,10 @@
     </svg>
   </div>
 
-  <!-- tooltip -->
   <div class="tooltip" id="tooltip"></div>
 
-  <!-- bottom bar -->
   <div class="bottom-bar" id="bottomBar">▼ ESCOLHA UMA REGIÃO NO MAPA PARA EXPLORAR ▼</div>
 
-  <!-- ── Modal de confirmação customizado ── -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-box" id="modalBox">
       <div class="modal-header">
@@ -759,7 +625,7 @@
     </div>
   </div>
 
-</div><!-- /.frame -->
+</div>
 
 <script src="data/phases.js"></script>
 <script src="data/cards_svg.js"></script>
