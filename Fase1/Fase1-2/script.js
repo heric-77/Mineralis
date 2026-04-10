@@ -1,9 +1,27 @@
 const SAVE_KEY = 'mineralis_save_v2';
+function normalizeSave(data={}) {
+  const s = (data && typeof data === 'object') ? data : {};
+  if (!s.versao) s.versao = 1;
+  if (s.iniciado !== true) s.iniciado = true;
+  if (!s.fases || typeof s.fases !== 'object') s.fases = {};
+  const defaults = {
+    '1.1': { desbloqueada: true, estrelas: 0 },
+    '1.2': { desbloqueada: true, estrelas: 0 },
+    '1.3': { desbloqueada: false, estrelas: 0 },
+  };
+  for (const [id, base] of Object.entries(defaults)) {
+    if (!s.fases[id] || typeof s.fases[id] !== 'object') s.fases[id] = { ...base };
+    if (typeof s.fases[id].desbloqueada !== 'boolean') s.fases[id].desbloqueada = base.desbloqueada;
+    if (typeof s.fases[id].estrelas !== 'number') s.fases[id].estrelas = base.estrelas;
+  }
+  if (!s.coletados || typeof s.coletados !== 'object') s.coletados = {};
+  return s;
+}
 function saveRead() {
-  try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { return {}; }
+  try { return normalizeSave(JSON.parse(localStorage.getItem(SAVE_KEY)) || {}); } catch { return normalizeSave(); }
 }
 function saveWrite(data) {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch {}
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(normalizeSave(data))); } catch {}
 }
 /** Desbloqueia próxima fase no menu (igual a SaveManager.desbloquearFase) */
 function unlockPhase(id) {
@@ -21,6 +39,9 @@ function journalCollect(id) {
     saveWrite(s);
     console.info('[Fase1-2] Journal item:', id);
   }
+}
+function goToMainMenu() {
+  window.location.href = '../../MenuPrincipal/index.html';
 }
 
 
@@ -64,15 +85,59 @@ function sfx(type) {
   o.start(t); o.stop(t+.6);
 }
 
-const IMG = {};
-let assetsLoaded = 0, totalAssets = 4, gameReady = false;
-['bg01','bg02','bg03','bg04'].forEach((key,i) => {
-  const src = `Fase 1.2 - Cena 0${i+1}.PNG`;
+const IMG = {}, SPRITES = {};
+const ASSETS = [
+  ['bg01','imagens/Fase 1.2 - Cena 01.png'],
+  ['bg04','imagens/Fase 1.2 - Cena 04.PNG'],
+  ['talk','../Fase1-3/Falando.PNG'],
+];
+function makeSprite(img, threshold = 28) {
+  const oc = document.createElement('canvas');
+  oc.width = img.naturalWidth; oc.height = img.naturalHeight;
+  const c2 = oc.getContext('2d');
+  c2.drawImage(img, 0, 0);
+  const d = c2.getImageData(0, 0, oc.width, oc.height);
+  for (let i = 0; i < d.data.length; i += 4) {
+    const r=d.data[i], g=d.data[i+1], b=d.data[i+2];
+    if (r<threshold && g<threshold && b<threshold) d.data[i+3]=0;
+    else if (r<20 && g<20 && b<36) d.data[i+3]=0;
+  }
+  c2.putImageData(d, 0, 0);
+  return oc;
+}
+const SPRITE_INFO = {
+  talk: { n:2, ox:25, oy:17, fw:184, fh:376 },
+};
+function drawSprite(key, frame, dx, dy, dw, dh, flipX=false, alpha=1) {
+  const spr = SPRITES[key]; if (!spr) return false;
+  const info = SPRITE_INFO[key]; if (!info) return false;
+  const fi = Math.floor(frame) % info.n;
+  const nw = spr.width / info.n;
+  const sx = fi * nw + info.ox;
+  ctx.save(); ctx.globalAlpha = alpha;
+  if (flipX) {
+    ctx.translate(dx + dw, dy);
+    ctx.scale(-1, 1);
+    ctx.drawImage(spr, sx, info.oy, info.fw, info.fh, 0, 0, dw, dh);
+  } else {
+    ctx.drawImage(spr, sx, info.oy, info.fw, info.fh, dx, dy, dw, dh);
+  }
+  ctx.restore();
+  return true;
+}
+let assetsLoaded = 0, totalAssets = ASSETS.length, gameReady = false;
+ASSETS.forEach(([key,src]) => {
   const img = new Image();
-  img.onload  = () => { IMG[key]=img; if (++assetsLoaded>=totalAssets){gameReady=true;startGame();} };
+  img.onload  = () => {
+    IMG[key]=img;
+    if (SPRITE_INFO[key]) SPRITES[key]=makeSprite(img);
+    if (++assetsLoaded>=totalAssets){gameReady=true;startGame();}
+  };
   img.onerror = () => { IMG[key]=null; if (++assetsLoaded>=totalAssets){gameReady=true;startGame();} };
   img.src = src;
 });
+IMG.bg02 = null;
+IMG.bg03 = null;
 
 const keys={}, jp={};
 window.addEventListener('keydown',e=>{ if(!keys[e.code])jp[e.code]=true; keys[e.code]=true;
@@ -94,28 +159,58 @@ function clearJP(){for(const k in jp)delete jp[k];}
 
 
 const ITEM_DEFS = {
+  picareta_basica: {
+    cat:'ferramenta', nome:'Picareta Básica', icon:'⛏', journalId:'picareta_basica',
+    desc:'Ferramenta essencial para quebrar rochas sedimentares.\nColetada em Potosí, na Fase 1.1.',
+    phase:'1.1',
+  },
   bateia: {
     cat:'ferramenta', nome:'Bateia', icon:'🥌', journalId:'bateia',
     desc:'Separa ouro pesado do sedimento leve.\nUse [E] nas zonas ⚓ para garimpar.',
+    phase:'1.2',
     drawHand:'left',
   },
   pa: {
     cat:'ferramenta', nome:'Pá Exploradora', icon:'🪏', journalId:'pa_exploradora',
     desc:'Escava solo aluvial amazônico.\nUse [E] próximo a fragmentos de cerâmica.',
+    phase:'1.2',
     drawHand:'left',
   },
   lanterna: {
     cat:'ferramenta', nome:'Lanterna', icon:'🔦', journalId:null,
     desc:'Revela itens ocultos nas sombras da selva.\nNecessária para encontrar a Urna Marajoara.',
+    phase:'1.2',
     drawHand:'right',
+  },
+  prata: {
+    cat:'minerio', nome:'Prata', icon:'◆', journalId:'prata',
+    desc:'Metal precioso extraído nos Andes.\nRegistrado no Diário a partir da Fase 1.1.',
+    phase:'1.1',
+  },
+  estanho: {
+    cat:'minerio', nome:'Estanho', icon:'◈', journalId:'estanho',
+    desc:'Mineral metálico encontrado nos Andes.\nEssencial para ligas como o bronze.',
+    phase:'1.1',
   },
   ouro_aluvial: {
     cat:'minerio', nome:'Ouro Aluvial', icon:'💛', journalId:'ouro_aluvial',
     desc:'Depositado nos rios por erosão milenar.\nDensidade: 19,3 g/cm³ — 19× mais pesado que a água.',
+    phase:'1.2',
+  },
+  ceramica_inca: {
+    cat:'artefato', nome:'Cerâmica Inca', icon:'🏺', journalId:'ceramica_inca',
+    desc:'Vasilha cerimonial andina encontrada em Potosí.\nRelíquia registrada na Fase 1.1.',
+    phase:'1.1',
+  },
+  mapa_potosi: {
+    cat:'artefato', nome:'Mapa de Potosí', icon:'🗺', journalId:'mapa_potosi',
+    desc:'Fragmento de mapa colonial com rotas da mineração andina.\nObtido na Fase 1.1.',
+    phase:'1.1',
   },
   urna: {
     cat:'artefato', nome:'Urna Marajoara', icon:'🏺', journalId:'vaso_amazônico',
     desc:'Cerâmica de 1.000 anos da Ilha de Marajó.\nEvidência de civilizações amazônicas avançadas.',
+    phase:'1.2',
   },
 };
 
@@ -128,9 +223,16 @@ const INV = {
   ],
   tabItems(player){
     const cat=this.TABS[this.tab].id;
+    const collected=saveRead().coletados || {};
     return Object.entries(ITEM_DEFS)
-      .filter(([id,def])=>def.cat===cat&&player.items.includes(id))
-      .map(([id,def])=>({id,...def}));
+      .filter(([,def])=>def.cat===cat)
+      .filter(([id,def])=>def.journalId ? collected[def.journalId] : player.items.includes(id))
+      .map(([id,def])=>({
+        id,
+        ...def,
+        owned: player.items.includes(id),
+        equipped: player.activeTool===id,
+      }));
   },
   toggle(player){
     this.open=!this.open;
@@ -145,7 +247,7 @@ const INV = {
     const items=this.tabItems(player);
     if(jp['ArrowUp']  ||jp['KeyW']){this.cursor=Math.max(0,this.cursor-1);return true;}
     if(jp['ArrowDown']||jp['KeyS']){this.cursor=Math.min(items.length-1,this.cursor+1);return true;}
-    if(isE()&&items.length>0&&this.tab===0){
+    if(isE()&&items.length>0&&this.tab===0&&items[this.cursor].owned){
       const item=items[this.cursor];
       player.activeTool=(player.activeTool===item.id)?null:item.id;
       return true;
@@ -184,7 +286,7 @@ const INV = {
       ctx.textAlign='left';
     } else {
       items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
+        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=item.equipped;
         if(selected){
           ctx.fillStyle='rgba(80,200,80,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();
           ctx.strokeStyle='#78d840';ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();
@@ -193,6 +295,9 @@ const INV = {
         ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
         ctx.fillStyle=equipped?'#a0e860':(selected?'#d8f0b8':'#aaa');
         ctx.fillText(item.nome,PX+62,iy+14);
+        ctx.font='10px "Courier New"';
+        ctx.fillStyle='#666';
+        ctx.fillText(`Fase ${item.phase||'?'}`,PX+62,iy+28);
         if(equipped){
           ctx.fillStyle='rgba(80,200,80,0.22)';roundRect(PX+62,iy+20,80,16,4);ctx.fill();
           ctx.font='10px "Courier New"';ctx.fillStyle='#78d840';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);
@@ -212,7 +317,7 @@ const INV = {
         ctx.font='13px "Courier New"';ctx.fillStyle='#c8e8b0';
         descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+144+i*22);});
         ctx.textAlign='left';
-        if(sel.cat==='ferramenta'){
+        if(sel.cat==='ferramenta'&&sel.owned){
           const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar';
           ctx.fillStyle=player.activeTool===sel.id?'rgba(180,60,20,0.3)':'rgba(80,200,80,0.2)';
           roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();
@@ -220,6 +325,13 @@ const INV = {
           roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke();
           ctx.font='bold 13px "Courier New"';ctx.fillStyle=player.activeTool===sel.id?'#e06040':'#78d840';
           ctx.textAlign='center';ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left';
+        } else if(sel.cat==='ferramenta'&&!sel.owned){
+          ctx.fillStyle='rgba(120,120,120,0.16)';
+          roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();
+          ctx.strokeStyle='#666';ctx.lineWidth=1.5;
+          roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke();
+          ctx.font='bold 12px "Courier New"';ctx.fillStyle='#888';
+          ctx.textAlign='center';ctx.fillText('Registrado de outra fase',DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left';
         }
       }
     }
@@ -246,9 +358,9 @@ function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;
 const cam={x:0,y:0};
 function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-cam.x)*0.12;}
 
-const GRAV=0.46, PSPD=4.5, JUMPF=-12.2, MAXFALL=16;
-const RUN_ACCEL=0.78, AIR_ACCEL=0.44, GROUND_FRICTION=0.72, AIR_FRICTION=0.92;
-const JUMP_CUT=0.55, COYOTE_FRAMES=8, JUMP_BUFFER_FRAMES=10;
+const GRAV=0.46, PSPD=4.6, JUMPF=-12.4, MAXFALL=16;
+const GROUND_FRICTION=0.7, AIR_FRICTION=0.86;
+const JUMP_CUT=0.62, COYOTE_FRAMES=8, JUMP_BUFFER_FRAMES=10;
 
 const TILE_THEMES={
   1:{top:'#4a9a28',body:'#5a3a18',dark:'#3a2008'},
@@ -353,21 +465,17 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const showBateia=(activeTool==='bateia');
   const showPa=(activeTool==='pa');
   const showLantern=(activeTool==='lanterna');
-  // Hat + lamp
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
   r(13,0,6,3,'#c8a020');r(14,0,4,2,'#ffe060');
-  // Head
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Shirt + belt + pants
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
   r(8,28,16,2,'#2a1408');r(14,28,4,2,'#c88020');
   r(9,30,14,12,'#383838');r(15,36,2,6,'#282828');
-  // Braço esquerdo
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
   if(showBateia){
     const wb=Math.sin(frame*0.15)*1.2;
@@ -379,13 +487,11 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
     r(0,22,4,1,'#8a5820');r(-1,23,1,8,'#8a5820');
     r(-4,20,9,6,'#9090a8');r(-4,20,9,2,'#b0b0c8');
   }
-  // Braço direito
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
   if(showLantern){
     r(26,31,1,3,'#888888');r(24,34,5,6,'#604010');r(25,35,3,4,'#ffe080');
     r(23,33,7,8,'#ffcc00',0.12*lb);
   }
-  // Boots
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
   ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
@@ -507,66 +613,85 @@ const BUBBLE={
   },
   _next(){
     if(!this.queue.length){this.active=false;G.dialog=false;if(this.cb){const f=this.cb;this.cb=null;f();}return;}
-    this.lines=wrapText(this.queue.shift(),470);
+    const raw=this.queue.shift();
+    this.lines=wrapText(raw,480);
   },
   advance(){if(this.active)this._next();},
   draw(player){
     if(!this.active)return;
-    this.faceFrame+=0.06;
-    ctx.font='15px "Courier New"';
-    const lineH=22,pad=16,textAreaW=470;
-    const CORVAN_W=64, CORVAN_H=104; // Corvan pixel at scale 2
-    const bubW=CORVAN_W+pad*2+textAreaW+pad;
-    const bubH=Math.max(CORVAN_H, this.lines.length*lineH+32)+pad*2;
-    const pcx=player.x-cam.x+player.w/2, pcy=player.y-cam.y;
-    let bx=Math.max(10,Math.min(pcx-bubW/2, W-bubW-10));
-    let by=Math.max(10, pcy-bubH-32);
+    this.faceFrame+=0.08;
 
-    // Shadow + background
-    ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=14;
-    ctx.fillStyle='rgba(4,14,4,0.95)'; roundRect(bx,by,bubW,bubH,14); ctx.fill();
+    const FONT='15px "Courier New"';
+    const NAMEFNT='bold 12px "Courier New"';
+    ctx.font=FONT;
+    const lineH=22,pad=18,faceW=56,faceH=68,textAreaW=480;
+    const bubW=faceW+pad+textAreaW+pad*2;
+    const bubH=Math.max(faceH,this.lines.length*lineH+30)+pad*2;
+
+    const pcx=player.x-cam.x+player.w/2;
+    const pcy=player.y-cam.y;
+    let bx=pcx-bubW/2;
+    let by=pcy-bubH-28;
+    bx=Math.max(12,Math.min(bx,W-bubW-12));
+    if(by<40)by=pcy+player.h+10;
+    by=Math.max(40,Math.min(by,H-bubH-10));
+
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=12;
+    ctx.fillStyle='rgba(6,3,0,0.94)';
+    roundRect(bx,by,bubW,bubH,14);ctx.fill();
     ctx.shadowBlur=0;
-    // Border
-    ctx.strokeStyle=this.speakerColor; ctx.lineWidth=2.5;
-    roundRect(bx,by,bubW,bubH,14); ctx.stroke();
-    // Inner decorative line
-    ctx.strokeStyle=`rgba(120,216,64,0.2)`; ctx.lineWidth=1;
-    roundRect(bx+4,by+4,bubW-8,bubH-8,10); ctx.stroke();
 
-    // Tail pointing to player
-    const tailBX=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
-    const tailTY=by+bubH, tailTipY=Math.min(pcy,tailTY+38);
-    ctx.fillStyle='rgba(4,14,4,0.95)';
-    ctx.beginPath();ctx.moveTo(tailBX-14,tailTY);ctx.lineTo(tailBX+14,tailTY);ctx.lineTo(pcx,tailTipY);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2.5;
+    roundRect(bx,by,bubW,bubH,14);ctx.stroke();
+
+    const tailBaseX=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
+    const tailTopY=by+bubH;
+    const tailTipY=Math.min(pcy,tailTopY+36);
+    ctx.fillStyle='rgba(6,3,0,0.94)';
+    ctx.beginPath();
+    ctx.moveTo(tailBaseX-14,tailTopY);
+    ctx.lineTo(tailBaseX+14,tailTopY);
+    ctx.lineTo(pcx,tailTipY);
+    ctx.closePath();ctx.fill();
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(tailBX-14,tailTY);ctx.lineTo(pcx,tailTipY);ctx.lineTo(tailBX+14,tailTY);ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(tailBaseX-14,tailTopY);
+    ctx.lineTo(pcx,tailTipY);
+    ctx.lineTo(tailBaseX+14,tailTopY);
+    ctx.stroke();
 
-    // Corvan face (SVG pixel art redrawn on canvas at scale 2)
-    const SCALE = 2;
-    const fx = bx+pad, fy = by+pad;
-    // Clip to face area
-    ctx.save();
-    ctx.beginPath();ctx.rect(fx, fy, CORVAN_W, CORVAN_H);ctx.clip();
-    drawCorvan(fx, fy, SCALE, false, this.faceFrame*8);
-    ctx.restore();
-    // Frame border around Corvan
-    ctx.strokeStyle='rgba(80,200,80,0.45)';ctx.lineWidth=1.5;
-    ctx.strokeRect(fx,fy,CORVAN_W,CORVAN_H);
+    const fx=bx+pad, fy=by+pad;
+    const talkSpr=SPRITES.talk||SPRITES.idle||SPRITES.walk;
+    if(talkSpr){
+      const key=SPRITES.talk?'talk':(SPRITES.idle?'idle':'walk');
+      const info=SPRITE_INFO[key];
+      const fi=Math.floor(this.faceFrame)%info.n;
+      const nw=talkSpr.width/info.n;
+      const showH=info.fh*0.55;
+      const scl=faceH/showH;
+      const dw=info.fw*scl;
+      ctx.save();
+      ctx.beginPath();ctx.rect(fx,fy,faceW,faceH);ctx.clip();
+      ctx.drawImage(talkSpr,fi*nw+info.ox,info.oy,info.fw,showH,fx+(faceW-dw)/2,fy,dw,faceH);
+      ctx.restore();
+    } else {
+      ctx.fillStyle='#c8845a';ctx.fillRect(fx+8,fy+4,40,50);
+    }
+    ctx.strokeStyle='rgba(200,160,32,0.5)';ctx.lineWidth=1.5;
+    ctx.strokeRect(fx,fy,faceW,faceH);
 
-    // Speaker name
-    const tx=fx+CORVAN_W+pad;
-    ctx.font='bold 12px "Courier New"';ctx.fillStyle=this.speakerColor;
-    ctx.fillText(this.speakerTxt, tx, by+pad+14);
+    const tx=fx+faceW+pad;
+    ctx.font=NAMEFNT;ctx.fillStyle=this.speakerColor;
+    ctx.fillText(this.speakerTxt,tx,by+pad+14);
 
-    // Text body
-    ctx.font='15px "Courier New"';ctx.fillStyle='#e8f8e0';
-    this.lines.forEach((l,i)=>ctx.fillText(l, tx, by+pad+36+i*lineH));
+    ctx.font=FONT;ctx.fillStyle='#f0e8c0';
+    this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+36+i*lineH));
 
-    // Continue hint
-    const pulse=0.5+Math.sin(Date.now()/400)*0.5;
-    ctx.fillStyle=`rgba(80,200,80,${pulse})`;
+    const pulse=0.55+Math.sin(Date.now()/400)*0.45;
+    ctx.fillStyle=`rgba(200,160,32,${pulse})`;
     ctx.font='12px "Courier New"';ctx.textAlign='right';
-    ctx.fillText('[E] Continuar →', bx+bubW-pad, by+bubH-8);ctx.textAlign='left';
+    ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-8);
+    ctx.textAlign='left';
   }
 };
 
@@ -853,14 +978,9 @@ class Player{
     else              this.heatAnim=Math.max(0,this.heatAnim-2);
     const sm=this.heat>=100?0.6:1.0;
 
-    const moveDir=(isR()?1:0)-(isL()?1:0);
-    const accel=this.onG?RUN_ACCEL:AIR_ACCEL;
-    const maxSpeed=PSPD*sm;
-    if(moveDir!==0){
-      this.vx+=moveDir*accel*sm;
-      this.vx=Math.max(-maxSpeed,Math.min(maxSpeed,this.vx));
-      this.facing=moveDir;
-    } else {
+    if(isL()){this.vx=-PSPD*sm;this.facing=-1;}
+    else if(isR()){this.vx=PSPD*sm;this.facing=1;}
+    else {
       this.vx*=this.onG?GROUND_FRICTION:AIR_FRICTION;
       if(Math.abs(this.vx)<0.05)this.vx=0;
     }
@@ -923,11 +1043,13 @@ class Player{
           if(!this.items.includes('ouro_aluvial_ok')){this.items.push('ouro_aluvial_ok');journalCollect('ouro_aluvial');
             showPopup('⭐ OURO ALUVIAL ENCONTRADO',['Metal 19× mais pesado que a água','Depositado nos rios por erosão','Serra Pelada: 100mil garimpeiros em 1980','Uma grama → fio de kilômetros'],'#d4a017');}
         } else if(c.type==='bateia'){
-          this.items.push('bateia');sfx('item');burst(c.x+18,c.y+18,'#78d840',12);
+          if(!this.items.includes('bateia'))this.items.push('bateia');
+          sfx('item');burst(c.x+18,c.y+18,'#78d840',12);
           journalCollect('bateia');
           showPopup('🥌 BATEIA COLETADA',['Ferramenta ancestral de garimpo','Movimentos circulares separam o ouro','Usada há 2.000 anos na Amazônia','Ouro: pesado, afunda no centro'],'#78d840');
         } else if(c.type==='pa'){
-          this.items.push('pa');sfx('item');burst(c.x+18,c.y+18,'#78d840',12);
+          if(!this.items.includes('pa'))this.items.push('pa');
+          sfx('item');burst(c.x+18,c.y+18,'#78d840',12);
           journalCollect('pa_exploradora');
           notify('✦ Pá Exploradora coletada! Registrada no Diário.');
         }
@@ -988,7 +1110,9 @@ class Player{
           }
         }
       }
-      for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}
+      if(!G.transitioning){
+        for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}
+      }
     }
 
     if(this.y>level.H+200)this._hurt(3,level);
@@ -1047,15 +1171,12 @@ class Player{
 
   draw(){
     if(this.dead)return;
-    // S=1.5 → Corvan fica 48×78px total, mas pés terminam em viewBox y=46 → 46×1.5=69px
     const S = 1.5;
-    const CW = 32*S;           // 48px largura
-    const FOOT_Y = 46*S;       // 69px — onde ficam os pés no desenho
+    const CW = 32*S;
+    const FOOT_Y = 46*S;
     const dx = this.x - cam.x + this.w/2 - CW/2;
-    const dy = this.y - cam.y + this.h - FOOT_Y; // pés tocam exatamente o chão
-
+    const dy = this.y - cam.y + this.h - FOOT_Y;
     const flip = this.facing===-1;
-    // Walk frame for arm/leg bob
     const wf = this.state==='run' ? this.walkT : (this.state==='idle' ? Date.now()/800 : 0);
 
     ctx.save();
@@ -1161,14 +1282,17 @@ function buildL1(){
   ];
   const triggers=[
     new Trigger(3320,FL-200,120,200,'Seguir ao Rio',(player,level)=>{
+      if(G.transitioning)return;
       if(!player.items.includes('bateia')){notify('Colete a Bateia primeiro!');return;}
+      G.transitioning=true;
+      level.triggers[0].done=true;
       player.interactAnim=40;sfx('unlock');
       showDialog([
         '"Saímos do ar rarefeito dos Andes para a densa umidade da Amazônia. Aqui o ouro não está nas profundezas — está misturado ao sedimento que os rios carregam."',
         '"É o ouro aluvial: fragmentos erodidos das montanhas ao longo de milhões de anos, transportados pelas águas e depositados no fundo dos rios."',
         '"Serra Pelada, no Pará, foi o maior garimpo a céu aberto do mundo. Em 1980, mais de 100.000 garimpeiros trabalhavam em condições extremas por pepitas de ouro."',
         '"Com a bateia em mãos, seguiremos o leito do rio. Mas lembre-se: o verdadeiro tesouro desta floresta vai além do que brilha."'
-      ],()=>{notify('✦ Bateia e Pá registradas no Diário!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+      ],()=>{notify('✦ Bateia e Pá registradas no Diário!');setTimeout(()=>{G.transitioning=false;G.nextLevel();},2000);});
     }),
   ];
   return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
@@ -1249,16 +1373,19 @@ function buildL2(){
   const panZones=[{x:1290,done:false},{x:2070,done:false},{x:2930,done:false}];
   const triggers=[
     new Trigger(3280,FL-260,160,260,'Avançar para Cena 3',(player,level)=>{
+      if(G.transitioning)return;
+      G.transitioning=true;
+      level.triggers[0].done=true;
       sfx('unlock');
       showDialog([
         '"Observe como a água molda tudo. O ouro é pesado — deposita-se no fundo dos rios após ser erodido das montanhas por milhares de anos."',
         '"O ciclo da água é o motor desta riqueza: chuvas carregam partículas das encostas, rios as transportam, e o ouro acumula nos meandros."',
         '"Mas há um preço. A turbidez que você verá adiante é resultado do mercúrio e do garimpo ilegal — um veneno invisível para o rio e para quem bebe essa água."',
         '"O Brasil exporta toneladas de ouro ilegalmente todos os anos. Junto vai a floresta, o rio, e a memória dos povos que aqui viveram."'
-      ],()=>{notify('✦ Continue para as águas contaminadas!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+      ],()=>{notify('✦ Continue para as águas contaminadas!');setTimeout(()=>{G.transitioning=false;G.nextLevel();},2000);});
     }),
   ];
-  return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,
+  return{id:2,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
     title:'Cena II — Geologia Aluvial e Ciclo da Água',
     hint:'Use [E] nas zonas ⚓ para garimpar com a bateia!',
     plats,enemies,cols,triggers,digSpots:[],panZones,
@@ -1334,16 +1461,19 @@ function buildL3(){
   ];
   const triggers=[
     new Trigger(3360,FL-280,160,280,'Avançar para Cena 4',(player,level)=>{
+      if(G.transitioning)return;
+      G.transitioning=true;
+      level.triggers[0].done=true;
       sfx('unlock');player.interactAnim=40;
       showDialog([
         '"O mercúrio usado na mineração ilegal se dissolve na água e entra na cadeia alimentar: peixe, garça, onça, e depois o ser humano."',
         '"A Amazônia já perdeu mais de 20% de sua cobertura original. Cada pepita de ouro ilegal carrega a destruição de hectares de floresta e rios envenenados."',
         '"Mas a floresta resiste. Em áreas protegidas, ela se recupera — e com ela, os rios voltam a ser limpos e o ouro volta a brilhar no fundo transparente."',
         '"Na margem à frente, algo me chama. Não é ouro — é cerâmica. Um vaso que sobreviveu séculos de chuva e raízes. Vamos investigar com cuidado."'
-      ],()=>{notify('✦ Siga para a Cena Final!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+      ],()=>{notify('✦ Siga para a Cena Final!');setTimeout(()=>{G.transitioning=false;G.nextLevel();},2000);});
     }),
   ];
-  return{id:3,bg:'bg03',W:WW,H:WH,startX:60,startY:FL-90,murky:true,
+  return{id:3,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,murky:true,
     title:'Cena III — A Coleta e o Impacto Ambiental',
     hint:'Água MARROM = contaminada por mercúrio! Evite-a.',
     plats,enemies,cols,triggers,digSpots:[],panZones:[],
@@ -1403,7 +1533,10 @@ function buildL4(){
   ];
   const triggers=[
     new Trigger(2860,FL-180,180,180,'Concluir Fase 1.2',(player,level)=>{
+      if(G.transitioning)return;
       if(!player.items.includes('urna')){notify('Colete a Urna Marajoara primeiro!');return;}
+      G.transitioning=true;
+      level.triggers[0].done=true;
       player.interactAnim=40;sfx('unlock');
       showDialog([
         '"Você encontrou a Urna Funerária Marajoara. Com mais de 1.000 anos, ela prova que povos sofisticados habitavam a Amazônia muito antes da colonização europeia."',
@@ -1413,6 +1546,7 @@ function buildL4(){
       ],()=>{
         // ── Unlock próximas fases e arquivar no save ──
         unlockPhase('1.3');
+        G.transitioning=false;
         G.state='complete';
       });
     }),
@@ -1513,6 +1647,7 @@ function drawTitle(){
   ctx.fillStyle='#888';ctx.font='13px "Courier New"';
   ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Escavar',W/2,494);
   ctx.fillText('Itens coletados serão arquivados no Diário de Bordo!',W/2,516);
+  ctx.fillText('[M] Voltar ao Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -1551,7 +1686,8 @@ function drawComplete(){
   ctx.fillStyle='rgba(120,216,64,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,368);
   ctx.fillStyle='#78d840';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
   ctx.fillStyle=`rgba(120,216,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('Pressione ENTER para voltar ao início',W/2,436);
+  ctx.fillText('Pressione ENTER para voltar ao Menu Principal',W/2,436);
+  ctx.fillStyle='#9ab88a';ctx.font='12px "Courier New"';ctx.fillText('Seu progresso da Fase 1.2 já ficou sincronizado com o menu.',W/2,462);
   ctx.textAlign='left';
 }
 
@@ -1559,7 +1695,7 @@ function drawComplete(){
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
-  dialog:false,deaths:0,timeOnLevel:0,
+  dialog:false,deaths:0,timeOnLevel:0,transitioning:false,
   _storedItems:[],_storedScore:0,_storedTool:null,
 
   load(idx){
@@ -1568,7 +1704,7 @@ const G={
     this.level=LEVELS[idx]();cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
     if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
-    this.dialog=false;this.state='playing';this.timeOnLevel=0;
+    this.dialog=false;this.state='playing';this.timeOnLevel=0;this.transitioning=false;
     BUBBLE.active=false;popup.active=false;
     setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},900);
   },
@@ -1606,9 +1742,10 @@ const G={
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
+  if(jp['KeyM'])goToMainMenu();
   if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
   if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
-  if(G.state==='complete' &&jp['Enter']){G.deaths=0;G._storedItems=[];G._storedScore=0;G._storedTool=null;G.state='title';}
+  if(G.state==='complete' &&jp['Enter'])goToMainMenu();
   G.update();G.draw();clearJP();
 }
 
