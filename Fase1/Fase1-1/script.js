@@ -676,7 +676,7 @@ class Player{
     if(INV.open){ INV.navigate(this); return; }
     if(G.dialog)return;
     if(level.underground){
-      this.soroche=Math.min(100,this.soroche+(isR()||isL()?0.10:0.04));
+      this.soroche=Math.min(100,this.soroche+(isR()||isL()?0.04:0.016));
     } else {
       this.soroche=Math.max(0,this.soroche-0.4);
     }
@@ -1177,7 +1177,6 @@ function buildL4(){
 
 function drawHUD(player,level){
   ctx.fillStyle='rgba(8,4,0,0.68)';ctx.fillRect(0,0,W,38);
-  // Hearts
   for(let i=0;i<player.maxHp;i++){
     ctx.fillStyle=i<player.hp?'#c83020':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
@@ -1254,7 +1253,6 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
   ctx.fillStyle='#e0b840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.1 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  // Draw Corvan + Tupu
   drawCorvan(W/2-160,200,4,false,Date.now()/300);
   ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawTupu(0,0,Date.now()/1000);ctx.restore();
   ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Segredo de Potosí foi desvendado!',W/2,196);
