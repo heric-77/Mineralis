@@ -1,7 +1,6 @@
 const CardsSVG = {
 
   // ── AMÉRICA DO NORTE ──
-
   '2.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
     <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
     <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
@@ -244,7 +243,6 @@ const CardsSVG = {
   </svg>`,
 
   // ── EUROPA ──
-
   '3.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
     <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
     <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
@@ -478,7 +476,6 @@ const CardsSVG = {
   </svg>`,
 
   // ── ÁFRICA ──
-
   '4.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
     <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
     <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
@@ -705,7 +702,6 @@ const CardsSVG = {
   </svg>`,
 
   // ── ÁSIA ──
-
   '5.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
     <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
     <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
@@ -930,7 +926,6 @@ const CardsSVG = {
   </svg>`,
 
   // ── OCEANIA ──
-
   '6.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
     <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
     <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>

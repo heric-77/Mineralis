@@ -40,9 +40,7 @@ const Cards = (() => {
         card.dataset.tip = fase.nome;
       } else {
         card.classList.add('locked');
-        card.dataset.tip = id === '1.1' && !SaveManager.jogoIniciado()
-          ? '🔒 Inicie uma Nova Jornada para explorar'
-          : '🔒 ' + fase.nome;
+        card.dataset.tip = '🔒 ' + fase.nome;
       }
     });
   }

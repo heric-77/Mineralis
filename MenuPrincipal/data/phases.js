@@ -1,7 +1,7 @@
 const PhasesData = [
 
   // ── AMÉRICA DO SUL ──
-  { id:'1.1', nome:'Minas de Prata dos Andes',      local:'Potosí, Bolívia',
+  { id:'1.1', nome:'O Segredo de Potosí',      local:'Potosí, Bolívia',
     continente:'América do Sul',  desbloqueada:false, estrelas:0,
     mapPos:{ top:'59%', left:'15%' },
     caminho:'../Fase1/Fase1-1/index.html' },

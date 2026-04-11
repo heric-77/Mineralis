@@ -1232,7 +1232,7 @@ function drawTitle(){
   drawStars();
   ctx.textAlign='center';
   ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
-  ctx.fillStyle='#e0b840';ctx.font='bold 46px "Courier New"';ctx.fillText('O SEGREDO DE POTOSÍ',W/2,220);
+  ctx.fillStyle='#e0b840';ctx.font='bold 46px "Courier New"';ctx.fillText('O Segredo de Potosí',W/2,220);
   ctx.shadowBlur=0;
   ctx.fillStyle='#c8a060';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.1  —  Potosí, Bolívia',W/2,270);
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';

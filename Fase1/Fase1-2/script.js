@@ -1639,7 +1639,7 @@ function drawTitle(){
   //drawCorvan(cx,cy,TS,false,Date.now()/400);
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
-  ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('O OURO DOS RIOS',W/2,148);
+  ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('Jazidas de Ouro da Amazônia',W/2,148);
   ctx.shadowBlur=0;
   ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,204);
   ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
