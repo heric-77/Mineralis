@@ -595,14 +595,15 @@ function wrapText(text,maxW){
 const BUBBLE={
   active:false,queue:[],cb:null,lines:[],speakerTxt:'CORVAN',speakerColor:'#e0b840',faceFrame:0,
   show(msgs,cb,speaker='CORVAN',color='#e0b840'){this.queue=[...msgs];this.cb=cb;this.active=true;this.speakerTxt=speaker;this.speakerColor=color;G.dialog=true;this._next();},
-  _next(){if(!this.queue.length){this.active=false;G.dialog=false;if(this.cb){const f=this.cb;this.cb=null;f();}return;}this.lines=wrapText(this.queue.shift(),560);},
+  _next(){if(!this.queue.length){this.active=false;G.dialog=false;if(this.cb){const f=this.cb;this.cb=null;f();}return;}this.lines=wrapText(this.queue.shift(),480);},
   advance(){if(this.active)this._next();},
   draw(player){
-    if(!this.active)return;this.faceFrame+=0.06;
+    if(!this.active)return;this.faceFrame+=0.03;
     ctx.font='15px "Courier New"';
-    const lineH=24,pad=20,textW=560;
-    const bubW=textW+pad*2;
-    const bubH=Math.max(80,this.lines.length*lineH+70)+pad;
+    const faceW=60,faceH=76,facePad=12;
+    const lineH=24,pad=20,textW=480;
+    const bubW=facePad+faceW+facePad+textW+pad;
+    const bubH=Math.max(faceH+pad*2,this.lines.length*lineH+70)+pad;
     const pcx=player.x-cam.x+player.w/2,pcy=player.y-cam.y;
     let bx=Math.max(10,Math.min(pcx-bubW/2,W-bubW-10)),by=Math.max(10,pcy-bubH-32);
     ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=14;
@@ -614,8 +615,29 @@ const BUBBLE={
     const tty=by+bubH,tipy=Math.min(pcy,tty+38);
     ctx.fillStyle='rgba(8,4,0,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(pcx,tipy);ctx.lineTo(tbx+14,tty);ctx.stroke();
-    const tx=bx+pad;
-    ctx.font='bold 13px "Courier New"';ctx.fillStyle=this.speakerColor;ctx.fillText(this.speakerTxt,tx,by+pad+14);
+    // ── Face panel ──
+    const fx=bx+facePad,fy=by+pad;
+    ctx.fillStyle='rgba(20,10,2,0.85)';roundRect(fx,fy,faceW,faceH,6);ctx.fill();
+    ctx.strokeStyle='rgba(200,160,40,0.45)';ctx.lineWidth=1.5;roundRect(fx,fy,faceW,faceH,6);ctx.stroke();
+    // Clip e desenha apenas a cabeça do Corvan (sprite pixels y=0..18, x=7..25)
+    // Scale para caber no painel: cabeça tem ~18px de largura no sprite
+    const faceScale=faceW/18*0.82;
+    // Posiciona: centro horizontal do sprite (x=16), topo em y=0
+    const sprX=fx+faceW/2-16*faceScale;
+    const sprY=fy+4;
+    ctx.save();
+    ctx.beginPath();roundRect(fx+1,fy+1,faceW-2,faceH-2,5);ctx.clip();
+    drawCorvan(sprX,sprY,faceScale,false,this.faceFrame*4,null);
+    // Boca animada: linha y=13 do sprite é a boca (r(12,13,8,1,'#7a3820'))
+    const mouthY=sprY+13*faceScale;
+    const mouthX=sprX+12*faceScale;
+    const mouthW=8*faceScale;
+    const open=Math.abs(Math.sin(this.faceFrame*4))*1.8*faceScale;
+    if(open>0.5){ctx.fillStyle='#2a0e06';ctx.fillRect(mouthX,mouthY,mouthW,open);}
+    ctx.restore();
+    // ── Nome + texto ──
+    const tx=fx+faceW+facePad;
+    ctx.font='bold 12px "Courier New"';ctx.fillStyle=this.speakerColor;ctx.fillText(this.speakerTxt,tx,by+pad+14);
     ctx.fillStyle='rgba(200,160,40,0.35)';ctx.fillRect(tx,by+pad+20,textW,1);
     ctx.font='15px "Courier New"';ctx.fillStyle='#f0e8c0';
     this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+40+i*lineH));
