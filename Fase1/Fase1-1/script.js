@@ -45,11 +45,20 @@ let assetsLoaded=0,totalAssets=4,gameReady=false;
   img.src=src;
 });
 
+IMG.card11 = null;
+(function(){
+  const ci=new Image();
+  ci.onload=()=>{IMG.card11=ci;};
+  ci.onerror=()=>{IMG.card11=null;};
+  ci.src='1_1_andes.svg';
+})();
+
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
   if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
+  if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
 const TOUCH={l:false,r:false,j:false,e:false};
@@ -615,27 +624,21 @@ const BUBBLE={
     const tty=by+bubH,tipy=Math.min(pcy,tty+38);
     ctx.fillStyle='rgba(8,4,0,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(pcx,tipy);ctx.lineTo(tbx+14,tty);ctx.stroke();
-    // ── Face panel ──
     const fx=bx+facePad,fy=by+pad;
     ctx.fillStyle='rgba(20,10,2,0.85)';roundRect(fx,fy,faceW,faceH,6);ctx.fill();
     ctx.strokeStyle='rgba(200,160,40,0.45)';ctx.lineWidth=1.5;roundRect(fx,fy,faceW,faceH,6);ctx.stroke();
-    // Clip e desenha apenas a cabeça do Corvan (sprite pixels y=0..18, x=7..25)
-    // Scale para caber no painel: cabeça tem ~18px de largura no sprite
     const faceScale=faceW/18*0.82;
-    // Posiciona: centro horizontal do sprite (x=16), topo em y=0
     const sprX=fx+faceW/2-16*faceScale;
     const sprY=fy+4;
     ctx.save();
     ctx.beginPath();roundRect(fx+1,fy+1,faceW-2,faceH-2,5);ctx.clip();
     drawCorvan(sprX,sprY,faceScale,false,this.faceFrame*4,null);
-    // Boca animada: linha y=13 do sprite é a boca (r(12,13,8,1,'#7a3820'))
     const mouthY=sprY+13*faceScale;
     const mouthX=sprX+12*faceScale;
     const mouthW=8*faceScale;
     const open=Math.abs(Math.sin(this.faceFrame*4))*1.8*faceScale;
     if(open>0.5){ctx.fillStyle='#2a0e06';ctx.fillRect(mouthX,mouthY,mouthW,open);}
     ctx.restore();
-    // ── Nome + texto ──
     const tx=fx+faceW+facePad;
     ctx.font='bold 12px "Courier New"';ctx.fillStyle=this.speakerColor;ctx.fillText(this.speakerTxt,tx,by+pad+14);
     ctx.fillStyle='rgba(200,160,40,0.35)';ctx.fillRect(tx,by+pad+20,textW,1);
@@ -948,7 +951,7 @@ function buildL1(){
   const triggers=[
     new Trigger(3140,FL-200,120,200,'Entrar na Mina',(player,level)=>{
       if(!player.items.includes('picareta')){notify('Colete a Picareta primeiro!');return;}
-      if(!player.items.includes('coca')){notify('Fale com a Lhama para obter as Folhas de Coca!');return;}
+      if(!player.items.includes('coca')){notify('Interaja com a Lhama para obter as Folhas de Coca!');return;}
       player.interactAnim=40;sfx('unlock');
       showDialog([
         '"Bem-vindo às alturas de Potosí, Bolívia — 4.090 metros de altitude. Esta é a Montanha Rica, o Cerro Rico."',
@@ -959,13 +962,13 @@ function buildL1(){
     }),
   ];
   return{id:1,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
-    title:'Cena I — O Início em Potosí',
-    hint:'⛏ Picareta na alcova • 🦙 Fale com a Lhama • Entre na mina →',
+    title:'O Início em Potosí',
+    hint:'⛏ Colete a Picareta • 🦙 Interaja com a Lhama • Entre na mina →',
     plats,bats,cols,triggers,llama,veins:[],
     intro:[
-      '"Bem-vindo ao Cerro Rico de Potosí, Bolívia — 4.090 metros de altitude. Uma das maiores jazidas de prata do mundo."',
-      '"Os Incas mineravam aqui séculos antes dos espanhóis. A prata era símbolo lunar — dos deuses, não do comércio."',
-      'Encontre a Picareta na alcova de pedra, converse com a Lhama para obter as Folhas de Coca, e entre na mina!'
+      '"Bem-vindo ao Cerro Rico de Potosí, Bolívia (4.090 metros de altitude), uma das maiores jazidas de prata do mundo."',
+      '"Os Incas mineravam aqui séculos antes dos espanhóis. A prata era símbolo lunar - dos deuses, não do comércio."',
+      'Encontre a Picareta em uma alcova de pedra, interaja com a Lhama para obter as Folhas de Coca e entre na mina!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
@@ -1057,7 +1060,7 @@ function buildL2(){
     }),
   ];
   return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
-    title:'Cena II — Geologia e Solo da Mina',
+    title:'Geologia e Solo da Mina',
     hint:'🔦 Ache a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Soroche aumenta!',
     plats,bats,cols,triggers,veins,llama:null,
     intro:[
@@ -1123,7 +1126,7 @@ function buildL3(){
     }),
   ];
   return{id:3,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
-    title:'Cena III — A Coleta nas Câmaras Profundas',
+    title:'A Coleta nas Câmaras Profundas',
     hint:'[E] nos veios de prata ⛏ | [E] para usar Coca 🌿 | Encontre o Tupu!',
     plats,bats,cols,triggers,veins,tupu,llama:null,
     intro:[
@@ -1181,12 +1184,12 @@ function buildL4(){
     }),
   ];
   return{id:4,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
-    title:'Cena IV — A Saída de Potosí',
+    title:'A Saída de Potosí',
     hint:'Chegue ao marco final para concluir a Fase 1.1!',
     plats,bats:[],cols,triggers,veins:[],llama:null,
     intro:[
-      '"Corvan emerge da mina segurando o Tupu de Prata. O céu de Potosí está estrelado — a altitude torna as estrelas mais brilhantes."',
-      '"A Fase 1.1 está quase completa. Chegue ao marco final para registrar todas as descobertas!"'
+      '"Conseguimos o Tupu de Prata! O céu de Potosí está estrelado — a altitude torna as estrelas mais brilhantes."',
+      '"A Fase 1.1 está quase completa, saia da mina para registrar todas as descobertas!"'
     ],
     update(player){for(const c of this.cols)c.tick();},
     draw(player){
@@ -1202,7 +1205,6 @@ function buildL4(){
 
 function drawHUD(player,level){
   ctx.fillStyle='rgba(8,4,0,0.68)';ctx.fillRect(0,0,W,38);
-  // Hearts
   for(let i=0;i<player.maxHp;i++){
     ctx.fillStyle=i<player.hp?'#c83020':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
@@ -1210,7 +1212,7 @@ function drawHUD(player,level){
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  ctx.fillStyle='rgba(220,185,80,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
+  ctx.fillStyle='rgba(220,185,80,.9)';ctx.font='18px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#e0b840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
 
   const toolY=44;
@@ -1245,25 +1247,42 @@ function drawHUD(player,level){
   if(G.timeOnLevel<600){
     ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(8,H-44,440,28);
     ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';
-    ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar   [Stomp morcegos]',14,H-25);
+    ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',14,H-25);
   }
 }
 
 function drawTitle(){
-  drawBg('bgext');ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
+  const bgCapa=IMG['bgcena0102'];
+  if(bgCapa){ctx.globalAlpha=0.85;drawBg('bgcena0102');ctx.globalAlpha=1;}
+  else{drawBg('bgext');}
+  ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
   drawStars();
   ctx.textAlign='center';
   ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
-  ctx.fillStyle='#e0b840';ctx.font='bold 46px "Courier New"';ctx.fillText('O Segredo de Potosí',W/2,220);
+  ctx.fillStyle='#e0b840';ctx.font='bold 46px "Courier New"';ctx.fillText('O Segredo de Potosí',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#c8a060';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.1  —  Potosí, Bolívia',W/2,270);
+  ctx.fillStyle='#c8a060';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.1  —  Potosí, Bolívia',W/2,200);
+
+  if(IMG.card11){
+    const cardSize=160, cardX=W/2-80, cardY=230;
+    const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
+    glow.addColorStop(0,'rgba(220,185,80,0.25)');
+    glow.addColorStop(1,'rgba(220,185,80,0)');
+    ctx.fillStyle=glow;
+    ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
+    ctx.drawImage(IMG.card11,cardX,cardY,cardSize,cardSize);
+  }
+
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
-  ctx.fillStyle='#888';ctx.font='13px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,494);
-  ctx.fillText('📚 Minerais e artefatos coletados vão para o Diário de Bordo!',W/2,516);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';
+  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,494);
+  ctx.fillText('[M] Voltar ao Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
+
+
+
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
   const cause=G.player?.deathCause||'queda';
@@ -1275,7 +1294,9 @@ function drawDeath(){
   ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
   drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);ctx.textAlign='left';
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Voltar ao Menu Principal',W/2,H/2+200);
+  ctx.textAlign='left';
 }
 function drawComplete(){
   const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#080408');gr.addColorStop(1,'#180c04');ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
@@ -1284,7 +1305,6 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
   ctx.fillStyle='#e0b840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.1 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  // Draw Corvan + Tupu
   drawCorvan(W/2-160,200,4,false,Date.now()/300);
   ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawTupu(0,0,Date.now()/1000);ctx.restore();
   ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Segredo de Potosí foi desvendado!',W/2,196);

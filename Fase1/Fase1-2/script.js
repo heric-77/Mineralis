@@ -1254,7 +1254,7 @@ function buildL1(){
     }),
   ];
   return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena I — A Entrada na Selva',
+    title:'A Entrada na Selva',
     hint:'Colete a 🥌 Bateia e a Pá Exploradora ao final do caminho!',
     plats,enemies,cols,triggers,digSpots:[],panZones:[],
     intro:[
@@ -1341,7 +1341,7 @@ function buildL2(){
     }),
   ];
   return{id:2,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena II — Geologia Aluvial e Ciclo da Água',
+    title:'Geologia Aluvial e Ciclo da Água',
     hint:'Use [E] nas zonas ⚓ para garimpar com a bateia!',
     plats,enemies,cols,triggers,digSpots:[],panZones,
     intro:[
@@ -1422,7 +1422,7 @@ function buildL3(){
     }),
   ];
   return{id:3,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,murky:true,
-    title:'Cena III — A Coleta e o Impacto Ambiental',
+    title:'A Coleta e o Impacto Ambiental',
     hint:'Água MARROM = contaminada por mercúrio! Evite-a.',
     plats,enemies,cols,triggers,digSpots:[],panZones:[],
     intro:[
@@ -1495,7 +1495,7 @@ function buildL4(){
     }),
   ];
   return{id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena IV — Relíquias Perdidas e Conclusão',
+    title:'Relíquias Perdidas e Conclusão',
     hint:'[E] próximo à terra vermelha para Escavar a Urna Marajoara!',
     plats,enemies,cols,triggers,digSpots,panZones:[],
     intro:[

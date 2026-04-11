@@ -119,6 +119,15 @@ ASSETS.forEach(([key,src]) => {
   img.src = src;
 });
 
+// Card da fase 1.3 — carregado independentemente
+IMG.card13 = null;
+(function(){
+  const ci = new Image();
+  ci.onload  = () => { IMG.card13 = ci; };
+  ci.onerror = () => { IMG.card13 = null; };
+  ci.src = '1_3_machu_pichu.svg';
+})();
+
 const keys={}, jp={};
 window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
@@ -126,6 +135,7 @@ window.addEventListener('keydown', e => {
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
   if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open)INV.close();
+  if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup', e => delete keys[e.code]);
 
@@ -1386,8 +1396,20 @@ function drawTitle(){
   ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O TESOURO DO CONDOR',W/2,155);
   ctx.shadowBlur=0;
   ctx.fillStyle='#c8a846';ctx.font='22px "Courier New"';ctx.fillText('Fase 1.3  —  Machu Picchu, Peru',W/2,210);
+
+  if(IMG.card13){
+    const cardSize=160, cardX=W/2-80, cardY=238;
+    const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
+    glow.addColorStop(0,'rgba(240,192,64,0.25)');
+    glow.addColorStop(1,'rgba(240,192,64,0)');
+    ctx.fillStyle=glow;
+    ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
+    ctx.drawImage(IMG.card13,cardX,cardY,cardSize,cardSize);
+  }
+
   ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='20px "Courier New"';ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
-  ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,500);ctx.fillText('Soroche: não corra demais na altitude!',W/2,524);
+  ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,500);
+  ctx.fillText('[M] Voltar ao Menu Principal',W/2,552);
   ctx.textAlign='left';
 }
 
@@ -1398,7 +1420,9 @@ function drawDeath(){
   ctx.shadowBlur=0;
   if(SPRITES['hurt']) drawSprite('hurt',Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#f0c040';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);ctx.textAlign='left';
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Voltar ao Menu Principal',W/2,H/2+168);
+  ctx.textAlign='left';
 }
 
 function drawComplete(){
