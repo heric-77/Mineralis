@@ -23,7 +23,6 @@ function saveRead() {
 function saveWrite(data) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(normalizeSave(data))); } catch {}
 }
-/** Desbloqueia próxima fase no menu (igual a SaveManager.desbloquearFase) */
 function unlockPhase(id) {
   const s = saveRead();
   if (!s.fases) s.fases = {};
@@ -43,7 +42,6 @@ function journalCollect(id) {
 function goToMainMenu() {
   window.location.href = '../../MenuPrincipal/index.html';
 }
-
 
 const JOURNAL_ITEMS = {
   bateia:       { id:'bateia',        tipo:'ferramenta', nome:'Bateia' },
@@ -89,6 +87,7 @@ const IMG = {}, SPRITES = {};
 const ASSETS = [
   ['bg01','imagens/Fase 1.2 - Cena 01.png'],
   ['bg04','imagens/Fase 1.2 - Cena 04.PNG'],
+  ['card12','imagens/1_2_amazonia.svg'],
   ['talk','../Fase1-3/Falando.PNG'],
 ];
 function makeSprite(img, threshold = 28) {
@@ -413,7 +412,6 @@ function drawPlatform(p){
     const t2=Date.now()/2200;
     ctx.fillStyle='rgba(120,80,30,0.3)';
     for(let i=0;i<3;i++)ctx.fillRect(sx+i*(p.w/3)+Math.sin(t2+i)*10,sy+6,28,4);
-    // Toxic bubbles
     ctx.fillStyle='rgba(180,200,20,0.5)';
     for(let i=0;i<3;i++){const bx=sx+((i*p.w/3+Date.now()/50)%p.w);ctx.beginPath();ctx.arc(bx,sy+4+Math.sin(Date.now()/600+i)*6,4,0,Math.PI*2);ctx.fill();}
     return;
@@ -443,7 +441,6 @@ function drawPlatform(p){
     }
   }
   ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,4);
-  // Grass tufts
   ctx.fillStyle='rgba(80,160,40,0.55)';
   for(let i=0;i<Math.floor(p.w/16);i++)ctx.fillRect(sx+i*16+4,sy-3,4,5);
   if(p.moving){ctx.fillStyle='rgba(80,200,80,0.35)';ctx.fillRect(sx,sy,p.w,4);}
@@ -505,19 +502,15 @@ function corvanFrame(t){return Math.sin(t)*2;}
 function drawBateia(cx,cy,bobT=0,scale=1){
   ctx.save(); ctx.translate(cx, cy+Math.sin(bobT)*4);
   const S=scale;
-  // Wooden rim
   ctx.fillStyle='#7a4010'; ctx.beginPath(); ctx.ellipse(0,0,28*S,14*S,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#8b5018'; ctx.beginPath(); ctx.ellipse(0,0,26*S,12*S,0,0,Math.PI*2); ctx.fill();
-  // Metal ring
   ctx.strokeStyle='#8a9ba8'; ctx.lineWidth=3*S;
   ctx.beginPath(); ctx.ellipse(0,0,28*S,14*S,0,0,Math.PI*2); ctx.stroke();
   ctx.strokeStyle='#b0c4cc'; ctx.lineWidth=1.5*S;
   ctx.beginPath(); ctx.ellipse(0,1*S,26*S,12*S,0,0,Math.PI*2); ctx.stroke();
-  // Interior
   ctx.fillStyle='#5a6670'; ctx.beginPath(); ctx.ellipse(0,1*S,20*S,9*S,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#6b7880'; ctx.beginPath(); ctx.ellipse(0,1*S,16*S,7*S,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='rgba(154,176,184,0.5)'; ctx.beginPath(); ctx.ellipse(-4*S,-1*S,5*S,2.5*S,-0.4,0,Math.PI*2); ctx.fill();
-  // Wood grain lines
   ctx.strokeStyle='rgba(90,48,8,0.35)'; ctx.lineWidth=2*S;
   ctx.beginPath(); ctx.ellipse(0,0,22*S,11*S,0,0.2,1.0); ctx.stroke();
   ctx.restore();
@@ -525,11 +518,9 @@ function drawBateia(cx,cy,bobT=0,scale=1){
 
 function drawGoldNugget(cx,cy,bobT=0,sz=1){
   ctx.save(); ctx.translate(cx, cy+Math.sin(bobT)*5);
-  // Glow
   const glow=ctx.createRadialGradient(0,0,0,0,0,22*sz);
   glow.addColorStop(0,'rgba(255,210,50,0.4)'); glow.addColorStop(1,'rgba(255,180,0,0)');
   ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,22*sz,0,Math.PI*2); ctx.fill();
-  // Body – irregular nugget shape
   ctx.fillStyle='#c9920f';
   ctx.beginPath(); ctx.moveTo(-8*sz,-6*sz); ctx.lineTo(0,-11*sz); ctx.lineTo(10*sz,-5*sz);
   ctx.lineTo(12*sz,2*sz); ctx.lineTo(6*sz,11*sz); ctx.lineTo(-4*sz,12*sz);
@@ -537,10 +528,8 @@ function drawGoldNugget(cx,cy,bobT=0,sz=1){
   ctx.fillStyle='#e8a820';
   ctx.beginPath(); ctx.moveTo(-7*sz,-5*sz); ctx.lineTo(-1*sz,-9*sz); ctx.lineTo(8*sz,-4*sz);
   ctx.lineTo(10*sz,2*sz); ctx.lineTo(5*sz,9*sz); ctx.lineTo(-4*sz,9*sz); ctx.closePath(); ctx.fill();
-  // Highlight
   ctx.fillStyle='#f0c040'; ctx.beginPath(); ctx.ellipse(-2*sz,-3*sz,4*sz,3*sz,0.4,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='rgba(255,255,200,0.7)'; ctx.beginPath(); ctx.arc(-3*sz,-5*sz,2*sz,0,Math.PI*2); ctx.fill();
-  // Animated glint
   const ga=Math.abs(Math.sin(Date.now()/400+cx*0.01));
   ctx.strokeStyle=`rgba(255,255,200,${ga*0.9})`; ctx.lineWidth=2*sz;
   ctx.beginPath(); ctx.moveTo(4*sz,-7*sz); ctx.lineTo(9*sz,-12*sz); ctx.stroke();
@@ -554,22 +543,16 @@ function drawUrna(cx,cy,bobT=0,buried=false){
     glow.addColorStop(0,'rgba(180,60,20,0.32)'); glow.addColorStop(1,'rgba(180,50,0,0)');
     ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,34,0,Math.PI*2); ctx.fill();
   }
-  // Body globular
   ctx.fillStyle='#aa1a00'; ctx.beginPath(); ctx.ellipse(0,5,15,20,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#cc2200'; ctx.beginPath(); ctx.ellipse(-2,3,13,17,-0.1,0,Math.PI*2); ctx.fill();
-  // Grey sheen top
   ctx.fillStyle='#888'; ctx.beginPath(); ctx.ellipse(0,-7,10,6,0,0,Math.PI*2); ctx.fill();
-  // Mouth ring
   ctx.fillStyle='#eee'; ctx.beginPath(); ctx.ellipse(0,-14,9,3.5,0,0,Math.PI*2); ctx.fill();
-  // Marajoara labirinto pattern
   ctx.strokeStyle='#fff'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(-12,2); ctx.lineTo(-7,-2); ctx.lineTo(-2,2); ctx.lineTo(3,-2); ctx.lineTo(8,2); ctx.lineTo(13,-2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(-12,9); ctx.lineTo(-7,5); ctx.lineTo(-2,9); ctx.lineTo(3,5); ctx.lineTo(8,9); ctx.lineTo(13,5); ctx.stroke();
-  // Handles
   ctx.fillStyle='#880a00'; ctx.fillRect(-20,0,5,12); ctx.fillRect(15,0,5,12);
   ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
   ctx.strokeRect(-20,0,5,12); ctx.strokeRect(15,0,5,12);
-  // Snake dots
   ctx.fillStyle='#6a0000';
   for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(-6+i*4,16,2.5,0,Math.PI*2);ctx.fill();}
   if(buried){ctx.fillStyle='rgba(60,35,10,0.5)';ctx.fillRect(-22,-24,44,28);}
@@ -589,7 +572,6 @@ function drawPa(cx,cy,bobT=0){
   ctx.restore();
 }
 
-// ── BUBBLE DIALOG ─────────────────────────────────────────────
 function wrapText(text, maxW) {
   ctx.font='15px "Courier New"';
   const pars=text.split('\n'), result=[];
@@ -698,7 +680,6 @@ const BUBBLE={
 function showDialog(msgs,cb,speaker='CORVAN',color='#78d840'){BUBBLE.show(msgs,cb,speaker,color);}
 function checkDlg(){if(G.dialog&&!INV.open&&isE())BUBBLE.advance();}
 
-// ── Info popup (mineral/artefact card) ────────────────────────
 let popup={active:false,timer:0,title:'',lines:[],color:'#f0c040',icon:''};
 function showPopup(title,lines,color,icon,ms=6500){popup={active:true,timer:ms,title,lines,color,icon};}
 function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.timer<=0)popup.active=false;}}
@@ -719,7 +700,6 @@ function drawPopup(){
   ctx.textAlign='left';ctx.restore();
 }
 
-// ── Notification ───────────────────────────────────────────────
 let notifText='',notifAlpha=0,notifTimer=0;
 function notify(msg,ms=2800){notifText=msg;notifTimer=ms;notifAlpha=1;}
 function tickNotif(){if(notifTimer>0){notifTimer-=16;if(notifTimer<=0)notifAlpha=0;else notifAlpha=Math.min(1,notifTimer/300);}}
@@ -733,7 +713,6 @@ function drawNotif(){
   ctx.restore();
 }
 
-// ── ENEMY ──────────────────────────────────────────────────────
 class Enemy{
   constructor(x,y,type,patrol){
     this.x=x;this.y=y;this.type=type;
@@ -840,7 +819,6 @@ class Enemy{
   }
 }
 
-// ── Collectible ────────────────────────────────────────────────
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=36;this.h=36;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
@@ -863,7 +841,6 @@ class Col{
   }
 }
 
-// ── Trigger ────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
   draw(px,py){
@@ -879,7 +856,6 @@ class Trigger{
   }
 }
 
-// ── Dig Spot (urna buried) ─────────────────────────────────────
 class DigSpot{
   constructor(x,y){this.x=x;this.y=y;this.progress=0;this.revealed=false;this.done=false;this.glowT=0;}
   tick(){this.glowT+=0.04;}
@@ -897,7 +873,6 @@ class DigSpot{
     if(!this.revealed){
       const a=Math.abs(Math.sin(this.glowT))*0.4+0.1;
       ctx.fillStyle=`rgba(180,80,20,${a})`;ctx.beginPath();ctx.arc(sx,sy,20,0,Math.PI*2);ctx.fill();
-      // shard hint
       ctx.fillStyle='rgba(160,60,20,0.55)';ctx.fillRect(sx-9,sy-5,13,7);
       ctx.fillStyle='rgba(120,216,64,0.85)';ctx.font='bold 12px "Courier New"';
       ctx.textAlign='center';ctx.fillText('[E] Escavar',sx,sy-30);ctx.textAlign='left';
@@ -914,7 +889,6 @@ class DigSpot{
   }
 }
 
-// ── Panning mini-game ──────────────────────────────────────────
 let panning={active:false,timer:0,px:0,py:0,cb:null};
 function startPanning(x,y,cb){panning={active:true,timer:0,px:x,py:y,cb};}
 function tickPanning(){if(!panning.active)return;panning.timer+=16;if(panning.timer>=2200){panning.active=false;if(panning.cb)panning.cb();}}
@@ -925,24 +899,20 @@ function drawPanning(){
   ctx.save();ctx.translate(sx,sy);
   const swirl=Math.sin(panning.timer/110)*0.45; ctx.rotate(swirl);
   drawBateia(0,0,0,1.3);
-  // Water swirl
   const t=panning.timer/200;
   ctx.strokeStyle='rgba(74,176,208,0.75)';ctx.lineWidth=2.5;
   for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(0,4,(10+i*5)*prog,t+i,t+i+Math.PI*1.5);ctx.stroke();}
-  // Gold sparks if >50%
   if(prog>0.5){
     for(let i=0;i<4;i++){const a=t+i*Math.PI/2;
       ctx.fillStyle='rgba(212,160,23,0.9)';ctx.beginPath();ctx.arc(Math.cos(a)*9,4+Math.sin(a)*5,3.5,0,Math.PI*2);ctx.fill();}
   }
   ctx.restore();
-  // Progress bar
   ctx.fillStyle='rgba(0,22,0,0.82)';ctx.fillRect(sx-54,sy-54,108,13);
   ctx.fillStyle='#d4a017';ctx.fillRect(sx-54,sy-54,108*prog,13);
   ctx.strokeStyle='#78d840';ctx.lineWidth=1.5;ctx.strokeRect(sx-54,sy-54,108,13);
   ctx.fillStyle='#78d840';ctx.font='11px "Courier New"';ctx.textAlign='center';ctx.fillText('Garimpar...',sx,sy-58);ctx.textAlign='left';
 }
 
-// ── PLAYER ─────────────────────────────────────────────────────
 class Player{
   constructor(x,y){
     this.x=x;this.y=y;this.w=40;this.h=82;
@@ -1039,7 +1009,6 @@ class Player{
       if(!c.done&&canCollect){c.done=true;
         if(c.type==='gold'){
           this.score+=15;sfx('gold');burst(c.x+18,c.y+18,'#d4a017',10);
-          // Register first gold in journal
           if(!this.items.includes('ouro_aluvial_ok')){this.items.push('ouro_aluvial_ok');journalCollect('ouro_aluvial');
             showPopup('⭐ OURO ALUVIAL ENCONTRADO',['Metal 19× mais pesado que a água','Depositado nos rios por erosão','Serra Pelada: 100mil garimpeiros em 1980','Uma grama → fio de kilômetros'],'#d4a017');}
         } else if(c.type==='bateia'){
@@ -1057,7 +1026,6 @@ class Player{
     }
 
     if(isE()){
-      // Escavar urna — exige Pá equipada
       if(level.digSpots){
         for(const ds of level.digSpots){
           if(!ds.done&&this.near({x:ds.x-32,y:ds.y-32,w:64,h:64})){
@@ -1082,7 +1050,6 @@ class Player{
             } else if(this.activeTool==='pa'){
               ds.tryDig();
             } else {
-              // Feedback se não tiver pá equipada
               if(this.items.includes('pa')) notify('Equipe a Pá no Diário [I] para escavar!');
               else notify('Colete a Pá Exploradora para escavar!');
             }
@@ -1090,7 +1057,6 @@ class Player{
           }
         }
       }
-      // Garimpar — exige Bateia equipada
       if(level.panZones&&this.activeTool==='bateia'&&!panning.active){
         for(const pz of level.panZones){
           if(!pz.done&&Math.abs(this.x+this.w/2-pz.x)<120){
@@ -1182,14 +1148,12 @@ class Player{
     ctx.save();
     drawCorvan(dx, dy, S, flip, wf, this.activeTool);
     ctx.restore();
-    // Glow quando carregando urna ou bateia
     if(this.activeTool==='bateia'||this.items.includes('urna')){
       const gx=this.x-cam.x+(flip?-10:this.w+12),gy=this.y-cam.y+this.h*0.6;
       const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,80);
       lg.addColorStop(0,'rgba(255,200,80,0.2)');lg.addColorStop(1,'rgba(255,200,80,0)');
       ctx.fillStyle=lg;ctx.fillRect(gx-80,gy-80,160,160);
     }
-    // Invincibility flash
     if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
     if(this.inMudwater||this.mudFlash>0){
       const alpha=this.inMudwater?0.24:Math.min(0.2,this.mudFlash/90);
@@ -1199,7 +1163,6 @@ class Player{
       ctx.lineWidth=2;
       ctx.strokeRect(this.x-cam.x-1,this.y-cam.y+this.h*0.48,this.w+2,this.h*0.44);
     }
-    // Heat overlay
     if(this.heatAnim>0){
       const a=this.heatAnim/80*0.4;ctx.fillStyle=`rgba(40,20,0,${a})`;ctx.fillRect(0,0,W,H);
       if(this.heatAnim>40){ctx.fillStyle=`rgba(255,120,0,${(this.heatAnim-40)/40*0.55})`;
@@ -1208,7 +1171,6 @@ class Player{
   }
 }
 
-// ── Backgrounds ────────────────────────────────────────────────
 function drawBg(bgKey,murky=false){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
@@ -1222,7 +1184,7 @@ function drawBg(bgKey,murky=false){
   ctx.fillStyle=murky?'rgba(20,10,0,0.42)':'rgba(0,10,0,0.22)';ctx.fillRect(0,0,W,H);
 }
 
-// ── Ambient effects ────────────────────────────────────────────
+
 let rainDrops=[];
 function initRain(){rainDrops=[];for(let i=0;i<120;i++)rainDrops.push({x:Math.random()*W,y:Math.random()*H,spd:7+Math.random()*5});}
 initRain();
@@ -1246,11 +1208,7 @@ function drawFireflies(){
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 1 — A Entrada na Selva
-//  Cena 01: Rio sinuoso, floresta densa, sol visível
-//  Objetivo: coletar Pá + Bateia
-// ══════════════════════════════════════════════════════════════
+
 function buildL1(){
   const FL=540,WW=3400,WH=860;
   const plats=[
@@ -1316,10 +1274,7 @@ function buildL1(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 2 — Geologia Aluvial e Ciclo da Água
-//  Cena 02: meio terra/meio rio, sedimento, mini-game bateia
-// ══════════════════════════════════════════════════════════════
+
 function buildL2(){
   const FL=540,WW=3600,WH=860;
   const plats=[
@@ -1406,7 +1361,6 @@ function buildL2(){
             const a=0.5+Math.sin(Date.now()/400)*0.45;
             ctx.fillStyle=`rgba(212,160,23,${a})`;ctx.beginPath();ctx.arc(px,FL-cam.y-12,16,0,Math.PI*2);ctx.fill();
             ctx.fillStyle='#fff';ctx.font='bold 13px "Courier New"';ctx.textAlign='center';ctx.fillText('⚓',px,FL-cam.y-5);ctx.textAlign='left';
-            // hint
             if(Math.abs(player.x+player.w/2-pz.x)<120){
               ctx.font='11px "Courier New"';ctx.fillStyle='rgba(100,220,60,0.8)';
               ctx.textAlign='center';const ht=player.activeTool==='bateia'?'[E] Garimpar':'Equipe Bateia [I]';
@@ -1421,10 +1375,7 @@ function buildL2(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 3 — A Coleta e o Impacto Ambiental
-//  Cena 03: Chuva, água turva/contaminada, alerta de mercúrio
-// ══════════════════════════════════════════════════════════════
+
 function buildL3(){
   const FL=540,WW=3800,WH=860;
   const plats=[
@@ -1441,12 +1392,9 @@ function buildL3(){
     logPlatform(1940,FL-36,80),logPlatform(2240,FL-36,80),logPlatform(2540,FL-36,80),
     logPlatform(2840,FL-36,80),logPlatform(3160,FL-36,80),
     movH(1080,FL-100,85,1080,1200,2.0),movH(1900,FL-100,85,1900,2060,2.0),movH(2540,FL-100,85,2540,2680,1.8),
-    // Clean river first section
     river(300,FL,80,WH-FL),river(570,FL,90,WH-FL),river(820,FL,80,WH-FL),river(1060,FL,80,WH-FL),
-    // Contaminated
     mudwater(1340,FL,140,WH-FL),mudwater(1640,FL,140,WH-FL),mudwater(1940,FL,140,WH-FL),
     mudwater(2240,FL,140,WH-FL),mudwater(2540,FL,140,WH-FL),
-    // Clean again
     river(2840,FL,140,WH-FL),river(3160,FL,120,WH-FL),
     trap(1200,FL-60,110),
   ];
@@ -1497,10 +1445,6 @@ function buildL3(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 4 — Relíquias Perdidas e Conclusão
-//  Cena 04: Pôr do sol, vaga-lumes, escavação da Urna Marajoara
-// ══════════════════════════════════════════════════════════════
 function buildL4(){
   const FL=540,WW=3000,WH=860;
   const plats=[
@@ -1539,12 +1483,11 @@ function buildL4(){
       level.triggers[0].done=true;
       player.interactAnim=40;sfx('unlock');
       showDialog([
-        '"Você encontrou a Urna Funerária Marajoara. Com mais de 1.000 anos, ela prova que povos sofisticados habitavam a Amazônia muito antes da colonização europeia."',
+        '"Encontramos a Urna Funerária Marajoara. Com mais de 1.000 anos, ela prova que povos sofisticados habitavam a Amazônia muito antes da colonização europeia."',
         '"A cultura Marajoara (400–1300 d.C.) criava cerâmicas elaboradas para rituais funerários com padrões que representavam o ciclo da vida e os espíritos da floresta."',
         '"Para eles, o ouro era o sol materializado. Não havia mineração destrutiva — apenas coleta cuidadosa do que a terra oferecia, em equilíbrio com a floresta."',
-        '"Você preservou essa memória. A Fase 1.2 está completa — itens registrados no Diário de Bordo. Próxima parada: Machu Picchu e o Tesouro do Condor!"'
+        '"Preservamos essa memória! A Fase 1.2 está concluída e todos os itens registrados no Diário de Bordo. Próxima Parada: Machu Pichu e o Tesouro do Condor!"'
       ],()=>{
-        // ── Unlock próximas fases e arquivar no save ──
         unlockPhase('1.3');
         G.transitioning=false;
         G.state='complete';
@@ -1582,7 +1525,6 @@ function buildL4(){
   };
 }
 
-// ── HUD ────────────────────────────────────────────────────────
 function drawHUD(player,level){
   ctx.fillStyle='rgba(0,22,0,0.68)';ctx.fillRect(0,0,W,38);
   for(let i=0;i<player.maxHp;i++){
@@ -1594,7 +1536,6 @@ function drawHUD(player,level){
   }
   ctx.fillStyle='rgba(120,216,64,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#78d840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  // Slot ferramenta ativa
   const tY=44;
   ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,tY,140,28,4);ctx.fill();
   ctx.strokeStyle=player.activeTool?'#78d840':'#444';ctx.lineWidth=1.5;roundRect(16,tY,140,28,4);ctx.stroke();
@@ -1606,7 +1547,6 @@ function drawHUD(player,level){
   ctx.fillStyle='rgba(80,200,80,0.15)';roundRect(162,tY,46,28,4);ctx.fill();
   ctx.strokeStyle='#2a5a18';ctx.lineWidth=1.5;roundRect(162,tY,46,28,4);ctx.stroke();
   ctx.font='bold 11px "Courier New"';ctx.fillStyle='#5a9830';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  // Inventário lado direito
   let ix=W-16;const inv=[];
   if(player.items.includes('urna'))   inv.push('🏺 URNA');
   if(player.items.includes('bateia')) inv.push('🥌 BATEIA');
@@ -1626,27 +1566,34 @@ function drawHUD(player,level){
   }
 }
 
-// ── Screens ────────────────────────────────────────────────────
 function drawTitle(){
   const bg=IMG['bg01'];
   if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.5;drawBg('bg01');ctx.globalAlpha=1;}
   else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a3010');g.addColorStop(1,'#0a1c08');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   ctx.fillStyle='rgba(0,10,0,0.56)';ctx.fillRect(0,0,W,H);
   drawFireflies();
-  // Draw Corvan large on title (scale 5, centered)
-  //const TS=5;
-  //const cx=W/2-16*TS, cy=160;
-  //drawCorvan(cx,cy,TS,false,Date.now()/400);
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('Jazidas de Ouro da Amazônia',W/2,148);
   ctx.shadowBlur=0;
   ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,204);
+
+  const cardImg = IMG['card12'];
+  const cardSize = 160;
+  const cardX = W/2 - cardSize/2;
+  const cardY = 240;
+  if(cardImg && cardImg.complete){
+    const glow = ctx.createRadialGradient(W/2, cardY+cardSize/2, 0, W/2, cardY+cardSize/2, cardSize*0.85);
+    glow.addColorStop(0,'rgba(120,216,64,0.22)');
+    glow.addColorStop(1,'rgba(120,216,64,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(W/2, cardY+cardSize/2, cardSize*0.85, 0, Math.PI*2); ctx.fill();
+    ctx.drawImage(cardImg, cardX, cardY, cardSize, cardSize);
+  }
   ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
-  ctx.fillStyle='#888';ctx.font='13px "Courier New"';
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';
   ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Escavar',W/2,494);
-  ctx.fillText('Itens coletados serão arquivados no Diário de Bordo!',W/2,516);
   ctx.fillText('[M] Voltar ao Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1671,7 +1618,6 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.2 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  // Corvan + Urna side by side
   drawCorvan(W/2-160,200,4,false,Date.now()/300);
   ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawUrna(0,0,Date.now()/1000,false);ctx.restore();
 
@@ -1691,7 +1637,6 @@ function drawComplete(){
   ctx.textAlign='left';
 }
 
-// ── Game state ──────────────────────────────────────────────────
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
@@ -1738,7 +1683,6 @@ const G={
   }
 };
 
-// ── Loop ─────────────────────────────────────────────────────
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
@@ -1749,7 +1693,6 @@ function loop(){
   G.update();G.draw();clearJP();
 }
 
-// Loading screen
 if(!gameReady){(function loadLoop(){
   if(gameReady)return;requestAnimationFrame(loadLoop);
   ctx.fillStyle='#0a1808';ctx.fillRect(0,0,W,H);
