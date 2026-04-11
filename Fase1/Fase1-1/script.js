@@ -1015,6 +1015,7 @@ function buildL2(){
   const cols=[
     ...[80,200,460,740,1020,1300,1600,1900,2200,2500,2780,3020,3160].map(x=>new Col(x,FL-50,'prata')),
     new Col(160,FL-80,'lanterna'),
+    new Col(1500,FL-80,'coca'),
   ];
   const bats=[new Bat(600,FL-200,100),new Bat(1200,FL-180,90),new Bat(1900,FL-220,110),new Bat(2600,FL-200,100)];
   const triggers=[
