@@ -701,7 +701,8 @@ class Player{
     if(INV.open){ INV.navigate(this); return; }
     if(G.dialog)return;
     if(level.underground){
-      this.soroche=Math.min(100,this.soroche+(isR()||isL()?0.04:0.016));
+      const srRate=level.underground?(isR()||isL()?0.10:0.04):(isR()||isL()?0.04:0.012);
+      this.soroche=Math.min(100,this.soroche+srRate);
     } else {
       this.soroche=Math.max(0,this.soroche-0.4);
     }
@@ -742,9 +743,30 @@ class Player{
       if(c.done||TOOL_TYPES.includes(c.type)) continue; 
       if(!this.overlaps(c)) continue;
       c.done=true;
-      if(c.type==='prata'){this.score+=20;sfx('prata');burst(c.x+17,c.y+17,'#c0c8d8',10);
-        if(!this.items.includes('prata_ok')){this.items.push('prata_ok');journalCollect('prata');
-          showPopup('✦ PRATA (FRAGMENTO)',['Melhor condutor elétrico e térmico','Liga-se ao estanho formando bronze','Usada pelos Incas em ornamentos','Hoje em circuitos e medicina'],'#c0c8d8');}
+      if(c.type==='prata'){
+        this.score+=20; sfx('prata');
+        // Fragmento de prata reduz Soroche — mastigar a prata pura abre vias respiratórias
+        const sorocheAntes=this.soroche;
+        this.soroche=Math.max(0,this.soroche-18);
+        const recuperou=sorocheAntes>0&&this.soroche<sorocheAntes;
+        burst(c.x+17,c.y+17,'#c0c8d8',recuperou?14:8,recuperou?4:2.5);
+        // Partículas extras de "fôlego recuperado"
+        if(recuperou){
+          for(let i=0;i<6;i++) particles.push({
+            x:c.x+17,y:c.y,
+            vx:(Math.random()-.5)*2,vy:-1.5-Math.random()*2,
+            life:55,max:55,color:'rgba(192,200,216,0.7)',r:2.5
+          });
+        }
+        if(!this.items.includes('prata_ok')){
+          this.items.push('prata_ok'); journalCollect('prata');
+          showPopup('◆ FRAGMENTO DE PRATA',
+            ['Ótimo condutor elétrico e térmico',
+             'A prata fria alivia a pressão da altitude',
+             'Incas a chamavam de "lágrima da Lua"',
+             'Eles vão aliviar o Soroche, colete-os!'],'#c0c8d8');
+        }
+        if(recuperou) notify('◆ Prata coletada — fôlego recuperado!');
       }
       else if(c.type==='estanho'){this.score+=15;sfx('prata');burst(c.x+17,c.y+17,'#9aaab8',8);
         if(!this.items.includes('estanho_ok')){this.items.push('estanho_ok');journalCollect('estanho');
@@ -812,8 +834,8 @@ class Player{
         for(let i=0;i<12;i++)burst(level.llama.x,level.llama.y-30,'#3a9a38',1,2+Math.random()*2);
         this.items.push('coca');journalCollect('ceramica_inca');
         showDialog([
-          '"Olá, linda lhama! Estes animais eram sagrados para os Incas — carregavam minérios pelas montanhas a 4.000 metros de altitude."',
-          '"A lhama me olha e me oferece Folhas de Coca. Os povos andinos as usam há mais de 4.000 anos contra o Soroche — o mal de altitude."',
+          '"Olhe que linda Lhama! Estes animais eram sagrados para os Incas — carregavam minérios pelas montanhas a fora"',
+          '"Ela me oferece Folhas de Coca. Os povos andinos as usam há mais de 4.000 anos contra o Soroche — o mal de altitude."',
           '"Dentro da mina, a 4.000 metros, o ar é rarefeito. A barra de Soroche vai subir. Quando ficar vermelha, pressione [E] para mastigar as folhas."',
           '"Com a Picareta e as Folhas de Coca, estou pronto para entrar. Mas vou precisar de uma Lanterna — deve estar em algum lugar lá dentro!"'
         ],null,'CORVAN','#e0b840');
@@ -876,7 +898,8 @@ function drawBg(bgKey,dark=false){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
     const sc=Math.max(W/img.naturalWidth,H/img.naturalHeight);
-    ctx.drawImage(img,(W-img.naturalWidth*sc)/2,(H-img.naturalHeight*sc)/2,img.naturalWidth*sc,img.naturalHeight*sc);
+    const iw=img.naturalWidth*sc, ih=img.naturalHeight*sc;
+    ctx.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
   } else {
     const fb={bg01:'#0a0e2a',bg02:'#1a0e08',bgext:'#0a0e2a',bgcena0102:'#0a0e2a'};
     const grd=ctx.createLinearGradient(0,0,0,H);
@@ -925,6 +948,119 @@ function drawMineDust(){
     ctx.fillStyle=`rgba(180,160,140,${p.a})`;ctx.beginPath();ctx.arc(sx,p.y-cam.y,2,0,Math.PI*2);ctx.fill();}
 }
 
+
+function drawMineEntrance(worldX, floorY){
+  const sx = worldX - cam.x;
+  const sy = floorY - cam.y;
+  if(sx > W+200 || sx < -400) return;
+
+  const W_ENT = 220, H_ENT = 260;
+  const bx = sx - W_ENT/2;
+  const by = sy - H_ENT;
+
+  // Stone wall base
+  const stoneRows = Math.ceil(H_ENT/20);
+  const stoneCols = Math.ceil(W_ENT/20);
+  for(let r=0;r<stoneRows;r++){
+    for(let c=0;c<stoneCols;c++){
+      const shade = ((r+c)%2===0)?'#6a5040':'#5a4030';
+      ctx.fillStyle = shade;
+      ctx.fillRect(bx+c*20, by+r*20, 19, 19);
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(bx+c*20+18, by+r*20, 1, 19);
+      ctx.fillRect(bx+c*20, by+r*20+18, 20, 1);
+    }
+  }
+
+  // Dark tunnel interior
+  const archTop = by + 30;
+  const archW   = 130;
+  const archH   = H_ENT - 30;
+  const ax = bx + (W_ENT - archW)/2;
+  ctx.fillStyle = '#050203';
+  ctx.beginPath();
+  ctx.moveTo(ax, sy);
+  ctx.lineTo(ax, archTop + archW*0.35);
+  ctx.quadraticCurveTo(ax, archTop, ax + archW/2, archTop);
+  ctx.quadraticCurveTo(ax + archW, archTop, ax + archW, archTop + archW*0.35);
+  ctx.lineTo(ax + archW, sy);
+  ctx.closePath();
+  ctx.fill();
+
+  // Arch frame — wooden beam style
+  ctx.strokeStyle = '#6a3e10';
+  ctx.lineWidth   = 8;
+  ctx.beginPath();
+  ctx.moveTo(ax, sy);
+  ctx.lineTo(ax, archTop + archW*0.35);
+  ctx.quadraticCurveTo(ax, archTop, ax + archW/2, archTop);
+  ctx.quadraticCurveTo(ax + archW, archTop, ax + archW, archTop + archW*0.35);
+  ctx.lineTo(ax + archW, sy);
+  ctx.stroke();
+
+  // Arch highlight
+  ctx.strokeStyle = '#8a5820';
+  ctx.lineWidth   = 3;
+  ctx.beginPath();
+  ctx.moveTo(ax+6, sy);
+  ctx.lineTo(ax+6, archTop + archW*0.35);
+  ctx.quadraticCurveTo(ax+6, archTop+6, ax + archW/2, archTop+6);
+  ctx.quadraticCurveTo(ax+archW-6, archTop+6, ax+archW-6, archTop + archW*0.35);
+  ctx.lineTo(ax+archW-6, sy);
+  ctx.stroke();
+
+  // Wooden horizontal supports
+  ctx.fillStyle = '#5a3210';
+  ctx.fillRect(ax+2, archTop + archW*0.35 + 40, archW-4, 10);
+  ctx.fillRect(ax+2, archTop + archW*0.35 + 90, archW-4, 10);
+
+  // Torch left
+  _drawTorch(ax - 18, archTop + archW*0.35 + 20, sy);
+  // Torch right
+  _drawTorch(ax + archW + 10, archTop + archW*0.35 + 20, sy);
+
+  // Keystone
+  ctx.fillStyle = '#9a7850';
+  ctx.beginPath();
+  ctx.moveTo(ax + archW/2 - 14, archTop + 2);
+  ctx.lineTo(ax + archW/2 + 14, archTop + 2);
+  ctx.lineTo(ax + archW/2 + 10, archTop + 22);
+  ctx.lineTo(ax + archW/2 - 10, archTop + 22);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='#6a5030';ctx.lineWidth=2;ctx.stroke();
+
+  // Top decorative blocks
+  for(let i=0;i<W_ENT/20;i++){
+    ctx.fillStyle = i%2===0?'#7a6050':'#6a5040';
+    ctx.fillRect(bx+i*20, by, 19, 14);
+  }
+  ctx.fillStyle = '#3a2010';
+  ctx.fillRect(bx, by+14, W_ENT, 2);
+
+  // Ground shadow inside tunnel
+  const grd = ctx.createLinearGradient(0, sy-30, 0, sy);
+  grd.addColorStop(0,'rgba(0,0,0,0)');
+  grd.addColorStop(1,'rgba(0,0,0,0.6)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(ax, sy-30, archW, 30);
+}
+
+function _drawTorch(x, y, groundY){
+  ctx.fillStyle = '#7a4820';
+  ctx.fillRect(x, y, 7, 20);
+  const fl = Math.sin(Date.now()/80)*2;
+  const g  = ctx.createRadialGradient(x+3, y-6+fl, 1, x+3, y, 20);
+  g.addColorStop(0,'rgba(255,180,40,0.85)');
+  g.addColorStop(0.5,'rgba(255,90,10,0.4)');
+  g.addColorStop(1,'rgba(255,60,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(x-14, y-22, 34, 34);
+  ctx.fillStyle = '#ffd060';
+  ctx.fillRect(x+1, y-12+fl, 5, 10);
+  ctx.fillStyle = '#ff8c00';
+  ctx.fillRect(x, y-8+fl, 7, 7);
+}
+
 function buildL1(){
   const FL=600,WW=3400,WH=900;
   const plats=[
@@ -963,16 +1099,22 @@ function buildL1(){
   ];
   return{id:1,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
     title:'O Início em Potosí',
-    hint:'⛏ Colete a Picareta • 🦙 Interaja com a Lhama • Entre na mina →',
+    hint(player){
+      if(!player.items.includes('picareta'))       return '⛏ Encontre a Picareta na alcova de pedra →';
+      if(!player.items.includes('coca'))            return '🦙 Interaja com a Lhama para obter Folhas de Coca';
+      if(!player.items.includes('lanterna'))        return '⛏ Entre na mina e encontre a Lanterna 🔦';
+      return '✦ Picareta + Coca prontas — Entre na mina →';
+    },
     plats,bats,cols,triggers,llama,veins:[],
     intro:[
-      '"Bem-vindo ao Cerro Rico de Potosí, Bolívia (4.090 metros de altitude), uma das maiores jazidas de prata do mundo."',
-      '"Os Incas mineravam aqui séculos antes dos espanhóis. A prata era símbolo lunar - dos deuses, não do comércio."',
-      'Encontre a Picareta em uma alcova de pedra, interaja com a Lhama para obter as Folhas de Coca e entre na mina!'
+      '"Bem-vindo ao Cerro Rico de Potosí na Bolívia, estamos há 4.090 metros de altitude e em uma das maiores jazidas de prata do mundo."',
+      '"Os Incas mineravam aqui há séculos antes dos espanhóis. Onde a prata era símbolo lunar dos deuses e não do comércio."',
+      'Preciso encontrar a Picareta, interajir com a Lhama para obter as Folhas de Coca e entrar na mina!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
       drawStars();drawWind();
+      drawMineEntrance(3200, FL);
       const alcovaCX=1630-cam.x;
       if(alcovaCX>-200&&alcovaCX<W+200&&!player.items.includes('picareta')){
         const ay=FL-120-cam.y;
@@ -981,6 +1123,8 @@ function buildL1(){
         ctx.font='bold 12px "Courier New"';ctx.textAlign='center';
         ctx.fillText('⛏ alcova →',alcovaCX,ay);ctx.textAlign='left';
       }
+      for(const b of this.bats)b.draw();
+      for(const c of this.cols)c.draw(player.x,player.y);
       if(this.llama){
         const lx=this.llama.x-cam.x,ly=this.llama.y-cam.y;
         if(lx>-100&&lx<W+100){
@@ -1007,7 +1151,7 @@ function buildL1(){
           }
         }
       }
-      for(const b of this.bats)b.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1064,9 +1208,9 @@ function buildL2(){
     hint:'🔦 Ache a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Soroche aumenta!',
     plats,bats,cols,triggers,veins,llama:null,
     intro:[
-      '"Corvan entra na mina. Está escuro — mas há algo brilhando na entrada. Uma lanterna abandonada!"',
+      '"Entramos na mina. Está escuro — mas há algo brilhando na entrada. Uma lanterna abandonada!"',
       '"Com a Lanterna em mãos, o caminho se ilumina. Os veios de prata nas paredes ficam visíveis."',
-      'Pegue a 🔦 Lanterna na entrada, equipe-a no Diário [I] e use a ⛏ Picareta nos veios brilhantes!'
+      'Pegue a 🔦 Lanterna, equipe-a no Diário [I] e use a ⛏ Picareta para minerar!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const v of this.veins)v.tick();for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
     draw(player){
@@ -1204,51 +1348,116 @@ function buildL4(){
 }
 
 function drawHUD(player,level){
-  ctx.fillStyle='rgba(8,4,0,0.68)';ctx.fillRect(0,0,W,38);
+  // ── Barra topo ──────────────────────────────────────────────
+  ctx.fillStyle='rgba(8,4,0,0.82)';ctx.fillRect(0,0,W,38);
+  ctx.fillStyle='rgba(200,160,40,0.18)';ctx.fillRect(0,36,W,2);
+
+  // Corações
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#c83020':'#334';
+    ctx.fillStyle=i<player.hp?'#c0c8d8':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
     ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  ctx.fillStyle='rgba(220,185,80,.9)';ctx.font='18px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#e0b840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
+  ctx.fillStyle='#c0c8d8';ctx.font='20px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
+  ctx.fillStyle='#c0c8d8';ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText('◆ '+player.score,W-14,26);ctx.textAlign='left';
 
-  const toolY=44;
-  ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,toolY,130,30,4);ctx.fill();
-  ctx.strokeStyle=player.activeTool?'#e0b840':'#444';ctx.lineWidth=1.5;roundRect(16,toolY,130,30,4);ctx.stroke();
+  const PX=12, PY=46;
+  const PW=178, PH_BASE=52;
+  const TOOL_DEFS=[
+    {id:'picareta',   icon:'⛏', nome:'Picareta'},
+    {id:'lanterna',   icon:'🔦',nome:'Lanterna'},
+    {id:'coca',       icon:'🌿',nome:'Coca'},
+  ];
+  const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
+  const PH = PH_BASE + (tools.length>0 ? 6+tools.length*22 : 0);
+
+  // Fundo com estética do Diário
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(8,4,0,0.88)';
+  roundRect(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;
+  roundRect(PX,PY,PW,PH,6);ctx.stroke();
+  // Linha interna dourada fina
+  ctx.strokeStyle='rgba(200,160,40,0.25)';ctx.lineWidth=1;
+  roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
+  ctx.restore();
+
+  // Ícone do livro + label + tecla [I] na mesma linha
+  const midX = PX + PW/2;
+  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#c0a030';
+  ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#c0a030';
+  ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(200,160,40,0.2)';
+  roundRect(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle='#c0a030';ctx.lineWidth=1;
+  roundRect(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#e0b840';
+  ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+
+  // Separador fino
+  ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
+
+  // Ferramenta ativa — centralizada
+  const atY=PY+44;
+  ctx.textAlign='center';
   if(player.activeTool&&ITEM_DEFS[player.activeTool]){
     const def=ITEM_DEFS[player.activeTool];
-    ctx.font='16px serif';ctx.fillText(def.icon,24,toolY+21);
-    ctx.font='12px "Courier New"';ctx.fillStyle='#e0b840';ctx.fillText(def.nome,46,toolY+21);
+    ctx.fillStyle='rgba(200,160,40,0.1)';
+    roundRect(PX+6,atY-14,PW-12,20,3);ctx.fill();
+    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';
+    ctx.fillText(def.icon+' '+def.nome,midX,atY+1);
   } else {
-    ctx.font='12px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',24,toolY+21);
+    ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8d8';
+    ctx.fillText('Não Equipado',midX,atY);
   }
-  ctx.fillStyle='rgba(200,160,40,0.15)';roundRect(152,toolY,52,30,4);ctx.fill();
-  ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;roundRect(152,toolY,52,30,4);ctx.stroke();
-  ctx.font='bold 12px "Courier New"';ctx.fillStyle='#c0a030';ctx.textAlign='center';ctx.fillText('[I]',178,toolY+21);ctx.textAlign='left';
+  ctx.textAlign='left';
 
-  let ix=W-16;const inv=[];
-  if(player.items.includes('tupu'))    inv.push('✦ TUPU');
-  if(player.items.includes('picareta'))inv.push('⛏ PICARETA');
-  if(player.items.includes('lanterna'))inv.push('🔦 LANTERNA');
-  if(player.items.includes('coca'))    inv.push('🌿 COCA');
-  for(const it of inv){ctx.fillStyle='#e0b840';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,toolY+21);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
+  // Ferramentas coletadas — centralizadas
+  if(tools.length>0){
+    ctx.fillStyle='rgba(200,160,40,0.3)';
+    ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
+    tools.forEach((t,i)=>{
+      const ty=PY+PH_BASE+8+i*22;
+      const equipped=player.activeTool===t.id;
+      ctx.textAlign='center';
+      ctx.font='11px serif';ctx.fillStyle=equipped?'#f0c040':'#a08040';
+      ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
+      ctx.textAlign='left';
+    });
+  }
+
+  // Barra de Soroche (à direita do painel, só quando relevante)
   if(player.soroche>20||level.underground){
-    const pct=player.soroche/100,bW=140,bX=16,bY=44;
-    ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(bX,bY,bW,12);
+    const pct=player.soroche/100,bW=130,bX=PX+PW+10,bY=PY+8;
+    ctx.fillStyle='rgba(8,4,0,0.82)';
+    roundRect(bX,bY,bW+8,22,4);ctx.fill();
+    ctx.strokeStyle='rgba(200,160,40,0.4)';ctx.lineWidth=1;
+    roundRect(bX,bY,bW+8,22,4);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(bX+4,bY+5,bW,12);
     const sc=pct<0.5?`rgb(${Math.round(100+pct*2*140)},180,100)`:(pct<0.8?'#e8a020':'#cc2020');
-    ctx.fillStyle=sc;ctx.fillRect(bX,bY,bW*pct,12);
-    ctx.strokeStyle='#c0a040';ctx.lineWidth=1;ctx.strokeRect(bX,bY,bW,12);
-    ctx.fillStyle='#c0a040';ctx.font='10px "Courier New"';ctx.fillText('SOROCHE',bX+2,bY+10);
+    ctx.fillStyle=sc;ctx.fillRect(bX+4,bY+5,bW*pct,12);
+    ctx.strokeStyle='#c0a040';ctx.lineWidth=1;ctx.strokeRect(bX+4,bY+5,bW,12);
+    ctx.font='9px "Courier New"';ctx.fillStyle='#c0a040';
+    ctx.fillText('SOROCHE',bX+6,bY+15);
+    if(pct>0.5){
+      const pulse=0.5+Math.sin(Date.now()/350)*0.5;
+      ctx.fillStyle=`rgba(192,200,216,${pulse})`;
+      ctx.fillText('◆ alivia',bX+bW-36,bY+15);
+    }
   }
-  ctx.fillStyle='rgba(210,185,80,.7)';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
-  if(G.timeOnLevel<600){
-    ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(8,H-44,440,28);
-    ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';
-    ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',14,H-25);
-  }
+
+  // Hint rodapé
+  const hintText=typeof level.hint==='function'?level.hint(player):level.hint;
+  ctx.fillStyle='rgba(210,185,80,.7)';ctx.font='12px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
 }
 
 function drawTitle(){
@@ -1311,7 +1520,7 @@ function drawComplete(){
   const lines=['✦  Picareta — ferramenta da mineração andina','✦  Prata — melhor condutor, metal dos Incas','✦  Estanho — base do bronze por 5.000 anos','✦  Tupu de Prata — arte ornamental Inca','✦  Folhas de Coca — combate ao Soroche'];
   ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
   ctx.fillStyle='rgba(220,185,80,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,400);
-  ctx.fillStyle='#e0b840';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
+  ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◆ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
   ctx.fillStyle=`rgba(220,185,80,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
   ctx.fillText('Pressione ENTER para voltar ao início',W/2,458);ctx.textAlign='left';
 }

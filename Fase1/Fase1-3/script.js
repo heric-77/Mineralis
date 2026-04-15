@@ -1408,7 +1408,7 @@ function drawTitle(){
   }
 
   ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='20px "Courier New"';ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
-  ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,500);
+  ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,500);ctx.fillText('Soroche: não corra demais na altitude!',W/2,524);
   ctx.fillText('[M] Voltar ao Menu Principal',W/2,552);
   ctx.textAlign='left';
 }

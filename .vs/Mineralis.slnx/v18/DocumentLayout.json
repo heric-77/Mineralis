@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\Fase1\\Fase1-3\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Fase1\\Fase1-3\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\Fase1\\Fase1-2\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Fase1\\Fase1-2\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "index.html",
+              "DocumentMoniker": "C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\Fase1\\Fase1-3\\index.html",
+              "RelativeDocumentMoniker": "Fase1\\Fase1-3\\index.html",
+              "ToolTip": "C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\Fase1\\Fase1-3\\index.html",
+              "RelativeToolTip": "Fase1\\Fase1-3\\index.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-04-11T02:56:49.33Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "index.html",
+              "DocumentMoniker": "C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\Fase1\\Fase1-2\\index.html",
+              "RelativeDocumentMoniker": "Fase1\\Fase1-2\\index.html",
+              "ToolTip": "C:\\Users\\BPO-01\\Documents\\Fran - Particular\\4 Fase\\PAC\\Mineralis\\Mineralis\\Fase1\\Fase1-2\\index.html",
+              "RelativeToolTip": "Fase1\\Fase1-2\\index.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-04-11T02:56:20.636Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
