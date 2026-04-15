@@ -52,15 +52,15 @@ const Cards = (() => {
 
 
 function selectCard(el) {
-  if (el.classList.contains('locked')) return;
- 
+  if (el.classList.contains('locked')) return;     // única checagem necessária
+
   document.querySelectorAll('.phase-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  Audio.clickMenu();                        // ← NOVO: feedback sonoro
- 
+  Audio.clickMenu();
+
   const phase = PhasesData.find(p => p.id === el.dataset.phase);
-  if (phase && SaveManager.faseDesbloqueada(phase.id) && phase.caminho) {
-    window.location.href = phase.caminho;
+  if (phase?.caminho) {
+    window.location.href = phase.caminho;          // DOM já garante desbloqueio
   }
 }
 

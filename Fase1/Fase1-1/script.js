@@ -37,8 +37,8 @@ function sfx(type){
 }
 
 const IMG={};
-let assetsLoaded=0,totalAssets=4,gameReady=false;
-[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01-04.JPG'],['bgcena0102','Cena01-02.svg']].forEach(([key,src])=>{
+let assetsLoaded=0,totalAssets=5,gameReady=false;
+[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01.svg'],['bgcena0102','Cena01.svg'],['bgmina','Cena02.svg']].forEach(([key,src])=>{
   const img=new Image();
   img.onload=()=>{IMG[key]=img;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
@@ -119,8 +119,18 @@ const INV = {
   ],
   tabItems(player) {
     const cat = this.TABS[this.tab].id;
+    // Lê coletados do localStorage (todas as fases)
+    let saved={};
+    try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
     return Object.entries(ITEM_DEFS)
-      .filter(([id, def]) => def.cat === cat && player.items.includes(id))
+      .filter(([id, def]) => {
+        if(def.cat !== cat) return false;
+        // Verifica em player.items direto, no localStorage, ou variações de sufixo
+        return player.items.includes(id)        // ex: 'lanterna'
+            || player.items.includes(id+'_ok')  // ex: 'prata_ok'
+            || player.items.includes(id+'_col') // ex: 'prata_col'
+            || saved[def.journalId||id];         // ex: salvo no diário global
+      })
       .map(([id, def]) => ({ id, ...def }));
   },
   toggle(player) {
@@ -142,8 +152,8 @@ const INV = {
     if (this.isDownKey()) { this.cursor = Math.min(items.length-1, this.cursor+1); return true; }
     if (isE() && items.length > 0 && this.tab === 0) {
       const item = items[this.cursor];
-      if (player.activeTool === item.id) player.activeTool = null;
-      else player.activeTool = item.id;
+      if (player.activeTools.has(item.id)) player.activeTools.delete(item.id);
+      else player.activeTools.add(item.id);
       return true;
     }
     return false;
@@ -163,7 +173,7 @@ const INV = {
     ctx.strokeStyle='rgba(200,160,40,0.2)'; ctx.lineWidth=1; roundRect(PX+4,PY+4,PW-8,PH-8,12); ctx.stroke();
 
     ctx.fillStyle='#e0b840'; ctx.font='bold 16px "Courier New"';
-    ctx.textAlign='center'; ctx.fillText('📔  DIÁRIO DE BORDO',W/2,PY+28); ctx.textAlign='left';
+    ctx.textAlign='center'; ctx.fillText('📔DIÁRIO DE BORDO',W/2,PY+28); ctx.textAlign='left';
     ctx.fillStyle='rgba(200,160,40,0.3)'; ctx.fillRect(PX+16,PY+38,PW-32,1);
 
     const TAB_W=PW/3, TAB_Y=PY+44;
@@ -191,7 +201,7 @@ const INV = {
       items.forEach((item,i)=>{
         const iy=CY+16+i*52;
         const selected=(i===this.cursor);
-        const equipped=(player.activeTool===item.id);
+        const equipped=player.activeTools.has(item.id);
         if(selected){
           ctx.fillStyle='rgba(200,160,40,0.18)';
           roundRect(PX+16,iy-10,COL_W,46,8); ctx.fill();
@@ -228,13 +238,13 @@ const INV = {
         descLines.forEach((l,i)=>{ ctx.textAlign='center'; ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+146+i*22); });
         ctx.textAlign='left';
         if(sel.cat==='ferramenta'){
-          const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar';
-          const btnColor=player.activeTool===sel.id?'rgba(180,60,20,0.3)':'rgba(200,160,40,0.2)';
+          const btnTxt=player.activeTools.has(sel.id)?'[E] Desequipar':'[E] Equipar';
+          const btnColor=player.activeTools.has(sel.id)?'rgba(180,60,20,0.3)':'rgba(200,160,40,0.2)';
           ctx.fillStyle=btnColor;
           roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8); ctx.fill();
-          ctx.strokeStyle=player.activeTool===sel.id?'#c04020':'#e0b840'; ctx.lineWidth=1.5;
+          ctx.strokeStyle=player.activeTools.has(sel.id)?'#c04020':'#e0b840'; ctx.lineWidth=1.5;
           roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8); ctx.stroke();
-          ctx.font='bold 13px "Courier New"'; ctx.fillStyle=player.activeTool===sel.id?'#e06040':'#e0b840';
+          ctx.font='bold 13px "Courier New"'; ctx.fillStyle=player.activeTools.has(sel.id)?'#e06040':'#e0b840';
           ctx.textAlign='center'; ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38); ctx.textAlign='left';
         }
       }
@@ -320,6 +330,7 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const showPickaxe = activeTool==='picareta';
   const showLantern = activeTool==='lanterna';
   const showCoca    = activeTool==='coca';
+  const showTupu    = activeTool==='tupu';
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
   r(13,0,6,3,'#c8a020');r(14,0,4,2,'#ffe060');
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
@@ -347,6 +358,19 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   if(showLantern){
     r(26,31,1,3,'#888888');r(24,34,5,6,'#604010');r(25,35,3,4,'#ffe080');
     r(23,33,7,8,'#ffcc00',0.12*lb);
+  }
+  if(showTupu){
+    // Tupu na mão direita — haste + barra + pedra
+    r(27,28,2,6,'#9090b8');  // haste vertical
+    r(24,26,8,3,'#9090b8');  // barra horizontal superior
+    r(25,25,6,2,'#c0c0d8');  // brilho na barra
+    ctx.fillStyle='#28a890';ctx.globalAlpha=0.95;
+    ctx.beginPath();ctx.arc(28*S,26*S,1.8*S,0,Math.PI*2);ctx.fill(); // pedra central
+    ctx.globalAlpha=1;
+    // Brilho pulsante ao redor
+    const tpGlow=0.18+Math.sin(frame*0.5)*0.12;
+    ctx.fillStyle=`rgba(192,200,216,${tpGlow})`;
+    ctx.beginPath();ctx.arc(28*S,26*S,4*S,0,Math.PI*2);ctx.fill();
   }
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
@@ -556,9 +580,9 @@ class Col{
 }
 
 class Trigger{
-  constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
+  constructor(x,y,w,h,label,fn,auto=false){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;this.auto=auto;}
   draw(px,py){
-    if(this.done)return;
+    if(this.done||this.auto)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near)return;
     const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
@@ -690,7 +714,7 @@ class Player{
     this.walkT=0;this.state='idle';
     this.coyote=0;this.jbuf=0;this.onMoving=null;
     this.items=[];this.score=0;
-    this.activeTool=null;  
+    this.activeTools=new Set(); // múltiplas ferramentas simultâneas
     this.soroche=0;this.sorocheAnim=0;  
     this.interactAnim=0;
   }
@@ -701,7 +725,7 @@ class Player{
     if(INV.open){ INV.navigate(this); return; }
     if(G.dialog)return;
     if(level.underground){
-      const srRate=level.underground?(isR()||isL()?0.10:0.04):(isR()||isL()?0.04:0.012);
+      const srRate=level.underground?(isR()||isL()?0.045:0.018):(isR()||isL()?0.04:0.012);
       this.soroche=Math.min(100,this.soroche+srRate);
     } else {
       this.soroche=Math.max(0,this.soroche-0.4);
@@ -801,11 +825,11 @@ class Player{
 
       if(this.items.includes('coca')&&this.soroche>20){
         this.items=this.items.filter(i=>i!=='coca');
-        if(this.activeTool==='coca') this.activeTool=null;
+        this.activeTools.delete('coca');
         this.soroche=Math.max(0,this.soroche-60);sfx('coca');
         burst(this.x+20,this.y-20,'#3a9a38',12);notify('✦ Folhas de coca usadas — fôlego recuperado!');
       }
-      if(level.veins&&this.activeTool==='picareta'){
+      if(level.veins&&this.activeTools.has('picareta')){
         for(const v of level.veins){
           if(!v.done&&this.near({x:v.x-28,y:v.y-28,w:56,h:56})){
             if(!G.dialog){v.tryMine();
@@ -820,7 +844,7 @@ class Player{
             }break;
           }
         }
-      } else if(level.veins&&this.activeTool!=='picareta'){
+      } else if(level.veins&&!this.activeTools.has('picareta')){
         for(const v of level.veins){
           if(!v.done&&this.near({x:v.x-28,y:v.y-28,w:56,h:56})){
             if(this.items.includes('picareta')) notify('Equipe a Picareta no Diário [I]!');
@@ -861,9 +885,20 @@ class Player{
     if(Math.abs(this.vx)>0.5)this.walkT+=0.18;
   }
 
-  _colX(plats){for(const p of plats){if(p.type==='spike'||p.type==='_dead')continue;
-    if(this.overlaps(p)){if(this.y+this.h*0.5<=p.y)continue;
-      if(this.vx>0)this.x=p.x-this.w;else this.x=p.x+p.w;this.vx=0;}}}
+  _colX(plats){
+    const STEP=6;  // só sobe degraus muito pequenos
+    for(const p of plats){if(p.type==='spike'||p.type==='_dead')continue;
+      if(this.overlaps(p)){
+        if(this.y+this.h*0.5<=p.y)continue;
+        const stepUp=p.y-(this.y+this.h);
+        if(this.onG&&stepUp>-STEP&&stepUp<=0){
+          this.y=p.y-this.h;
+        } else {
+          if(this.vx>0)this.x=p.x-this.w;else this.x=p.x+p.w;this.vx=0;
+        }
+      }
+    }
+  }
   _colY(plats){for(const p of plats){if(p.type==='spike'||p.type==='_dead')continue;
     if(p.type==='trapdoor'&&this.vy<0)continue;
     if(this.overlaps(p)){
@@ -878,8 +913,10 @@ class Player{
     const dy=this.y-cam.y+this.h-FOOT_Y;
     const flip=this.facing===-1;
     const wf=this.state==='run'?this.walkT:(this.state==='idle'?Date.now()/800:0);
-    ctx.save();drawCorvan(dx,dy,S,flip,wf,this.activeTool);ctx.restore();
-    if(this.activeTool==='lanterna'){
+    // Prioridade visual: picareta > lanterna > coca
+    const _dispTool=this.activeTools.has('tupu')?'tupu':this.activeTools.has('picareta')?'picareta':this.activeTools.has('lanterna')?'lanterna':this.activeTools.has('coca')?'coca':null;
+    ctx.save();drawCorvan(dx,dy,S,flip,wf,_dispTool);ctx.restore();
+    if(this.activeTools.has('lanterna')){
       const gx=this.x-cam.x+(flip?-12:this.w+14),gy=this.y-cam.y+this.h*0.6;
       const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,120);
       lg.addColorStop(0,'rgba(255,210,80,0.28)');lg.addColorStop(1,'rgba(255,210,80,0)');
@@ -901,7 +938,7 @@ function drawBg(bgKey,dark=false){
     const iw=img.naturalWidth*sc, ih=img.naturalHeight*sc;
     ctx.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
   } else {
-    const fb={bg01:'#0a0e2a',bg02:'#1a0e08',bgext:'#0a0e2a',bgcena0102:'#0a0e2a'};
+    const fb={bg01:'#0a0e2a',bg02:'#1a0e08',bgext:'#0a0e2a',bgcena0102:'#0a0e2a',bgmina:'#1a0e08'};
     const grd=ctx.createLinearGradient(0,0,0,H);
     grd.addColorStop(0,fb[bgKey]||'#111');grd.addColorStop(1,'#050308');
     ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
@@ -911,7 +948,7 @@ function drawBg(bgKey,dark=false){
 }
 
 function drawDarkness(player){
-  if(player.activeTool!=='lanterna')return;
+  if(!player.activeTools.has('lanterna'))return;
   const px=player.x-cam.x+player.w/2,py=player.y-cam.y+player.h*0.5;
   const darkCanvas=document.createElement('canvas');darkCanvas.width=W;darkCanvas.height=H;
   const dc=darkCanvas.getContext('2d');
@@ -1088,14 +1125,15 @@ function buildL1(){
     new Trigger(3140,FL-200,120,200,'Entrar na Mina',(player,level)=>{
       if(!player.items.includes('picareta')){notify('Colete a Picareta primeiro!');return;}
       if(!player.items.includes('coca')){notify('Interaja com a Lhama para obter as Folhas de Coca!');return;}
+      if(level._enterFired)return; level._enterFired=true;
       player.interactAnim=40;sfx('unlock');
       showDialog([
-        '"Bem-vindo às alturas de Potosí, Bolívia — 4.090 metros de altitude. Esta é a Montanha Rica, o Cerro Rico."',
-        '"No tempo do Império Inca, a prata extraída aqui decorava templos sagrados. Com os espanhóis, tornou-se a maior fonte de prata do mundo colonial."',
-        '"Entre 1545 e 1825, estima-se que 45.000 toneladas de prata saíram daqui — mudando a economia global e financiando a Europa por séculos."',
-        '"As Folhas de Coca vão nos ajudar contra o Soroche lá dentro. Mas primeiro precisamos encontrar uma lanterna — está em algum lugar na mina!"'
+        '"Estamos na entrada do Cerro Rico — 4.090 metros de altitude. Aqui, entre 1545 e 1825, saíram 45.000 toneladas de prata que financiaram a Europa colonial."',
+        '"Lá dentro vou encontrar uma Lanterna abandonada nos primeiros metros — preciso equipá-la para enxergar os veios metálicos nas paredes."',
+        '"Os veios cinza-brilhantes são prata e estanho cristalizados. Com a Picareta, posso liberá-los das rochas vulcânicas sem fragmentar os cristais."',
+        '"No fundo da câmara mais profunda está um Tupu de Prata — fivela ornamental da nobreza Inca. Esse é meu objetivo. O Soroche vai aumentar lá dentro, uso a Coca quando a barra ficar vermelha. Vamos!"',
       ],()=>{notify('✦ Entrando na mina! Encontre a Lanterna lá dentro.');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
-    }),
+    },true),
   ];
   return{id:1,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
     title:'O Início em Potosí',
@@ -1111,7 +1149,15 @@ function buildL1(){
       '"Os Incas mineravam aqui há séculos antes dos espanhóis. Onde a prata era símbolo lunar dos deuses e não do comércio."',
       'Preciso encontrar a Picareta, interajir com a Lhama para obter as Folhas de Coca e entrar na mina!'
     ],
-    update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
+    update(player){
+      tickMoving(this.plats);tickTrapdoors(this.plats);
+      for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();
+      // Auto-entrada: ao chegar na entrada com os itens, dispara sem teclar E
+      const ent=this.triggers[0];
+      if(!ent.done && !G.dialog && player.items.includes('picareta') && player.items.includes('coca')){
+        if(player.x+player.w >= ent.x && player.x <= ent.x+ent.w+80) ent.fn(player,this);
+      }
+    },
     draw(player){
       drawStars();drawWind();
       drawMineEntrance(3200, FL);
@@ -1140,7 +1186,7 @@ function buildL1(){
           }
           if(!this.llama.gifted&&Math.abs(player.x-this.llama.x)<140){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
-            const t2='[E] Cumprimentar a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
+            const t2='[E] Interaja a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
             roundRect(lx-tw/2,ly-90,tw,24,4);ctx.fill();
             ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,ly-90,tw,24,4);ctx.stroke();
             ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,ly-73);ctx.textAlign='left';
@@ -1174,7 +1220,7 @@ function buildL2(){
     solid(620,FL-120,80,18),solid(1100,FL-140,80,18),
     movH(1800,FL-100,90,1800,1960,2.0),movH(2500,FL-120,90,2500,2640,1.8),
     trap(1540,FL-80,110),
-    spike(920,FL+8,80),spike(1680,FL+8,60),
+    spike(880,FL-18,80),spike(1760,FL-18,60),
   ];
   const veins=[
     new MineVein(440,FL-260,'prata'),
@@ -1189,11 +1235,12 @@ function buildL2(){
   const bats=[new Bat(600,FL-200,100),new Bat(1200,FL-180,90),new Bat(1900,FL-220,110),new Bat(2600,FL-200,100)];
   const triggers=[
     new Trigger(3100,FL-260,140,260,'Avançar para Cena 3',(player,level)=>{
-      if(!player.activeTool&&!player.items.includes('lanterna')){
+      if(player.activeTools.size===0&&!player.items.includes('lanterna')){
         notify('Encontre a Lanterna na mina antes de avançar!');return;
       }
       const vDone=level.veins.filter(v=>v.done).length;
       if(vDone<2){notify(`Mine mais veios de prata! (${vDone}/2)`);return;}
+      if(level._advanceFired)return; level._advanceFired=true;
       sfx('unlock');
       showDialog([
         '"Observe as paredes — esses veios cinza-brilhantes são prata. Ela se infiltrou em fendas rochosas junto com estanho durante atividade vulcânica."',
@@ -1201,18 +1248,28 @@ function buildL2(){
         '"As paredes desta mina têm 500 anos de marcas de picareta. Cada golpe é um registro da história dos trabalhadores mitayos — indígenas forçados a trabalhar aqui."',
         '"Vamos mais fundo. O Tupu de Prata está nos níveis mais baixos desta caverna. Não se esqueça de usar as folhas de coca se sentir o Soroche!"'
       ],()=>{notify('✦ Continue mais fundo na mina!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
-    }),
+    },true),
   ];
-  return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
+  return{id:2,bg:'bgmina',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
     title:'Geologia e Solo da Mina',
-    hint:'🔦 Ache a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Soroche aumenta!',
+    hint:'🔦 Pegue a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Cuidado! Soroche aumentando.',
     plats,bats,cols,triggers,veins,llama:null,
     intro:[
       '"Entramos na mina. Está escuro — mas há algo brilhando na entrada. Uma lanterna abandonada!"',
       '"Com a Lanterna em mãos, o caminho se ilumina. Os veios de prata nas paredes ficam visíveis."',
       'Pegue a 🔦 Lanterna, equipe-a no Diário [I] e use a ⛏ Picareta para minerar!'
     ],
-    update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const v of this.veins)v.tick();for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();},
+    update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const v of this.veins)v.tick();for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();
+      // Auto-avanço: ao chegar na área do trigger com os requisitos cumpridos, dispara sem teclar E
+      const adv=this.triggers[0];
+      if(!adv.done&&!G.dialog){
+        const hasLanterna=player.activeTools.size>0||player.items.includes('lanterna');
+        const vDone=this.veins.filter(v=>v.done).length;
+        if(hasLanterna&&vDone>=2&&player.x+player.w>=adv.x&&player.x<=adv.x+adv.w+80){
+          adv.fn(player,this);
+        }
+      }
+    },
     draw(player){
       drawMineDust();
       for(const v of this.veins)v.draw();
@@ -1224,37 +1281,44 @@ function buildL2(){
 function buildL3(){
   const FL=580,WW=3600,WH=900;
   const plats=[
-    solid(0,FL,280,WH-FL),solid(360,FL,180,WH-FL),solid(620,FL,160,WH-FL),
-    solid(880,FL,180,WH-FL),solid(1160,FL,180,WH-FL),solid(1440,FL,180,WH-FL),
-    solid(1720,FL,180,WH-FL),solid(2000,FL,200,WH-FL),solid(2280,FL,180,WH-FL),
-    solid(2560,FL,180,WH-FL),solid(2840,FL,200,WH-FL),solid(3120,FL,680,WH-FL),
-    solid(160,FL-200,120,18),solid(400,FL-260,110,18),solid(660,FL-200,110,18),
-    solid(940,FL-250,110,18),solid(1220,FL-200,120,18),solid(1500,FL-260,110,18),
-    solid(1780,FL-200,110,18),solid(2060,FL-250,120,18),solid(2340,FL-200,110,18),
-    solid(2620,FL-260,110,18),solid(2900,FL-200,120,18),
-    solid(280,FL-36,80,14),solid(540,FL-36,80,14),solid(800,FL-36,80,14),
-    solid(1080,FL-36,80,14),solid(1360,FL-36,80,14),solid(1640,FL-36,80,14),
-    solid(1920,FL-36,80,14),solid(2200,FL-36,80,14),solid(2480,FL-36,80,14),
-    solid(2760,FL-36,80,14),solid(3040,FL-36,80,14),
-    movH(500,FL-110,80,500,620,2.0),movH(1100,FL-130,80,1100,1200,1.8),
-    movH(1860,FL-110,80,1860,2000,2.2),movH(2580,FL-130,80,2580,2700,2.0),
-    trap(880,FL-80,110),trap(1720,FL-80,110),trap(2560,FL-80,100),
-    spike(620,FL+8,60),spike(1160,FL+8,60),spike(1960,FL+8,60),spike(2640,FL+8,60),
+    // Plataformas principais — gaps menores (max 100px), mais seguros
+    solid(0,FL,320,WH-FL),solid(420,FL,220,WH-FL),solid(700,FL,220,WH-FL),
+    solid(980,FL,220,WH-FL),solid(1260,FL,220,WH-FL),solid(1540,FL,220,WH-FL),
+    solid(1820,FL,220,WH-FL),solid(2100,FL,220,WH-FL),solid(2380,FL,220,WH-FL),
+    solid(2660,FL,220,WH-FL),solid(2940,FL,220,WH-FL),solid(3200,FL,600,WH-FL),
+    // Plataformas flutuantes — mais largas e menos escalonadas
+    solid(200,FL-200,140,18),solid(480,FL-240,130,18),solid(760,FL-200,130,18),
+    solid(1040,FL-240,130,18),solid(1320,FL-200,140,18),solid(1600,FL-240,130,18),
+    solid(1880,FL-200,130,18),solid(2160,FL-240,130,18),solid(2440,FL-200,130,18),
+    solid(2720,FL-240,130,18),solid(3000,FL-200,140,18),
+    // Pedras de passagem — mais largas
+    solid(320,FL-36,100,14),solid(600,FL-36,100,14),solid(880,FL-36,100,14),
+    solid(1160,FL-36,100,14),solid(1440,FL-36,100,14),solid(1720,FL-36,100,14),
+    solid(2000,FL-36,100,14),solid(2280,FL-36,100,14),solid(2560,FL-36,100,14),
+    solid(2840,FL-36,100,14),solid(3100,FL-36,100,14),
+    // 1 plataforma móvel lenta (não 4)
+    movH(1500,FL-110,100,1500,1640,1.2),
+    // 1 trapdoor apenas (não 3)
+    trap(2100,FL-80,120),
+    // 1 spike no único gap perigoso (não 4)
+    spike(1900,FL-18,60),
   ];
   const veins=[
-    new MineVein(400,FL-280,'prata'),
-    new MineVein(1000,FL-270,'prata'),
-    new MineVein(1740,FL-280,'prata'),
-    new MineVein(2400,FL-270,'estanho'),
+    new MineVein(480,FL-260,'prata'),
+    new MineVein(1040,FL-250,'prata'),
+    new MineVein(1880,FL-260,'prata'),
+    new MineVein(2440,FL-270,'estanho'),
   ];
-  const tupu={x:3180,y:FL-80,done:false};
+  const tupu={x:3260,y:FL-80,done:false};
   const cols=[
-    ...[80,200,380,640,900,1180,1460,1740,2020,2300,2580,2860,3060,3200].map(x=>new Col(x,FL-50,'prata')),
-    new Col(600,FL-90,'coca'),
-    new Col(1800,FL-90,'coca'),
+    ...[80,220,440,720,1000,1280,1560,1840,2120,2400,2680,2960,3080,3220].map(x=>new Col(x,FL-50,'prata')),
+    // 3 bolsas de coca bem distribuídas
+    new Col(500,FL-90,'coca'),
+    new Col(1320,FL-90,'coca'),
+    new Col(2440,FL-90,'coca'),
   ];
-  const bats=[new Bat(480,FL-220,90),new Bat(900,FL-200,80),new Bat(1360,FL-220,90),
-               new Bat(1800,FL-200,80),new Bat(2300,FL-220,90),new Bat(2800,FL-200,80)];
+  // Apenas 2 morcegos, posicionados longe dos pulos obrigatórios
+  const bats=[new Bat(700,FL-200,80),new Bat(2200,FL-200,80)];
   const triggers=[
     new Trigger(3240,FL-200,160,200,'Subir ao Exterior',(player,level)=>{
       if(!player.items.includes('tupu')){notify('Encontre o Tupu de Prata primeiro!');return;}
@@ -1269,7 +1333,7 @@ function buildL3(){
       ],()=>{level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
     }),
   ];
-  return{id:3,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
+  return{id:3,bg:'bgmina',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
     title:'A Coleta nas Câmaras Profundas',
     hint:'[E] nos veios de prata ⛏ | [E] para usar Coca 🌿 | Encontre o Tupu!',
     plats,bats,cols,triggers,veins,tupu,llama:null,
@@ -1304,45 +1368,163 @@ function buildL3(){
 }
 
 function buildL4(){
-  const FL=600,WW=2400,WH=900;
+  const FL=600,WW=1400,WH=900;
+  // Nível curto — Corvan sai da mina e caminha até o marco
   const plats=[
-    solid(0,FL,2400,WH-FL),
-    solid(200,FL-200,140,18),solid(420,FL-280,120,18),solid(660,FL-200,140,18),
-    solid(900,FL-260,120,18),solid(1140,FL-200,140,18),solid(1380,FL-280,120,18),
-    solid(1620,FL-200,140,18),solid(1860,FL-260,120,18),solid(2100,FL-200,140,18),
+    solid(0,FL,1400,WH-FL),           // chão contínuo, sem gaps
+    solid(300,FL-220,160,18),          // plataforma decorativa média
+    solid(700,FL-180,140,18),          // plataforma decorativa baixa
+    solid(1050,FL-240,140,18),         // plataforma próximo ao fim
   ];
   const cols=[
-    ...[80,260,500,740,980,1220,1460,1700,1940].map(x=>new Col(x,FL-50,'prata')),
+    ...[180,360,540,720,900,1080].map(x=>new Col(x,FL-50,'prata')),
   ];
+  // Estado de celebração do Corvan
+  const celebState={active:false,t:0};
+
   const triggers=[
-    new Trigger(2200,FL-200,160,200,'Completar Fase 1.1',(player,level)=>{
-      if(!player.items.includes('tupu')){notify('Volte e encontre o Tupu de Prata!');return;}
-      level.triggers[0].done=true;player.interactAnim=40;sfx('unlock');
-      showDialog([
-        '"Consegui! Este Tupu de Prata viajou séculos. A mineração excessiva deixou cicatrizes profundas nesta montanha — o Cerro Rico está oco por dentro."',
-        '"Como guardião, meu trabalho é extrair o conhecimento sem apagar a história. A prata, para os Incas, era arte e espiritualidade. Para os colonizadores, era poder."',
-        '"Esta diferença mudou o mundo: financiou guerras europeias, criou o sistema econômico global moderno e custou milhões de vidas indígenas e africanas escravizadas."',
-        '"Itens registrados no Diário de Bordo. Nossa próxima parada: a Serra Pelada, na Amazônia brasileira — onde o ouro esconde segredos igualmente profundos."',
-        '🏆 FASE 1.1 CONCLUÍDA! O Segredo de Potosí foi desvendado!'
-      ],()=>{unlockPhase('1.2');BUBBLE.active=false;G.dialog=false;G.state='complete';});
-    }),
+    new Trigger(1200,FL-200,140,200,'Concluir Fase 1.1',(player,level)=>{
+      if(!player.items.includes('tupu')){notify('Volte à mina e encontre o Tupu de Prata!');return;}
+      if(level._finFired)return; level._finFired=true;
+      level.triggers[0].done=true;
+      player.activeTools.clear(); player.activeTools.add('tupu');
+      celebState.active=true;
+      celebState.t=0;
+      sfx('unlock');
+      // Partículas de celebração
+      for(let i=0;i<20;i++) burst(player.x+20,player.y,'#c0c8d8',2,5+Math.random()*3);
+      for(let i=0;i<12;i++) burst(player.x+20,player.y,'#e0b840',1,4+Math.random()*3);
+      player.interactAnim=60;
+      setTimeout(()=>{
+        showDialog([
+          '"Consegui! Este Tupu de Prata tem séculos. A mineração excessiva deixou cicatrizes profundas nesta montanha — o Cerro Rico está oco por dentro."',
+          '"Como guardião, meu trabalho é extrair o conhecimento sem apagar a história. A prata, para os Incas, era arte e espiritualidade. Para os colonizadores, era poder."',
+          '"Esta diferença mudou o mundo: financiou guerras europeias, criou o sistema econômico global moderno e custou milhões de vidas indígenas e africanas escravizadas."',
+          '"Itens registrados no Diário de Bordo. Nossa próxima parada: a Serra Pelada, na Amazônia brasileira — onde o ouro esconde segredos igualmente profundos."',
+        ],()=>{
+          unlockPhase('1.2');
+          BUBBLE.active=false;G.dialog=false;
+          // Mantém sessão para o menu não limpar o localStorage ao voltar
+          try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+          G.state='complete';
+        });
+      },1200);
+    },true),   // auto=true → sem label [E]
   ];
-  return{id:4,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
+
+  return{id:4,bg:'bgcena0102',W:WW,H:WH,startX:105,startY:FL-90,underground:false,
     title:'A Saída de Potosí',
-    hint:'Chegue ao marco final para concluir a Fase 1.1!',
-    plats,bats:[],cols,triggers,veins:[],llama:null,
+    hint(player){return player.items.includes('tupu')?'✦ Chegue ao marco final para concluir!':'← Retorne à mina e encontre o Tupu de Prata!';},
+    plats,bats:[],cols,triggers,veins:[],llama:null,celebState,
     intro:[
-      '"Conseguimos o Tupu de Prata! O céu de Potosí está estrelado — a altitude torna as estrelas mais brilhantes."',
-      '"A Fase 1.1 está quase completa, saia da mina para registrar todas as descobertas!"'
+      '"Corvan emerge da mina segurando o Tupu de Prata. O céu de Potosí está estrelado — a altitude torna as estrelas mais brilhantes."',
+      '"Chegue ao marco dourado para registrar todas as descobertas e concluir a Fase 1.1!"',
     ],
-    update(player){for(const c of this.cols)c.tick();},
+    update(player){
+      for(const c of this.cols)c.tick();
+      if(this.celebState.active) this.celebState.t+=0.06;
+      // Auto-conclusão: ao cruzar o marco, finaliza sem teclar E
+      const fim=this.triggers[0];
+      if(!fim.done && !G.dialog && player.items.includes('tupu')){
+        if(player.x+player.w >= fim.x && player.x <= fim.x+fim.w+60){
+          fim.fn(player,this);
+        }
+      }
+    },
     draw(player){
       drawStars();drawWind();
-      const fx=2240-cam.x,fy=FL-cam.y;
-      ctx.fillStyle='#8a6030';ctx.fillRect(fx,fy-120,4,120);
-      ctx.fillStyle='#c8a020';ctx.fillRect(fx+4,fy-120,40,24);
-      ctx.fillStyle='#fff';ctx.font='bold 11px "Courier New"';ctx.fillText('FIM',fx+8,fy-103);
-      for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
+
+      // Entrada da mina encostada no canto esquerdo (saída) — bx=0 com worldX=110
+      drawMineEntrance(110, FL);
+
+      // Marco final dourado
+      const fx=1240-cam.x, fy=FL-cam.y;
+      ctx.fillStyle='#7a5020';ctx.fillRect(fx,fy-160,5,160);
+      // Bandeira animada
+      const flagWave=Math.sin(Date.now()/300)*4;
+      ctx.fillStyle='#c8a020';
+      ctx.beginPath();
+      ctx.moveTo(fx+5,fy-158);
+      ctx.lineTo(fx+55,fy-145+flagWave);
+      ctx.lineTo(fx+5,fy-128);
+      ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#e0c040';ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(fx+5,fy-158);
+      ctx.lineTo(fx+55,fy-145+flagWave);
+      ctx.lineTo(fx+5,fy-128);
+      ctx.stroke();
+      // Texto na bandeira
+      ctx.save();ctx.translate(fx+28,fy-143+flagWave*0.5);ctx.rotate(flagWave*0.01);
+      ctx.font='bold 10px "Courier New"';ctx.fillStyle='#3a1808';
+      ctx.textAlign='center';ctx.fillText('FIM',0,4);ctx.textAlign='left';
+      ctx.restore();
+      // Brilho ao redor do marco
+      const mg=ctx.createRadialGradient(fx+30,fy-80,5,fx+30,fy-80,60);
+      mg.addColorStop(0,'rgba(200,160,40,0.18)');mg.addColorStop(1,'rgba(200,160,40,0)');
+      ctx.fillStyle=mg;ctx.fillRect(fx-30,fy-140,120,160);
+
+      // Tupu sempre visível na Cena 4 — sutil durante caminhada, exuberante na celebração
+      if(player.items.includes('tupu')){
+        const now=Date.now()/1000;
+        const px=player.x-cam.x+20, py=player.y-cam.y;
+        if(this.celebState.active){
+          // Celebração completa: grande, girando, estrelinhas
+          const t=this.celebState.t;
+          const tg=ctx.createRadialGradient(px,py-70,0,px,py-70,70);
+          tg.addColorStop(0,`rgba(192,200,216,${0.35+Math.sin(t*3)*0.15})`);
+          tg.addColorStop(1,'rgba(192,200,216,0)');
+          ctx.fillStyle=tg;ctx.fillRect(px-70,py-140,140,140);
+          ctx.save();
+          ctx.translate(px, py-70+Math.sin(t*2)*10);
+          ctx.rotate(Math.sin(t*1.5)*0.3);
+          ctx.scale(2.8,2.8);
+          drawTupu(0,0,t);
+          ctx.restore();
+          for(let i=0;i<8;i++){
+            const a=t*0.9+i*(Math.PI*2/8);
+            const sr=40+Math.sin(t*2+i)*8;
+            const sx2=px+Math.cos(a)*sr, sy2=py-70+Math.sin(a)*sr;
+            const sa=0.5+Math.abs(Math.sin(t*2.5+i))*0.5;
+            ctx.fillStyle=`rgba(200,160,40,${sa})`;
+            ctx.font='13px serif';ctx.textAlign='center';
+            ctx.fillText('✦',sx2,sy2);ctx.textAlign='left';
+          }
+          const la=0.7+Math.sin(t*3)*0.3;
+          ctx.font='bold 12px "Courier New"';
+          const lw=ctx.measureText('✦ TUPU DE PRATA ✦').width+16;
+          ctx.fillStyle=`rgba(8,4,0,${la*0.88})`;
+          roundRect(px-lw/2,py-112,lw,20,4);ctx.fill();
+          ctx.strokeStyle=`rgba(192,200,216,${la})`;ctx.lineWidth=1.2;
+          roundRect(px-lw/2,py-112,lw,20,4);ctx.stroke();
+          ctx.fillStyle=`rgba(210,220,240,${la})`;
+          ctx.textAlign='center';ctx.fillText('✦ TUPU DE PRATA ✦',px,py-97);ctx.textAlign='left';
+        } else {
+          // Caminhando: Tupu pequeno e suave, balançando
+          const bob=Math.sin(now*2)*5;
+          const pulse=0.55+Math.sin(now*2.5)*0.2;
+          const tg2=ctx.createRadialGradient(px,py-52+bob,0,px,py-52+bob,28);
+          tg2.addColorStop(0,`rgba(192,200,216,${pulse*0.5})`);
+          tg2.addColorStop(1,'rgba(192,200,216,0)');
+          ctx.fillStyle=tg2;ctx.fillRect(px-28,py-80+bob,56,56);
+          ctx.save();
+          ctx.translate(px, py-52+bob);
+          ctx.rotate(Math.sin(now*1.2)*0.12);
+          ctx.scale(1.6,1.6);
+          drawTupu(0,0,now);
+          ctx.restore();
+          if(Math.random()<0.12){
+            particles.push({
+              x:player.x+20+(Math.random()-0.5)*20,
+              y:player.y-52+bob*0.6,
+              vx:(Math.random()-0.5)*0.8,vy:-0.8-Math.random()*0.8,
+              life:35,max:35,color:'rgba(192,200,216,0.7)',r:1.8
+            });
+          }
+        }
+      }
+      for(const c of this.cols)c.draw(player.x,player.y);
+      for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1426,7 +1608,7 @@ function drawHUD(player,level){
     ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
     tools.forEach((t,i)=>{
       const ty=PY+PH_BASE+8+i*22;
-      const equipped=player.activeTool===t.id;
+      const equipped=player.activeTools.has(t.id);
       ctx.textAlign='center';
       ctx.font='11px serif';ctx.fillStyle=equipped?'#f0c040':'#a08040';
       ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
@@ -1456,7 +1638,7 @@ function drawHUD(player,level){
 
   // Hint rodapé
   const hintText=typeof level.hint==='function'?level.hint(player):level.hint;
-  ctx.fillStyle='rgba(210,185,80,.7)';ctx.font='12px "Courier New"';
+  ctx.fillStyle='#b0b0c8';ctx.font='18px "Courier New"';
   ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
 }
 
@@ -1484,8 +1666,8 @@ function drawTitle(){
 
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';
-  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,494);
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
   ctx.fillText('[M] Voltar ao Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1522,19 +1704,24 @@ function drawComplete(){
   ctx.fillStyle='rgba(220,185,80,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,400);
   ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◆ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
   ctx.fillStyle=`rgba(220,185,80,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('Pressione ENTER para voltar ao início',W/2,458);ctx.textAlign='left';
+  ctx.fillText('✦ Fase 1.2 desbloqueada!   ENTER → Voltar ao Menu',W/2,458);ctx.textAlign='left';
 }
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
-  dialog:false,deaths:0,timeOnLevel:0,_storedItems:[],_storedScore:0,_storedTool:null,
+  dialog:false,deaths:0,timeOnLevel:0,_storedItems:[],_storedScore:0,_storedTools:[],
   load(idx){
     this.lvIdx=idx;particles=[];
     tileTheme=TILE_THEMES[idx+1]||TILE_THEMES[1];
     this.level=LEVELS[idx]();cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
-    if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
+    if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTools=new Set(this._storedTools||[]);}
+    // Cena 4 (saída da mina): Corvan sai já segurando o Tupu de Prata
+    if(idx===3 && this.player.items.includes('tupu')){
+      this.player.activeTools.clear();
+      this.player.activeTools.add('tupu');
+    }
     this.dialog=false;this.state='playing';this.timeOnLevel=0;
     BUBBLE.active=false;popup.active=false;
     for(const k in jp)delete jp[k];
@@ -1572,7 +1759,10 @@ function loop(){
   requestAnimationFrame(loop);
   if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
   if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
-  if(G.state==='complete' &&jp['Enter']){G.deaths=0;G._storedItems=[];G._storedScore=0;G.state='title';}
+  if(G.state==='complete' &&jp['Enter']){
+    G.deaths=0;G._storedItems=[];G._storedScore=0;
+    window.location.href='../../MenuPrincipal/index.html?unlocked=1.2';
+  }
   G.update();G.draw();clearJP();
 }
 
