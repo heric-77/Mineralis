@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="194"
+   height="166"
+   viewBox="0 0 194 166"
+   role="img"
+   version="1.1"
+   id="svg35"
+   sodipodi:docname="Placa_de_Reivindicacao.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs35" />
+  <sodipodi:namedview
+     id="namedview35"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="4.7168675"
+     inkscape:cx="96.992337"
+     inkscape:cy="83"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg35" />
+  <title
+     id="title1">Placa de Reivindicação — Mineralis Fase 2.1</title>
+  <desc
+     id="desc1">Item da Fase 2.1: Mining Claim Plate — artefato histórico da Corrida do Ouro de 1849</desc>
+  <!-- ═══ HEADER ═══ -->
+  <rect
+     x="0"
+     y="0"
+     width="194"
+     height="32"
+     rx="8"
+     fill="#5A3C18"
+     id="rect1" />
+  <!-- square off bottom corners of header -->
+  <rect
+     x="0"
+     y="22"
+     width="194"
+     height="10"
+     fill="#5A3C18"
+     id="rect2" />
+  <text
+     x="97"
+     y="14"
+     text-anchor="middle"
+     font-family="Georgia,serif"
+     font-size="9.5"
+     fill="#D4A850"
+     font-weight="bold"
+     id="text2">Placa de Reivindicação</text>
+  <!-- ═══ ROPE LOOP (hanging hole at top center) ═══ -->
+  <!-- Loop shadow -->
+  <ellipse
+     cx="97"
+     cy="47"
+     rx="10"
+     ry="7"
+     fill="#3A2008"
+     id="ellipse3" />
+  <!-- Rope oval -->
+  <ellipse
+     cx="97"
+     cy="46"
+     rx="8"
+     ry="5.5"
+     fill="#5A3A18"
+     id="ellipse4" />
+  <!-- Rope inner hole -->
+  <ellipse
+     cx="97"
+     cy="34"
+     rx="5"
+     ry="3"
+     fill="#1e1008"
+     id="ellipse5" />
+  <!-- Rope texture highlight -->
+  <ellipse
+     cx="95"
+     cy="33"
+     rx="2"
+     ry="1.2"
+     fill="#7a5230"
+     opacity="0.7"
+     id="ellipse6" />
+  <!-- ═══ PLAQUE BODY (nested rects — wood depth effect) ═══ -->
+  <!-- Outer shadow/frame -->
+  <rect
+     x="14"
+     y="42"
+     width="166"
+     height="100"
+     rx="7"
+     fill="#3a1e08"
+     id="rect6" />
+  <!-- Dark wood edge -->
+  <rect
+     x="17"
+     y="45"
+     width="160"
+     height="94"
+     rx="6"
+     fill="#5a3010"
+     id="rect7" />
+  <!-- Mid wood -->
+  <rect
+     x="20"
+     y="48"
+     width="154"
+     height="88"
+     rx="5"
+     fill="#7a4820"
+     id="rect8" />
+  <!-- Main surface -->
+  <rect
+     x="23"
+     y="51"
+     width="148"
+     height="82"
+     rx="4"
+     fill="#9a6030"
+     id="rect9" />
+  <!-- Inner lighter surface (worn center) -->
+  <rect
+     x="26"
+     y="54"
+     width="142"
+     height="76"
+     rx="3"
+     fill="#b07840"
+     id="rect10" />
+  <!-- ═══ WOOD GRAIN LINES (horizontal, subtle) ═══ -->
+  <line
+     x1="28"
+     y1="62"
+     x2="166"
+     y2="62"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line10" />
+  <line
+     x1="28"
+     y1="70"
+     x2="166"
+     y2="70"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line11" />
+  <line
+     x1="28"
+     y1="78"
+     x2="166"
+     y2="78"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line12" />
+  <line
+     x1="28"
+     y1="86"
+     x2="166"
+     y2="86"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line13" />
+  <line
+     x1="28"
+     y1="94"
+     x2="166"
+     y2="94"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line14" />
+  <line
+     x1="28"
+     y1="102"
+     x2="166"
+     y2="102"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line15" />
+  <line
+     x1="28"
+     y1="110"
+     x2="166"
+     y2="110"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line16" />
+  <line
+     x1="28"
+     y1="118"
+     x2="166"
+     y2="118"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line17" />
+  <line
+     x1="28"
+     y1="126"
+     x2="166"
+     y2="126"
+     stroke="#9a6830"
+     stroke-width="0.8"
+     stroke-linecap="round"
+     opacity="0.7"
+     id="line18" />
+  <!-- ═══ NAIL HOLES (4 corners) ═══ -->
+  <!-- Top-left -->
+  <circle
+     cx="34"
+     cy="60"
+     r="4"
+     fill="#3a1c08"
+     id="circle18" />
+  <circle
+     cx="34"
+     cy="60"
+     r="2.5"
+     fill="#221008"
+     id="circle19" />
+  <circle
+     cx="33"
+     cy="59"
+     r="1"
+     fill="#6a4028"
+     opacity="0.8"
+     id="circle20" />
+  <!-- Top-right -->
+  <circle
+     cx="160"
+     cy="60"
+     r="4"
+     fill="#3a1c08"
+     id="circle21" />
+  <circle
+     cx="160"
+     cy="60"
+     r="2.5"
+     fill="#221008"
+     id="circle22" />
+  <circle
+     cx="159"
+     cy="59"
+     r="1"
+     fill="#6a4028"
+     opacity="0.8"
+     id="circle23" />
+  <!-- Bottom-left -->
+  <circle
+     cx="34"
+     cy="126"
+     r="4"
+     fill="#3a1c08"
+     id="circle24" />
+  <circle
+     cx="34"
+     cy="126"
+     r="2.5"
+     fill="#221008"
+     id="circle25" />
+  <circle
+     cx="33"
+     cy="125"
+     r="1"
+     fill="#6a4028"
+     opacity="0.8"
+     id="circle26" />
+  <!-- Bottom-right -->
+  <circle
+     cx="160"
+     cy="126"
+     r="4"
+     fill="#3a1c08"
+     id="circle27" />
+  <circle
+     cx="160"
+     cy="126"
+     r="2.5"
+     fill="#221008"
+     id="circle28" />
+  <circle
+     cx="159"
+     cy="125"
+     r="1"
+     fill="#6a4028"
+     opacity="0.8"
+     id="circle29" />
+  <!-- ═══ ENGRAVED TEXT CONTENT ═══ -->
+  <!-- Title block -->
+  <text
+     x="97"
+     y="72"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="9.5px"
+     fill="#3e1a06"
+     font-weight="bold"
+     id="text29">MINING CLAIM</text>
+  <text
+     x="97"
+     y="84"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="10px"
+     fill="#3e1a06"
+     font-weight="bold"
+     id="text30">Nº 4821</text>
+  <!-- Divider rule -->
+  <line
+     x1="40"
+     y1="89"
+     x2="154"
+     y2="89"
+     stroke="#7a4820"
+     stroke-width="1"
+     id="line30" />
+  <!-- Claimant info -->
+  <text
+     x="97"
+     y="99"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="8.5px"
+     fill="#4a2408"
+     id="text31">J. W. Douglas</text>
+  <text
+     x="97"
+     y="109"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="8px"
+     fill="#4a2408"
+     id="text32">American River, CA</text>
+  <text
+     x="97"
+     y="118"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="8px"
+     fill="#4a2408"
+     id="text33">Janeiro, 1849</text>
+  <!-- Bottom rule -->
+  <line
+     x1="40"
+     y1="123"
+     x2="154"
+     y2="123"
+     stroke="#7a4820"
+     stroke-width="0.8"
+     id="line33" />
+  <!-- Coordinates -->
+  <text
+     x="97"
+     y="131"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="7.5px"
+     fill="#5a3018"
+     id="text34">38°32'N 121°05'O</text>
+  <!-- ═══ BOTTOM INFO ═══ -->
+  <line
+     x1="14"
+     y1="139"
+     x2="180"
+     y2="139"
+     stroke="#4a3018"
+     stroke-width="0.8"
+     id="line34" />
+  <text
+     x="97"
+     y="161"
+     text-anchor="middle"
+     font-family="Georgia,serif"
+     font-size="8"
+     fill="#7A5830"
+     id="text35">Cena 3 · Artefato Histórico</text>
+</svg>

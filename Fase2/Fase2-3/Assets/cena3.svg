@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1456" height="839" viewBox="0 0 1456 839" version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="basalt" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#1C1E22"/>
+      <rect width="64" height="1" fill="#141618"/>
+      <rect y="10" width="64" height="1" fill="#141618"/>
+      <rect width="1" height="10" fill="#141618"/>
+      <rect x="63" width="1" height="10" fill="#141618"/>
+      <rect x="32" y="10" width="1" height="10" fill="#141618"/>
+    </pattern>
+    <pattern id="basaltMid" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#181A1E"/>
+      <rect width="64" height="1" fill="#101214"/>
+      <rect y="10" width="64" height="1" fill="#101214"/>
+      <rect width="1" height="10" fill="#101214"/>
+      <rect x="63" width="1" height="10" fill="#101214"/>
+      <rect x="32" y="10" width="1" height="10" fill="#101214"/>
+    </pattern>
+    <pattern id="basaltDeep" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#141416"/>
+      <rect width="64" height="1" fill="#0C0C0E"/>
+      <rect y="10" width="64" height="1" fill="#0C0C0E"/>
+      <rect width="1" height="10" fill="#0C0C0E"/>
+      <rect x="63" width="1" height="10" fill="#0C0C0E"/>
+      <rect x="32" y="10" width="1" height="10" fill="#0C0C0E"/>
+    </pattern>
+  </defs>
+
+  <!-- ===== SKY: BRIGHT COLD DAY - clear steel blue over Lake Superior ===== -->
+  <rect x="0" y="0" width="1456" height="839" fill="#1E3448"/>
+  <rect x="0" y="0" width="1456" height="70" fill="#1A2C3E"/>
+  <rect x="0" y="52" width="1456" height="88" fill="#1E3040"/>
+  <rect x="0" y="124" width="1456" height="88" fill="#243648"/>
+  <rect x="0" y="196" width="1456" height="80" fill="#2C3E50"/>
+  <rect x="0" y="264" width="1456" height="74" fill="#344858"/>
+  <rect x="0" y="322" width="1456" height="68" fill="#3C5060"/>
+  <rect x="0" y="374" width="1456" height="60" fill="#445868"/>
+  <rect x="0" y="420" width="1456" height="52" fill="#4C6070"/>
+  <rect x="0" y="458" width="1456" height="44" fill="#546878"/>
+
+  <!-- SUN - higher in sky, daytime, cold white-gold -->
+  <ellipse cx="1100" cy="160" rx="52" ry="44" fill="#C8D4D8" fill-opacity="0.35"/>
+  <ellipse cx="1100" cy="160" rx="36" ry="30" fill="#D4DDE0" fill-opacity="0.45"/>
+  <ellipse cx="1100" cy="160" rx="22" ry="18" fill="#E0E8EC" fill-opacity="0.60"/>
+
+  <!-- LIGHT MIST streaks - thinner than scene 1 (mid day) -->
+  <ellipse cx="300" cy="472" rx="500" ry="25" fill="#A0B8C8" fill-opacity="0.14"/>
+  <ellipse cx="1050" cy="480" rx="400" ry="20" fill="#A8C0D0" fill-opacity="0.12"/>
+  <ellipse cx="728" cy="492" rx="700" ry="18" fill="#B0C8D4" fill-opacity="0.10"/>
+
+  <!-- LAKE SURFACE - mid scene, flat dark steel-blue -->
+  <rect x="0" y="500" width="1456" height="70" fill="#1C2C3C"/>
+  <rect x="0" y="514" width="1456" height="44" fill="#1A2838"/>
+  <!-- Water pixel ripples -->
+  <rect x="0" y="522" width="1456" height="2" fill="#253444" fill-opacity="0.8"/>
+  <rect x="0" y="530" width="1456" height="2" fill="#243040" fill-opacity="0.7"/>
+  <rect x="0" y="538" width="1456" height="2" fill="#222C3C" fill-opacity="0.6"/>
+  <rect x="0" y="546" width="1456" height="2" fill="#202838" fill-opacity="0.5"/>
+  <!-- Bright water glints from sun -->
+  <rect x="1060" y="520" width="6" height="2" fill="#8098A8" fill-opacity="0.5"/>
+  <rect x="1080" y="526" width="4" height="2" fill="#809098" fill-opacity="0.45"/>
+  <rect x="1020" y="530" width="8" height="2" fill="#7090A0" fill-opacity="0.4"/>
+  <rect x="1140" y="524" width="5" height="2" fill="#8098A8" fill-opacity="0.4"/>
+
+  <!-- MAIN GROUND / ROCKY SHORE -->
+  <rect x="0" y="570" width="1456" height="269" fill="url(#basalt)"/>
+  <rect x="0" y="570" width="1456" height="4" fill="#30343A"/>
+
+  <!-- ===== CLOSE-UP BASALT WALL - the main scene feature ===== -->
+  <!-- This scene shows the rock face UP CLOSE for collection mechanic -->
+  <!-- Large basalt face - back wall of scene, takes up much of screen -->
+  <rect x="280" y="310" width="880" height="268" fill="#181A1E" rx="3"/>
+  <rect x="300" y="296" width="840" height="40" fill="#161820" rx="2"/>
+  <rect x="320" y="284" width="800" height="28" fill="#14161C" rx="2"/>
+
+  <!-- Horizontal crack lines in basalt wall (geological layers) -->
+  <rect x="280" y="380" width="880" height="2" fill="#0E1014"/>
+  <rect x="280" y="420" width="880" height="2" fill="#0E1014"/>
+  <rect x="280" y="460" width="880" height="2" fill="#0E1014"/>
+  <rect x="280" y="500" width="880" height="1" fill="#0E1014"/>
+
+  <!-- Vertical crack lines -->
+  <rect x="440" y="310" width="1" height="268" fill="#0C0E12"/>
+  <rect x="600" y="296" width="1" height="282" fill="#0C0E12"/>
+  <rect x="760" y="310" width="1" height="268" fill="#0C0E12"/>
+  <rect x="930" y="310" width="1" height="268" fill="#0C0E12"/>
+
+  <!-- ===== COPPER VEINS - multiple mining targets ===== -->
+  <!-- Orange/red vein clusters - scattered across the wall -->
+
+  <!-- Cluster A - left section (active mining spot) -->
+  <rect x="340" y="320" width="6" height="80" fill="#C05228" transform="rotate(-8,340,320)"/>
+  <rect x="346" y="322" width="4" height="75" fill="#D06030" transform="rotate(-8,346,322)"/>
+  <rect x="340" y="356" width="60" height="4" fill="#B84A20" fill-opacity="0.7"/>
+  <rect x="340" y="360" width="60" height="2" fill="#C85828" fill-opacity="0.6"/>
+  <!-- Copper nodule cluster A -->
+  <ellipse cx="360" cy="348" rx="16" ry="10" fill="#D06830" fill-opacity="0.85"/>
+  <ellipse cx="360" cy="348" rx="10" ry="6" fill="#E07840" fill-opacity="0.9"/>
+  <ellipse cx="360" cy="348" rx="5" ry="3" fill="#F08848" fill-opacity="0.95"/>
+  <!-- Fracture marks from hammering -->
+  <rect x="344" y="368" width="30" height="1" fill="#0A0C10"/>
+  <rect x="350" y="372" width="20" height="1" fill="#0A0C10"/>
+
+  <!-- Cluster B - center (rich deposit) -->
+  <rect x="590" y="312" width="7" height="100" fill="#C85A2A"/>
+  <rect x="596" y="316" width="5" height="92" fill="#D86432"/>
+  <rect x="620" y="316" width="6" height="95" fill="#C05228" transform="rotate(5,620,316)"/>
+  <rect x="570" y="400" width="100" height="5" fill="#B84820" fill-opacity="0.75"/>
+  <rect x="570" y="405" width="100" height="3" fill="#C85028" fill-opacity="0.6"/>
+  <!-- Copper nodule B - largest deposit -->
+  <ellipse cx="618" cy="360" rx="22" ry="14" fill="#D86A32" fill-opacity="0.85"/>
+  <ellipse cx="618" cy="360" rx="14" ry="9" fill="#E87A3C" fill-opacity="0.9"/>
+  <ellipse cx="618" cy="360" rx="7" ry="4" fill="#F88E48" fill-opacity="0.95"/>
+  <!-- Smaller nearby nodules -->
+  <ellipse cx="648" cy="388" rx="10" ry="6" fill="#D06030" fill-opacity="0.8"/>
+  <ellipse cx="590" cy="376" rx="8" ry="5" fill="#C85828" fill-opacity="0.8"/>
+
+  <!-- Cluster C - right-center -->
+  <rect x="790" y="328" width="5" height="85" fill="#B85028" transform="rotate(-5,790,328)"/>
+  <rect x="795" y="330" width="4" height="78" fill="#C85830" transform="rotate(-5,795,330)"/>
+  <rect x="780" y="430" width="80" height="4" fill="#B04820" fill-opacity="0.65"/>
+  <!-- Copper nodule C -->
+  <ellipse cx="812" cy="390" rx="14" ry="9" fill="#CE6030" fill-opacity="0.8"/>
+  <ellipse cx="812" cy="390" rx="8" ry="5" fill="#DE7038" fill-opacity="0.9"/>
+
+  <!-- Cluster D - far right -->
+  <rect x="980" y="318" width="6" height="92" fill="#C25228" transform="rotate(7,980,318)"/>
+  <rect x="985" y="322" width="4" height="86" fill="#D25E30" transform="rotate(7,985,322)"/>
+  <!-- Copper nodule D -->
+  <ellipse cx="1000" cy="370" rx="12" ry="8" fill="#CC5C2C" fill-opacity="0.82"/>
+  <ellipse cx="1000" cy="370" rx="7" ry="4" fill="#DC6C36" fill-opacity="0.9"/>
+
+  <!-- CALCITE DECOYS (white/pale mineral imitators) -->
+  <!-- These look superficially like copper but are white/cream -->
+  <ellipse cx="410" cy="450" rx="14" ry="8" fill="#C8C0A8" fill-opacity="0.8"/>
+  <ellipse cx="410" cy="450" rx="8" ry="5" fill="#D8D0B8" fill-opacity="0.9"/>
+  <!-- Calcite B -->
+  <ellipse cx="700" cy="480" rx="12" ry="7" fill="#C0B898" fill-opacity="0.8"/>
+  <ellipse cx="700" cy="480" rx="7" ry="4" fill="#D0C8A8" fill-opacity="0.9"/>
+  <!-- Calcite C -->
+  <ellipse cx="880" cy="445" rx="10" ry="6" fill="#C8C0A8" fill-opacity="0.78"/>
+
+  <!-- FALLEN ROCK CHIPS on ground (evidence of hammering) -->
+  <rect x="330" y="572" width="18" height="8" fill="#1A1C20" transform="rotate(-15,330,572)"/>
+  <rect x="356" y="576" width="12" height="6" fill="#181A1E" transform="rotate(10,356,576)"/>
+  <rect x="600" y="572" width="20" height="9" fill="#1A1C22" transform="rotate(-8,600,572)"/>
+  <rect x="628" y="578" width="14" height="7" fill="#181A1E" transform="rotate(12,628,578)"/>
+  <rect x="800" y="574" width="16" height="7" fill="#1A1C20" transform="rotate(-20,800,574)"/>
+
+  <!-- COPPER FRAGMENTS already extracted - small shiny pieces -->
+  <ellipse cx="370" cy="590" rx="7" ry="4" fill="#D06830" fill-opacity="0.9"/>
+  <ellipse cx="385" cy="586" rx="5" ry="3" fill="#E07840" fill-opacity="0.9"/>
+  <ellipse cx="635" cy="588" rx="6" ry="3" fill="#C85830" fill-opacity="0.9"/>
+
+  <!-- PINE FOREST - both sides framing the wall -->
+  <!-- Left trees -->
+  <rect x="0" y="450" width="9" height="130" fill="#0E1214"/>
+  <polygon points="0,356 50,452 -50,452" fill="#0C1012"/>
+  <polygon points="4,388 48,452 -40,452" fill="#0E1214"/>
+  <polygon points="8,420 46,452 -30,452" fill="#0A1010"/>
+
+  <rect x="70" y="462" width="8" height="118" fill="#0E1214"/>
+  <polygon points="70,372 114,464 26,464" fill="#0C1012"/>
+  <polygon points="74,402 112,464 32,464" fill="#0E1214"/>
+
+  <rect x="155" y="468" width="8" height="112" fill="#0E1214"/>
+  <polygon points="155,380 198,470 112,470" fill="#0C1012"/>
+  <polygon points="159,410 196,470 118,470" fill="#0E1214"/>
+
+  <!-- Right trees -->
+  <rect x="1390" y="448" width="9" height="132" fill="#0E1214"/>
+  <polygon points="1390,354 1440,450 1340,450" fill="#0C1012"/>
+  <polygon points="1394,386 1438,450 1346,450" fill="#0E1214"/>
+  <polygon points="1398,418 1436,450 1352,450" fill="#0A1010"/>
+
+  <rect x="1316" y="460" width="8" height="120" fill="#0E1214"/>
+  <polygon points="1316,370 1360,462 1272,462" fill="#0C1012"/>
+  <polygon points="1320,400 1358,462 1278,462" fill="#0E1214"/>
+
+  <rect x="1236" y="466" width="8" height="114" fill="#0E1214"/>
+  <polygon points="1236,378 1278,468 1194,468" fill="#0C1012"/>
+  <polygon points="1240,408 1276,468 1200,468" fill="#0E1214"/>
+
+  <!-- GEOLOGICAL STRATA ON GROUND -->
+  <rect x="0" y="690" width="1456" height="24" fill="#1E2024"/>
+  <rect x="0" y="690" width="1456" height="3" fill="#2E3236"/>
+  <!-- Thin copper layer in cross-section -->
+  <rect x="0" y="702" width="1456" height="3" fill="#8C2E0C" fill-opacity="0.7"/>
+  <rect x="0" y="704" width="1456" height="2" fill="#A83E18" fill-opacity="0.5"/>
+  <rect x="0" y="714" width="1456" height="28" fill="url(#basaltMid)"/>
+  <rect x="0" y="742" width="1456" height="97" fill="url(#basaltDeep)"/>
+
+  <!-- PLATFORM LEDGES -->
+  <!-- Left ledge -->
+  <rect x="0" y="556" width="140" height="16" fill="#1E2228"/>
+  <rect x="0" y="556" width="140" height="3" fill="#2E3238"/>
+  <!-- Center-left ledge -->
+  <rect x="280" y="578" width="1" height="1" fill="none"/><!-- marker -->
+  <!-- Ground platform at wall base, playfield -->
+  <rect x="280" y="574" width="880" height="12" fill="#222630"/>
+  <rect x="280" y="574" width="880" height="2" fill="#343840"/>
+  <!-- Right ledge -->
+  <rect x="1316" y="554" width="140" height="16" fill="#1E2228"/>
+  <rect x="1316" y="554" width="140" height="3" fill="#2E3238"/>
+  <!-- Elevated platform mid-left -->
+  <rect x="100" y="510" width="160" height="14" fill="#1E2228"/>
+  <rect x="100" y="510" width="160" height="3" fill="#2E3238"/>
+  <!-- Elevated platform mid-right -->
+  <rect x="1196" y="508" width="160" height="14" fill="#1E2228"/>
+  <rect x="1196" y="508" width="160" height="3" fill="#2E3238"/>
+</svg>

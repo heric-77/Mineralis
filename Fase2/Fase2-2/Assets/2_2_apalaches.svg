@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges" width="160" height="160">
+  <!-- Card frame -->
+  <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
+  <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
+  <rect x="3" y="3" width="74" height="74" fill="#1a0f08"/>
+  <rect x="3" y="3" width="74" height="1" fill="#6B3A1F"/>
+  <rect x="3" y="3" width="1" height="74" fill="#6B3A1F"/>
+  <rect x="3" y="76" width="74" height="1" fill="#0d0804"/>
+  <rect x="76" y="3" width="1" height="74" fill="#0d0804"/>
+
+  <!-- Sky - heavy industrial, overcast -->
+  <rect x="4" y="4" width="72" height="30" fill="#5A5A60"/>
+  <rect x="4" y="4" width="72" height="8" fill="#686870"/>
+  <rect x="4" y="10" width="72" height="5" fill="#606068"/>
+
+  <!-- Smoke clouds from industrial chimneys -->
+  <!-- Smoke puff 1 -->
+  <rect x="28" y="4" width="12" height="6" fill="#7A7A80"/>
+  <rect x="26" y="6" width="16" height="5" fill="#888890"/>
+  <rect x="29" y="3" width="8" height="3" fill="#808088"/>
+  <!-- Smoke puff 2 -->
+  <rect x="44" y="5" width="10" height="5" fill="#7A7A80"/>
+  <rect x="42" y="7" width="14" height="4" fill="#888890"/>
+  <rect x="45" y="4" width="6" height="3" fill="#808088"/>
+  <!-- More distant smoke -->
+  <rect x="10" y="7" width="8" height="4" fill="#6A6A70"/>
+  <rect x="62" y="6" width="8" height="4" fill="#6A6A70"/>
+
+  <!-- Appalachian mountains - rounded old mountains (oldest in NA) -->
+  <!-- Far mountains (flat and eroded - characteristic of Appalachians) -->
+  <rect x="4" y="18" width="10" height="16" fill="#4A5040"/>
+  <rect x="6" y="15" width="10" height="19" fill="#505848"/>
+  <rect x="9" y="13" width="10" height="21" fill="#586050"/>
+  <rect x="12" y="15" width="8" height="19" fill="#505848"/>
+  <rect x="15" y="19" width="6" height="15" fill="#4A5040"/>
+
+  <rect x="26" y="16" width="10" height="18" fill="#4A5040"/>
+  <rect x="28" y="13" width="12" height="21" fill="#505848"/>
+  <rect x="30" y="11" width="12" height="23" fill="#586050"/>
+  <rect x="33" y="13" width="10" height="21" fill="#505848"/>
+  <rect x="36" y="17" width="8" height="17" fill="#4A5040"/>
+
+  <rect x="52" y="17" width="10" height="17" fill="#4A5040"/>
+  <rect x="54" y="14" width="12" height="20" fill="#505848"/>
+  <rect x="56" y="12" width="10" height="22" fill="#586050"/>
+  <rect x="58" y="15" width="8" height="19" fill="#505848"/>
+  <rect x="62" y="18" width="6" height="16" fill="#4A5040"/>
+
+  <!-- Forest on mountains (deciduous - Appalachian) -->
+  <rect x="4" y="29" width="72" height="5" fill="#3A4830"/>
+  <rect x="4" y="27" width="72" height="3" fill="#445438"/>
+
+  <!-- Sedimentary rock layers (key geological feature!) -->
+  <!-- Layer 1 - top, dark shale -->
+  <rect x="4" y="32" width="72" height="4" fill="#484840"/>
+  <rect x="4" y="32" width="72" height="1" fill="#585850"/>
+  <!-- Layer 2 - coal seam (the prize!) -->
+  <rect x="4" y="36" width="72" height="5" fill="#1A1A1C"/>
+  <rect x="4" y="36" width="72" height="1" fill="#2A2A2C"/>
+  <rect x="4" y="40" width="72" height="1" fill="#141416"/>
+  <!-- Coal shimmer/sheen -->
+  <rect x="8" y="37" width="4" height="1" fill="#3A3A44"/>
+  <rect x="20" y="38" width="6" height="1" fill="#303038"/>
+  <rect x="40" y="37" width="8" height="1" fill="#3A3A44"/>
+  <rect x="60" y="38" width="5" height="1" fill="#303038"/>
+  <!-- Layer 3 - sandstone -->
+  <rect x="4" y="41" width="72" height="4" fill="#7A6848"/>
+  <rect x="4" y="41" width="72" height="1" fill="#8A7858"/>
+  <!-- Layer 4 - another coal seam -->
+  <rect x="4" y="45" width="72" height="3" fill="#1A1A1C"/>
+  <rect x="4" y="45" width="72" height="1" fill="#2A2A2C"/>
+
+  <!-- Mine entrance / shaft head frame (headframe - iconic coal mine structure) -->
+  <!-- Frame structure -->
+  <rect x="28" y="22" width="2" height="18" fill="#5A4020"/>
+  <rect x="50" y="22" width="2" height="18" fill="#5A4020"/>
+  <rect x="28" y="22" width="24" height="2" fill="#6A5030"/>
+  <!-- Pulley wheel at top -->
+  <rect x="37" y="19" width="6" height="6" fill="#888880"/>
+  <rect x="38" y="20" width="4" height="4" fill="#606058"/>
+  <rect x="39" y="21" width="2" height="2" fill="#404038"/>
+  <!-- Cable/rope -->
+  <rect x="40" y="25" width="1" height="15" fill="#484830"/>
+  <!-- Mine cart track -->
+  <rect x="26" y="39" width="28" height="1" fill="#686858"/>
+  <rect x="26" y="37" width="28" height="1" fill="#686858"/>
+
+  <!-- Mine cart with coal -->
+  <rect x="34" y="34" width="8" height="5" fill="#4A4040"/>
+  <rect x="34" y="33" width="8" height="1" fill="#5A5050"/>
+  <!-- Coal in cart -->
+  <rect x="35" y="31" width="6" height="3" fill="#1A1A1C"/>
+  <rect x="35" y="31" width="6" height="1" fill="#2A2A2C"/>
+  <!-- Cart wheels -->
+  <rect x="35" y="39" width="2" height="2" fill="#606050"/>
+  <rect x="39" y="39" width="2" height="2" fill="#606050"/>
+
+  <!-- Industrial mine building left -->
+  <rect x="4" y="28" width="14" height="12" fill="#4A4038"/>
+  <rect x="4" y="27" width="14" height="2" fill="#5A5048"/>
+  <!-- Chimney -->
+  <rect x="8" y="18" width="4" height="10" fill="#484030"/>
+  <rect x="8" y="17" width="4" height="2" fill="#383028"/>
+  <!-- Smoke rising -->
+  <rect x="9" y="13" width="2" height="4" fill="#7A7880"/>
+  <rect x="8" y="10" width="4" height="3" fill="#888890"/>
+
+  <!-- Industrial mine building right -->
+  <rect x="62" y="29" width="14" height="11" fill="#4A4038"/>
+  <rect x="62" y="28" width="14" height="2" fill="#5A5048"/>
+  <!-- Chimney right -->
+  <rect x="68" y="19" width="4" height="10" fill="#484030"/>
+  <rect x="68" y="18" width="4" height="2" fill="#383028"/>
+  <!-- Smoke right -->
+  <rect x="69" y="14" width="2" height="4" fill="#7A7880"/>
+  <rect x="68" y="11" width="4" height="3" fill="#888890"/>
+
+  <!-- Ground / coal processing area -->
+  <rect x="4" y="48" width="72" height="18" fill="#3A3028"/>
+  <rect x="4" y="48" width="72" height="2" fill="#4A4038"/>
+
+  <!-- Coal piles on ground -->
+  <rect x="4" y="52" width="14" height="6" fill="#1A1A1C"/>
+  <rect x="5" y="50" width="12" height="8" fill="#222224"/>
+  <rect x="6" y="49" width="8" height="9" fill="#1E1E20"/>
+  <!-- Coal sheen -->
+  <rect x="7" y="51" width="4" height="1" fill="#3A3A44"/>
+
+  <rect x="58" y="52" width="14" height="6" fill="#1A1A1C"/>
+  <rect x="59" y="50" width="12" height="8" fill="#222224"/>
+  <rect x="62" y="49" width="8" height="9" fill="#1E1E20"/>
+  <rect x="63" y="51" width="4" height="1" fill="#3A3A44"/>
+
+  <!-- Rail tracks on ground -->
+  <rect x="18" y="53" width="40" height="1" fill="#686858"/>
+  <rect x="18" y="55" width="40" height="1" fill="#686858"/>
+  <!-- Rail ties -->
+  <rect x="20" y="52" width="2" height="5" fill="#5A4828"/>
+  <rect x="26" y="52" width="2" height="5" fill="#5A4828"/>
+  <rect x="32" y="52" width="2" height="5" fill="#5A4828"/>
+  <rect x="38" y="52" width="2" height="5" fill="#5A4828"/>
+  <rect x="44" y="52" width="2" height="5" fill="#5A4828"/>
+  <rect x="50" y="52" width="2" height="5" fill="#5A4828"/>
+
+  <!-- Corvan with hard hat (mining safety!) -->
+  <rect x="33" y="48" width="4" height="6" fill="#B22222"/>
+  <rect x="33" y="46" width="4" height="2" fill="#D4956A"/>
+  <!-- Yellow hard hat -->
+  <rect x="32" y="44" width="6" height="2" fill="#FFD700"/>
+  <rect x="33" y="43" width="4" height="1" fill="#FFD700"/>
+  <rect x="33" y="43" width="4" height="1" fill="#FFC800"/>
+  <!-- Lamp on hard hat -->
+  <rect x="35" y="43" width="2" height="1" fill="#FFFFFF"/>
+  <!-- Legs -->
+  <rect x="33" y="54" width="2" height="2" fill="#3D2810"/>
+  <rect x="35" y="54" width="2" height="2" fill="#3D2810"/>
+  <!-- Coal chunk in hand -->
+  <rect x="37" y="50" width="3" height="3" fill="#1A1A1C"/>
+  <rect x="37" y="50" width="3" height="1" fill="#2A2A2C"/>
+
+  <!-- Xisto (shale) samples on ground -->
+  <rect x="44" y="57" width="4" height="3" fill="#484840"/>
+  <rect x="44" y="57" width="4" height="1" fill="#585850"/>
+  <rect x="48" y="58" width="3" height="2" fill="#383830"/>
+
+  <!-- Stars (3 stars - medium difficulty) -->
+  <rect x="27" y="70" width="5" height="5" fill="#FFD700"/>
+  <rect x="28" y="69" width="3" height="1" fill="#FFD700"/>
+  <rect x="29" y="68" width="1" height="1" fill="#FFD700"/>
+  <rect x="26" y="71" width="1" height="2" fill="#FFD700"/>
+  <rect x="31" y="71" width="1" height="2" fill="#FFD700"/>
+  <rect x="37" y="70" width="5" height="5" fill="#FFD700"/>
+  <rect x="38" y="69" width="3" height="1" fill="#FFD700"/>
+  <rect x="39" y="68" width="1" height="1" fill="#FFD700"/>
+  <rect x="36" y="71" width="1" height="2" fill="#FFD700"/>
+  <rect x="41" y="71" width="1" height="2" fill="#FFD700"/>
+  <rect x="47" y="70" width="5" height="5" fill="#FFD700"/>
+  <rect x="48" y="69" width="3" height="1" fill="#FFD700"/>
+  <rect x="49" y="68" width="1" height="1" fill="#FFD700"/>
+  <rect x="46" y="71" width="1" height="2" fill="#FFD700"/>
+  <rect x="51" y="71" width="1" height="2" fill="#FFD700"/>
+
+  <!-- Corner bolts -->
+  <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
+  <rect x="73" y="4" width="3" height="3" fill="#C8A060"/>
+  <rect x="4" y="73" width="3" height="3" fill="#C8A060"/>
+  <rect x="73" y="73" width="3" height="3" fill="#C8A060"/>
+  <rect x="5" y="5" width="1" height="1" fill="#FFD080"/>
+  <rect x="74" y="5" width="1" height="1" fill="#FFD080"/>
+  <rect x="5" y="74" width="1" height="1" fill="#FFD080"/>
+  <rect x="74" y="74" width="1" height="1" fill="#FFD080"/>
+</svg>

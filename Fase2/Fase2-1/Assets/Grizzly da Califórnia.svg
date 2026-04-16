@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="194"
+   viewBox="0 0 194 166"
+   role="img"
+   version="1.1"
+   id="svg44"
+   sodipodi:docname="Grizzly da Califórnia.svg"
+   height="166"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs44" />
+  <sodipodi:namedview
+     id="namedview44"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.7"
+     inkscape:cx="183.88889"
+     inkscape:cy="140.18519"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg44" />
+  <title
+     id="title1">Itens e Personagens — Fase 2.1 Mineralis</title>
+  <desc
+     id="desc1">Cartas de item: Grizzly da Califórnia, Bateia, Picareta, Pedra de Toque e Placa de Reivindicação</desc>
+  <!-- Background -->
+  <!-- Header -->
+  <!-- ===== CARD 1: GRIZZLY DA CALIFÓRNIA ===== -->
+  <!-- Card header -->
+  <rect
+     x="0"
+     y="0"
+     width="194"
+     height="32"
+     rx="8"
+     fill="#5A3010"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#5a3010;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect5" />
+  <text
+     x="97"
+     y="16"
+     text-anchor="middle"
+     font-family="Georgia,serif"
+     font-size="10.5"
+     fill="#E8B050"
+     font-weight="bold"
+     style="color:#000000;font-weight:700;font-size:10.5px;font-family:Georgia, serif;dominant-baseline:auto;text-anchor:middle;opacity:1;fill:#e8b050;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="text5">Grizzly da Califórnia</text>
+  <!-- Grizzly illustration -->
+  <!-- Body -->
+  <ellipse
+     cx="97"
+     cy="110"
+     rx="52"
+     ry="40"
+     fill="#8A5820"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#8a5820;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse6" />
+  <ellipse
+     cx="97"
+     cy="114"
+     rx="40"
+     ry="28"
+     fill="#A87840"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#a87840;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse7" />
+  <!-- Head -->
+  <ellipse
+     cx="56"
+     cy="92"
+     rx="30"
+     ry="26"
+     fill="#8A5820"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#8a5820;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse8" />
+  <!-- Muzzle -->
+  <ellipse
+     cx="38"
+     cy="98"
+     rx="17"
+     ry="13"
+     fill="#A87840"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#a87840;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse9" />
+  <!-- Nose -->
+  <ellipse
+     cx="28"
+     cy="94"
+     rx="7"
+     ry="5"
+     fill="#1A1008"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#1a1008;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse10" />
+  <circle
+     cx="26"
+     cy="95"
+     r="2"
+     fill="#0A0804"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#0a0804;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="circle10" />
+  <circle
+     cx="30"
+     cy="95"
+     r="2"
+     fill="#0A0804"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#0a0804;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="circle11" />
+  <!-- Eye -->
+  <circle
+     cx="60"
+     cy="87"
+     r="5.5"
+     fill="#1A1008"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#1a1008;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="circle12" />
+  <circle
+     cx="59"
+     cy="86"
+     r="2"
+     fill="#FFFFFF"
+     opacity="0.6"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:0.6;fill:#ffffff;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="circle13" />
+  <!-- Ear -->
+  <circle
+     cx="78"
+     cy="72"
+     fill="#7A4A18"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#7a4a18;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="circle14"
+     r="0" />
+  <circle
+     cx="78"
+     cy="72"
+     r="6"
+     fill="#A87840"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#a87840;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="circle15" />
+  <!-- Front paw raised (California bear pose) -->
+  <ellipse
+     cx="28"
+     cy="110"
+     rx="16"
+     ry="12"
+     fill="#8A5820"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#8a5820;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse15" />
+  <ellipse
+     cx="20"
+     cy="114"
+     rx="12"
+     ry="9"
+     fill="#7A4A18"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#7a4a18;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse16" />
+  <!-- Claws -->
+  <line
+     x1="14"
+     y1="119"
+     x2="11"
+     y2="125"
+     stroke="#5A3A10"
+     stroke-width="1.5"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#000000;stroke:#5a3a10;stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="line16" />
+  <line
+     x1="18"
+     y1="121"
+     x2="16"
+     y2="127"
+     stroke="#5A3A10"
+     stroke-width="1.5"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#000000;stroke:#5a3a10;stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="line17" />
+  <line
+     x1="22"
+     y1="121"
+     x2="21"
+     y2="127"
+     stroke="#5A3A10"
+     stroke-width="1.5"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#000000;stroke:#5a3a10;stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="line18" />
+  <!-- Rear legs -->
+  <rect
+     x="66"
+     y="138"
+     width="20"
+     height="28"
+     rx="7"
+     fill="#7A4818"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#7a4818;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect18" />
+  <rect
+     x="96"
+     y="140"
+     width="20"
+     height="26"
+     rx="7"
+     fill="#7A4818"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#7a4818;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect19" />
+  <!-- Tail (small) -->
+  <ellipse
+     cx="176.01268"
+     cy="50.867821"
+     rx="8"
+     ry="6"
+     fill="#7A4818"
+     transform="rotate(20)"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#7a4818;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="ellipse19" />
+  <!-- EXTINCT badge -->
+  <!-- Star (CA flag element) -->
+  <!-- ===== CARD 2: BATEIA ===== -->
+  <!-- Bateia illustration (top-down view) -->
+  <!-- Inner pan surface -->
+  <!-- Water in pan -->
+  <!-- Sediment in pan -->
+  <!-- Mud and sand -->
+  <!-- Gold in pan -->
+  <!-- Pyrite (brassy, angular) -->
+  <!-- Pebbles -->
+  <!-- Swirl motion lines -->
+  <!-- Pan handle -->
+  <!-- Riffles (pan ridges) -->
+  <!-- Card info -->
+  <!-- ===== CARD 3: PICARETA ===== -->
+</svg>

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="301"
+   viewBox="0 0 301 201"
+   role="img"
+   version="1.1"
+   id="svg227"
+   sodipodi:docname="Martelo de Pedra.svg"
+   height="201"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs227" />
+  <sodipodi:namedview
+     id="namedview227"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.9925926"
+     inkscape:cx="148.36634"
+     inkscape:cy="119.96287"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg227" />
+  <title
+     id="title1">Itens da Fase 2.3 – Mineralis pixel art</title>
+  <desc
+     id="desc1">Cinco itens em pixel art: Águia Careca, Maço de Pedra, Escopro de Cobre, Martelo de Pedra, Gorget de Cobre</desc>
+  <!-- === CARD 1: ÁGUIA CARECA (BALD EAGLE) === -->
+  <!-- Sky bg inside card -->
+  <!-- Eagle pixel art — centered around x=170, y=100 -->
+  <!-- Wing left (dark brown) -->
+  <!-- Wing right (dark brown) -->
+  <!-- Wing feather tips left -->
+  <!-- Wing feather tips right -->
+  <!-- Body center (dark) -->
+  <!-- Tail white -->
+  <!-- Head white -->
+  <!-- Eye -->
+  <!-- Beak yellow -->
+  <!-- Talons -->
+  <!-- Label -->
+  <!-- === CARD 2: MAÇO DE PEDRA NATIVO === -->
+  <!-- ground hint -->
+  <!-- Maço — large stone head + wooden handle -->
+  <!-- Handle (wood) -->
+  <!-- Handle grip wrapping (sinew) -->
+  <!-- Stone head (round river cobble) -->
+  <!-- Stone highlight -->
+  <!-- Stone shadow -->
+  <!-- Binding lashing at handle-stone joint -->
+  <!-- Chips and texture on stone -->
+  <!-- === CARD 3: ESCOPRO DE COBRE === -->
+  <!-- Chisel body (copper) — angled tool -->
+  <!-- Main shaft -->
+  <!-- More precise chisel using rects at angle — draw straight and describe angled shape -->
+  <!-- Copper shaft main -->
+  <!-- Highlights on copper (left edge) -->
+  <!-- Dark right edge shadow -->
+  <!-- Chisel tip (wider, cutting edge) -->
+  <!-- Tip highlight (beveled edge glint) -->
+  <!-- Hammerhead top (flat struck end) -->
+  <!-- Top struck-by-hammer dents (darker spots) -->
+  <!-- Work hardening lines on shaft (encruamento) -->
+  <!-- Rock chip near tip showing use -->
+  <!-- === CARD 4: MARTELO DE PEDRA === -->
+  <!-- Smaller hand hammer — testing mallet -->
+  <!-- Handle shorter, thinner -->
+  <rect
+     x="139.5"
+     y="70.5"
+     width="6"
+     height="60"
+     fill="#5A3414"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#5a3414;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect122" />
+  <rect
+     x="141.5"
+     y="70.5"
+     width="3"
+     height="60"
+     fill="#6A3E1C"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#6a3e1c;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect123" />
+  <rect
+     x="143.5"
+     y="72.5"
+     width="2"
+     height="56"
+     fill="#7A4824"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#7a4824;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect124" />
+  <!-- Stone head — smaller, rounder -->
+  <rect
+     x="118.87128"
+     y="52.175743"
+     width="8"
+     height="3"
+     fill="#504C48"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#504c48;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect125" />
+  <rect
+     x="114.87128"
+     y="55.175743"
+     width="16"
+     height="3"
+     fill="#5C5854"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#5c5854;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect126" />
+  <rect
+     x="110.87128"
+     y="58.175743"
+     width="24"
+     height="4"
+     fill="#686460"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#686460;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect127" />
+  <rect
+     x="108.87128"
+     y="62.175743"
+     width="28"
+     height="4"
+     fill="#706C68"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#706c68;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect128" />
+  <rect
+     x="108.87128"
+     y="66.175743"
+     width="28"
+     height="4"
+     fill="#787470"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#787470;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect129" />
+  <rect
+     x="108.87128"
+     y="70.175743"
+     width="28"
+     height="4"
+     fill="#706C68"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#706c68;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect130" />
+  <rect
+     x="110.87128"
+     y="74.175743"
+     width="24"
+     height="3"
+     fill="#646058"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#646058;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect131" />
+  <rect
+     x="114.87128"
+     y="77.175743"
+     width="16"
+     height="3"
+     fill="#585450"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#585450;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect132" />
+  <rect
+     x="118.87128"
+     y="80.175743"
+     width="8"
+     height="3"
+     fill="#4C4844"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#4c4844;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect133" />
+  <!-- Stone highlight -->
+  <rect
+     x="114.87128"
+     y="58.175743"
+     width="6"
+     height="4"
+     fill="#9C9490"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#9c9490;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect134" />
+  <rect
+     x="112.87128"
+     y="62.175743"
+     width="4"
+     height="4"
+     fill="#A8A09C"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#a8a09c;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect135" />
+  <!-- Stone texture chips -->
+  <rect
+     x="126.87128"
+     y="66.175743"
+     width="4"
+     height="3"
+     fill="#484440"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#484440;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect136" />
+  <rect
+     x="120.87128"
+     y="72.175743"
+     width="3"
+     height="3"
+     fill="#403C38"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#403c38;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect137" />
+  <!-- Lashing at joint -->
+  <rect
+     x="135.5"
+     y="62.5"
+     width="10"
+     height="3"
+     fill="#C09040"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#c09040;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect138" />
+  <rect
+     x="135.5"
+     y="68.5"
+     width="10"
+     height="3"
+     fill="#B88038"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#b88038;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect139" />
+  <!-- Copper residue on stone face (evidence of testing) -->
+  <rect
+     x="112.87128"
+     y="62.175743"
+     width="3"
+     height="3"
+     fill="#C85A28"
+     fill-opacity="0.6"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#c85a28;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect140" />
+  <rect
+     x="116.87128"
+     y="70.175743"
+     width="3"
+     height="3"
+     fill="#C05028"
+     fill-opacity="0.5"
+     style="color:#000000;font-weight:400;font-size:16px;font-family:'Anthropic Sans', '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;dominant-baseline:auto;text-anchor:start;opacity:1;fill:#c05028;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="rect141" />
+  <text
+     x="150.5"
+     y="175.5"
+     text-anchor="middle"
+     style="color:#000000;font-weight:700;font-size:13px;font-family:monospace;dominant-baseline:auto;text-anchor:middle;opacity:1;fill:#c8b890;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="text141">MARTELO DE PEDRA</text>
+  <!-- === CARD 5: GORGET DE COBRE === -->
+  <!-- subtle dark stone bg -->
+  <!-- GORGET: semicircular copper pectoral ornament -->
+  <!-- Using pixel rects to form a crescent/semicircle shape -->
+  <!-- Outer arc (top of crescent) -->
+  <!-- Middle band (body of gorget) -->
+  <!-- Inner arc cutout (hollow center) — darker -->
+  <!-- GEOMETRIC ENGRAVINGS — Anishinaabe pattern lines -->
+  <!-- Outer row of notches (top edge decoration) -->
+  <!-- Center cross / geometric motif (etched darker) -->
+  <!-- Corner geometric diamonds -->
+  <!-- SURFACE POLISH GLINTS — polished copper reflections -->
+  <!-- Suspension holes at top corners (gorget hangs from these) -->
+  <!-- Thin cord/string suggestion -->
+  <!-- Bottom tabs of gorget -->
+  <!-- Round bottom tab -->
+  <!-- Label area -->
+  <!-- Labels for items 1–4 -->
+  <text
+     x="150.5"
+     y="192.5"
+     text-anchor="middle"
+     style="color:#000000;font-weight:400;font-size:10px;font-family:monospace;dominant-baseline:auto;text-anchor:middle;opacity:1;fill:#706050;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter"
+     id="text222">percussão fina · teste de maleabilidade</text>
+  <!-- Item sub-labels -->
+</svg>

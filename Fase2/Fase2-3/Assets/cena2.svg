@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1456" height="839" viewBox="0 0 1456 839" version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="basalt" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#1C1E22"/>
+      <rect width="64" height="1" fill="#141618"/>
+      <rect y="10" width="64" height="1" fill="#141618"/>
+      <rect width="1" height="10" fill="#141618"/>
+      <rect x="63" width="1" height="10" fill="#141618"/>
+      <rect x="32" y="10" width="1" height="10" fill="#141618"/>
+    </pattern>
+    <pattern id="basaltRich" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#201E22"/>
+      <rect width="64" height="1" fill="#181618"/>
+      <rect y="10" width="64" height="1" fill="#181618"/>
+      <rect width="1" height="10" fill="#181618"/>
+      <rect x="63" width="1" height="10" fill="#181618"/>
+      <rect x="32" y="10" width="1" height="10" fill="#181618"/>
+    </pattern>
+    <pattern id="basaltDeep" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#161416"/>
+      <rect width="64" height="1" fill="#0E0C0E"/>
+      <rect y="10" width="64" height="1" fill="#0E0C0E"/>
+      <rect width="1" height="10" fill="#0E0C0E"/>
+      <rect x="63" width="1" height="10" fill="#0E0C0E"/>
+      <rect x="32" y="10" width="1" height="10" fill="#0E0C0E"/>
+    </pattern>
+  </defs>
+
+  <!-- ===== SKY: COLD MORNING - steel blue-grey with mist ===== -->
+  <rect x="0" y="0" width="1456" height="839" fill="#1A2830"/>
+  <rect x="0" y="0" width="1456" height="80" fill="#1C2C38"/>
+  <rect x="0" y="60" width="1456" height="90" fill="#203040"/>
+  <rect x="0" y="138" width="1456" height="80" fill="#243648"/>
+  <rect x="0" y="202" width="1456" height="80" fill="#2C4050"/>
+  <rect x="0" y="268" width="1456" height="72" fill="#344858"/>
+  <rect x="0" y="324" width="1456" height="68" fill="#3C5060"/>
+  <rect x="0" y="376" width="1456" height="62" fill="#445868"/>
+  <!-- Horizon band - mist over water -->
+  <rect x="0" y="426" width="1456" height="52" fill="#506470"/>
+  <rect x="0" y="462" width="1456" height="42" fill="#586C78"/>
+
+  <!-- DIFFUSE MORNING SUN - pale disc through mist, high sky -->
+  <ellipse cx="900" cy="220" rx="60" ry="50" fill="#B0C4CC" fill-opacity="0.3"/>
+  <ellipse cx="900" cy="220" rx="40" ry="34" fill="#C0D0D8" fill-opacity="0.4"/>
+  <ellipse cx="900" cy="220" rx="24" ry="20" fill="#D0E0E4" fill-opacity="0.5"/>
+
+  <!-- MIST CLOUDS / LAKE MIST - very prominent this scene -->
+  <!-- Heavy mist bank over lake -->
+  <ellipse cx="728" cy="490" rx="1000" ry="60" fill="#A0B8C4" fill-opacity="0.25"/>
+  <ellipse cx="400" cy="475" rx="700" ry="45" fill="#90ACBC" fill-opacity="0.22"/>
+  <ellipse cx="1100" cy="482" rx="600" ry="38" fill="#A8C0CC" fill-opacity="0.20"/>
+  <ellipse cx="728" cy="500" rx="800" ry="35" fill="#B4C8D4" fill-opacity="0.18"/>
+  <!-- Low mist rolling over shore -->
+  <ellipse cx="200" cy="510" rx="400" ry="30" fill="#B8CCD8" fill-opacity="0.20"/>
+  <ellipse cx="1200" cy="515" rx="350" ry="28" fill="#B4C8D4" fill-opacity="0.18"/>
+  <ellipse cx="728" cy="518" rx="900" ry="22" fill="#C0D4DC" fill-opacity="0.15"/>
+
+  <!-- LAKE SUPERIOR - vast dark grey-blue water -->
+  <rect x="0" y="504" width="1456" height="80" fill="#1E3040"/>
+  <rect x="0" y="520" width="1456" height="50" fill="#1C2C3C"/>
+  <!-- Water surface pixel ripples -->
+  <rect x="0" y="528" width="1456" height="2" fill="#2A3C4C" fill-opacity="0.9"/>
+  <rect x="0" y="536" width="1456" height="2" fill="#263848" fill-opacity="0.7"/>
+  <rect x="0" y="544" width="1456" height="2" fill="#243644" fill-opacity="0.6"/>
+  <rect x="0" y="552" width="1456" height="2" fill="#222E3C" fill-opacity="0.5"/>
+
+  <!-- ROCKY SHORELINE BASE -->
+  <rect x="0" y="568" width="1456" height="271" fill="url(#basalt)"/>
+  <rect x="0" y="568" width="1456" height="4" fill="#2E3238"/>
+
+  <!-- LARGE CENTRAL BASALT OUTCROP - main focus of scene -->
+  <!-- This is where copper veins are most visible -->
+  <!-- Base of outcrop -->
+  <rect x="440" y="440" width="500" height="140" fill="#1C1E22" rx="6"/>
+  <rect x="460" y="420" width="440" height="60" fill="#1A1C20" rx="4"/>
+  <rect x="490" y="400" width="380" height="50" fill="#181A1E" rx="4"/>
+  <rect x="520" y="384" width="320" height="40" fill="#161820" rx="4"/>
+  <rect x="550" y="368" width="260" height="36" fill="#141618" rx="3"/>
+  <!-- Top of outcrop -->
+  <rect x="572" y="352" width="216" height="30" fill="#12141A" rx="3"/>
+
+  <!-- COPPER VEINS on central outcrop - the key visual element -->
+  <!-- Diagonal vein patterns in the dark basalt -->
+  <!-- Major vein 1 -->
+  <rect x="536" y="388" width="5" height="120" fill="#C05828" transform="rotate(-12,536,388)"/>
+  <rect x="540" y="390" width="3" height="115" fill="#D06030" transform="rotate(-12,540,390)"/>
+  <!-- Major vein 2 -->
+  <rect x="600" y="372" width="5" height="140" fill="#B85028"/>
+  <rect x="604" y="376" width="3" height="132" fill="#C85830"/>
+  <!-- Major vein 3 -->
+  <rect x="660" y="368" width="4" height="135" fill="#C05228" transform="rotate(8,660,368)"/>
+  <rect x="664" y="372" width="3" height="128" fill="#CC5A2C" transform="rotate(8,664,372)"/>
+  <!-- Major vein 4 -->
+  <rect x="720" y="380" width="5" height="128" fill="#B84E24"/>
+  <rect x="724" y="384" width="3" height="120" fill="#C85828"/>
+  <!-- Vein 5 (horizontal crossing) -->
+  <rect x="540" y="430" width="300" height="4" fill="#A84020" fill-opacity="0.7"/>
+  <rect x="540" y="434" width="300" height="2" fill="#C05028" fill-opacity="0.5"/>
+  <!-- Vein 6 (smaller) -->
+  <rect x="760" y="390" width="4" height="100" fill="#B05028" transform="rotate(-6,760,390)"/>
+
+  <!-- Copper deposits / nodules on surface of outcrop -->
+  <ellipse cx="580" cy="420" rx="12" ry="8" fill="#D06030" fill-opacity="0.8"/>
+  <ellipse cx="580" cy="420" rx="8" ry="5" fill="#E07038" fill-opacity="0.9"/>
+  <ellipse cx="658" cy="400" rx="10" ry="7" fill="#C85828" fill-opacity="0.8"/>
+  <ellipse cx="730" cy="436" rx="14" ry="9" fill="#D06832" fill-opacity="0.8"/>
+  <ellipse cx="730" cy="436" rx="9" ry="6" fill="#E07A40" fill-opacity="0.9"/>
+
+  <!-- Rock crack details on outcrop -->
+  <rect x="500" y="460" width="80" height="1" fill="#101214"/>
+  <rect x="620" y="480" width="120" height="1" fill="#101214"/>
+  <rect x="750" y="455" width="90" height="1" fill="#101214"/>
+
+  <!-- SMALLER ROCK CLUSTERS left side -->
+  <rect x="80" y="510" width="200" height="62" fill="#1A1C22" rx="4"/>
+  <rect x="100" y="496" width="150" height="30" fill="#181A20" rx="3"/>
+  <rect x="118" y="484" width="100" height="24" fill="#161820" rx="3"/>
+  <!-- copper on left rocks -->
+  <rect x="128" y="490" width="4" height="20" fill="#B85028"/>
+  <rect x="135" y="492" width="3" height="16" fill="#C85830"/>
+
+  <!-- SMALLER ROCK CLUSTERS right side -->
+  <rect x="1200" y="516" width="180" height="58" fill="#1A1C22" rx="4"/>
+  <rect x="1215" y="502" width="140" height="28" fill="#181A20" rx="3"/>
+  <rect x="1232" y="490" width="96" height="22" fill="#161820" rx="3"/>
+  <!-- copper on right rocks -->
+  <rect x="1265" y="496" width="4" height="18" fill="#B85028"/>
+
+  <!-- PINE TREES - boreal forest flanking scene -->
+  <!-- Left pine group -->
+  <rect x="0" y="460" width="8" height="120" fill="#0E1214"/>
+  <polygon points="0,368 44,462 -44,462" fill="#0C1012"/>
+  <polygon points="4,400 42,462 -34,462" fill="#0E1214"/>
+  <polygon points="8,432 40,462 -24,462" fill="#0A1010"/>
+
+  <rect x="52" y="472" width="7" height="108" fill="#0E1214"/>
+  <polygon points="52,386 92,474 12,474" fill="#0C1012"/>
+  <polygon points="56,416 90,474 18,474" fill="#0E1214"/>
+
+  <rect x="110" y="478" width="7" height="104" fill="#0E1214"/>
+  <polygon points="110,398 148,480 72,480" fill="#0C1012"/>
+  <polygon points="114,426 146,480 78,480" fill="#0E1214"/>
+
+  <!-- Right pine group -->
+  <rect x="1380" y="458" width="8" height="122" fill="#0E1214"/>
+  <polygon points="1380,364 1424,460 1336,460" fill="#0C1012"/>
+  <polygon points="1384,396 1422,460 1342,460" fill="#0E1214"/>
+  <polygon points="1388,428 1420,460 1352,460" fill="#0A1010"/>
+
+  <rect x="1332" y="470" width="7" height="110" fill="#0E1214"/>
+  <polygon points="1332,384 1372,472 1292,472" fill="#0C1012"/>
+  <polygon points="1336,414 1370,472 1298,472" fill="#0E1214"/>
+
+  <!-- GEOLOGICAL STRATA VISIBLE ON GROUND CROSS-SECTION -->
+  <!-- Surface basalt -->
+  <rect x="0" y="680" width="1456" height="26" fill="#1E2024"/>
+  <rect x="0" y="680" width="1456" height="3" fill="#2E3236"/>
+  <!-- Copper vein layer -->
+  <rect x="0" y="694" width="1456" height="4" fill="#902C0C" fill-opacity="0.7"/>
+  <rect x="0" y="696" width="1456" height="2" fill="#B84018" fill-opacity="0.5"/>
+  <!-- Sub-surface basalt -->
+  <rect x="0" y="706" width="1456" height="30" fill="url(#basaltRich)"/>
+  <!-- Deep basalt -->
+  <rect x="0" y="736" width="1456" height="103" fill="url(#basaltDeep)"/>
+
+  <!-- WATER REFLECTIONS on lake -->
+  <rect x="80" y="516" width="5" height="2" fill="#5090B0" fill-opacity="0.4"/>
+  <rect x="300" y="512" width="8" height="2" fill="#4888A8" fill-opacity="0.35"/>
+  <rect x="700" y="518" width="6" height="2" fill="#5090B0" fill-opacity="0.35"/>
+  <rect x="1100" y="514" width="7" height="2" fill="#4888A8" fill-opacity="0.30"/>
+  <rect x="1350" y="516" width="5" height="2" fill="#4880A0" fill-opacity="0.35"/>
+
+  <!-- PLATFORM LEDGES -->
+  <!-- Left small ledge -->
+  <rect x="0" y="554" width="100" height="16" fill="#1E2226"/>
+  <rect x="0" y="554" width="100" height="3" fill="#303438"/>
+  <!-- Near outcrop left -->
+  <rect x="200" y="548" width="200" height="14" fill="#1E2226"/>
+  <rect x="200" y="548" width="200" height="3" fill="#2E3236"/>
+  <!-- Top of central outcrop -->
+  <rect x="572" y="352" width="216" height="8" fill="#20242A"/>
+  <rect x="572" y="352" width="216" height="2" fill="#343840"/>
+  <!-- Right ledge -->
+  <rect x="1100" y="545" width="200" height="14" fill="#1E2226"/>
+  <rect x="1100" y="545" width="200" height="3" fill="#2E3236"/>
+  <!-- Far right ledge -->
+  <rect x="1380" y="552" width="76" height="16" fill="#1E2226"/>
+  <rect x="1380" y="552" width="76" height="3" fill="#303438"/>
+</svg>

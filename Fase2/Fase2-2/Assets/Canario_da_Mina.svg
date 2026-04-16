@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="194" height="166" viewBox="0 0 194 166" role="img" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <title>Canário da Mina</title>
+  <desc>Mine Canary — detector de gases</desc>
+
+  <!-- HEADER -->
+  <rect x="0" y="0" width="194" height="32" rx="8" fill="#2E2808"/>
+  <rect x="0" y="22" width="194" height="10" fill="#2E2808"/>
+  <text x="97" y="15" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#E8C818" font-weight="bold">Canário da Mina</text>
+  <text x="97" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#A89818">Detector vivo de CO e CH₄</text>
+
+  <!-- HOOK (topo da gaiola) -->
+  <ellipse cx="97" cy="42" rx="8" ry="5" fill="none" stroke="#8A7828" stroke-width="2.5"/>
+  <rect x="94" y="42" width="6" height="10" rx="1" fill="#8A7828"/>
+
+  <!-- ANEL SUPERIOR da gaiola -->
+  <ellipse cx="97" cy="54" rx="42" ry="11" fill="#2A2408"/>
+  <ellipse cx="97" cy="54" rx="38" ry="7" fill="#3C3410"/>
+  <ellipse cx="97" cy="54" rx="28" ry="4" fill="#4A4218"/>
+  <!-- Brilho do anel -->
+  <ellipse cx="90" cy="52" rx="16" ry="2" fill="#6A5E20" opacity="0.6"/>
+
+  <!-- INTERIOR da gaiola (fundo escuro) -->
+  <ellipse cx="97" cy="98" rx="38" ry="50" fill="#1A1A10"/>
+
+  <!-- BARRAS VERTICAIS (12 barras) -->
+  <line x1="59"  y1="54" x2="57"  y2="142" stroke="#4A4218" stroke-width="3"/>
+  <line x1="68"  y1="51" x2="67"  y2="143" stroke="#4A4218" stroke-width="3"/>
+  <line x1="77"  y1="49" x2="77"  y2="144" stroke="#4A4218" stroke-width="3"/>
+  <line x1="86"  y1="48" x2="87"  y2="144" stroke="#4A4218" stroke-width="3"/>
+  <line x1="97"  y1="47" x2="97"  y2="145" stroke="#4A4218" stroke-width="3"/>
+  <line x1="108" y1="48" x2="107" y2="144" stroke="#4A4218" stroke-width="3"/>
+  <line x1="117" y1="49" x2="117" y2="144" stroke="#4A4218" stroke-width="3"/>
+  <line x1="126" y1="51" x2="127" y2="143" stroke="#4A4218" stroke-width="3"/>
+  <line x1="135" y1="54" x2="137" y2="142" stroke="#4A4218" stroke-width="3"/>
+
+  <!-- ANEL DO MEIO -->
+  <ellipse cx="97" cy="98" rx="42" ry="8" fill="#2A2408"/>
+  <ellipse cx="97" cy="98" rx="38" ry="5" fill="#3C3410"/>
+
+  <!-- ANEL INFERIOR -->
+  <ellipse cx="97" cy="143" rx="42" ry="11" fill="#2A2408"/>
+  <ellipse cx="97" cy="143" rx="38" ry="7" fill="#3C3410"/>
+  <ellipse cx="90" cy="141" rx="16" ry="2" fill="#6A5E20" opacity="0.5"/>
+
+  <!-- POLEIRO -->
+  <rect x="70" y="108" width="54" height="5" rx="2" fill="#5A4418"/>
+  <rect x="70" y="108" width="54" height="2" rx="1" fill="#7A6028"/>
+
+  <!-- CANÁRIO — sombra/silhueta -->
+  <ellipse cx="94" cy="92" rx="15" ry="11" fill="#8A7E08"/>
+  <!-- CANÁRIO — corpo -->
+  <ellipse cx="93" cy="91" rx="14" ry="10" fill="#D4C010"/>
+  <ellipse cx="94" cy="90" rx="12" ry="8" fill="#E8D418"/>
+  <!-- CANÁRIO — asa (tonalidade diferente) -->
+  <ellipse cx="98" cy="92" rx="9" ry="6" fill="#C4B008" opacity="0.8"/>
+  <ellipse cx="96" cy="89" rx="7" ry="4" fill="#F0E020" opacity="0.6"/>
+  <!-- CANÁRIO — cabeça -->
+  <circle cx="83" cy="85" r="9" fill="#E8D418"/>
+  <circle cx="84" cy="84" r="7" fill="#F0E428"/>
+  <!-- CANÁRIO — olho -->
+  <circle cx="80" cy="83" r="2.2" fill="#1A1008"/>
+  <circle cx="79.5" cy="82.5" r="0.8" fill="#FFFFFF" opacity="0.65"/>
+  <!-- CANÁRIO — bico -->
+  <polygon points="74,84 70,86 74,88" fill="#E07018"/>
+  <polygon points="74,84 70,86 73,85" fill="#F08820"/>
+  <!-- CANÁRIO — cauda -->
+  <polygon points="106,90 115,86 116,96 107,94" fill="#B4A808"/>
+  <!-- CANÁRIO — pés no poleiro -->
+  <line x1="88" y1="100" x2="86" y2="108" stroke="#C07018" stroke-width="1.5"/>
+  <line x1="92" y1="101" x2="91" y2="108" stroke="#C07018" stroke-width="1.5"/>
+
+  <!-- DIVIDER + INFO -->
+  <line x1="14" y1="150" x2="180" y2="150" stroke="#3A3018" stroke-width="0.8"/>
+  <text x="97" y="161" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#585028">Cena 1 · Recebido na gaiola da entrada</text>
+</svg>

@@ -1,0 +1,1119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1456"
+   height="839"
+   viewBox="0 0 1456 839"
+   version="1.1"
+   id="svg149"
+   sodipodi:docname="cena1_fase2_3.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview149"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.93325387"
+     inkscape:cx="758.10026"
+     inkscape:cy="387.35441"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg149" />
+  <defs
+     id="defs18">
+    <!-- Basalt rock pattern - dark with subtle texture -->
+    <pattern
+       id="basalt"
+       x="0"
+       y="0"
+       width="64"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="20"
+         fill="#1C1E20"
+         id="rect1" />
+      <rect
+         width="64"
+         height="1"
+         fill="#141618"
+         id="rect2" />
+      <rect
+         y="10"
+         width="64"
+         height="1"
+         fill="#141618"
+         id="rect3" />
+      <rect
+         width="1"
+         height="10"
+         fill="#141618"
+         id="rect4" />
+      <rect
+         x="63"
+         width="1"
+         height="10"
+         fill="#141618"
+         id="rect5" />
+      <rect
+         x="32"
+         y="10"
+         width="1"
+         height="10"
+         fill="#141618"
+         id="rect6" />
+    </pattern>
+    <!-- Deep basalt sub-layer -->
+    <pattern
+       id="basaltDeep"
+       x="0"
+       y="0"
+       width="64"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="20"
+         fill="#141416"
+         id="rect7" />
+      <rect
+         width="64"
+         height="1"
+         fill="#0C0C0E"
+         id="rect8" />
+      <rect
+         y="10"
+         width="64"
+         height="1"
+         fill="#0C0C0E"
+         id="rect9" />
+      <rect
+         width="1"
+         height="10"
+         fill="#0C0C0E"
+         id="rect10" />
+      <rect
+         x="63"
+         width="1"
+         height="10"
+         fill="#0C0C0E"
+         id="rect11" />
+      <rect
+         x="32"
+         y="10"
+         width="1"
+         height="10"
+         fill="#0C0C0E"
+         id="rect12" />
+    </pattern>
+    <!-- Forest/pine silhouette pattern on ground -->
+    <pattern
+       id="groundRock"
+       x="0"
+       y="0"
+       width="48"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="48"
+         height="20"
+         fill="#181A1C"
+         id="rect13" />
+      <rect
+         width="48"
+         height="1"
+         fill="#101214"
+         id="rect14" />
+      <rect
+         y="10"
+         width="48"
+         height="1"
+         fill="#101214"
+         id="rect15" />
+      <rect
+         width="1"
+         height="10"
+         fill="#101214"
+         id="rect16" />
+      <rect
+         x="47"
+         width="1"
+         height="10"
+         fill="#101214"
+         id="rect17" />
+      <rect
+         x="24"
+         y="10"
+         width="1"
+         height="10"
+         fill="#101214"
+         id="rect18" />
+    </pattern>
+  </defs>
+  <!-- ===== SKY: DAWN - cool blue-grey to pale gold ===== -->
+  <!-- Deep pre-dawn top -->
+  <rect
+     x="0"
+     y="0"
+     width="1456"
+     height="839"
+     fill="#0A0E18"
+     id="rect19" />
+  <rect
+     x="0"
+     y="0"
+     width="1456"
+     height="90"
+     fill="#0E1420"
+     id="rect20" />
+  <rect
+     x="0"
+     y="65"
+     width="1456"
+     height="100"
+     fill="#141C2E"
+     id="rect21" />
+  <rect
+     x="0"
+     y="148"
+     width="1456"
+     height="100"
+     fill="#1E2A3C"
+     id="rect22" />
+  <rect
+     x="0"
+     y="228"
+     width="1456"
+     height="90"
+     fill="#263448"
+     id="rect23" />
+  <rect
+     x="0"
+     y="300"
+     width="1456"
+     height="80"
+     fill="#2E3E54"
+     id="rect24" />
+  <rect
+     x="0"
+     y="360"
+     width="1456"
+     height="70"
+     fill="#344858"
+     id="rect25" />
+  <!-- Horizon glow - pale gold-blue dawn -->
+  <rect
+     x="0"
+     y="410"
+     width="1456"
+     height="65"
+     fill="#3C5060"
+     id="rect26" />
+  <rect
+     x="0"
+     y="452"
+     width="1456"
+     height="50"
+     fill="#486070"
+     id="rect27" />
+  <rect
+     x="0"
+     y="488"
+     width="1456"
+     height="44"
+     fill="#506870"
+     id="rect28" />
+  <!-- DAWN SUN - low, pale gold emerging at horizon left-center -->
+  <ellipse
+     cx="320"
+     cy="510"
+     rx="44"
+     ry="28"
+     fill="#C8B060"
+     fill-opacity="0.6"
+     id="ellipse28" />
+  <ellipse
+     cx="320"
+     cy="516"
+     rx="44"
+     ry="14"
+     fill="#D4C070"
+     fill-opacity="0.5"
+     id="ellipse29" />
+  <ellipse
+     cx="320"
+     cy="514"
+     rx="28"
+     ry="18"
+     fill="#E0D090"
+     fill-opacity="0.7"
+     id="ellipse30" />
+  <!-- MIST LAYERS - key atmospheric element of this scene -->
+  <!-- Far mist bands over the lake -->
+  <ellipse
+     cx="728"
+     cy="520"
+     rx="900"
+     ry="40"
+     fill="#A0B4C0"
+     fill-opacity="0.18"
+     id="ellipse31" />
+  <ellipse
+     cx="500"
+     cy="530"
+     rx="700"
+     ry="30"
+     fill="#90A8B8"
+     fill-opacity="0.22"
+     id="ellipse32" />
+  <ellipse
+     cx="1000"
+     cy="535"
+     rx="600"
+     ry="25"
+     fill="#B0C4D0"
+     fill-opacity="0.15"
+     id="ellipse33" />
+  <ellipse
+     cx="240"
+     cy="525"
+     rx="400"
+     ry="22"
+     fill="#C0D0DC"
+     fill-opacity="0.20"
+     id="ellipse34" />
+  <!-- STARS - few faint ones in upper sky -->
+  <rect
+     x="148"
+     y="45"
+     width="2"
+     height="2"
+     fill="#C0C8D8"
+     fill-opacity="0.6"
+     id="rect34" />
+  <rect
+     x="380"
+     y="28"
+     width="2"
+     height="2"
+     fill="#C0C8D8"
+     fill-opacity="0.5"
+     id="rect35" />
+  <rect
+     x="620"
+     y="60"
+     width="2"
+     height="2"
+     fill="#D0D8E8"
+     fill-opacity="0.55"
+     id="rect36" />
+  <rect
+     x="820"
+     y="32"
+     width="2"
+     height="2"
+     fill="#C0C8D8"
+     fill-opacity="0.5"
+     id="rect37" />
+  <rect
+     x="1050"
+     y="52"
+     width="2"
+     height="2"
+     fill="#D0D8E8"
+     fill-opacity="0.45"
+     id="rect38" />
+  <rect
+     x="1220"
+     y="38"
+     width="2"
+     height="2"
+     fill="#C0C8D8"
+     fill-opacity="0.5"
+     id="rect39" />
+  <rect
+     x="1340"
+     y="70"
+     width="2"
+     height="2"
+     fill="#B8C0D0"
+     fill-opacity="0.4"
+     id="rect40" />
+  <rect
+     x="200"
+     y="112"
+     width="2"
+     height="2"
+     fill="#B8C0D0"
+     fill-opacity="0.35"
+     id="rect41" />
+  <rect
+     x="900"
+     y="80"
+     width="2"
+     height="2"
+     fill="#B8C0D0"
+     fill-opacity="0.4"
+     id="rect42" />
+  <rect
+     x="1150"
+     y="100"
+     width="2"
+     height="2"
+     fill="#B8C0D0"
+     fill-opacity="0.35"
+     id="rect43" />
+  <!-- THE LAKE SURFACE - Lake Superior, vast and dark -->
+  <!-- Lake water - occupies the mid section -->
+  <rect
+     x="0"
+     y="532"
+     width="1456"
+     height="80"
+     fill="#1C3040"
+     id="rect44" />
+  <rect
+     x="0"
+     y="546"
+     width="1456"
+     height="48"
+     fill="#1A2C3C"
+     id="rect45" />
+  <!-- Water ripple lines - pixel style -->
+  <rect
+     x="0"
+     y="556"
+     width="1456"
+     height="2"
+     fill="#243848"
+     fill-opacity="0.8"
+     id="rect46" />
+  <rect
+     x="0"
+     y="564"
+     width="1456"
+     height="2"
+     fill="#243848"
+     fill-opacity="0.6"
+     id="rect47" />
+  <rect
+     x="0"
+     y="572"
+     width="1456"
+     height="2"
+     fill="#243848"
+     fill-opacity="0.5"
+     id="rect48" />
+  <rect
+     x="0"
+     y="580"
+     width="1456"
+     height="2"
+     fill="#243848"
+     fill-opacity="0.4"
+     id="rect49" />
+  <!-- Reflections of dawn light on water -->
+  <ellipse
+     cx="310"
+     cy="556"
+     rx="120"
+     ry="8"
+     fill="#C0A040"
+     fill-opacity="0.14"
+     id="ellipse49" />
+  <ellipse
+     cx="310"
+     cy="566"
+     rx="90"
+     ry="5"
+     fill="#B09030"
+     fill-opacity="0.12"
+     id="ellipse50" />
+  <!-- FAR TREE LINE - boreal forest silhouette, far distance -->
+  <!-- Pine forest background layer (far, very dark) -->
+  <!-- Row of pines - pixel art style triangles -->
+  <!-- Far forest band -->
+  <rect
+     x="0"
+     y="492"
+     width="1456"
+     height="46"
+     fill="#0E1416"
+     id="rect50" />
+  <!-- Individual pine tree shapes - far distance band -->
+  <!-- Pine tops using polygon points -->
+  <polygon
+     points="50,492 68,506 32,506"
+     fill="#0A1010"
+     id="polygon50" />
+  <polygon
+     points="90,488 112,506 68,506"
+     fill="#0C1214"
+     id="polygon51" />
+  <polygon
+     points="130,492 150,506 110,506"
+     fill="#0A1010"
+     id="polygon52" />
+  <polygon
+     points="175,486 200,506 150,506"
+     fill="#0C1214"
+     id="polygon53" />
+  <polygon
+     points="220,490 244,506 196,506"
+     fill="#0A1010"
+     id="polygon54" />
+  <polygon
+     points="260,488 286,506 234,506"
+     fill="#0C1214"
+     id="polygon55" />
+  <polygon
+     points="310,484 340,506 280,506"
+     fill="#0A1010"
+     id="polygon56" />
+  <polygon
+     points="360,490 386,506 334,506"
+     fill="#0C1214"
+     id="polygon57" />
+  <polygon
+     points="405,486 432,506 378,506"
+     fill="#0A1010"
+     id="polygon58" />
+  <polygon
+     points="450,492 474,506 426,506"
+     fill="#0C1214"
+     id="polygon59" />
+  <polygon
+     points="498,488 524,506 472,506"
+     fill="#0A1010"
+     id="polygon60" />
+  <polygon
+     points="545,492 570,506 520,506"
+     fill="#0C1214"
+     id="polygon61" />
+  <polygon
+     points="596,487 624,506 568,506"
+     fill="#0A1010"
+     id="polygon62" />
+  <polygon
+     points="645,490 672,506 618,506"
+     fill="#0C1214"
+     id="polygon63" />
+  <polygon
+     points="695,486 724,506 666,506"
+     fill="#0A1010"
+     id="polygon64" />
+  <polygon
+     points="745,488 774,506 716,506"
+     fill="#0C1214"
+     id="polygon65" />
+  <polygon
+     points="795,484 826,506 764,506"
+     fill="#0A1010"
+     id="polygon66" />
+  <polygon
+     points="847,490 876,506 818,506"
+     fill="#0C1214"
+     id="polygon67" />
+  <polygon
+     points="900,486 928,506 872,506"
+     fill="#0A1010"
+     id="polygon68" />
+  <polygon
+     points="950,491 978,506 922,506"
+     fill="#0C1214"
+     id="polygon69" />
+  <polygon
+     points="1000,487 1030,506 970,506"
+     fill="#0A1010"
+     id="polygon70" />
+  <polygon
+     points="1054,490 1084,506 1024,506"
+     fill="#0C1214"
+     id="polygon71" />
+  <polygon
+     points="1108,486 1138,506 1078,506"
+     fill="#0A1010"
+     id="polygon72" />
+  <polygon
+     points="1162,488 1192,506 1132,506"
+     fill="#0C1214"
+     id="polygon73" />
+  <polygon
+     points="1216,484 1248,506 1184,506"
+     fill="#0A1010"
+     id="polygon74" />
+  <polygon
+     points="1270,490 1300,506 1240,506"
+     fill="#0C1214"
+     id="polygon75" />
+  <polygon
+     points="1325,486 1356,506 1294,506"
+     fill="#0A1010"
+     id="polygon76" />
+  <polygon
+     points="1378,488 1406,506 1350,506"
+     fill="#0C1214"
+     id="polygon77" />
+  <polygon
+     points="1420,492 1456,506 1400,506"
+     fill="#0A1010"
+     id="polygon78" />
+  <!-- NEAR SHORE ROCKY COAST - basalt outcrops with copper veins -->
+  <!-- Rocky shoreline terrain -->
+  <rect
+     x="0"
+     y="588"
+     width="1456"
+     height="251"
+     fill="url(#basalt)"
+     id="rect78" />
+  <!-- Top shore edge - irregular basalt surface -->
+  <rect
+     x="0"
+     y="588"
+     width="1456"
+     height="4"
+     fill="#283032"
+     id="rect79" />
+  <!-- Large basalt rock formations on shore - left side -->
+  <!-- Rock cluster 1 (left) -->
+  <rect
+     x="20"
+     y="552"
+     width="120"
+     height="40"
+     fill="#1C1E22"
+     rx="4"
+     id="rect80" />
+  <rect
+     x="30"
+     y="544"
+     width="80"
+     height="20"
+     fill="#1A1C20"
+     rx="2"
+     id="rect81" />
+  <rect
+     x="50"
+     y="538"
+     width="48"
+     height="18"
+     fill="#181A1E"
+     rx="2"
+     id="rect82" />
+  <!-- copper vein highlight on left rock -->
+  <rect
+     x="55"
+     y="548"
+     width="3"
+     height="12"
+     fill="#B05020"
+     id="rect83" />
+  <rect
+     x="62"
+     y="542"
+     width="2"
+     height="18"
+     fill="#A04818"
+     id="rect84" />
+  <rect
+     x="75"
+     y="550"
+     width="3"
+     height="10"
+     fill="#C06028"
+     id="rect85" />
+  <!-- Rock cluster 2 (center-left) -->
+  <rect
+     x="280"
+     y="558"
+     width="100"
+     height="34"
+     fill="#1E2024"
+     rx="3"
+     id="rect86" />
+  <rect
+     x="290"
+     y="548"
+     width="70"
+     height="22"
+     fill="#1C1E22"
+     rx="2"
+     id="rect87" />
+  <rect
+     x="305"
+     y="542"
+     width="42"
+     height="16"
+     fill="#1A1C20"
+     rx="2"
+     id="rect88" />
+  <!-- Rock cluster 3 (center) - prominent outcrop -->
+  <rect
+     x="550"
+     y="545"
+     width="140"
+     height="46"
+     fill="#1C1E22"
+     rx="4"
+     id="rect89" />
+  <rect
+     x="570"
+     y="533"
+     width="100"
+     height="26"
+     fill="#1A1C20"
+     rx="3"
+     id="rect90" />
+  <rect
+     x="590"
+     y="524"
+     width="60"
+     height="22"
+     fill="#181A1E"
+     rx="2"
+     id="rect91" />
+  <!-- copper vein on center rock -->
+  <rect
+     x="596"
+     y="530"
+     width="4"
+     height="16"
+     fill="#B85428"
+     id="rect92" />
+  <rect
+     x="608"
+     y="528"
+     width="3"
+     height="20"
+     fill="#C06030"
+     id="rect93" />
+  <rect
+     x="620"
+     y="534"
+     width="4"
+     height="14"
+     fill="#A84820"
+     id="rect94" />
+  <!-- Rock cluster 4 (right) -->
+  <rect
+     x="900"
+     y="555"
+     width="110"
+     height="36"
+     fill="#1E2024"
+     rx="3"
+     id="rect95" />
+  <rect
+     x="912"
+     y="546"
+     width="78"
+     height="20"
+     fill="#1C1E22"
+     rx="2"
+     id="rect96" />
+  <rect
+     x="926"
+     y="540"
+     width="46"
+     height="16"
+     fill="#1A1C20"
+     rx="2"
+     id="rect97" />
+  <!-- Rock cluster 5 (far right) -->
+  <rect
+     x="1250"
+     y="560"
+     width="90"
+     height="30"
+     fill="#1C1E22"
+     rx="3"
+     id="rect98" />
+  <rect
+     x="1260"
+     y="552"
+     width="64"
+     height="18"
+     fill="#1A1C20"
+     rx="2"
+     id="rect99" />
+  <!-- PEBBLES on shoreline -->
+  <ellipse
+     cx="160"
+     cy="596"
+     rx="8"
+     ry="4"
+     fill="#242628"
+     id="ellipse99" />
+  <ellipse
+     cx="200"
+     cy="600"
+     rx="6"
+     ry="3"
+     fill="#1E2022"
+     id="ellipse100" />
+  <ellipse
+     cx="450"
+     cy="594"
+     rx="10"
+     ry="4"
+     fill="#242628"
+     id="ellipse101" />
+  <ellipse
+     cx="500"
+     cy="598"
+     rx="7"
+     ry="3"
+     fill="#1E2022"
+     id="ellipse102" />
+  <ellipse
+     cx="750"
+     cy="596"
+     rx="9"
+     ry="4"
+     fill="#222426"
+     id="ellipse103" />
+  <ellipse
+     cx="1100"
+     cy="595"
+     rx="8"
+     ry="4"
+     fill="#242628"
+     id="ellipse104" />
+  <ellipse
+     cx="1150"
+     cy="599"
+     rx="6"
+     ry="3"
+     fill="#1E2022"
+     id="ellipse105" />
+  <ellipse
+     cx="1350"
+     cy="596"
+     rx="7"
+     ry="4"
+     fill="#242628"
+     id="ellipse106" />
+  <!-- COPPER VEIN OUTCROPS on ground -->
+  <!-- Several reddish-orange vein exposures -->
+  <rect
+     x="130"
+     y="610"
+     width="5"
+     height="20"
+     fill="#B85030"
+     id="rect106" />
+  <rect
+     x="138"
+     y="606"
+     width="3"
+     height="26"
+     fill="#C85838"
+     id="rect107" />
+  <rect
+     x="390"
+     y="614"
+     width="4"
+     height="16"
+     fill="#B04828"
+     id="rect108" />
+  <rect
+     x="680"
+     y="608"
+     width="5"
+     height="22"
+     fill="#C05030"
+     id="rect109" />
+  <rect
+     x="688"
+     y="612"
+     width="3"
+     height="16"
+     fill="#B84828"
+     id="rect110" />
+  <rect
+     x="1020"
+     y="610"
+     width="4"
+     height="18"
+     fill="#B85030"
+     id="rect111" />
+  <rect
+     x="1028"
+     y="614"
+     width="3"
+     height="14"
+     fill="#A84020"
+     id="rect112" />
+  <!-- SNOW/FROST patches on dark rocks (cold Michigan morning) -->
+  <rect
+     x="70"
+     y="548"
+     width="12"
+     height="3"
+     fill="#D0D8E0"
+     fill-opacity="0.5"
+     id="rect113" />
+  <rect
+     x="310"
+     y="550"
+     width="8"
+     height="2"
+     fill="#D0D8E0"
+     fill-opacity="0.4"
+     id="rect114" />
+  <rect
+     x="610"
+     y="532"
+     width="10"
+     height="2"
+     fill="#D0D8E0"
+     fill-opacity="0.45"
+     id="rect115" />
+  <!-- MIST near ground level - atmospheric depth -->
+  <ellipse
+     cx="300"
+     cy="592"
+     rx="250"
+     ry="20"
+     fill="#B0C4CC"
+     fill-opacity="0.12"
+     id="ellipse115" />
+  <ellipse
+     cx="900"
+     cy="590"
+     rx="300"
+     ry="18"
+     fill="#A8BCC4"
+     fill-opacity="0.10"
+     id="ellipse116" />
+  <ellipse
+     cx="1200"
+     cy="594"
+     rx="200"
+     ry="15"
+     fill="#B0C4CC"
+     fill-opacity="0.11"
+     id="ellipse117" />
+  <!-- PINE TREES on far left edge (boreal forest close-up) -->
+  <!-- Tall pine tree left -->
+  <rect
+     x="80"
+     y="480"
+     width="8"
+     height="116"
+     fill="#141618"
+     id="rect117" />
+  <polygon
+     points="80,388 120,482 40,482"
+     fill="#0E1214"
+     id="polygon117" />
+  <polygon
+     points="84,420 118,482 50,482"
+     fill="#101416"
+     id="polygon118" />
+  <polygon
+     points="88,448 116,482 60,482"
+     fill="#0C1010"
+     id="polygon119" />
+  <!-- Pine tree center-left -->
+  <rect
+     x="186"
+     y="496"
+     width="7"
+     height="98"
+     fill="#141618"
+     id="rect119" />
+  <polygon
+     points="186,408 222,498 150,498"
+     fill="#0E1214"
+     id="polygon120" />
+  <polygon
+     points="190,438 220,498 156,498"
+     fill="#101416"
+     id="polygon121" />
+  <!-- EAGLE silhouette - soaring high above the lake -->
+  <!-- Bald Eagle pixel art - white head and tail, dark body/wings -->
+  <!-- Eagle body -->
+  <!-- Wings spread - left wing -->
+  <!-- Wings - right wing -->
+  <!-- White head -->
+  <!-- Yellow beak -->
+  <!-- White tail -->
+  <!-- GROUND LAYERS - geological strata visible -->
+  <!-- Top basalt layer with copper veins visible in cross section -->
+  <rect
+     x="0"
+     y="700"
+     width="1456"
+     height="30"
+     fill="#1C2024"
+     id="rect129" />
+  <rect
+     x="0"
+     y="700"
+     width="1456"
+     height="2"
+     fill="#283032"
+     id="rect130" />
+  <!-- Copper vein horizontal layer in basalt -->
+  <rect
+     x="0"
+     y="714"
+     width="1456"
+     height="3"
+     fill="#803818"
+     fill-opacity="0.6"
+     id="rect131" />
+  <!-- Sub-basalt layer -->
+  <rect
+     x="0"
+     y="730"
+     width="1456"
+     height="40"
+     fill="url(#basaltDeep)"
+     id="rect132" />
+  <rect
+     x="0"
+     y="770"
+     width="1456"
+     height="69"
+     fill="#0E1012"
+     id="rect133" />
+  <!-- WATER REFLECTIONS - pixel shimmers on lake surface -->
+  <rect
+     x="100"
+     y="538"
+     width="4"
+     height="2"
+     fill="#4080A0"
+     fill-opacity="0.5"
+     id="rect134" />
+  <rect
+     x="200"
+     y="542"
+     width="6"
+     height="2"
+     fill="#4080A0"
+     fill-opacity="0.4"
+     id="rect135" />
+  <rect
+     x="460"
+     y="536"
+     width="4"
+     height="2"
+     fill="#4080A0"
+     fill-opacity="0.45"
+     id="rect136" />
+  <rect
+     x="700"
+     y="540"
+     width="8"
+     height="2"
+     fill="#5090B0"
+     fill-opacity="0.4"
+     id="rect137" />
+  <rect
+     x="980"
+     y="538"
+     width="6"
+     height="2"
+     fill="#4080A0"
+     fill-opacity="0.4"
+     id="rect138" />
+  <rect
+     x="1200"
+     y="540"
+     width="4"
+     height="2"
+     fill="#4080A0"
+     fill-opacity="0.35"
+     id="rect139" />
+  <!-- PLATFORM LEDGES (playfield platforms) -->
+  <!-- Left ledge - rock outcrop platform -->
+  <rect
+     x="60"
+     y="574"
+     width="180"
+     height="16"
+     fill="url(#groundRock)"
+     id="rect140" />
+  <rect
+     x="60"
+     y="574"
+     width="180"
+     height="3"
+     fill="#303436"
+     id="rect141" />
+  <!-- Center-left ledge -->
+  <rect
+     x="340"
+     y="566"
+     width="160"
+     height="16"
+     fill="url(#groundRock)"
+     id="rect142" />
+  <rect
+     x="340"
+     y="566"
+     width="160"
+     height="3"
+     fill="#2E3234"
+     id="rect143" />
+  <!-- Center ledge -->
+  <rect
+     x="600"
+     y="570"
+     width="200"
+     height="16"
+     fill="url(#groundRock)"
+     id="rect144" />
+  <rect
+     x="600"
+     y="570"
+     width="200"
+     height="3"
+     fill="#303436"
+     id="rect145" />
+  <!-- Right ledge -->
+  <rect
+     x="980"
+     y="568"
+     width="170"
+     height="16"
+     fill="url(#groundRock)"
+     id="rect146" />
+  <rect
+     x="980"
+     y="568"
+     width="170"
+     height="3"
+     fill="#2E3234"
+     id="rect147" />
+  <!-- Far right ledge -->
+  <rect
+     x="1260"
+     y="572"
+     width="150"
+     height="16"
+     fill="url(#groundRock)"
+     id="rect148" />
+  <rect
+     x="1260"
+     y="572"
+     width="150"
+     height="3"
+     fill="#303436"
+     id="rect149" />
+</svg>

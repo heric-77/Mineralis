@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="194" height="166" viewBox="0 0 194 166" role="img" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <title>Xisto Carbonoso</title>
+  <desc>Rocha sedimentar que envolve as camadas de carvão</desc>
+
+  <!-- HEADER -->
+  <rect x="0" y="0" width="194" height="32" rx="8" fill="#242424"/>
+  <rect x="0" y="22" width="194" height="10" fill="#242424"/>
+  <text x="97" y="15" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#909090" font-weight="bold">Xisto Carbonoso</text>
+  <text x="97" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#585858">Carbonaceous Shale</text>
+
+  <!-- AMOSTRA DE XISTO (forma irregular, plana — rocha sedimentar) -->
+  <!-- Sombra projetada -->
+  <polygon points="32,138 162,138 158,148 40,150" fill="#141412"/>
+  <!-- Perfil da rocha (vista lateral — destaca as camadas) -->
+  <polygon points="28,86 166,82 168,136 30,140" fill="#1E1E1C"/>
+
+  <!-- FACE PRINCIPAL DA ROCHA ──────────────────────── -->
+  <!-- Camadas da rocha (de baixo para cima, alternando tons) -->
+  <!-- Camada base — xisto escuro -->
+  <polygon points="30,128 164,124 166,136 28,140" fill="#282826"/>
+  <!-- Camada com carvão (inclusão escura) -->
+  <polygon points="30,118 165,114 165,124 30,128" fill="#1A1A18"/>
+  <!-- Linha de carvão mais brilhante dentro -->
+  <polygon points="42,119 152,115 153,119 42,122" fill="#141412"/>
+  <polygon points="50,120 145,116 146,118 50,121" fill="#0E0E0C"/>
+  <!-- Camada de xisto médio -->
+  <polygon points="30,108 165,104 165,114 30,118" fill="#303030"/>
+  <!-- Camada com inclusão de carvão (mais brilhante) -->
+  <polygon points="30,97 165,93 166,104 30,108" fill="#1C1C1A"/>
+  <polygon points="38,99 155,95 155,101 38,103" fill="#141412"/>
+  <!-- Camada de xisto claro (mais superficial) -->
+  <polygon points="30,87 164,83 165,93 30,97" fill="#383836"/>
+  <!-- Face superior da pedra (topo) -->
+  <polygon points="28,86 166,82 168,88 30,92" fill="#424240"/>
+  <!-- Highlight do topo -->
+  <polygon points="32,86 140,82 142,84 34,88" fill="#4E4E4C" opacity="0.7"/>
+
+  <!-- TEXTURA DE ESTRATIFICAÇÃO (linhas de clivagem no xisto) -->
+  <line x1="32"  y1="91"  x2="162" y2="87"  stroke="#2A2A28" stroke-width="0.8" opacity="0.8"/>
+  <line x1="32"  y1="95"  x2="162" y2="91"  stroke="#1E1E1C" stroke-width="0.8" opacity="0.7"/>
+  <line x1="31"  y1="102" x2="163" y2="98"  stroke="#2A2A28" stroke-width="0.8" opacity="0.7"/>
+  <line x1="31"  y1="112" x2="163" y2="108" stroke="#1E1E1C" stroke-width="0.8" opacity="0.7"/>
+  <line x1="31"  y1="122" x2="163" y2="118" stroke="#2A2A28" stroke-width="0.8" opacity="0.8"/>
+  <line x1="31"  y1="132" x2="163" y2="128" stroke="#1E1E1C" stroke-width="0.7" opacity="0.6"/>
+
+  <!-- INCLUSÕES DE CARVÃO (nódulos escuros brilhantes) -->
+  <ellipse cx="62"  cy="112" rx="9"  ry="4"  fill="#0C0C0A"/>
+  <ellipse cx="62"  cy="111" rx="7"  ry="2.5" fill="#121210"/>
+  <ellipse cx="120" cy="100" rx="12" ry="4.5" fill="#0C0C0A"/>
+  <ellipse cx="120" cy="99"  rx="9"  ry="3"   fill="#141412"/>
+  <ellipse cx="148" cy="120" rx="7"  ry="3"   fill="#0C0C0A"/>
+  <ellipse cx="148" cy="119" rx="5.5" ry="2"  fill="#121210"/>
+  <ellipse cx="45"  cy="125" rx="6"  ry="2.5" fill="#0E0E0C"/>
+  <!-- Brilho leve nos nódulos de carvão (antracito) -->
+  <ellipse cx="118" cy="98"  rx="4"  ry="1.5" fill="#1E1E1C" opacity="0.6"/>
+  <ellipse cx="60"  cy="110" rx="3.5" ry="1.5" fill="#181816" opacity="0.6"/>
+
+  <!-- QUEBRA NA ROCHA (clivagem natural do xisto) -->
+  <line x1="138" y1="84"  x2="148" y2="140" stroke="#141412" stroke-width="2"/>
+  <line x1="139" y1="84"  x2="149" y2="140" stroke="#282826" stroke-width="1.2"/>
+  <!-- Fragmento levemente deslocado -->
+  <polygon points="140,84 166,82 168,130 150,140" fill="#2A2A28"/>
+  <polygon points="141,84 165,82 167,128 151,140" fill="#323230"/>
+  <!-- Estratos do fragmento -->
+  <line x1="142" y1="92"  x2="165" y2="90"  stroke="#282826" stroke-width="0.8" opacity="0.7"/>
+  <line x1="142" y1="104" x2="166" y2="102" stroke="#1E1E1C" stroke-width="0.8" opacity="0.7"/>
+  <line x1="142" y1="118" x2="166" y2="116" stroke="#282826" stroke-width="0.8" opacity="0.7"/>
+
+  <!-- REFLXO DE LUZ no topo da rocha -->
+  <ellipse cx="80" cy="86" rx="30" ry="4" fill="#4A4A48" opacity="0.4"/>
+
+  <!-- DIVIDER + INFO -->
+  <line x1="14" y1="150" x2="180" y2="150" stroke="#303030" stroke-width="0.8"/>
+  <text x="97" y="161" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#505050">Camada geológica · Carbonífero · 300 Ma</text>
+</svg>

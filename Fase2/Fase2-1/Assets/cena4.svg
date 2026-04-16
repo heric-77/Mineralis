@@ -1,0 +1,1334 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1456"
+   height="816"
+   viewBox="0 0 1456 816"
+   version="1.1"
+   id="svg247"
+   sodipodi:docname="cena4.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview247"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.9191176"
+     inkscape:cx="1475.4177"
+     inkscape:cy="506.74331"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg247" />
+  <defs
+     id="defs42">
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#brkSub"
+       id="pattern1"
+       patternTransform="matrix(1,0,0,0.7127317,0,197.8704)" />
+    <pattern
+       id="brkGnd"
+       x="0"
+       y="0"
+       width="64"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="20"
+         fill="#4A2A0A"
+         id="rect1" />
+      <rect
+         width="64"
+         height="1"
+         fill="#3A1E06"
+         id="rect2" />
+      <rect
+         y="10"
+         width="64"
+         height="1"
+         fill="#3A1E06"
+         id="rect3" />
+      <rect
+         width="1"
+         height="10"
+         fill="#3A1E06"
+         id="rect4" />
+      <rect
+         x="63"
+         width="1"
+         height="10"
+         fill="#3A1E06"
+         id="rect5" />
+      <rect
+         x="32"
+         y="10"
+         width="1"
+         height="10"
+         fill="#3A1E06"
+         id="rect6" />
+    </pattern>
+    <pattern
+       id="brkSub"
+       x="0"
+       y="0"
+       width="64"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="20"
+         fill="#3A1E06"
+         id="rect7" />
+      <rect
+         width="64"
+         height="1"
+         fill="#2A1204"
+         id="rect8" />
+      <rect
+         y="10"
+         width="64"
+         height="1"
+         fill="#2A1204"
+         id="rect9" />
+      <rect
+         width="1"
+         height="10"
+         fill="#2A1204"
+         id="rect10" />
+      <rect
+         x="63"
+         width="1"
+         height="10"
+         fill="#2A1204"
+         id="rect11" />
+      <rect
+         x="32"
+         y="10"
+         width="1"
+         height="10"
+         fill="#2A1204"
+         id="rect12" />
+    </pattern>
+    <pattern
+       id="brkDeep"
+       x="0"
+       y="0"
+       width="64"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="20"
+         fill="#2A1204"
+         id="rect13" />
+      <rect
+         width="64"
+         height="1"
+         fill="#1E0E02"
+         id="rect14" />
+      <rect
+         y="10"
+         width="64"
+         height="1"
+         fill="#1E0E02"
+         id="rect15" />
+      <rect
+         width="1"
+         height="10"
+         fill="#1E0E02"
+         id="rect16" />
+      <rect
+         x="63"
+         width="1"
+         height="10"
+         fill="#1E0E02"
+         id="rect17" />
+      <rect
+         x="32"
+         y="10"
+         width="1"
+         height="10"
+         fill="#1E0E02"
+         id="rect18" />
+    </pattern>
+    <pattern
+       id="brkPlt"
+       x="0"
+       y="0"
+       width="48"
+       height="24"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="48"
+         height="24"
+         fill="#8A7858"
+         id="rect19" />
+      <rect
+         width="48"
+         height="1"
+         fill="#6A5840"
+         id="rect20" />
+      <rect
+         y="12"
+         width="48"
+         height="1"
+         fill="#6A5840"
+         id="rect21" />
+      <rect
+         width="1"
+         height="12"
+         fill="#6A5840"
+         id="rect22" />
+      <rect
+         x="47"
+         width="1"
+         height="12"
+         fill="#6A5840"
+         id="rect23" />
+      <rect
+         x="24"
+         y="12"
+         width="1"
+         height="12"
+         fill="#6A5840"
+         id="rect24" />
+    </pattern>
+    <pattern
+       id="brkCave"
+       x="0"
+       y="0"
+       width="48"
+       height="24"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="48"
+         height="24"
+         fill="#3A3438"
+         id="rect25" />
+      <rect
+         width="48"
+         height="1"
+         fill="#2A2830"
+         id="rect26" />
+      <rect
+         y="12"
+         width="48"
+         height="1"
+         fill="#2A2830"
+         id="rect27" />
+      <rect
+         width="1"
+         height="12"
+         fill="#2A2830"
+         id="rect28" />
+      <rect
+         x="47"
+         width="1"
+         height="12"
+         fill="#2A2830"
+         id="rect29" />
+      <rect
+         x="24"
+         y="12"
+         width="1"
+         height="12"
+         fill="#2A2830"
+         id="rect30" />
+    </pattern>
+    <pattern
+       id="brkCaveFlr"
+       x="0"
+       y="0"
+       width="64"
+       height="18"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="18"
+         fill="#2A2430"
+         id="rect31" />
+      <rect
+         width="64"
+         height="1"
+         fill="#1E1C28"
+         id="rect32" />
+      <rect
+         y="9"
+         width="64"
+         height="1"
+         fill="#1E1C28"
+         id="rect33" />
+      <rect
+         width="1"
+         height="9"
+         fill="#1E1C28"
+         id="rect34" />
+      <rect
+         x="63"
+         width="1"
+         height="9"
+         fill="#1E1C28"
+         id="rect35" />
+      <rect
+         x="32"
+         y="9"
+         width="1"
+         height="9"
+         fill="#1E1C28"
+         id="rect36" />
+    </pattern>
+    <pattern
+       id="brkRiver"
+       x="0"
+       y="0"
+       width="64"
+       height="18"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="64"
+         height="18"
+         fill="#6A4820"
+         id="rect37" />
+      <rect
+         width="64"
+         height="1"
+         fill="#4A3010"
+         id="rect38" />
+      <rect
+         y="9"
+         width="64"
+         height="1"
+         fill="#4A3010"
+         id="rect39" />
+      <rect
+         width="1"
+         height="9"
+         fill="#4A3010"
+         id="rect40" />
+      <rect
+         x="63"
+         width="1"
+         height="9"
+         fill="#4A3010"
+         id="rect41" />
+      <rect
+         x="32"
+         y="9"
+         width="1"
+         height="9"
+         fill="#4A3010"
+         id="rect42" />
+    </pattern>
+  </defs>
+  <rect
+     x="0.0"
+     y="0.0"
+     width="1456.0"
+     height="816.0"
+     fill="#0E0810"
+     id="rect43" />
+  <rect
+     x="0.0"
+     y="0.0"
+     width="1456.0"
+     height="81.6"
+     fill="#1A0606"
+     id="rect44" />
+  <rect
+     x="0.0"
+     y="65.3"
+     width="1456.0"
+     height="114.2"
+     fill="#2E0A08"
+     id="rect45" />
+  <rect
+     x="0.0"
+     y="146.9"
+     width="1456.0"
+     height="97.9"
+     fill="#440E08"
+     id="rect46" />
+  <rect
+     x="0.0"
+     y="212.2"
+     width="1456.0"
+     height="81.6"
+     fill="#581408"
+     id="rect47" />
+  <rect
+     x="0.0"
+     y="261.1"
+     width="1456.0"
+     height="81.6"
+     fill="#4A1208"
+     id="rect48" />
+  <rect
+     x="0.0"
+     y="310.1"
+     width="1456.0"
+     height="65.3"
+     fill="#380E08"
+     id="rect49" />
+  <rect
+     x="0.0"
+     y="359.0"
+     width="1456.0"
+     height="65.3"
+     fill="#280C06"
+     id="rect50" />
+  <rect
+     x="0.0"
+     y="408.0"
+     width="1456.0"
+     height="81.6"
+     fill="#1C0804"
+     id="rect51" />
+  <rect
+     x="0.0"
+     y="473.3"
+     width="1456.0"
+     height="32.6"
+     fill="#140604"
+     id="rect52" />
+  <ellipse
+     cx="902.7"
+     cy="228.5"
+     rx="260.0"
+     ry="50.0"
+     fill="#7A1008"
+     id="ellipse52" />
+  <ellipse
+     cx="902.7"
+     cy="228.5"
+     rx="180.0"
+     ry="32.0"
+     fill="#A01A08"
+     id="ellipse53" />
+  <ellipse
+     cx="902.7"
+     cy="228.5"
+     rx="110.0"
+     ry="20.0"
+     fill="#C82A10"
+     id="ellipse54" />
+  <ellipse
+     cx="902.7"
+     cy="228.5"
+     rx="58.0"
+     ry="12.0"
+     fill="#E04020"
+     id="ellipse55" />
+  <ellipse
+     cx="902.7"
+     cy="228.5"
+     rx="28.0"
+     ry="7.0"
+     fill="#F06030"
+     id="ellipse56" />
+  <circle
+     cx="55.0"
+     cy="22.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle56" />
+  <circle
+     cx="200.0"
+     cy="14.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle57" />
+  <circle
+     cx="420.0"
+     cy="30.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle58" />
+  <circle
+     cx="680.0"
+     cy="18.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle59" />
+  <circle
+     cx="900.0"
+     cy="35.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle60" />
+  <circle
+     cx="1160.0"
+     cy="20.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle61" />
+  <circle
+     cx="1350.0"
+     cy="28.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle62" />
+  <circle
+     cx="140.0"
+     cy="55.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle63" />
+  <circle
+     cx="380.0"
+     cy="65.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle64" />
+  <circle
+     cx="620.0"
+     cy="48.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle65" />
+  <circle
+     cx="860.0"
+     cy="60.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle66" />
+  <circle
+     cx="1080.0"
+     cy="42.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle67" />
+  <circle
+     cx="1280.0"
+     cy="55.0"
+     r="2.0"
+     fill="#E8D8B8"
+     id="circle68" />
+  <circle
+     cx="1440.0"
+     cy="38.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle69" />
+  <circle
+     cx="290.0"
+     cy="38.0"
+     r="1.0"
+     fill="#E8D8B8"
+     id="circle70" />
+  <circle
+     cx="510.0"
+     cy="28.0"
+     r="1.0"
+     fill="#E8D8B8"
+     id="circle71" />
+  <circle
+     cx="740.0"
+     cy="42.0"
+     r="1.0"
+     fill="#E8D8B8"
+     id="circle72" />
+  <circle
+     cx="990.0"
+     cy="30.0"
+     r="1.0"
+     fill="#E8D8B8"
+     id="circle73" />
+  <circle
+     cx="1200.0"
+     cy="46.0"
+     r="1.0"
+     fill="#E8D8B8"
+     id="circle74" />
+  <circle
+     cx="70.0"
+     cy="78.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle75" />
+  <circle
+     cx="480.0"
+     cy="82.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle76" />
+  <circle
+     cx="820.0"
+     cy="76.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle77" />
+  <circle
+     cx="1100.0"
+     cy="82.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle78" />
+  <circle
+     cx="1380.0"
+     cy="78.0"
+     r="1.5"
+     fill="#E8D8B8"
+     id="circle79" />
+  <circle
+     cx="116.5"
+     cy="73.4"
+     r="28.0"
+     fill="#D8C898"
+     id="circle80" />
+  <circle
+     cx="130.5"
+     cy="69.4"
+     r="26.0"
+     fill="#140A10"
+     id="circle81" />
+  <ellipse
+     cx="300.0"
+     cy="122.4"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse81" />
+  <ellipse
+     cx="497.0"
+     cy="140.4"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse82" />
+  <ellipse
+     cx="694.0"
+     cy="158.4"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse83" />
+  <ellipse
+     cx="891.0"
+     cy="176.4"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse84" />
+  <ellipse
+     cx="1088.0"
+     cy="194.4"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse85" />
+  <ellipse
+     cx="1285.0"
+     cy="212.4"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse86" />
+  <ellipse
+     cx="26.0"
+     cy="230.4"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse87" />
+  <ellipse
+     cx="223.0"
+     cy="248.4"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse88" />
+  <ellipse
+     cx="420.0"
+     cy="266.4"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse89" />
+  <ellipse
+     cx="617.0"
+     cy="284.4"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse90" />
+  <ellipse
+     cx="814.0"
+     cy="302.4"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse91" />
+  <ellipse
+     cx="1011.0"
+     cy="320.4"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse92" />
+  <ellipse
+     cx="1208.0"
+     cy="338.4"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse93" />
+  <ellipse
+     cx="1405.0"
+     cy="356.4"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse94" />
+  <ellipse
+     cx="146.0"
+     cy="374.4"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse95" />
+  <ellipse
+     cx="343.0"
+     cy="392.4"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse96" />
+  <ellipse
+     cx="540.0"
+     cy="410.4"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse97" />
+  <ellipse
+     cx="737.0"
+     cy="428.4"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse98" />
+  <ellipse
+     cx="934.0"
+     cy="446.4"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse99" />
+  <ellipse
+     cx="1131.0"
+     cy="464.4"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse100" />
+  <ellipse
+     cx="1328.0"
+     cy="482.4"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse101" />
+  <ellipse
+     cx="69.0"
+     cy="133.2"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse102" />
+  <ellipse
+     cx="266.0"
+     cy="151.2"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse103" />
+  <ellipse
+     cx="463.0"
+     cy="169.2"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse104" />
+  <ellipse
+     cx="660.0"
+     cy="187.2"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse105" />
+  <ellipse
+     cx="857.0"
+     cy="205.2"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse106" />
+  <ellipse
+     cx="1054.0"
+     cy="223.2"
+     rx="5.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse107" />
+  <ellipse
+     cx="1251.0"
+     cy="241.2"
+     rx="6.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse108" />
+  <ellipse
+     cx="1448.0"
+     cy="259.2"
+     rx="3.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse109" />
+  <ellipse
+     cx="189.0"
+     cy="277.2"
+     rx="4.0"
+     ry="2.0"
+     fill="#A06030"
+     fill-opacity="0.10"
+     id="ellipse110" />
+  <polygon
+     points="0.0,440.6 100.0,163.2 200.0,440.6"
+     fill="#1A1428"
+     id="polygon110" />
+  <polygon
+     points="140.0,440.6 280.0,97.9 420.0,440.6"
+     fill="#1A1428"
+     id="polygon111" />
+  <polygon
+     points="340.0,440.6 480.0,146.9 620.0,440.6"
+     fill="#1A1428"
+     id="polygon112" />
+  <polygon
+     points="540.0,440.6 670.0,81.6 800.0,440.6"
+     fill="#1A1428"
+     id="polygon113" />
+  <polygon
+     points="720.0,440.6 850.0,130.6 980.0,440.6"
+     fill="#1A1428"
+     id="polygon114" />
+  <polygon
+     points="900.0,440.6 1040.0,97.9 1180.0,440.6"
+     fill="#1A1428"
+     id="polygon115" />
+  <polygon
+     points="1080.0,440.6 1220.0,163.2 1360.0,440.6"
+     fill="#1A1428"
+     id="polygon116" />
+  <polygon
+     points="1280.0,440.6 1400.0,114.2 1520.0,440.6"
+     fill="#1A1428"
+     id="polygon117" />
+  <polygon
+     points="72.5,163.2 127.5,163.2 150.0,183.2 50.0,183.2"
+     fill="#302840"
+     id="polygon118" />
+  <polygon
+     points="247.5,97.9 312.5,97.9 337.5,121.9 222.5,121.9"
+     fill="#302840"
+     id="polygon119" />
+  <polygon
+     points="451.0,146.9 509.0,146.9 532.5,168.9 427.5,168.9"
+     fill="#302840"
+     id="polygon120" />
+  <polygon
+     points="634.0,81.6 706.0,81.6 734.0,107.6 606.0,107.6"
+     fill="#302840"
+     id="polygon121" />
+  <polygon
+     points="819.0,130.6 881.0,130.6 905.0,152.6 795.0,152.6"
+     fill="#302840"
+     id="polygon122" />
+  <polygon
+     points="1006.0,97.9 1074.0,97.9 1099.0,121.9 981.0,121.9"
+     fill="#302840"
+     id="polygon123" />
+  <polygon
+     points="1190.0,163.2 1250.0,163.2 1274.0,184.2 1166.0,184.2"
+     fill="#302840"
+     id="polygon124" />
+  <polygon
+     points="-20.0,587.5 180.0,261.1 380.0,587.5"
+     fill="#2E1A08"
+     id="polygon125" />
+  <polygon
+     points="220.0,587.5 430.0,195.8 640.0,587.5"
+     fill="#3A2210"
+     id="polygon126" />
+  <polygon
+     points="440.0,587.5 640.0,277.4 840.0,587.5"
+     fill="#2E1A08"
+     id="polygon127" />
+  <polygon
+     points="720.0,587.5 920.0,228.5 1120.0,587.5"
+     fill="#3A2210"
+     id="polygon128" />
+  <polygon
+     points="1000.0,587.5 1200.0,269.3 1400.0,587.5"
+     fill="#2E1A08"
+     id="polygon129" />
+  <polygon
+     points="1280.0,587.5 1450.0,310.1 1600.0,587.5"
+     fill="#3A2210"
+     id="polygon130" />
+  <polygon
+     points="144.0,261.1 216.0,261.1 245.0,289.1 115.0,289.1"
+     fill="#7A8AA0"
+     id="polygon131" />
+  <polygon
+     points="606.0,277.4 674.0,277.4 701.0,303.4 579.0,303.4"
+     fill="#7A8AA0"
+     id="polygon132" />
+  <polygon
+     points="880.0,228.5 960.0,228.5 992.5,260.5 847.5,260.5"
+     fill="#7A8AA0"
+     id="polygon133" />
+  <polygon
+     points="1163.0,269.3 1237.0,269.3 1266.0,297.3 1134.0,297.3"
+     fill="#7A8AA0"
+     id="polygon134" />
+  <ellipse
+     cx="430.0"
+     cy="579.4"
+     rx="110.0"
+     ry="20.0"
+     fill="#8C6432"
+     fill-opacity="0.40"
+     id="ellipse142" />
+  <rect
+     x="280.0"
+     y="583.4"
+     width="22.0"
+     height="8.0"
+     fill="#6A5030"
+     id="rect142" />
+  <rect
+     x="330.0"
+     y="583.4"
+     width="24.0"
+     height="8.0"
+     fill="#6A5030"
+     id="rect143" />
+  <rect
+     x="380.0"
+     y="583.4"
+     width="26.0"
+     height="8.0"
+     fill="#6A5030"
+     id="rect144" />
+  <rect
+     x="440.0"
+     y="583.4"
+     width="26.0"
+     height="8.0"
+     fill="#6A5030"
+     id="rect145" />
+  <rect
+     x="490.0"
+     y="583.4"
+     width="28.0"
+     height="8.0"
+     fill="#6A5030"
+     id="rect146" />
+  <rect
+     x="540.0"
+     y="583.4"
+     width="18.0"
+     height="8.0"
+     fill="#6A5030"
+     id="rect147" />
+  <polygon
+     points="30.0,551.5 13.5,581.5 46.5,581.5"
+     fill="#0E1C0C"
+     id="polygon147" />
+  <polygon
+     points="30.0,565.0 9.0,595.0 51.0,595.0"
+     fill="#162816"
+     id="polygon148" />
+  <rect
+     x="26.4"
+     y="593.5"
+     width="7.2"
+     height="12.0"
+     fill="#2A1408"
+     id="rect148" />
+  <polygon
+     points="90.0,543.5 71.3,577.5 108.7,577.5"
+     fill="#0E1C0C"
+     id="polygon149" />
+  <polygon
+     points="90.0,558.8 66.2,592.8 113.8,592.8"
+     fill="#162816"
+     id="polygon150" />
+  <rect
+     x="85.9"
+     y="591.1"
+     width="8.2"
+     height="13.6"
+     fill="#2A1408"
+     id="rect150" />
+  <polygon
+     points="160.0,535.5 139.1,573.5 180.9,573.5"
+     fill="#0E1C0C"
+     id="polygon151" />
+  <polygon
+     points="160.0,552.6 133.4,590.6 186.6,590.6"
+     fill="#162816"
+     id="polygon152" />
+  <rect
+     x="155.4"
+     y="588.7"
+     width="9.1"
+     height="15.2"
+     fill="#2A1408"
+     id="rect152" />
+  <polygon
+     points="700.0,551.5 676.9,593.5 723.1,593.5"
+     fill="#0E1C0C"
+     id="polygon153" />
+  <polygon
+     points="700.0,570.4 670.6,612.4 729.4,612.4"
+     fill="#162816"
+     id="polygon154" />
+  <rect
+     x="695.0"
+     y="610.3"
+     width="10.1"
+     height="16.8"
+     fill="#2A1408"
+     id="rect154" />
+  <polygon
+     points="780.0,543.5 763.5,573.5 796.5,573.5"
+     fill="#0E1C0C"
+     id="polygon155" />
+  <polygon
+     points="780.0,557.0 759.0,587.0 801.0,587.0"
+     fill="#162816"
+     id="polygon156" />
+  <rect
+     x="776.4"
+     y="585.5"
+     width="7.2"
+     height="12.0"
+     fill="#2A1408"
+     id="rect156" />
+  <polygon
+     points="860.0,535.5 841.3,569.5 878.7,569.5"
+     fill="#0E1C0C"
+     id="polygon157" />
+  <polygon
+     points="860.0,550.8 836.2,584.8 883.8,584.8"
+     fill="#162816"
+     id="polygon158" />
+  <rect
+     x="855.9"
+     y="583.1"
+     width="8.2"
+     height="13.6"
+     fill="#2A1408"
+     id="rect158" />
+  <polygon
+     points="940.0,551.5 919.1,589.5 960.9,589.5"
+     fill="#0E1C0C"
+     id="polygon159" />
+  <polygon
+     points="940.0,568.6 913.4,606.6 966.6,606.6"
+     fill="#162816"
+     id="polygon160" />
+  <rect
+     x="935.4"
+     y="604.7"
+     width="9.1"
+     height="15.2"
+     fill="#2A1408"
+     id="rect160" />
+  <polygon
+     points="1020.0,543.5 996.9,585.5 1043.1,585.5"
+     fill="#0E1C0C"
+     id="polygon161" />
+  <polygon
+     points="1020.0,562.4 990.6,604.4 1049.4,604.4"
+     fill="#162816"
+     id="polygon162" />
+  <rect
+     x="1015.0"
+     y="602.3"
+     width="10.1"
+     height="16.8"
+     fill="#2A1408"
+     id="rect162" />
+  <polygon
+     points="1100.0,535.5 1083.5,565.5 1116.5,565.5"
+     fill="#0E1C0C"
+     id="polygon163" />
+  <polygon
+     points="1100.0,549.0 1079.0,579.0 1121.0,579.0"
+     fill="#162816"
+     id="polygon164" />
+  <rect
+     x="1096.4"
+     y="577.5"
+     width="7.2"
+     height="12.0"
+     fill="#2A1408"
+     id="rect164" />
+  <polygon
+     points="1180.0,551.5 1161.3,585.5 1198.7,585.5"
+     fill="#0E1C0C"
+     id="polygon165" />
+  <polygon
+     points="1180.0,566.8 1156.2,600.8 1203.8,600.8"
+     fill="#162816"
+     id="polygon166" />
+  <rect
+     x="1175.9"
+     y="599.1"
+     width="8.2"
+     height="13.6"
+     fill="#2A1408"
+     id="rect166" />
+  <polygon
+     points="1280.0,543.5 1259.1,581.5 1300.9,581.5"
+     fill="#0E1C0C"
+     id="polygon167" />
+  <polygon
+     points="1280.0,560.6 1253.4,598.6 1306.6,598.6"
+     fill="#162816"
+     id="polygon168" />
+  <rect
+     x="1275.4"
+     y="596.7"
+     width="9.1"
+     height="15.2"
+     fill="#2A1408"
+     id="rect168" />
+  <polygon
+     points="1370.0,535.5 1346.9,577.5 1393.1,577.5"
+     fill="#0E1C0C"
+     id="polygon169" />
+  <polygon
+     points="1370.0,554.4 1340.6,596.4 1399.4,596.4"
+     fill="#162816"
+     id="polygon170" />
+  <rect
+     x="1365.0"
+     y="594.3"
+     width="10.1"
+     height="16.8"
+     fill="#2A1408"
+     id="rect170" />
+  <polygon
+     points="1440.0,551.5 1423.5,581.5 1456.5,581.5"
+     fill="#0E1C0C"
+     id="polygon171" />
+  <polygon
+     points="1440.0,565.0 1419.0,595.0 1461.0,595.0"
+     fill="#162816"
+     id="polygon172" />
+  <rect
+     x="1436.4"
+     y="593.5"
+     width="7.2"
+     height="12.0"
+     fill="#2A1408"
+     id="rect172" />
+  <rect
+     x="616.0"
+     y="567.1"
+     width="8.0"
+     height="20.4"
+     fill="#1E1208"
+     id="rect173" />
+  <rect
+     x="618.0"
+     y="567.1"
+     width="4.0"
+     height="12.2"
+     fill="#2A1808"
+     id="rect174" />
+  <rect
+     x="676.0"
+     y="567.1"
+     width="8.0"
+     height="20.4"
+     fill="#1E1208"
+     id="rect175" />
+  <rect
+     x="678.0"
+     y="567.1"
+     width="4.0"
+     height="12.2"
+     fill="#2A1808"
+     id="rect176" />
+  <rect
+     x="736.0"
+     y="567.1"
+     width="8.0"
+     height="20.4"
+     fill="#1E1208"
+     id="rect177" />
+  <rect
+     x="738.0"
+     y="567.1"
+     width="4.0"
+     height="12.2"
+     fill="#2A1808"
+     id="rect178" />
+  <rect
+     x="0.0"
+     y="501.8"
+     width="1456.0"
+     height="8.0"
+     fill="#4A3010"
+     id="rect179" />
+  <rect
+     x="0"
+     y="505.89999"
+     width="1456"
+     height="103.62222"
+     fill="#28380A"
+     id="rect180"
+     style="fill:#008080;stroke-width:1.18817" />
+  <rect
+     x="-1.2170931e-06"
+     y="596.07434"
+     width="1456"
+     height="49.717243"
+     fill="#202E08"
+     id="rect181"
+     style="fill:#00ffff;stroke-width:2.01871" />
+  <ellipse
+     cx="582.4"
+     cy="536.9"
+     rx="280.0"
+     ry="22.0"
+     fill="#786420"
+     fill-opacity="0.35"
+     id="ellipse181"
+     style="fill:#00ffff" />
+  <ellipse
+     cx="800.8"
+     cy="538.6"
+     rx="220.0"
+     ry="18.0"
+     fill="#685A18"
+     fill-opacity="0.30"
+     id="ellipse182"
+     style="fill:#00ffff" />
+  <line
+     x1="80.0"
+     y1="519.0"
+     x2="240.0"
+     y2="519.0"
+     stroke="#3A5028"
+     stroke-width="2"
+     id="line182" />
+  <line
+     x1="340.0"
+     y1="522.2"
+     x2="460.0"
+     y2="522.2"
+     stroke="#3A5028"
+     stroke-width="2"
+     id="line183" />
+  <line
+     x1="580.0"
+     y1="520.6"
+     x2="760.0"
+     y2="520.6"
+     stroke="#3A5028"
+     stroke-width="2"
+     id="line184" />
+  <line
+     x1="840.0"
+     y1="519.0"
+     x2="980.0"
+     y2="519.0"
+     stroke="#3A5028"
+     stroke-width="2"
+     id="line185" />
+  <line
+     x1="1060.0"
+     y1="521.4"
+     x2="1180.0"
+     y2="521.4"
+     stroke="#3A5028"
+     stroke-width="2"
+     id="line186" />
+  <line
+     x1="1280.0"
+     y1="518.2"
+     x2="1390.0"
+     y2="518.2"
+     stroke="#3A5028"
+     stroke-width="2"
+     id="line187" />
+  <rect
+     x="0"
+     y="642.25861"
+     width="1456"
+     height="46.541382"
+     fill="url(#brkSub)"
+     id="rect189"
+     style="fill:url(#pattern1);stroke-width:0.844234" />
+  <rect
+     x="0.0"
+     y="688.8"
+     width="1456.0"
+     height="163.2"
+     fill="url(#brkDeep)"
+     id="rect190" />
+  <rect
+     x="0.0"
+     y="0.0"
+     width="1456.0"
+     height="38.0"
+     fill="#0A0808"
+     id="rect233" />
+</svg>
