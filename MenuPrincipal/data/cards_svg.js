@@ -1,4 +1,330 @@
 const CardsSVG = {
+  
+ '1.2': `<svg
+   viewBox="0 0 80 80"
+   shape-rendering="crispEdges"
+   xmlns="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25" />
+  <!-- Card frame -->
+  <rect x="0" y="0" width="80" height="80" fill="#2C1810" />
+  <rect x="2" y="2" width="76" height="76" fill="#3D2214" />
+  <rect x="3" y="3" width="74" height="74" fill="#1a0f08" />
+  <rect x="3" y="3" width="74" height="1" fill="#6B3A1F" />
+  <rect x="3" y="3" width="1" height="74" fill="#6B3A1F" />
+  <rect x="3" y="76" width="74" height="1" fill="#0d0804" />
+  <rect x="76" y="3" width="1" height="74" fill="#0d0804" />
+  <!-- Sky - dense jungle canopy blocks most sky -->
+  <rect x="4" y="4" width="72" height="20" fill="#1A3D1A" />
+  <rect x="4" y="4" width="72" height="6" fill="#2A5C2A" />
+  <!-- Sunbeams through canopy -->
+  <rect x="20" y="4" width="3" height="30" fill="#3A6B1A" opacity="0.5" />
+  <rect x="22" y="4" width="1" height="25" fill="#7AB828" opacity="0.3" />
+  <rect x="45" y="4" width="4" height="28" fill="#3A6B1A" opacity="0.5" />
+  <rect x="47" y="4" width="2" height="22" fill="#8AC830" opacity="0.3" />
+  <rect x="62" y="4" width="3" height="20" fill="#3A6B1A" opacity="0.4" />
+  <!-- Background jungle canopy (far) -->
+  <!-- Tree tops far -->
+  <rect x="4" y="8" width="12" height="16" fill="#1E4D1E" />
+  <rect x="6" y="6" width="8" height="18" fill="#256325" />
+  <rect x="8" y="4" width="6" height="20" fill="#2A7A2A" />
+  <rect x="14" y="10" width="10" height="14" fill="#1E4D1E" />
+  <rect x="16" y="7" width="8" height="17" fill="#256325" />
+  <rect x="24" y="9" width="10" height="15" fill="#1E4D1E" />
+  <rect x="26" y="6" width="7" height="18" fill="#2A7A2A" />
+  <rect x="38" y="7" width="10" height="17" fill="#1E4D1E" />
+  <rect x="40" y="4" width="7" height="20" fill="#256325" />
+  <rect x="50" y="9" width="10" height="15" fill="#1E4D1E" />
+  <rect x="52" y="6" width="7" height="18" fill="#2A7A2A" />
+  <rect x="62" y="8" width="10" height="16" fill="#1E4D1E" />
+  <rect x="64" y="5" width="8" height="19" fill="#256325" />
+  <!-- Hanging vines -->
+  <rect x="12" y="4" width="1" height="30" fill="#3D6B20" />
+  <rect x="13" y="4" width="1" height="25" fill="#2E5518" />
+  <rect x="35" y="4" width="1" height="28" fill="#3D6B20" />
+  <rect x="36" y="4" width="1" height="22" fill="#2E5518" />
+  <rect x="58" y="4" width="1" height="26" fill="#3D6B20" />
+  <rect x="70" y="4" width="1" height="20" fill="#2E5518" />
+  <!-- Vine leaves -->
+  <rect x="11" y="18" width="3" height="2" fill="#4A8028" />
+  <rect x="11" y="25" width="3" height="2" fill="#4A8028" />
+  <rect x="34" y="15" width="3" height="2" fill="#4A8028" />
+  <rect x="34" y="22" width="3" height="2" fill="#4A8028" />
+  <rect x="57" y="17" width="3" height="2" fill="#4A8028" />
+  <!-- Jungle floor vegetation -->
+  <rect x="4" y="34" width="72" height="15" fill="#2A5C1E" />
+  <rect x="4" y="34" width="72" height="4" fill="#3A7028" />
+  <!-- Large jungle leaves foreground -->
+  <rect x="4" y="30" width="14" height="8" fill="#3A8020" />
+  <rect x="4" y="28" width="10" height="10" fill="#4A9030" />
+  <rect x="6" y="26" width="7" height="12" fill="#5AA040" />
+  <!-- Leaf detail -->
+  <rect x="7" y="27" width="1" height="10" fill="#3A8020" />
+  <rect x="60" y="29" width="16" height="9" fill="#3A8020" />
+  <rect x="64" y="27" width="10" height="11" fill="#4A9030" />
+  <rect x="66" y="25" width="8" height="13" fill="#5AA040" />
+  <rect x="70" y="26" width="1" height="11" fill="#3A8020" />
+  <!-- River - muddy gold rush river -->
+  <rect x="4" y="49" width="72" height="12" fill="#6B4E2A" />
+  <rect x="4" y="50" width="72" height="2" fill="#7A5C35" />
+  <rect x="4" y="52" width="72" height="2" fill="#5C3F1E" />
+  <!-- Water shimmer -->
+  <rect x="8" y="50" width="4" height="1" fill="#8A7040" />
+  <rect x="20" y="52" width="6" height="1" fill="#7A6030" />
+  <rect x="40" y="51" width="8" height="1" fill="#8A7040" />
+  <rect x="58" y="53" width="5" height="1" fill="#7A6030" />
+  <!-- Gold nuggets in river -->
+  <rect x="15" y="53" width="3" height="2" fill="#FFD700" />
+  <rect x="16" y="52" width="2" height="4" fill="#FFC800" />
+  <rect x="30" y="54" width="2" height="2" fill="#FFD700" />
+  <rect x="50" y="53" width="3" height="2" fill="#FFD700" />
+  <rect x="51" y="52" width="2" height="3" fill="#FFC800" />
+  <rect x="63" y="54" width="2" height="2" fill="#FFD700" />
+  <!-- Gold shimmer -->
+  <rect x="15" y="53" width="1" height="1" fill="#FFEC60" />
+  <rect x="50" y="53" width="1" height="1" fill="#FFEC60" />
+  <!-- Sluice box (gold panning equipment) -->
+  <rect x="36" y="48" width="12" height="4" fill="#8B6835" />
+  <rect x="36" y="48" width="12" height="1" fill="#A07840" />
+  <rect x="36" y="48" width="1" height="4" fill="#6B4820" />
+  <rect x="47" y="48" width="1" height="4" fill="#6B4820" />
+  <!-- Riffle bars in sluice -->
+  <rect x="38" y="49" width="1" height="3" fill="#6B4820" />
+  <rect x="40" y="49" width="1" height="3" fill="#6B4820" />
+  <rect x="42" y="49" width="1" height="3" fill="#6B4820" />
+  <rect x="44" y="49" width="1" height="3" fill="#6B4820" />
+  <rect x="46" y="49" width="1" height="3" fill="#6B4820" />
+  <!-- Corvan panning for gold -->
+  <!-- Body -->
+  <rect x="34" y="46" width="4" height="5" fill="#B22222" />
+  <!-- Head -->
+  <rect x="34" y="44" width="4" height="2" fill="#D4956A" />
+  <!-- Hat -->
+  <rect x="33" y="42" width="6" height="2" fill="#5C3A1E" />
+  <rect x="34" y="41" width="4" height="1" fill="#5C3A1E" />
+  <rect x="36" y="41" width="2" height="1" fill="#FFD700" />
+  <!-- Arms extended with pan -->
+  <rect x="30" y="47" width="4" height="1" fill="#D4956A" />
+  <rect x="28" y="46" width="4" height="3" fill="#7A5A30" />
+  <!-- pan -->
+  <rect x="28" y="46" width="4" height="1" fill="#8B6835" />
+  <!-- Legs -->
+  <rect x="34" y="51" width="2" height="2" fill="#3D2810" />
+  <rect x="36" y="51" width="2" height="2" fill="#3D2810" />
+  <!-- Ancient pottery artifacts -->
+  <rect x="10" y="55" width="4" height="5" fill="#8B4513" />
+  <rect x="9" y="56" width="6" height="3" fill="#A0522D" />
+  <rect x="10" y="55" width="4" height="1" fill="#6B3510" />
+  <!-- Pottery design -->
+  <rect x="10" y="57" width="1" height="1" fill="#5C2808" />
+  <rect x="12" y="57" width="1" height="1" fill="#5C2808" />
+  <rect x="65" y="56" width="4" height="4" fill="#8B4513" />
+  <rect x="64" y="57" width="6" height="2" fill="#A0522D" />
+  <rect x="65" y="56" width="4" height="1" fill="#6B3510" />
+  <!-- Ground - muddy river bank -->
+  <rect x="4" y="61" width="72" height="15" fill="#4A3318" />
+  <rect x="4" y="61" width="72" height="2" fill="#5C4020" />
+  <!-- Mud/dirt patches -->
+  <rect x="4" y="63" width="12" height="4" fill="#3D2810" />
+  <rect x="20" y="64" width="8" height="3" fill="#3D2810" />
+  <rect x="55" y="63" width="10" height="4" fill="#3D2810" />
+  <!-- More gold scattered on bank -->
+  <rect x="8" y="64" width="2" height="2" fill="#FFD700" />
+  <rect x="55" y="65" width="2" height="2" fill="#FFD700" />
+  <rect x="70" y="63" width="2" height="2" fill="#FFD700" />
+  <rect x="8" y="64" width="1" height="1" fill="#FFEC60" />
+  <!-- Gems (gemas) -->
+  <rect x="44" y="64" width="3" height="3" fill="#50C878" />
+  <rect x="45" y="63" width="1" height="5" fill="#3DAF65" />
+  <rect x="44" y="64" width="1" height="1" fill="#80E8A0" />
+  <!-- Stars (3 stars) -->
+  <!-- Corner bolts -->
+  <rect x="4" y="4" width="3" height="3" fill="#C8A060" />
+  <rect x="73" y="4" width="3" height="3" fill="#C8A060" />
+  <rect x="4" y="73" width="3" height="3" fill="#C8A060" />
+  <rect x="73" y="73" width="3" height="3" fill="#C8A060" />
+  <rect x="5" y="5" width="1" height="1" fill="#FFD080" />
+  <rect x="74" y="5" width="1" height="1" fill="#FFD080" />
+  <rect x="5" y="74" width="1" height="1" fill="#FFD080" />
+  <rect x="74" y="74" width="1" height="1" fill="#FFD080" />
+</svg>`,
+
+  '1.3': `<svg
+   viewBox="0 0 80 80"
+   shape-rendering="crispEdges"
+   xmlns="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25" />
+  <!-- Card frame -->
+  <rect x="0" y="0" width="80" height="80" fill="#2C1810" />
+  <rect x="2" y="2" width="76" height="76" fill="#3D2214" />
+  <rect x="3" y="3" width="74" height="74" fill="#1a0f08" />
+  <rect x="3" y="3" width="74" height="1" fill="#6B3A1F" />
+  <rect x="3" y="3" width="1" height="74" fill="#6B3A1F" />
+  <rect x="3" y="76" width="74" height="1" fill="#0d0804" />
+  <rect x="76" y="3" width="1" height="74" fill="#0d0804" />
+  <!-- Sky - misty mountain sky -->
+  <rect x="4" y="4" width="72" height="35" fill="#4A6B8A" />
+  <rect x="4" y="4" width="72" height="10" fill="#5A7FA0" />
+  <rect x="4" y="10" width="72" height="8" fill="#4E7090" />
+  <!-- Sun halo through mist -->
+  <rect x="55" y="5" width="8" height="8" fill="#8AAABF" />
+  <rect x="56" y="4" width="6" height="10" fill="#7A9AAF" />
+  <rect x="57" y="5" width="4" height="8" fill="#C8DCE8" />
+  <rect x="58" y="6" width="2" height="6" fill="#E8F0F8" />
+  <!-- Mist/clouds wrapping mountains -->
+  <rect x="4" y="16" width="20" height="5" fill="#6A8AA0" />
+  <rect x="4" y="18" width="15" height="4" fill="#7A9AB0" />
+  <rect x="30" y="14" width="25" height="4" fill="#6A8AA0" />
+  <rect x="32" y="16" width="20" height="5" fill="#7A9AB0" />
+  <rect x="60" y="15" width="16" height="5" fill="#6A8AA0" />
+  <rect x="62" y="17" width="14" height="4" fill="#7A9AB0" />
+  <!-- Background mountains - green peaks (Andes) -->
+  <rect x="4" y="20" width="8" height="19" fill="#3D6B3D" />
+  <rect x="6" y="16" width="8" height="23" fill="#4A7A4A" />
+  <rect x="8" y="13" width="8" height="26" fill="#527A52" />
+  <rect x="10" y="16" width="6" height="23" fill="#4A7A4A" />
+  <rect x="12" y="20" width="6" height="19" fill="#3D6B3D" />
+  <rect x="22" y="18" width="8" height="21" fill="#3D6B3D" />
+  <rect x="24" y="14" width="8" height="25" fill="#4A7A4A" />
+  <rect x="26" y="11" width="8" height="28" fill="#527A52" />
+  <rect x="28" y="14" width="6" height="25" fill="#4A7A4A" />
+  <rect x="30" y="18" width="6" height="21" fill="#3D6B3D" />
+  <!-- Snow on this peak -->
+  <rect x="26" y="11" width="8" height="3" fill="#D8E8F0" />
+  <rect x="27" y="10" width="6" height="1" fill="#E8F4FF" />
+  <rect x="28" y="9" width="4" height="1" fill="#FFFFFF" />
+  <rect x="52" y="17" width="8" height="22" fill="#3D6B3D" />
+  <rect x="54" y="13" width="8" height="26" fill="#4A7A4A" />
+  <rect x="56" y="10" width="8" height="29" fill="#527A52" />
+  <rect x="58" y="13" width="7" height="26" fill="#4A7A4A" />
+  <rect x="61" y="17" width="6" height="22" fill="#3D6B3D" />
+  <!-- Snow -->
+  <rect x="56" y="10" width="8" height="3" fill="#D8E8F0" />
+  <rect x="57" y="9" width="6" height="1" fill="#E8F4FF" />
+  <rect x="66" y="18" width="10" height="21" fill="#3D6B3D" />
+  <rect x="68" y="14" width="8" height="25" fill="#4A7A4A" />
+  <rect x="68" y="11" width="8" height="28" fill="#527A52" />
+  <!-- Green mountain/hill where ruins sit -->
+  <rect x="4" y="35" width="72" height="14" fill="#4A7020" />
+  <rect x="4" y="31" width="72" height="8" fill="#527828" />
+  <rect x="10" y="28" width="60" height="11" fill="#5C8030" />
+  <rect x="18" y="26" width="44" height="13" fill="#5C8030" />
+  <!-- Terraced agriculture (Inca terraces!) -->
+  <!-- Terrace 1 -->
+  <rect x="4" y="38" width="72" height="3" fill="#6A9038" />
+  <rect x="4" y="38" width="72" height="1" fill="#7AA040" />
+  <rect x="4" y="40" width="72" height="1" fill="#4A7020" />
+  <!-- Terrace 2 -->
+  <rect x="4" y="42" width="72" height="3" fill="#5C8830" />
+  <rect x="4" y="42" width="72" height="1" fill="#6A9838" />
+  <rect x="4" y="44" width="72" height="1" fill="#3D6818" />
+  <!-- Terrace walls (stone) -->
+  <rect x="4" y="41" width="72" height="1" fill="#8A7055" />
+  <rect x="4" y="45" width="72" height="1" fill="#7A6045" />
+  <!-- Inca ruins - stone buildings -->
+  <!-- Main temple structure -->
+  <rect x="18" y="22" width="44" height="16" fill="#8A8070" />
+  <rect x="20" y="20" width="40" height="18" fill="#9A9080" />
+  <rect x="22" y="18" width="36" height="20" fill="#A8A090" />
+  <!-- Stone texture/bricks -->
+  <rect x="22" y="18" width="6" height="3" fill="#989080" />
+  <rect x="28" y="18" width="6" height="3" fill="#A0988A" />
+  <rect x="34" y="18" width="6" height="3" fill="#989080" />
+  <rect x="40" y="18" width="6" height="3" fill="#A0988A" />
+  <rect x="46" y="18" width="6" height="3" fill="#989080" />
+  <rect x="52" y="18" width="6" height="3" fill="#A0988A" />
+  <rect x="22" y="21" width="6" height="3" fill="#A0988A" />
+  <rect x="28" y="21" width="6" height="3" fill="#989080" />
+  <rect x="34" y="21" width="6" height="3" fill="#A0988A" />
+  <rect x="40" y="21" width="6" height="3" fill="#989080" />
+  <rect x="46" y="21" width="6" height="3" fill="#A0988A" />
+  <rect x="52" y="21" width="6" height="3" fill="#989080" />
+  <rect x="22" y="24" width="6" height="3" fill="#989080" />
+  <rect x="28" y="24" width="6" height="3" fill="#A0988A" />
+  <rect x="34" y="24" width="6" height="3" fill="#989080" />
+  <rect x="40" y="24" width="6" height="3" fill="#A0988A" />
+  <rect x="46" y="24" width="6" height="3" fill="#989080" />
+  <rect x="52" y="24" width="6" height="3" fill="#A0988A" />
+  <!-- Temple doorway -->
+  <rect x="36" y="27" width="8" height="11" fill="#2A1E10" />
+  <rect x="37" y="26" width="6" height="12" fill="#2A1E10" />
+  <!-- Door arch (trapezoidal Inca style) -->
+  <rect x="37" y="26" width="6" height="1" fill="#7A6848" />
+  <rect x="36" y="27" width="1" height="10" fill="#7A6848" />
+  <rect x="43" y="27" width="1" height="10" fill="#7A6848" />
+  <!-- Gold detail on temple -->
+  <rect x="24" y="19" width="2" height="1" fill="#FFD700" />
+  <rect x="32" y="19" width="2" height="1" fill="#FFD700" />
+  <rect x="46" y="19" width="2" height="1" fill="#FFD700" />
+  <rect x="54" y="19" width="2" height="1" fill="#FFD700" />
+  <!-- Smaller ruins left -->
+  <rect x="4" y="30" width="14" height="9" fill="#8A8070" />
+  <rect x="5" y="29" width="12" height="10" fill="#9A9080" />
+  <!-- Brick detail -->
+  <rect x="5" y="29" width="4" height="2" fill="#A0988A" />
+  <rect x="9" y="29" width="4" height="2" fill="#989080" />
+  <rect x="5" y="31" width="4" height="2" fill="#989080" />
+  <rect x="9" y="31" width="4" height="2" fill="#A0988A" />
+  <!-- Window -->
+  <rect x="6" y="33" width="4" height="4" fill="#2A1E10" />
+  <rect x="6" y="33" width="4" height="1" fill="#7A6848" />
+  <!-- Smaller ruins right -->
+  <rect x="62" y="30" width="14" height="9" fill="#8A8070" />
+  <rect x="63" y="29" width="12" height="10" fill="#9A9080" />
+  <rect x="63" y="29" width="4" height="2" fill="#A0988A" />
+  <rect x="67" y="29" width="4" height="2" fill="#989080" />
+  <rect x="63" y="31" width="4" height="2" fill="#989080" />
+  <rect x="67" y="31" width="4" height="2" fill="#A0988A" />
+  <rect x="70" y="33" width="4" height="4" fill="#2A1E10" />
+  <rect x="70" y="33" width="4" height="1" fill="#7A6848" />
+  <!-- Corvan examining wall with artifacts -->
+  <rect x="48" y="30" width="4" height="5" fill="#B22222" />
+  <rect x="48" y="28" width="4" height="2" fill="#D4956A" />
+  <rect x="47" y="26" width="6" height="2" fill="#5C3A1E" />
+  <rect x="48" y="25" width="4" height="1" fill="#5C3A1E" />
+  <rect x="50" y="25" width="2" height="1" fill="#FFD700" />
+  <rect x="48" y="35" width="2" height="2" fill="#3D2810" />
+  <rect x="50" y="35" width="2" height="2" fill="#3D2810" />
+  <!-- Arm reaching to wall -->
+  <rect x="52" y="30" width="3" height="1" fill="#D4956A" />
+  <!-- Gold artifacts scattered -->
+  <rect x="14" y="37" width="3" height="3" fill="#FFD700" />
+  <rect x="15" y="36" width="2" height="5" fill="#FFC800" />
+  <rect x="14" y="37" width="1" height="1" fill="#FFEC60" />
+  <rect x="60" y="36" width="3" height="3" fill="#FFD700" />
+  <rect x="61" y="35" width="2" height="5" fill="#FFC800" />
+  <!-- Ground area below terraces -->
+  <rect x="4" y="46" width="72" height="20" fill="#4A3318" />
+  <rect x="4" y="46" width="72" height="2" fill="#5C4020" />
+  <!-- Stone steps -->
+  <rect x="30" y="46" width="20" height="2" fill="#7A7060" />
+  <rect x="32" y="48" width="16" height="2" fill="#8A8070" />
+  <rect x="34" y="50" width="12" height="2" fill="#9A9080" />
+  <!-- Pottery/artifacts on ground -->
+  <rect x="8" y="50" width="4" height="5" fill="#8B4513" />
+  <rect x="7" y="51" width="6" height="3" fill="#A0522D" />
+  <rect x="8" y="50" width="4" height="1" fill="#6B3510" />
+  <rect x="9" y="52" width="1" height="1" fill="#FFD700" />
+  <rect x="64" y="51" width="4" height="4" fill="#8B4513" />
+  <rect x="63" y="52" width="6" height="2" fill="#A0522D" />
+  <rect x="65" y="52" width="1" height="1" fill="#FFD700" />
+  <!-- Stars (4 stars) -->
+  <!-- Corner bolts -->
+  <rect x="4" y="4" width="3" height="3" fill="#C8A060" />
+  <rect x="73" y="4" width="3" height="3" fill="#C8A060" />
+  <rect x="4" y="73" width="3" height="3" fill="#C8A060" />
+  <rect x="73" y="73" width="3" height="3" fill="#C8A060" />
+  <rect x="5" y="5" width="1" height="1" fill="#FFD080" />
+  <rect x="74" y="5" width="1" height="1" fill="#FFD080" />
+  <rect x="5" y="74" width="1" height="1" fill="#FFD080" />
+  <rect x="74" y="74" width="1" height="1" fill="#FFD080" />
+</svg>`,
+
 
   // ── AMÉRICA DO NORTE ──
   '2.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">

@@ -1760,6 +1760,7 @@ function loop(){
   if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
   if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
   if(G.state==='complete' &&jp['Enter']){
+    unlockPhase('1.2');
     G.deaths=0;G._storedItems=[];G._storedScore=0;
     window.location.href='../../MenuPrincipal/index.html?unlocked=1.2';
   }
