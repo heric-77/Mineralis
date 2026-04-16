@@ -139,6 +139,23 @@ ASSETS.forEach(([key,src]) => {
 IMG.bg02 = null;
 IMG.bg03 = null;
 
+// Imagem de fundo da capa e card — carregados independentemente
+IMG.bgCapa = null;
+(function(){
+  const ci=new Image();
+  ci.onload=()=>{IMG.bgCapa=ci;};
+  ci.onerror=()=>{IMG.bgCapa=null;};
+  ci.src='imagens/Fase_1_2_-_Cena_01.png';
+})();
+
+IMG.card12 = null;
+(function(){
+  const ci=new Image();
+  ci.onload=()=>{IMG.card12=ci;};
+  ci.onerror=()=>{IMG.card12=null;};
+  ci.src='imagens/1_2_amazonia.svg';
+})();
+
 const keys={}, jp={};
 window.addEventListener('keydown',e=>{ if(!keys[e.code])jp[e.code]=true; keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
@@ -1628,20 +1645,35 @@ function drawHUD(player,level){
 
 // ── Screens ────────────────────────────────────────────────────
 function drawTitle(){
-  const bg=IMG['bg01'];
-  if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.5;drawBg('bg01');ctx.globalAlpha=1;}
-  else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a3010');g.addColorStop(1,'#0a1c08');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
-  ctx.fillStyle='rgba(0,10,0,0.56)';ctx.fillRect(0,0,W,H);
+  // Fundo da capa
+  if(IMG.bgCapa){
+    const s=Math.max(W/IMG.bgCapa.naturalWidth,H/IMG.bgCapa.naturalHeight);
+    const sw=IMG.bgCapa.naturalWidth*s, sh=IMG.bgCapa.naturalHeight*s;
+    ctx.globalAlpha=0.75;
+    ctx.drawImage(IMG.bgCapa,(W-sw)/2,(H-sh)/2,sw,sh);
+    ctx.globalAlpha=1;
+  } else {
+    const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a3010');g.addColorStop(1,'#0a1c08');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  ctx.fillStyle='rgba(0,10,0,0.52)';ctx.fillRect(0,0,W,H);
   drawFireflies();
-  // Draw Corvan large on title (scale 5, centered)
-  //const TS=5;
-  //const cx=W/2-16*TS, cy=160;
-  //drawCorvan(cx,cy,TS,false,Date.now()/400);
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('Jazidas de Ouro da Amazônia',W/2,148);
   ctx.shadowBlur=0;
   ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,204);
+
+  // Card centralizado entre o subtítulo e o "Pressione ENTER"
+  if(IMG.card12){
+    const cardSize=160, cardX=W/2-80, cardY=236;
+    const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
+    glow.addColorStop(0,'rgba(120,216,64,0.25)');
+    glow.addColorStop(1,'rgba(120,216,64,0)');
+    ctx.fillStyle=glow;
+    ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
+    ctx.drawImage(IMG.card12,cardX,cardY,cardSize,cardSize);
+  }
+
   ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#888';ctx.font='13px "Courier New"';
