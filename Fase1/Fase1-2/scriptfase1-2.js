@@ -87,8 +87,8 @@ function sfx(type) {
 
 const IMG = {}, SPRITES = {};
 const ASSETS = [
-  ['bg01','imagens/Fase 1.2 - Cena 01.png'],
-  ['bg04','imagens/Fase 1.2 - Cena 04.PNG'],
+  ['bg01','Assets/Fase 1.2 - Cena 01.png'],
+  ['bg04','Assets/Fase 1.2 - Cena 04.PNG'],
   ['talk','../Fase1-3/Falando.PNG'],
 ];
 function makeSprite(img, threshold = 28) {
@@ -145,7 +145,7 @@ IMG.bgCapa = null;
   const ci=new Image();
   ci.onload=()=>{IMG.bgCapa=ci;};
   ci.onerror=()=>{IMG.bgCapa=null;};
-  ci.src='imagens/Fase_1_2_-_Cena_01.png';
+  ci.src='Assets/Fase 1.2 - Cena 01.png';
 })();
 
 IMG.card12 = null;
@@ -153,7 +153,7 @@ IMG.card12 = null;
   const ci=new Image();
   ci.onload=()=>{IMG.card12=ci;};
   ci.onerror=()=>{IMG.card12=null;};
-  ci.src='imagens/1_2_amazonia.svg';
+  ci.src='Assets/1_2_amazonia.svg';
 })();
 
 const keys={}, jp={};
@@ -1263,11 +1263,6 @@ function drawFireflies(){
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 1 — A Entrada na Selva
-//  Cena 01: Rio sinuoso, floresta densa, sol visível
-//  Objetivo: coletar Pá + Bateia
-// ══════════════════════════════════════════════════════════════
 function buildL1(){
   const FL=540,WW=3400,WH=860;
   const plats=[
@@ -1313,7 +1308,7 @@ function buildL1(){
     }),
   ];
   return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena I — A Entrada na Selva',
+    title:'A Entrada na Selva',
     hint:'Colete a 🥌 Bateia e a Pá Exploradora ao final do caminho!',
     plats,enemies,cols,triggers,digSpots:[],panZones:[],
     intro:[
@@ -1333,10 +1328,6 @@ function buildL1(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 2 — Geologia Aluvial e Ciclo da Água
-//  Cena 02: meio terra/meio rio, sedimento, mini-game bateia
-// ══════════════════════════════════════════════════════════════
 function buildL2(){
   const FL=540,WW=3600,WH=860;
   const plats=[
@@ -1403,7 +1394,7 @@ function buildL2(){
     }),
   ];
   return{id:2,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena II — Geologia Aluvial e Ciclo da Água',
+    title:'Geologia Aluvial e Ciclo da Água',
     hint:'Use [E] nas zonas ⚓ para garimpar com a bateia!',
     plats,enemies,cols,triggers,digSpots:[],panZones,
     intro:[
@@ -1438,10 +1429,7 @@ function buildL2(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 3 — A Coleta e o Impacto Ambiental
-//  Cena 03: Chuva, água turva/contaminada, alerta de mercúrio
-// ══════════════════════════════════════════════════════════════
+
 function buildL3(){
   const FL=540,WW=3800,WH=860;
   const plats=[
@@ -1491,7 +1479,7 @@ function buildL3(){
     }),
   ];
   return{id:3,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,murky:true,
-    title:'Cena III — A Coleta e o Impacto Ambiental',
+    title:'A Coleta e o Impacto Ambiental',
     hint:'Água MARROM = contaminada por mercúrio! Evite-a.',
     plats,enemies,cols,triggers,digSpots:[],panZones:[],
     intro:[
@@ -1514,10 +1502,6 @@ function buildL3(){
   };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  LEVEL 4 — Relíquias Perdidas e Conclusão
-//  Cena 04: Pôr do sol, vaga-lumes, escavação da Urna Marajoara
-// ══════════════════════════════════════════════════════════════
 function buildL4(){
   const FL=540,WW=3000,WH=860;
   const plats=[
@@ -1569,8 +1553,8 @@ function buildL4(){
     }),
   ];
   return{id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena IV — Relíquias Perdidas e Conclusão',
-    hint:'[E] próximo à terra vermelha para Escavar a Urna Marajoara!',
+    title:'Relíquias Perdidas e Conclusão',
+    hint:'Use [E] na Terra vermelha para Escavar e encontrara Urna Marajoara!',
     plats,enemies,cols,triggers,digSpots,panZones:[],
     intro:[
       '"No entardecer da Amazônia, o rio reflete ouro. Mas o maior tesouro está enterrado na margem — esperando há séculos para ser encontrado com cuidado."',
@@ -1673,13 +1657,12 @@ function drawTitle(){
     ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
     ctx.drawImage(IMG.card12,cardX,cardY,cardSize,cardSize);
   }
-
-  ctx.fillStyle=`rgba(120,216,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
+  
+  ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
-  ctx.fillStyle='#888';ctx.font='13px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Escavar',W/2,494);
-  ctx.fillText('Itens coletados serão arquivados no Diário de Bordo!',W/2,516);
-  ctx.fillText('[M] Voltar ao Menu Principal',W/2,538);
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -1718,8 +1701,7 @@ function drawComplete(){
   ctx.fillStyle='rgba(120,216,64,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,368);
   ctx.fillStyle='#78d840';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
   ctx.fillStyle=`rgba(120,216,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('Pressione ENTER para voltar ao Menu Principal',W/2,436);
-  ctx.fillStyle='#9ab88a';ctx.font='12px "Courier New"';ctx.fillText('Seu progresso da Fase 1.2 já ficou sincronizado com o menu.',W/2,462);
+  ctx.fillText(' [M] Menu Principal',W/2,436);
   ctx.textAlign='left';
 }
 

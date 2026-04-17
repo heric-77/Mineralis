@@ -38,7 +38,7 @@ function sfx(type){
 
 const IMG={};
 let assetsLoaded=0,totalAssets=5,gameReady=false;
-[['bg01','Cena01.JPG'],['bg02','Cena02.PNG'],['bgext','Cena01.svg'],['bgcena0102','Cena01.svg'],['bgmina','Cena02.svg']].forEach(([key,src])=>{
+[['bg01','Assets/Cena01.svg'],['bg02','Assets/Cena02.svg'],['bgext','Assets/Cena01.svg'],['bgcena0102','Assets/Cena01.svg'],['bgmina','Assets/Cena02.svg']].forEach(([key,src])=>{
   const img=new Image();
   img.onload=()=>{IMG[key]=img;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
@@ -50,7 +50,7 @@ IMG.card11 = null;
   const ci=new Image();
   ci.onload=()=>{IMG.card11=ci;};
   ci.onerror=()=>{IMG.card11=null;};
-  ci.src='1_1_andes.svg';
+  ci.src='Assets/1_1_andes.svg';
 })();
 
 const keys={},jp={};
@@ -1464,7 +1464,6 @@ function buildL4(){
       mg.addColorStop(0,'rgba(200,160,40,0.18)');mg.addColorStop(1,'rgba(200,160,40,0)');
       ctx.fillStyle=mg;ctx.fillRect(fx-30,fy-140,120,160);
 
-      // Tupu sempre visível na Cena 4 — sutil durante caminhada, exuberante na celebração
       if(player.items.includes('tupu')){
         const now=Date.now()/1000;
         const px=player.x-cam.x+20, py=player.y-cam.y;
@@ -1668,7 +1667,7 @@ function drawTitle(){
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
   ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
-  ctx.fillText('[M] Voltar ao Menu Principal',W/2,538);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -1686,7 +1685,7 @@ function drawDeath(){
   drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Voltar ao Menu Principal',W/2,H/2+200);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
   ctx.textAlign='left';
 }
 function drawComplete(){
@@ -1701,10 +1700,9 @@ function drawComplete(){
   ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Segredo de Potosí foi desvendado!',W/2,196);
   const lines=['✦  Picareta — ferramenta da mineração andina','✦  Prata — melhor condutor, metal dos Incas','✦  Estanho — base do bronze por 5.000 anos','✦  Tupu de Prata — arte ornamental Inca','✦  Folhas de Coca — combate ao Soroche'];
   ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
-  ctx.fillStyle='rgba(220,185,80,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,400);
   ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◆ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
   ctx.fillStyle=`rgba(220,185,80,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 1.2 desbloqueada!   ENTER → Voltar ao Menu',W/2,458);ctx.textAlign='left';
+  ctx.fillText('✦ Fase 1.2 desbloqueada!   [M] Menu Principal',W/2,458);ctx.textAlign='left';
 }
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
@@ -1717,7 +1715,6 @@ const G={
     this.level=LEVELS[idx]();cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
     if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTools=new Set(this._storedTools||[]);}
-    // Cena 4 (saída da mina): Corvan sai já segurando o Tupu de Prata
     if(idx===3 && this.player.items.includes('tupu')){
       this.player.activeTools.clear();
       this.player.activeTools.add('tupu');

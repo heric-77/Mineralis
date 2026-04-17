@@ -10,7 +10,7 @@ canvas.height = H;
 function resize() {
   const scaleW = window.innerWidth  / W;
   const scaleH = window.innerHeight / H;
-  const s  = Math.max(scaleW, scaleH);
+  const s  = Math.min(scaleW, scaleH);
   const sw = Math.round(W * s);
   const sh = Math.round(H * s);
   canvas.style.width  = sw + 'px';
@@ -18,7 +18,6 @@ function resize() {
   wrap.style.width    = sw + 'px';
   wrap.style.height   = sh + 'px';
   wrap.style.position = 'fixed';
-  wrap.style.overflow = 'hidden';
   wrap.style.left     = Math.round((window.innerWidth  - sw) / 2) + 'px';
   wrap.style.top      = Math.round((window.innerHeight - sh) / 2) + 'px';
 }
@@ -42,8 +41,6 @@ function sfx(type) {
   o.start(t); o.stop(t+.6);
 }
 
-
-// ── Save / Menu integration ───────────────────────────────────
 const SAVE_KEY = 'mineralis_save_v2';
 function _salvarFase(score, deaths){
   const estrelas = deaths===0?4 : deaths<=2?3 : deaths<=5?2 : 1;
@@ -60,23 +57,22 @@ function _salvarFase(score, deaths){
 }
 function _voltarAoMenu(){
   _salvarFase(G.player?.score||0, G.deaths);
-  // Volta para o menu principal (pasta pai MenuPrincipal)
   window.location.href = '../../MenuPrincipal/index.html';
 }
 
 const IMG = {}, SPRITES = {};
 const ASSETS = [
-  ['bg01','Fase 1.3 - Cena 01.PNG'],
-  ['bg02','Fase 1.3 - Cena 02.PNG'],
-  ['bg03','Fase 1.3 - Cena 03.PNG'],
-  ['bg04','Fase 1.3 - Cena 04.PNG'],
-  ['walk','Sprite_Caminhando.PNG'],
-  ['idle','Respirando_Levemente.PNG'],
-  ['hurt','Soroche_-_Ofegante.PNG'],
-  ['lant','Sprite_com_lanterna.PNG'],
-  ['talk','Falando.PNG'],
-  ['dig', 'Escavando.PNG'],
-  ['condor','condor_sprite_sheet.png'],
+  ['bg01','Assets/Fase 1.3 - Cena 01.PNG'],
+  ['bg02','Assets/Fase 1.3 - Cena 02.PNG'],
+  ['bg03','Assets/Fase 1.3 - Cena 03.PNG'],
+  ['bg04','Assets/Fase 1.3 - Cena 04.PNG'],
+  ['walk','Assets/Sprite Caminhando.PNG'],
+  ['idle','Assets/Respirando Levemente.PNG'],
+  ['hurt','Assets/Soroche - Ofegante.PNG'],
+  ['lant','Assets/Sprite com lanterna.PNG'],
+  ['talk','Assets/Falando.PNG'],
+  ['dig', 'Assets/Escavando.PNG'],
+  ['condor','Assets/condor_sprite_sheet.png'],
 ];
 
 function makeSprite(img, threshold = 28) {
@@ -119,13 +115,12 @@ ASSETS.forEach(([key,src]) => {
   img.src = src;
 });
 
-// Card da fase 1.3 — carregado independentemente
 IMG.card13 = null;
 (function(){
   const ci = new Image();
   ci.onload  = () => { IMG.card13 = ci; };
   ci.onerror = () => { IMG.card13 = null; };
-  ci.src = '1_3_machu_pichu.svg';
+  ci.src = 'Assets/1_3_machu_pichu.svg';
 })();
 
 const keys={}, jp={};
@@ -284,10 +279,7 @@ function wrapText(text, maxW) {
 }
 
 
-// ── Catálogo de itens — Fase 1.3 ─────────────────────────────
-// Catálogo COMPLETO de todas as fases — IDs = journalId do menu
 const ITEM_DEFS = {
-  // ─── FERRAMENTAS ───────────────────────────────────────────────
   picareta_basica:  { cat:'ferramenta', nome:'Picareta Básica',       icon:'⛏', fase:'1.1',
     desc:'Extrai minérios das paredes rochosas.\nEssencial nas minas de Potosí.' },
   pa_exploradora:   { cat:'ferramenta', nome:'Pá Exploradora',        icon:'🪏', fase:'1.2',
@@ -299,7 +291,6 @@ const ITEM_DEFS = {
   pedra_constelacao:{ cat:'ferramenta', nome:'Pedra da Constelação',  icon:'💎', fase:'1.3',
     desc:'Peça da constelação do Condor.\nColete 3 para alinhar o painel astronômico.',
     multiple:true },
-  // ─── MINÉRIOS ──────────────────────────────────────────────────
   prata:            { cat:'minerio',   nome:'Prata',                   icon:'◆', fase:'1.1',
     desc:'Melhor condutor elétrico e térmico.\nUsada pelos Incas como arte e símbolo lunar.' },
   estanho:          { cat:'minerio',   nome:'Estanho',                 icon:'◈', fase:'1.1',
@@ -308,7 +299,6 @@ const ITEM_DEFS = {
     desc:'Depositado nos rios por erosão milenar.\n19× mais pesado que a água.' },
   tumi_dourado:     { cat:'minerio',   nome:'Ouro Inca',               icon:'🥇', fase:'1.3',
     desc:'Para os Incas, o ouro era o sol materializado.\nNão era moeda — era divindade.' },
-  // ─── ARTEFATOS ─────────────────────────────────────────────────
   ceramica_inca:    { cat:'artefato',  nome:'Cerâmica Inca',           icon:'🏺', fase:'1.1',
     desc:'Vasilha ritual do Império Inca.\nPadrões geométricos representando o cosmos.' },
   mapa_potosi:      { cat:'artefato',  nome:'Tupu de Prata',           icon:'✦', fase:'1.1',
@@ -319,7 +309,6 @@ const ITEM_DEFS = {
     desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
 };
 
-// Mapa: tipo coletado no jogo → journalId no catálogo
 const TIPO_TO_JOURNAL = {
   lantern:'lanterna_arqueologa', stone:'pedra_constelacao',
   tumi:'relevo_inca', gold:'tumi_dourado',
@@ -334,15 +323,12 @@ const INV = {
   ],
   tabItems(player){
     const cat=this.TABS[this.tab].id;
-    // Lê todos os itens coletados em QUALQUER fase do localStorage
     let coletados={};
     try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);coletados=j.coletados||{};}}catch(e){}
-    // Adiciona também itens coletados NESTA sessão (ainda não gravados)
     for(const tipo of player.items){
       const jid=TIPO_TO_JOURNAL[tipo]||tipo;
       coletados[jid]=true;
     }
-    // Pedras múltiplas: conta quantas o player tem na sessão atual
     const stoneCount=player.items.filter(i=>i==='stone').length;
     const out=[];
     for(const [id,def] of Object.entries(ITEM_DEFS)){
@@ -1000,7 +986,7 @@ function buildL1(){
   ];
   return{
     id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena I — O Observatório das Nuvens',
+    title:'O Observatório das Nuvens',
     hint:'Colete a 🔦 Lanterna e use [E] no Intihuatana ao final!',
     plats,enemies,cols,triggers,
     intro:[
@@ -1082,7 +1068,7 @@ function buildL2(){
   ];
   return{
     id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena II — Engenharia e Astronomia',
+    title:'Engenharia e Astronomia',
     hint:'Colete as 3 💎 pedras da constelação do Condor!',
     plats,enemies,cols,triggers,rocks,rockZones,
     intro:[
@@ -1186,7 +1172,7 @@ function buildL3(){
   ];
   return{
     id:3,bg:'bg03',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena III — A Relíquia de Ouro e Prata',
+    title:'A Relíquia de Ouro e Prata',
     hint:'Atravesse os canais sagrados. Suba a escadaria até o altar!',
     plats,enemies,cols,triggers,torches,
     intro:[
@@ -1285,7 +1271,7 @@ function buildL4(){
 
   return{
     id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Cena IV — O Voo do Condor',
+    title:'O Voo do Condor',
     hint:'Siga o Condor sagrado e escale o Templo do Sol! Use [E] no cume.',
     plats,enemies,cols,triggers,condor,condorMessages,
     intro:[
@@ -1329,7 +1315,6 @@ function drawHUD(player,level){
   ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
   ctx.fillStyle='#f0c040';ctx.font='bold 15px "Courier New"';
   ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  // Slot ferramenta ativa
   const tY=44;
   ctx.fillStyle='rgba(0,0,0,0.5)';_roundRect(16,tY,140,28,4);ctx.fill();
   ctx.strokeStyle=player.activeTool?'#f0c040':'#444';ctx.lineWidth=1.5;_roundRect(16,tY,140,28,4);ctx.stroke();
@@ -1341,7 +1326,6 @@ function drawHUD(player,level){
   ctx.fillStyle='rgba(200,160,40,0.15)';_roundRect(162,tY,46,28,4);ctx.fill();
   ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;_roundRect(162,tY,46,28,4);ctx.stroke();
   ctx.font='bold 11px "Courier New"';ctx.fillStyle='#c0a030';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  // Inventário lado direito
   let ix=W-16;const inv=[];
   if(player.items.includes('tumi'))    inv.push('🗡 TUMI');
   if(player.items.includes('lantern')) inv.push('🔦 LANTERNA');
@@ -1407,9 +1391,11 @@ function drawTitle(){
     ctx.drawImage(IMG.card13,cardX,cardY,cardSize,cardSize);
   }
 
-  ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='20px "Courier New"';ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
-  ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir',W/2,500);ctx.fillText('Soroche: não corra demais na altitude!',W/2,524);
-  ctx.fillText('[M] Voltar ao Menu Principal',W/2,552);
+  ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -1421,7 +1407,7 @@ function drawDeath(){
   if(SPRITES['hurt']) drawSprite('hurt',Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#f0c040';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Voltar ao Menu Principal',W/2,H/2+168);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+168);
   ctx.textAlign='left';
 }
 
@@ -1434,7 +1420,7 @@ function drawComplete(){
   const lines=['✦  Faca Cerimonial Tumi — ouro, prata e turquesa','✦  Intihuatana — o relógio solar Inca revelado','✦  Constelação do Condor — geometria das estrelas','✦  Sistema de irrigação do Vale Sagrado'];
   ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,250+i*30));
   ctx.fillStyle='#f0c040';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
-  ctx.fillStyle=`rgba(240,192,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('▶  ENTER ou M — Voltar ao Menu Principal  ◀',W/2,450);
+  ctx.fillStyle=`rgba(240,192,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('▶[M] Menu Principal◀',W/2,450);
   ctx.font='64px serif';ctx.fillText('🏆',W/2-32,540);ctx.textAlign='left';
 }
 
