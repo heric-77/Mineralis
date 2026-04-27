@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 80 80"
+   shape-rendering="crispEdges"
+   width="160"
+   height="160"
+   version="1.1"
+   id="svg42"
+   sodipodi:docname="4_2_zimbabwe.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+   xmlns="http://www.w3.org/2000/svg">
+  <defs />
+  <!-- Card frame -->
+  <rect x="0" y="0" width="80" height="80" fill="#2C1810" />
+  <rect x="2" y="2" width="76" height="76" fill="#3D2214" />
+  <rect x="3" y="3" width="74" height="74" fill="#1a0f08" />
+  <!-- Inner frame highlight -->
+  <rect x="3" y="3" width="74" height="1" fill="#6B3A1F" />
+  <rect x="3" y="3" width="1" height="74" fill="#6B3A1F" />
+  <rect x="3" y="76" width="74" height="1" fill="#0d0804" />
+  <rect x="76" y="3" width="1" height="74" fill="#0d0804" />
+
+  <!-- Sky: Warm golden African afternoon -->
+  <rect x="4" y="4" width="72" height="32" fill="#C87020" />
+  <rect x="4" y="4" width="72" height="10" fill="#D88030" />
+  <rect x="4" y="6" width="72" height="8" fill="#CC7828" />
+  <rect x="4" y="12" width="72" height="8" fill="#BE6818" />
+  <rect x="4" y="18" width="72" height="6" fill="#B06010" />
+  <rect x="4" y="22" width="72" height="4" fill="#A05808" />
+  <!-- Setting sun (low, large, golden) -->
+  <rect x="50" y="10" width="12" height="12" fill="#FFB820" />
+  <rect x="51" y="9" width="10" height="1" fill="#FFB820" />
+  <rect x="51" y="22" width="10" height="1" fill="#FFB820" />
+  <rect x="49" y="13" width="1" height="6" fill="#FFB820" />
+  <rect x="62" y="13" width="1" height="6" fill="#FFB820" />
+  <rect x="50" y="10" width="3" height="3" fill="#FFE060" />
+  <rect x="58" y="10" width="2" height="2" fill="#FFE060" />
+  <!-- Sun glow halo -->
+  <rect x="46" y="13" width="3" height="6" fill="#FF9010" />
+  <rect x="63" y="13" width="3" height="6" fill="#FF9010" />
+  <rect x="50" y="8" width="12" height="2" fill="#FF9010" />
+  <rect x="50" y="22" width="12" height="2" fill="#FF9010" />
+  <!-- AFRICAN FISH EAGLE in sky -->
+  <rect x="20" y="8" width="2" height="1" fill="#101010" />
+  <rect x="18" y="9" width="6" height="1" fill="#101010" />
+  <rect x="17" y="10" width="8" height="1" fill="#181818" />
+  <rect x="21" y="8" width="1" height="3" fill="#101010" />
+  <rect x="19" y="9" width="1" height="1" fill="#E8E0D0" />
+  <rect x="20" y="9" width="2" height="1" fill="#FFFFFF" />
+  <!-- Kopje granite boulders (background) -->
+  <rect x="4" y="20" width="16" height="16" fill="#8A6840" />
+  <rect x="6" y="18" width="14" height="4" fill="#9A7848" />
+  <rect x="8" y="16" width="10" height="4" fill="#A08050" />
+  <rect x="10" y="15" width="8" height="2" fill="#B09060" />
+  <rect x="12" y="14" width="4" height="2" fill="#C0A070" />
+  <!-- Kopje right -->
+  <rect x="62" y="22" width="14" height="14" fill="#8A6840" />
+  <rect x="63" y="20" width="12" height="4" fill="#9A7848" />
+  <rect x="65" y="18" width="10" height="4" fill="#A08050" />
+  <rect x="67" y="17" width="6" height="2" fill="#B09060" />
+  <!-- Rock shadow -->
+  <rect x="4" y="28" width="16" height="8" fill="#6A5030" />
+  <rect x="62" y="28" width="14" height="8" fill="#6A5030" />
+  <!-- GREAT ZIMBABWE STONE WALLS (curved, no mortar, iconic) -->
+  <!-- Main enclosure wall - left section -->
+  <rect x="8" y="26" width="12" height="10" fill="#A08858" />
+  <rect x="8" y="26" width="12" height="2" fill="#B09868" />
+  <rect x="9" y="25" width="10" height="2" fill="#B89C60" />
+  <!-- Wall texture (stone blocks) -->
+  <rect x="9" y="27" width="3" height="2" fill="#988050" />
+  <rect x="12" y="28" width="3" height="2" fill="#988050" />
+  <rect x="15" y="27" width="3" height="2" fill="#988050" />
+  <rect x="9" y="29" width="2" height="2" fill="#907848" />
+  <rect x="11" y="30" width="4" height="2" fill="#988050" />
+  <rect x="15" y="29" width="3" height="2" fill="#907848" />
+  <rect x="9" y="31" width="3" height="1" fill="#907848" />
+  <rect x="13" y="32" width="4" height="1" fill="#A08858" />
+  <!-- Curved wall top decorative pattern (chevron stones) -->
+  <rect x="9" y="25" width="2" height="1" fill="#C8A870" />
+  <rect x="11" y="24" width="2" height="1" fill="#C0A068" />
+  <rect x="13" y="25" width="2" height="1" fill="#C8A870" />
+  <rect x="15" y="24" width="2" height="1" fill="#C0A068" />
+  <rect x="17" y="25" width="2" height="1" fill="#C8A870" />
+  <!-- Main wall right section -->
+  <rect x="58" y="26" width="14" height="10" fill="#A08858" />
+  <rect x="58" y="26" width="14" height="2" fill="#B09868" />
+  <rect x="59" y="25" width="12" height="2" fill="#B89C60" />
+  <rect x="59" y="27" width="3" height="2" fill="#988050" />
+  <rect x="62" y="28" width="3" height="2" fill="#988050" />
+  <rect x="65" y="27" width="3" height="2" fill="#988050" />
+  <rect x="68" y="28" width="3" height="2" fill="#988050" />
+  <rect x="59" y="25" width="2" height="1" fill="#C8A870" />
+  <rect x="61" y="24" width="2" height="1" fill="#C0A068" />
+  <rect x="63" y="25" width="2" height="1" fill="#C8A870" />
+  <rect x="65" y="24" width="2" height="1" fill="#C0A068" />
+  <rect x="67" y="25" width="2" height="1" fill="#C8A870" />
+  <!-- CONICAL TOWER (iconic Zimbabwe tower, solid stone, no windows) -->
+  <rect x="34" y="24" width="12" height="12" fill="#9A8050" />
+  <rect x="35" y="22" width="10" height="4" fill="#A89060" />
+  <rect x="36" y="20" width="8" height="4" fill="#B09868" />
+  <rect x="37" y="18" width="6" height="4" fill="#B8A070" />
+  <rect x="38" y="16" width="4" height="4" fill="#C0A878" />
+  <rect x="39" y="14" width="2" height="4" fill="#C8B080" />
+  <!-- Tower texture bands (horizontal courses) -->
+  <rect x="34" y="26" width="12" height="1" fill="#887040" />
+  <rect x="34" y="28" width="12" height="1" fill="#887040" />
+  <rect x="34" y="30" width="12" height="1" fill="#887040" />
+  <rect x="34" y="32" width="12" height="1" fill="#887040" />
+  <rect x="35" y="24" width="10" height="1" fill="#887040" />
+  <rect x="36" y="22" width="8" height="1" fill="#887040" />
+  <rect x="37" y="20" width="6" height="1" fill="#887040" />
+  <rect x="38" y="18" width="4" height="1" fill="#887040" />
+  <!-- Tower chevron decoration at top -->
+  <rect x="38" y="14" width="1" height="2" fill="#D0B880" />
+  <rect x="39" y="13" width="2" height="2" fill="#D8C090" />
+  <rect x="40" y="14" width="1" height="2" fill="#D0B880" />
+  <!-- RIVER MUTIRIKWE (gold flecks) -->
+  <rect x="4" y="36" width="72" height="8" fill="#4878A8" />
+  <rect x="4" y="36" width="72" height="2" fill="#5888B8" />
+  <rect x="4" y="37" width="72" height="2" fill="#4070A0" />
+  <rect x="4" y="40" width="72" height="2" fill="#386898" />
+  <rect x="4" y="43" width="72" height="1" fill="#507898" />
+  <!-- River current lines -->
+  <rect x="10" y="38" width="12" height="1" fill="#608AB0" />
+  <rect x="30" y="39" width="16" height="1" fill="#608AB0" />
+  <rect x="55" y="38" width="14" height="1" fill="#608AB0" />
+  <!-- GOLD NUGGETS in river (shining) -->
+  <rect x="18" y="40" width="2" height="2" fill="#FFD700" />
+  <rect x="19" y="39" width="1" height="1" fill="#FFE840" />
+  <rect x="32" y="41" width="3" height="2" fill="#FFD700" />
+  <rect x="33" y="40" width="2" height="1" fill="#FFEC60" />
+  <rect x="48" y="40" width="2" height="2" fill="#FFD700" />
+  <rect x="49" y="39" width="1" height="1" fill="#FFE840" />
+  <rect x="60" y="41" width="2" height="2" fill="#FFCC00" />
+  <rect x="22" y="42" width="2" height="1" fill="#FFD700" />
+  <rect x="54" y="42" width="2" height="1" fill="#FFD700" />
+  <!-- MICA flakes (fool's gold - false) -->
+  <rect x="26" y="40" width="2" height="1" fill="#D8C890" />
+  <rect x="42" y="39" width="2" height="1" fill="#D0C088" />
+  <rect x="65" y="41" width="2" height="1" fill="#D8C890" />
+  <!-- SAVANNA GRASS foreground -->
+  <rect x="4" y="44" width="72" height="32" fill="#A85820" />
+  <rect x="4" y="44" width="72" height="2" fill="#BC6C28" />
+  <!-- Grass tufts -->
+  <rect x="4" y="44" width="3" height="5" fill="#C87830" />
+  <rect x="8" y="43" width="2" height="6" fill="#B86C28" />
+  <rect x="14" y="44" width="3" height="5" fill="#C07028" />
+  <rect x="62" y="44" width="3" height="5" fill="#C87830" />
+  <rect x="67" y="43" width="2" height="6" fill="#B86C28" />
+  <rect x="72" y="44" width="3" height="5" fill="#C07028" />
+  <!-- Corvan at river with wooden bateia -->
+  <rect x="34" y="43" width="5" height="8" fill="#4A5828" />
+  <rect x="34" y="41" width="4" height="2" fill="#D4956A" />
+  <rect x="33" y="39" width="6" height="2" fill="#3A2A18" />
+  <rect x="34" y="38" width="4" height="1" fill="#3A2A18" />
+  <rect x="34" y="51" width="2" height="3" fill="#2A1808" />
+  <rect x="36" y="51" width="2" height="3" fill="#2A1808" />
+  <!-- Wooden bateia (bowl) -->
+  <rect x="38" y="46" width="8" height="3" fill="#8B5A20" />
+  <rect x="39" y="45" width="6" height="2" fill="#A07030" />
+  <rect x="40" y="44" width="4" height="2" fill="#B08040" />
+  <!-- Gold in bateia -->
+  <rect x="40" y="46" width="2" height="2" fill="#FFD700" />
+  <rect x="41" y="45" width="1" height="1" fill="#FFEC60" />
+  <!-- Mica in bateia (false) -->
+  <rect x="43" y="46" width="2" height="1" fill="#D8C890" />
+  <!-- ZIMBABWE BIRD soapstone (simplified, on ledge) -->
+  <rect x="58" y="33" width="4" height="5" fill="#C0A870" />
+  <rect x="59" y="32" width="3" height="2" fill="#D0B880" />
+  <rect x="59" y="31" width="2" height="2" fill="#C8B078" />
+  <rect x="60" y="29" width="2" height="3" fill="#B8A068" />
+  <rect x="59" y="29" width="1" height="1" fill="#101010" />
+  <rect x="57" y="32" width="2" height="2" fill="#C0A870" />
+  <rect x="62" y="32" width="2" height="2" fill="#C0A870" />
+  <!-- Stone ledge under bird -->
+  <rect x="56" y="37" width="10" height="2" fill="#988050" />
+  <rect x="57" y="36" width="8" height="1" fill="#A89060" />
+  <!-- Calabaça water gourd -->
+  <rect x="22" y="46" width="4" height="4" fill="#8A6030" />
+  <rect x="23" y="45" width="3" height="2" fill="#9A7040" />
+  <rect x="22" y="49" width="4" height="1" fill="#B89050" />
+  <!-- Stick compass (bastão de sombra) on ground -->
+  <rect x="14" y="46" width="1" height="8" fill="#6A4020" />
+  <rect x="12" y="46" width="4" height="1" fill="#5A3010" />
+  <!-- Corner bolts -->
+  <rect x="4" y="4" width="3" height="3" fill="#C8A060" />
+  <rect x="73" y="4" width="3" height="3" fill="#C8A060" />
+  <rect x="4" y="73" width="3" height="3" fill="#C8A060" />
+  <rect x="73" y="73" width="3" height="3" fill="#C8A060" />
+  <rect x="5" y="5" width="1" height="1" fill="#FFD080" />
+  <rect x="74" y="5" width="1" height="1" fill="#FFD080" />
+  <rect x="5" y="74" width="1" height="1" fill="#FFD080" />
+  <rect x="74" y="74" width="1" height="1" fill="#FFD080" />
+</svg>

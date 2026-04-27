@@ -1,0 +1,130 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <title>Bateia de Madeira Shona</title>
+
+  <!-- Sombra base -->
+  <rect x="30" y="172" width="140" height="8" fill="#1A1408" opacity="0.22"/>
+
+  <!-- ===== BATEIA DE MADEIRA CURVADA / CÔNCAVA ===== -->
+  <!-- Vista em perspectiva levemente inclinada -->
+
+  <!-- BORDA EXTERNA da bateia - madeira de mopane escura -->
+  <!-- Elipse exterior (borda) - representação pixel art -->
+  <!-- Anel externo -->
+  <rect x="28"  y="72"  width="144" height="8"  fill="#5A3A18"/>
+  <rect x="20"  y="76"  width="160" height="8"  fill="#5A3A18"/>
+  <rect x="16"  y="80"  width="168" height="8"  fill="#5A3A18"/>
+  <rect x="16"  y="84"  width="168" height="8"  fill="#5A3A18"/>
+  <rect x="20"  y="88"  width="160" height="8"  fill="#5A3A18"/>
+  <rect x="28"  y="92"  width="144" height="8"  fill="#5A3A18"/>
+  <rect x="44"  y="96"  width="112" height="8"  fill="#5A3A18"/>
+  <rect x="64"  y="100" width="72"  height="4"  fill="#5A3A18"/>
+
+  <!-- INTERIOR da bateia - madeira mais clara (côncava) -->
+  <rect x="44"  y="76"  width="112" height="8"  fill="#7A5228"/>
+  <rect x="36"  y="80"  width="128" height="8"  fill="#8A5E30"/>
+  <rect x="32"  y="84"  width="136" height="8"  fill="#8A5E30"/>
+  <rect x="36"  y="88"  width="128" height="8"  fill="#7A5228"/>
+  <rect x="48"  y="92"  width="104" height="8"  fill="#6A4A22"/>
+  <rect x="64"  y="96"  width="72"  height="6"  fill="#5A3E1C"/>
+  <rect x="76"  y="100" width="48"  height="4"  fill="#4A3016"/>
+
+  <!-- FUNDO da bateia (centro côncavo - mais escuro) -->
+  <rect x="72"  y="96"  width="56"  height="4"  fill="#3A2410"/>
+  <rect x="80"  y="98"  width="40"  height="4"  fill="#3A2410"/>
+  <rect x="84"  y="100" width="32"  height="4"  fill="#2E1C0C"/>
+
+  <!-- VEIOS DA MADEIRA - textura de mopane -->
+  <!-- Veio 1 -->
+  <rect x="52"  y="80"  width="2"   height="14" fill="#6A4A22" opacity="0.6"/>
+  <rect x="52"  y="84"  width="8"   height="2"  fill="#6A4A22" opacity="0.5"/>
+  <!-- Veio 2 -->
+  <rect x="80"  y="78"  width="2"   height="18" fill="#9A6E38" opacity="0.5"/>
+  <rect x="80"  y="86"  width="12"  height="2"  fill="#9A6E38" opacity="0.4"/>
+  <!-- Veio 3 -->
+  <rect x="110" y="80"  width="2"   height="14" fill="#6A4A22" opacity="0.6"/>
+  <rect x="102" y="88"  width="12"  height="2"  fill="#6A4A22" opacity="0.5"/>
+  <!-- Veio 4 -->
+  <rect x="136" y="82"  width="2"   height="12" fill="#7A5228" opacity="0.5"/>
+
+  <!-- BORDA INTERNA (chanfro côncavo) - tons mais escuros -->
+  <rect x="40"  y="76"  width="4"   height="24" fill="#4A2E14"/>
+  <rect x="156" y="76"  width="4"   height="24" fill="#4A2E14"/>
+  <rect x="40"  y="72"  width="120" height="4"  fill="#4A2E14"/>
+
+  <!-- PARTE INFERIOR da bateia (base) -->
+  <!-- Corpo cônico abaixo da borda -->
+  <rect x="28"  y="96"  width="12"  height="32" fill="#4A3018"/>
+  <rect x="24"  y="92"  width="12"  height="40" fill="#3A2410"/>
+  <rect x="160" y="96"  width="12"  height="32" fill="#4A3018"/>
+  <rect x="164" y="92"  width="12"  height="40" fill="#3A2410"/>
+  <!-- Fundo cônico -->
+  <rect x="36"  y="124" width="128" height="8"  fill="#4A3018"/>
+  <rect x="44"  y="128" width="112" height="8"  fill="#5A3A20"/>
+  <rect x="56"  y="132" width="88"  height="8"  fill="#5A3A20"/>
+  <rect x="72"  y="136" width="56"  height="8"  fill="#4A3018"/>
+  <rect x="84"  y="140" width="32"  height="4"  fill="#3A2410"/>
+  <rect x="92"  y="140" width="16"  height="8"  fill="#3A2410"/>
+  <rect x="96"  y="144" width="8"   height="8"  fill="#2A1C0C"/>
+
+  <!-- Veios na parte lateral -->
+  <rect x="30"  y="100" width="2"   height="28" fill="#6A4A22" opacity="0.5"/>
+  <rect x="168" y="100" width="2"   height="28" fill="#6A4A22" opacity="0.5"/>
+
+  <!-- ===== CONTEÚDO DA BATEIA - água e sedimento ===== -->
+  <!-- Água rasa na bateia - azul translúcido sobre o fundo -->
+  <rect x="36"  y="80"  width="128" height="12" fill="#5A9AAA" opacity="0.30"/>
+  <rect x="32"  y="84"  width="136" height="8"  fill="#6EB0C0" opacity="0.25"/>
+
+  <!-- Areia / sedimento no fundo da bateia -->
+  <rect x="56"  y="90"  width="88"  height="8"  fill="#A89050" opacity="0.7"/>
+  <rect x="64"  y="92"  width="72"  height="6"  fill="#B8A060" opacity="0.65"/>
+  <rect x="72"  y="94"  width="56"  height="4"  fill="#C0A868" opacity="0.6"/>
+
+  <!-- PEPITAS DE OURO no sedimento (afundadas no centro) -->
+  <!-- Pepita 1 - dourada oval -->
+  <rect x="86"  y="92"  width="8"   height="6"  fill="#D4A830"/>
+  <rect x="88"  y="90"  width="4"   height="8"  fill="#E0B840"/>
+  <rect x="88"  y="91"  width="4"   height="2"  fill="#F0C848" opacity="0.9"/><!-- brilho -->
+
+  <!-- Pepita 2 -->
+  <rect x="100" y="93"  width="6"   height="5"  fill="#C89820"/>
+  <rect x="102" y="91"  width="4"   height="7"  fill="#D4A830"/>
+  <rect x="102" y="92"  width="2"   height="2"  fill="#E8C040" opacity="0.9"/>
+
+  <!-- Pepita 3 pequena -->
+  <rect x="76"  y="94"  width="4"   height="4"  fill="#D4A830"/>
+  <rect x="78"  y="93"  width="2"   height="2"  fill="#E8C040" opacity="0.8"/>
+
+  <!-- FLOCOS DE MICA na borda da água (leves, flutuando) -->
+  <rect x="44"  y="84"  width="6"   height="2"  fill="#E8D860" opacity="0.7"/>
+  <rect x="60"  y="82"  width="8"   height="2"  fill="#D4C450" opacity="0.65"/>
+  <rect x="120" y="83"  width="6"   height="2"  fill="#E8D860" opacity="0.7"/>
+  <rect x="136" y="84"  width="8"   height="2"  fill="#D4C450" opacity="0.65"/>
+  <rect x="50"  y="88"  width="4"   height="2"  fill="#EEE070" opacity="0.6"/>
+  <rect x="140" y="88"  width="4"   height="2"  fill="#EEE070" opacity="0.6"/>
+
+  <!-- Reflexo de luz na água -->
+  <rect x="68"  y="82"  width="12"  height="2"  fill="#FFFFFF" opacity="0.2"/>
+  <rect x="110" y="83"  width="10"  height="2"  fill="#FFFFFF" opacity="0.2"/>
+
+  <!-- ===== GOTINHAS DE ÁGUA caindo ===== -->
+  <rect x="78"  y="58"  width="4"   height="8"  fill="#5A9AAA" opacity="0.6"/>
+  <rect x="80"  y="54"  width="2"   height="4"  fill="#6EB0C0" opacity="0.5"/>
+  <rect x="112" y="62"  width="4"   height="6"  fill="#5A9AAA" opacity="0.6"/>
+  <rect x="114" y="58"  width="2"   height="4"  fill="#6EB0C0" opacity="0.5"/>
+
+  <!-- ===== RÓTULO / DETALHE ENTALHE SHONA na borda ===== -->
+  <!-- Padrão geométrico entalhado na madeira (estilo Shona) -->
+  <rect x="56"  y="73"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="64"  y="73"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="72"  y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="80"  y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="88"  y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="96"  y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="104" y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="112" y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="120" y="72"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="128" y="73"  width="4"   height="3"  fill="#3A2410"/>
+  <rect x="136" y="73"  width="4"   height="3"  fill="#3A2410"/>
+
+</svg>

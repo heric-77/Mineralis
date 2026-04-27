@@ -1,0 +1,1504 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="100%"
+   viewBox="0 0 680 430"
+   role="img"
+   version="1.1"
+   id="svg225"
+   sodipodi:docname="cena4.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs225" />
+  <sodipodi:namedview
+     id="namedview225"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.8790698"
+     inkscape:cx="369.86385"
+     inkscape:cy="210.21039"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg225" />
+  <title
+     id="title1">Fase 3.1 Cena 4 – Câmara Catedral de Sal, Lustre de Cristal e Lago Subterrâneo</title>
+  <desc
+     id="desc1">Câmara subterrânea de escala catedralesca esculpida inteiramente em sal branco e rosado, com lustre de cristal de sal, lago azul-esverdeado e relevos de santos nas paredes</desc>
+  <!-- ── BASE: absolute darkness ── -->
+  <rect
+     x="0"
+     y="0"
+     width="680"
+     height="430"
+     fill="#08060A"
+     id="rect1" />
+  <!-- ── GRAND CHAMBER AMBIENT GLOW (salt lamp + crystal chandelier) ── -->
+  <!-- Wide warm ambient fill -->
+  <rect
+     x="0"
+     y="60"
+     width="680"
+     height="320"
+     fill="#2A1408"
+     opacity="0.9"
+     id="rect2" />
+  <rect
+     x="40"
+     y="50"
+     width="600"
+     height="330"
+     fill="#401C08"
+     opacity="0.8"
+     id="rect3" />
+  <rect
+     x="80"
+     y="40"
+     width="520"
+     height="350"
+     fill="#5E280A"
+     opacity="0.7"
+     id="rect4" />
+  <rect
+     x="120"
+     y="30"
+     width="440"
+     height="360"
+     fill="#7A3410"
+     opacity="0.55"
+     id="rect5" />
+  <rect
+     x="180"
+     y="20"
+     width="320"
+     height="370"
+     fill="#904018"
+     opacity=" 0.4"
+     id="rect6" />
+  <rect
+     x="240"
+     y="10"
+     width="200"
+     height="380"
+     fill="#A84E20"
+     opacity="0.3"
+     id="rect7" />
+  <rect
+     x="290"
+     y="0"
+     width="100"
+     height="390"
+     fill="#C06030"
+     opacity="0.2"
+     id="rect8" />
+  <!-- ── VAULTED CATHEDRAL CEILING (enormous, high) ── -->
+  <!-- Left ceiling vault -->
+  <rect
+     x="0"
+     y="0"
+     width="60"
+     height="30"
+     fill="#1A1008"
+     id="rect9" />
+  <rect
+     x="0"
+     y="28"
+     width="50"
+     height="18"
+     fill="#1E1408"
+     id="rect10" />
+  <rect
+     x="0"
+     y="44"
+     width="40"
+     height="16"
+     fill="#221808"
+     id="rect11" />
+  <rect
+     x="0"
+     y="58"
+     width="30"
+     height="14"
+     fill="#281C08"
+     id="rect12" />
+  <rect
+     x="0"
+     y="70"
+     width="22"
+     height="12"
+     fill="#2E200A"
+     id="rect13" />
+  <rect
+     x="0"
+     y="80"
+     width="16"
+     height="100"
+     fill="#341E0C"
+     id="rect14" />
+  <!-- Right ceiling vault -->
+  <rect
+     x="620"
+     y="0"
+     width="60"
+     height="30"
+     fill="#1A1008"
+     id="rect15" />
+  <rect
+     x="630"
+     y="28"
+     width="50"
+     height="18"
+     fill="#1E1408"
+     id="rect16" />
+  <rect
+     x="640"
+     y="44"
+     width="40"
+     height="16"
+     fill="#221808"
+     id="rect17" />
+  <rect
+     x="650"
+     y="58"
+     width="30"
+     height="14"
+     fill="#281C08"
+     id="rect18" />
+  <rect
+     x="658"
+     y="70"
+     width="22"
+     height="12"
+     fill="#2E200A"
+     id="rect19" />
+  <rect
+     x="664"
+     y="80"
+     width="16"
+     height="100"
+     fill="#341E0C"
+     id="rect20" />
+  <!-- Center ceiling (vast span) -->
+  <rect
+     x="60"
+     y="0"
+     width="560"
+     height="18"
+     fill="#160E08"
+     id="rect21" />
+  <rect
+     x="50"
+     y="16"
+     width="580"
+     height="16"
+     fill="#1C1208"
+     id="rect22" />
+  <rect
+     x="40"
+     y="30"
+     width="600"
+     height="14"
+     fill="#221408"
+     id="rect23" />
+  <rect
+     x="30"
+     y="42"
+     width="620"
+     height="12"
+     fill="#281808"
+     id="rect24" />
+  <rect
+     x="20"
+     y="52"
+     width="640"
+     height="10"
+     fill="#2E1C0A"
+     id="rect25" />
+  <rect
+     x="14"
+     y="60"
+     width="652"
+     height="10"
+     fill="#34200C"
+     id="rect26" />
+  <!-- Salt crystal formations on ceiling (white/pink, sparkling) -->
+  <!-- Large ceiling crystals (stalactites) -->
+  <rect
+     x="100"
+     y="68"
+     width="16"
+     height="32"
+     fill="#D0B0A8"
+     id="rect27" />
+  <rect
+     x="104"
+     y="66"
+     width="8"
+     height="36"
+     fill="#DEC0B8"
+     id="rect28" />
+  <rect
+     x="107"
+     y="62"
+     width="2"
+     height="8"
+     fill="#EED0C8"
+     id="rect29" />
+  <rect
+     x="108"
+     y="94"
+     width="2"
+     height="8"
+     fill="#C0A098"
+     id="rect30" />
+  <!-- drip -->
+  <rect
+     x="200"
+     y="62"
+     width="20"
+     height="40"
+     fill="#D0B0A8"
+     id="rect31" />
+  <rect
+     x="204"
+     y="60"
+     width="12"
+     height="44"
+     fill="#DEC0B8"
+     id="rect32" />
+  <rect
+     x="208"
+     y="56"
+     width="4"
+     height="10"
+     fill="#EED0C8"
+     id="rect33" />
+  <rect
+     x="210"
+     y="98"
+     width="2"
+     height="6"
+     fill="#C0A098"
+     id="rect34" />
+  <rect
+     x="320"
+     y="60"
+     width="24"
+     height="46"
+     fill="#E0C0B8"
+     id="rect35" />
+  <!-- biggest center -->
+  <rect
+     x="326"
+     y="58"
+     width="12"
+     height="50"
+     fill="#ECD0C8"
+     id="rect36" />
+  <rect
+     x="330"
+     y="54"
+     width="4"
+     height="10"
+     fill="#F8E0D8"
+     id="rect37" />
+  <rect
+     x="328"
+     y="60"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.9"
+     id="rect38" />
+  <rect
+     x="450"
+     y="64"
+     width="18"
+     height="36"
+     fill="#D0B0A8"
+     id="rect39" />
+  <rect
+     x="454"
+     y="62"
+     width="10"
+     height="40"
+     fill="#DEC0B8"
+     id="rect40" />
+  <rect
+     x="457"
+     y="58"
+     width="2"
+     height="8"
+     fill="#EED0C8"
+     id="rect41" />
+  <rect
+     x="560"
+     y="68"
+     width="14"
+     height="30"
+     fill="#D0B0A8"
+     id="rect42" />
+  <rect
+     x="563"
+     y="66"
+     width="8"
+     height="34"
+     fill="#DEC0B8"
+     id="rect43" />
+  <!-- Smaller crystal clusters -->
+  <rect
+     x="150"
+     y="70"
+     width="8"
+     height="20"
+     fill="#C8A8A0"
+     id="rect44" />
+  <rect
+     x="260"
+     y="66"
+     width="10"
+     height="24"
+     fill="#D0B0A8"
+     id="rect45" />
+  <rect
+     x="390"
+     y="68"
+     width="8"
+     height="22"
+     fill="#C8A8A0"
+     id="rect46" />
+  <rect
+     x="510"
+     y="70"
+     width="10"
+     height="24"
+     fill="#D0B0A8"
+     id="rect47" />
+  <rect
+     x="610"
+     y="70"
+     width="8"
+     height="18"
+     fill="#C8A8A0"
+     id="rect48" />
+  <!-- Ceiling sparkles -->
+  <rect
+     x="130"
+     y="72"
+     width="4"
+     height="4"
+     fill="#FFFFFF"
+     opacity="0.8"
+     id="rect49" />
+  <rect
+     x="180"
+     y="68"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.7"
+     id="rect50" />
+  <rect
+     x="240"
+     y="74"
+     width="4"
+     height="4"
+     fill="#FFE8E0"
+     opacity="0.75"
+     id="rect51" />
+  <rect
+     x="340"
+     y="72"
+     width="4"
+     height="4"
+     fill="#FFFFFF"
+     opacity="0.8"
+     id="rect52" />
+  <rect
+     x="410"
+     y="70"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.7"
+     id="rect53" />
+  <rect
+     x="490"
+     y="74"
+     width="4"
+     height="4"
+     fill="#FFE8E0"
+     opacity="0.75"
+     id="rect54" />
+  <rect
+     x="544"
+     y="72"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.7"
+     id="rect55" />
+  <rect
+     x="590"
+     y="68"
+     width="4"
+     height="4"
+     fill="#FFFFFF"
+     opacity="0.65"
+     id="rect56" />
+  <!-- ── CRYSTAL SALT CHANDELIER (real Wieliczka feature!) ── -->
+  <!-- Chandelier base ring -->
+  <rect
+     x="290"
+     y="96"
+     width="100"
+     height="12"
+     fill="#C8A890"
+     id="rect57" />
+  <rect
+     x="294"
+     y="92"
+     width="92"
+     height="8"
+     fill="#D8B8A0"
+     id="rect58" />
+  <rect
+     x="298"
+     y="88"
+     width="84"
+     height="6"
+     fill="#E0C0A8"
+     id="rect59" />
+  <!-- Chandelier chains/rope -->
+  <rect
+     x="336"
+     y="68"
+     width="8"
+     height="28"
+     fill="#A88870"
+     id="rect60" />
+  <rect
+     x="338"
+     y="66"
+     width="4"
+     height="30"
+     fill="#B89880"
+     id="rect61" />
+  <!-- Chandelier arms (horizontal spokes) -->
+  <rect
+     x="274"
+     y="100"
+     width="132"
+     height="6"
+     fill="#C8A888"
+     id="rect62" />
+  <rect
+     x="284"
+     y="108"
+     width="112"
+     height="4"
+     fill="#D0B090"
+     id="rect63" />
+  <!-- Crystal pendant drops (salt crystals hanging) -->
+  <!-- Outer pendants -->
+  <rect
+     x="278"
+     y="106"
+     width="6"
+     height="16"
+     fill="#D4C0B8"
+     id="rect64" />
+  <rect
+     x="280"
+     y="104"
+     width="2"
+     height="20"
+     fill="#E4D0C8"
+     id="rect65" />
+  <rect
+     x="280"
+     y="122"
+     width="2"
+     height="6"
+     fill="#C4B0A8"
+     id="rect66" />
+  <rect
+     x="282"
+     y="126"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.9"
+     id="rect67" />
+  <rect
+     x="296"
+     y="106"
+     width="6"
+     height="18"
+     fill="#D4C0B8"
+     id="rect68" />
+  <rect
+     x="298"
+     y="104"
+     width="2"
+     height="22"
+     fill="#E4D0C8"
+     id="rect69" />
+  <rect
+     x="298"
+     y="124"
+     width="2"
+     height="4"
+     fill="#C4B0A8"
+     id="rect70" />
+  <rect
+     x="300"
+     y="127"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.85"
+     id="rect71" />
+  <rect
+     x="318"
+     y="104"
+     width="8"
+     height="22"
+     fill="#E0CCC0"
+     id="rect72" />
+  <!-- large center pendant -->
+  <rect
+     x="320"
+     y="102"
+     width="4"
+     height="26"
+     fill="#ECD8D0"
+     id="rect73" />
+  <rect
+     x="321"
+     y="126"
+     width="2"
+     height="6"
+     fill="#D0BEB8"
+     id="rect74" />
+  <rect
+     x="321"
+     y="130"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.9"
+     id="rect75" />
+  <rect
+     x="338"
+     y="106"
+     width="6"
+     height="20"
+     fill="#D4C0B8"
+     id="rect76" />
+  <rect
+     x="340"
+     y="104"
+     width="2"
+     height="24"
+     fill="#E4D0C8"
+     id="rect77" />
+  <rect
+     x="340"
+     y="126"
+     width="2"
+     height="4"
+     fill="#C4B0A8"
+     id="rect78" />
+  <rect
+     x="356"
+     y="106"
+     width="6"
+     height="16"
+     fill="#D4C0B8"
+     id="rect79" />
+  <rect
+     x="358"
+     y="104"
+     width="2"
+     height="20"
+     fill="#E4D0C8"
+     id="rect80" />
+  <rect
+     x="358"
+     y="122"
+     width="2"
+     height="4"
+     fill="#C4B0A8"
+     id="rect81" />
+  <rect
+     x="360"
+     y="125"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.8"
+     id="rect82" />
+  <rect
+     x="376"
+     y="108"
+     width="6"
+     height="14"
+     fill="#D4C0B8"
+     id="rect83" />
+  <rect
+     x="378"
+     y="106"
+     width="2"
+     height="18"
+     fill="#E4D0C8"
+     id="rect84" />
+  <rect
+     x="394"
+     y="106"
+     width="6"
+     height="16"
+     fill="#D4C0B8"
+     id="rect85" />
+  <rect
+     x="396"
+     y="104"
+     width="2"
+     height="20"
+     fill="#E4D0C8"
+     id="rect86" />
+  <!-- Chandelier candles (salt lamp inserts) -->
+  <rect
+     x="288"
+     y="102"
+     width="4"
+     height="6"
+     fill="#D08848"
+     id="rect87" />
+  <!-- candle -->
+  <rect
+     x="290"
+     y="98"
+     width="2"
+     height="4"
+     fill="#FF9A30"
+     id="rect88" />
+  <!-- flame -->
+  <rect
+     x="310"
+     y="100"
+     width="4"
+     height="6"
+     fill="#D08848"
+     id="rect89" />
+  <rect
+     x="312"
+     y="96"
+     width="2"
+     height="4"
+     fill="#FF9A30"
+     id="rect90" />
+  <rect
+     x="330"
+     y="100"
+     width="4"
+     height="6"
+     fill="#D08848"
+     id="rect91" />
+  <rect
+     x="332"
+     y="96"
+     width="2"
+     height="4"
+     fill="#FFA840"
+     id="rect92" />
+  <rect
+     x="350"
+     y="100"
+     width="4"
+     height="6"
+     fill="#D08848"
+     id="rect93" />
+  <rect
+     x="352"
+     y="96"
+     width="2"
+     height="4"
+     fill="#FF9A30"
+     id="rect94" />
+  <rect
+     x="370"
+     y="102"
+     width="4"
+     height="6"
+     fill="#D08848"
+     id="rect95" />
+  <rect
+     x="372"
+     y="98"
+     width="2"
+     height="4"
+     fill="#FF9A30"
+     id="rect96" />
+  <rect
+     x="390"
+     y="102"
+     width="4"
+     height="6"
+     fill="#D08848"
+     id="rect97" />
+  <rect
+     x="392"
+     y="98"
+     width="2"
+     height="4"
+     fill="#FF9A30"
+     id="rect98" />
+  <!-- ── LEFT WALL: Sculpted saints/angels in salt ── -->
+  <rect
+     x="0"
+     y="70"
+     width="80"
+     height="310"
+     fill="#2A1C0C"
+     id="rect99" />
+  <rect
+     x="16"
+     y="70"
+     width="64"
+     height="310"
+     fill="#D4B8B0"
+     id="rect100" />
+  <!-- white salt wall -->
+  <rect
+     x="18"
+     y="72"
+     width="60"
+     height="308"
+     fill="#DCC0B8"
+     id="rect101" />
+  <!-- Salt relief texture - bas reliefs of angels -->
+  <!-- Angel figure 1 (carved recess) -->
+  <rect
+     x="22"
+     y="80"
+     width="52"
+     height="80"
+     fill="#C8A8A0"
+     id="rect102" />
+  <!-- recess darker -->
+  <rect
+     x="26"
+     y="84"
+     width="44"
+     height="72"
+     fill="#D0B0A8"
+     id="rect103" />
+  <!-- Angel body carved in salt -->
+  <rect
+     x="36"
+     y="88"
+     width="24"
+     height="44"
+     fill="#BEA098"
+     id="rect104" />
+  <!-- figure -->
+  <rect
+     x="40"
+     y="84"
+     width="16"
+     height="12"
+     fill="#BEA098"
+     id="rect105" />
+  <!-- head -->
+  <!-- Wings (carved) -->
+  <rect
+     x="24"
+     y="96"
+     width="14"
+     height="28"
+     fill="#C8A8A0"
+     id="rect106" />
+  <!-- left wing -->
+  <rect
+     x="58"
+     y="96"
+     width="14"
+     height="28"
+     fill="#C8A8A0"
+     id="rect107" />
+  <!-- right wing -->
+  <!-- Halo (circular carved relief) -->
+  <rect
+     x="38"
+     y="80"
+     width="20"
+     height="4"
+     fill="#E0C8C0"
+     id="rect108" />
+  <rect
+     x="36"
+     y="82"
+     width="24"
+     height="2"
+     fill="#E8D0C8"
+     id="rect109" />
+  <!-- Highlights on relief -->
+  <rect
+     x="38"
+     y="90"
+     width="4"
+     height="4"
+     fill="#EADAD4"
+     opacity="0.8"
+     id="rect110" />
+  <!-- Angel figure 2 (lower) -->
+  <rect
+     x="22"
+     y="172"
+     width="52"
+     height="72"
+     fill="#C4A49C"
+     id="rect111" />
+  <rect
+     x="26"
+     y="176"
+     width="44"
+     height="64"
+     fill="#CCA8A0"
+     id="rect112" />
+  <rect
+     x="34"
+     y="180"
+     width="28"
+     height="42"
+     fill="#BAA098"
+     id="rect113" />
+  <rect
+     x="36"
+     y="176"
+     width="24"
+     height="12"
+     fill="#BAA098"
+     id="rect114" />
+  <rect
+     x="22"
+     y="192"
+     width="14"
+     height="26"
+     fill="#C4A49C"
+     id="rect115" />
+  <rect
+     x="60"
+     y="192"
+     width="14"
+     height="26"
+     fill="#C4A49C"
+     id="rect116" />
+  <rect
+     x="36"
+     y="172"
+     width="24"
+     height="4"
+     fill="#DCC8C0"
+     id="rect117" />
+  <!-- Salt column details (architectural) -->
+  <rect
+     x="16"
+     y="70"
+     width="8"
+     height="310"
+     fill="#C8B0A8"
+     id="rect118" />
+  <!-- column edge -->
+  <rect
+     x="18"
+     y="70"
+     width="4"
+     height="310"
+     fill="#D8C0B8"
+     id="rect119" />
+  <!-- ── RIGHT WALL: Carved reliefs ── -->
+  <rect
+     x="600"
+     y="70"
+     width="80"
+     height="310"
+     fill="#2A1C0C"
+     id="rect120" />
+  <rect
+     x="600"
+     y="70"
+     width="64"
+     height="310"
+     fill="#D4B8B0"
+     id="rect121" />
+  <rect
+     x="602"
+     y="72"
+     width="60"
+     height="308"
+     fill="#DCC0B8"
+     id="rect122" />
+  <!-- Relief 1 right -->
+  <rect
+     x="606"
+     y="82"
+     width="52"
+     height="78"
+     fill="#C8A8A0"
+     id="rect123" />
+  <rect
+     x="610"
+     y="86"
+     width="44"
+     height="70"
+     fill="#D0B0A8"
+     id="rect124" />
+  <rect
+     x="622"
+     y="90"
+     width="22"
+     height="44"
+     fill="#BEA098"
+     id="rect125" />
+  <rect
+     x="626"
+     y="86"
+     width="14"
+     height="12"
+     fill="#BEA098"
+     id="rect126" />
+  <rect
+     x="606"
+     y="98"
+     width="14"
+     height="28"
+     fill="#C8A8A0"
+     id="rect127" />
+  <rect
+     x="644"
+     y="98"
+     width="14"
+     height="28"
+     fill="#C8A8A0"
+     id="rect128" />
+  <rect
+     x="624"
+     y="82"
+     width="18"
+     height="4"
+     fill="#E0C8C0"
+     id="rect129" />
+  <!-- Relief 2 right -->
+  <rect
+     x="606"
+     y="172"
+     width="52"
+     height="72"
+     fill="#C4A49C"
+     id="rect130" />
+  <rect
+     x="610"
+     y="176"
+     width="44"
+     height="64"
+     fill="#CCA8A0"
+     id="rect131" />
+  <rect
+     x="618"
+     y="180"
+     width="28"
+     height="42"
+     fill="#BAA098"
+     id="rect132" />
+  <rect
+     x="622"
+     y="176"
+     width="24"
+     height="12"
+     fill="#BAA098"
+     id="rect133" />
+  <rect
+     x="606"
+     y="192"
+     width="14"
+     height="26"
+     fill="#C4A49C"
+     id="rect134" />
+  <rect
+     x="644"
+     y="192"
+     width="14"
+     height="26"
+     fill="#C4A49C"
+     id="rect135" />
+  <rect
+     x="656"
+     y="70"
+     width="8"
+     height="310"
+     fill="#C8B0A8"
+     id="rect136" />
+  <rect
+     x="658"
+     y="70"
+     width="4"
+     height="310"
+     fill="#D8C0B8"
+     id="rect137" />
+  <!-- ── UNDERGROUND LAKE (azul-esverdeado, reflective) ── -->
+  <!-- Lake far shore -->
+  <rect
+     x="0"
+     y="338"
+     width="680"
+     height="8"
+     fill="#3A5C40"
+     id="rect138" />
+  <!-- Lake water (rich teal-blue) -->
+  <rect
+     x="0"
+     y="344"
+     width="680"
+     height="56"
+     fill="#1C4840"
+     id="rect139" />
+  <rect
+     x="0"
+     y="346"
+     width="680"
+     height="14"
+     fill="#245850"
+     id="rect140" />
+  <rect
+     x="0"
+     y="358"
+     width="680"
+     height="10"
+     fill="#1E5048"
+     id="rect141" />
+  <rect
+     x="0"
+     y="366"
+     width="680"
+     height="8"
+     fill="#183C38"
+     id="rect142" />
+  <rect
+     x="0"
+     y="372"
+     width="680"
+     height="20"
+     fill="#142E2C"
+     id="rect143" />
+  <rect
+     x="0"
+     y="390"
+     width="680"
+     height="40"
+     fill="#0E2220"
+     id="rect144" />
+  <!-- Lake reflections (chandelier and walls reflecting) -->
+  <!-- Chandelier reflection (wavy, centered) -->
+  <rect
+     x="290"
+     y="346"
+     width="100"
+     height="4"
+     fill="#C8A070"
+     opacity="0.4"
+     id="rect145" />
+  <rect
+     x="296"
+     y="350"
+     width="88"
+     height="3"
+     fill="#D0A878"
+     opacity="0.35"
+     id="rect146" />
+  <rect
+     x="302"
+     y="354"
+     width="76"
+     height="2"
+     fill="#D0A878"
+     opacity="0.3"
+     id="rect147" />
+  <rect
+     x="308"
+     y="357"
+     width="64"
+     height="2"
+     fill="#C8A070"
+     opacity="0.25"
+     id="rect148" />
+  <rect
+     x="314"
+     y="360"
+     width="52"
+     height="2"
+     fill="#C08860"
+     opacity="0.2"
+     id="rect149" />
+  <!-- Wall crystal reflections in water -->
+  <rect
+     x="40"
+     y="348"
+     width="40"
+     height="3"
+     fill="#D4B8B0"
+     opacity="0.3"
+     id="rect150" />
+  <rect
+     x="46"
+     y="352"
+     width="28"
+     height="2"
+     fill="#D4B8B0"
+     opacity="0.25"
+     id="rect151" />
+  <rect
+     x="600"
+     y="348"
+     width="40"
+     height="3"
+     fill="#D4B8B0"
+     opacity="0.3"
+     id="rect152" />
+  <rect
+     x="606"
+     y="352"
+     width="28"
+     height="2"
+     fill="#D4B8B0"
+     opacity="0.25"
+     id="rect153" />
+  <!-- Water shimmer (horizontal light bands) -->
+  <rect
+     x="60"
+     y="354"
+     width="80"
+     height="2"
+     fill="#3C6858"
+     opacity="0.7"
+     id="rect154" />
+  <rect
+     x="180"
+     y="358"
+     width="60"
+     height="2"
+     fill="#3C6858"
+     opacity="0.6"
+     id="rect155" />
+  <rect
+     x="360"
+     y="356"
+     width="80"
+     height="2"
+     fill="#3C6858"
+     opacity="0.7"
+     id="rect156" />
+  <rect
+     x="500"
+     y="359"
+     width="70"
+     height="2"
+     fill="#3C6858"
+     opacity="0.6"
+     id="rect157" />
+  <!-- Bioluminescent edge glow (mineral effect, green) -->
+  <rect
+     x="0"
+     y="344"
+     width="680"
+     height="4"
+     fill="#3A8060"
+     opacity="0.35"
+     id="rect158" />
+  <rect
+     x="0"
+     y="346"
+     width="680"
+     height="2"
+     fill="#50A870"
+     opacity="0.3"
+     id="rect159" />
+  <!-- ── STONE PLATFORM / BANK where Corvan stands ── -->
+  <rect
+     x="200"
+     y="330"
+     width="280"
+     height="16"
+     fill="#4A3018"
+     id="rect160" />
+  <rect
+     x="210"
+     y="326"
+     width="260"
+     height="8"
+     fill="#5A3C20"
+     id="rect161" />
+  <rect
+     x="220"
+     y="322"
+     width="240"
+     height="6"
+     fill="#6A4A28"
+     id="rect162" />
+  <!-- Salt crust on platform edge -->
+  <rect
+     x="200"
+     y="328"
+     width="280"
+     height="4"
+     fill="#C8C0B4"
+     id="rect163" />
+  <rect
+     x="202"
+     y="324"
+     width="276"
+     height="2"
+     fill="#D0C8BC"
+     id="rect164" />
+  <!-- ── CORVAN (holding Guild Insignia, lit by chandelier light) ── -->
+  <!-- Legs -->
+  <!-- Body (cloak, open, celebratory) -->
+  <!-- Arms extended (holding insignia up) -->
+  <!-- GUILD INSIGNIA (metal shield held up) -->
+  <!-- shield frame gold -->
+  <!-- shield top -->
+  <!-- Insignia design: two salt blocks crossed -->
+  <!-- salt block 1 -->
+  <!-- salt block 2 -->
+  <!-- cross piece -->
+  <!-- Insignia shine (gold gleam from chandelier) -->
+  <!-- Head -->
+  <!-- positioned lower, looking up -->
+  <!-- eyes (looking up/wide) -->
+  <!-- Beard -->
+  <!-- Hat -->
+  <!-- Fur trim -->
+  <!-- Salt Lamp on ground nearby -->
+  <!-- Lamp glow (warm on floor) -->
+  <!-- ── EXTRA CRYSTAL SPARKLES throughout chamber ── -->
+  <rect
+     x="90"
+     y="90"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.5"
+     id="rect199" />
+  <rect
+     x="130"
+     y="110"
+     width="2"
+     height="2"
+     fill="#FFE0D8"
+     opacity="0.55"
+     id="rect200" />
+  <rect
+     x="174"
+     y="84"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.45"
+     id="rect201" />
+  <rect
+     x="224"
+     y="92"
+     width="2"
+     height="2"
+     fill="#FFE0D8"
+     opacity="0.5"
+     id="rect202" />
+  <rect
+     x="468"
+     y="86"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.5"
+     id="rect203" />
+  <rect
+     x="520"
+     y="96"
+     width="2"
+     height="2"
+     fill="#FFE0D8"
+     opacity="0.45"
+     id="rect204" />
+  <rect
+     x="560"
+     y="82"
+     width="2"
+     height="2"
+     fill="#FFFFFF"
+     opacity="0.55"
+     id="rect205" />
+  <rect
+     x="584"
+     y="100"
+     width="2"
+     height="2"
+     fill="#FFE0D8"
+     opacity="0.5"
+     id="rect206" />
+  <!-- ── SALT COLUMNS (architectural pillars carved from salt) ── -->
+  <!-- Left pillar -->
+  <rect
+     x="86"
+     y="80"
+     width="28"
+     height="260"
+     fill="#C8B0A8"
+     id="rect207" />
+  <rect
+     x="88"
+     y="78"
+     width="24"
+     height="264"
+     fill="#D8C0B8"
+     id="rect208" />
+  <rect
+     x="90"
+     y="80"
+     width="8"
+     height="260"
+     fill="#E0C8C0"
+     id="rect209" />
+  <!-- highlight -->
+  <!-- Pillar capital (carved top) -->
+  <rect
+     x="82"
+     y="76"
+     width="36"
+     height="8"
+     fill="#D0B8B0"
+     id="rect210" />
+  <rect
+     x="84"
+     y="70"
+     width="32"
+     height="8"
+     fill="#DCC0B8"
+     id="rect211" />
+  <rect
+     x="86"
+     y="66"
+     width="28"
+     height="6"
+     fill="#E4C8C0"
+     id="rect212" />
+  <!-- Pillar base -->
+  <rect
+     x="82"
+     y="336"
+     width="36"
+     height="8"
+     fill="#D0B8B0"
+     id="rect213" />
+  <rect
+     x="84"
+     y="342"
+     width="32"
+     height="4"
+     fill="#DCC0B8"
+     id="rect214" />
+  <!-- Right pillar -->
+  <rect
+     x="566"
+     y="80"
+     width="28"
+     height="260"
+     fill="#C8B0A8"
+     id="rect215" />
+  <rect
+     x="568"
+     y="78"
+     width="24"
+     height="264"
+     fill="#D8C0B8"
+     id="rect216" />
+  <rect
+     x="582"
+     y="80"
+     width="8"
+     height="260"
+     fill="#C0A8A0"
+     id="rect217" />
+  <!-- shadow R -->
+  <!-- Capital and base -->
+  <rect
+     x="562"
+     y="76"
+     width="36"
+     height="8"
+     fill="#D0B8B0"
+     id="rect218" />
+  <rect
+     x="564"
+     y="70"
+     width="32"
+     height="8"
+     fill="#DCC0B8"
+     id="rect219" />
+  <rect
+     x="566"
+     y="66"
+     width="28"
+     height="6"
+     fill="#E4C8C0"
+     id="rect220" />
+  <rect
+     x="562"
+     y="336"
+     width="36"
+     height="8"
+     fill="#D0B8B0"
+     id="rect221" />
+  <rect
+     x="564"
+     y="342"
+     width="32"
+     height="4"
+     fill="#DCC0B8"
+     id="rect222" />
+  <!-- ── WARM GLOW HALO around chandelier ── -->
+  <rect
+     x="240"
+     y="80"
+     width="200"
+     height="60"
+     fill="#FF8020"
+     opacity="0.1"
+     id="rect223" />
+  <rect
+     x="270"
+     y="72"
+     width="140"
+     height="50"
+     fill="#FFA030"
+     opacity="0.08"
+     id="rect224" />
+  <rect
+     x="300"
+     y="64"
+     width="80"
+     height="40"
+     fill="#FFC040"
+     opacity="0.07"
+     id="rect225" />
+</svg>

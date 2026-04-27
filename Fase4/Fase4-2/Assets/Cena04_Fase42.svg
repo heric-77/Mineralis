@@ -1,0 +1,315 @@
+<svg width="100%" viewBox="0 0 1240 830" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <title>Fase 4.2 Cena 04 - Topo da Torre ao Pôr do Sol Africano</title>
+
+  <!-- CÉU PÔR DO SOL AFRICANO - laranja intenso raso sobre o planalto -->
+  <!-- Gradiente de cores do pôr do sol africano -->
+  <rect x="0" y="0" width="1240" height="830" fill="#3A1A08"/>
+  <!-- Faixas de cor do céu -->
+  <rect x="0" y="0" width="1240" height="60" fill="#1A0C18"/>
+  <rect x="0" y="50" width="1240" height="60" fill="#241018"/>
+  <rect x="0" y="100" width="1240" height="60" fill="#3A1820"/>
+  <rect x="0" y="150" width="1240" height="60" fill="#6A2418"/>
+  <rect x="0" y="200" width="1240" height="60" fill="#982C14"/>
+  <rect x="0" y="250" width="1240" height="60" fill="#C04010"/>
+  <rect x="0" y="300" width="1240" height="60" fill="#D85C18"/>
+  <rect x="0" y="350" width="1240" height="60" fill="#E87020"/>
+  <rect x="0" y="400" width="1240" height="60" fill="#F08028"/>
+  <rect x="0" y="450" width="1240" height="40" fill="#F49030"/>
+  <rect x="0" y="480" width="1240" height="30" fill="#F0A038"/>
+
+  <!-- SOL NO HORIZONTE - grande e raso, laranja-avermelhado -->
+  <rect x="480" y="448" width="280" height="60" fill="#F8C040" opacity="0.9"/>
+  <rect x="460" y="456" width="320" height="44" fill="#F0B030" opacity="0.85"/>
+  <rect x="500" y="448" width="240" height="52" fill="#FCD048" opacity="0.9"/>
+  <rect x="520" y="452" width="200" height="44" fill="#FEDA50" opacity="0.85"/>
+  <rect x="540" y="456" width="160" height="36" fill="#FFE860" opacity="0.8"/>
+  <rect x="556" y="460" width="128" height="28" fill="#FFF060" opacity="0.75"/>
+  <!-- Coroa solar e raios de luz -->
+  <rect x="560" y="432" width="120" height="20" fill="#F8C040" opacity="0.3"/>
+  <rect x="576" y="420" width="88" height="16" fill="#F0B030" opacity="0.2"/>
+  <rect x="600" y="440" width="8" height="80" fill="#FCD048" opacity="0.2"/>
+  <rect x="624" y="438" width="8" height="80" fill="#FCD048" opacity="0.15"/>
+  <rect x="648" y="438" width="8" height="80" fill="#FCD048" opacity="0.2"/>
+
+  <!-- Reflexo/brilho horizontal no horizonte -->
+  <rect x="0" y="500" width="1240" height="30" fill="#E89030" opacity="0.4"/>
+  <rect x="0" y="506" width="1240" height="18" fill="#F0A038" opacity="0.3"/>
+
+  <!-- NUVENS de pôr do sol - tingidas de laranja e vermelho -->
+  <!-- Nuvem alta esquerda -->
+  <rect x="40" y="80" width="180" height="24" fill="#5A2018" opacity="0.8"/>
+  <rect x="24" y="92" width="212" height="24" fill="#6A2C1C" opacity="0.75"/>
+  <rect x="32" y="108" width="196" height="18" fill="#5A2018" opacity="0.7"/>
+  <rect x="72" y="68" width="120" height="20" fill="#6A2C1C" opacity="0.75"/>
+  <rect x="100" y="56" width="72" height="16" fill="#5A2018" opacity="0.7"/>
+
+  <!-- Nuvem alta centro -->
+  <rect x="500" y="60" width="240" height="22" fill="#6A2C1C" opacity="0.7"/>
+  <rect x="480" y="74" width="280" height="24" fill="#783018" opacity="0.65"/>
+  <rect x="490" y="92" width="260" height="18" fill="#6A2C1C" opacity="0.6"/>
+  <rect x="540" y="48" width="160" height="18" fill="#783018" opacity="0.65"/>
+  <rect x="576" y="36" width="88" height="16" fill="#6A2C1C" opacity="0.6"/>
+
+  <!-- Nuvem direita -->
+  <rect x="980" y="90" width="200" height="22" fill="#5A2018" opacity="0.75"/>
+  <rect x="960" y="104" width="240" height="22" fill="#6A2C1C" opacity="0.7"/>
+  <rect x="968" y="118" width="224" height="16" fill="#5A2018" opacity="0.65"/>
+  <rect x="1000" y="78" width="160" height="18" fill="#6A2C1C" opacity="0.7"/>
+
+  <!-- Nuvens de baixo - rosas e douradas -->
+  <rect x="0" y="200" width="300" height="16" fill="#C84820" opacity="0.5"/>
+  <rect x="0" y="210" width="280" height="12" fill="#D85828" opacity="0.45"/>
+  <rect x="900" y="210" width="340" height="16" fill="#C84820" opacity="0.5"/>
+  <rect x="920" y="220" width="320" height="12" fill="#D85828" opacity="0.45"/>
+  <rect x="380" y="180" width="480" height="14" fill="#E06820" opacity="0.4"/>
+  <rect x="400" y="192" width="440" height="12" fill="#D05818" opacity="0.35"/>
+
+  <!-- SILHUETA DO PLANALTO ZIMBABWEANO ao horizonte -->
+  <!-- Formações de granito do planalto - silhuetas escuras contra o sol -->
+  <!-- Linha de colinas esquerda -->
+  <rect x="0" y="480" width="480" height="200" fill="#1E1008"/>
+  <rect x="0" y="462" width="440" height="24" fill="#1E1008"/>
+  <rect x="0" y="444" width="380" height="22" fill="#1E1008"/>
+  <rect x="0" y="426" width="300" height="22" fill="#1E1008"/>
+  <rect x="0" y="408" width="230" height="22" fill="#1E1008"/>
+  <rect x="0" y="390" width="160" height="22" fill="#1E1008"/>
+  <rect x="0" y="372" width="100" height="22" fill="#1E1008"/>
+  <rect x="0" y="356" width="60" height="20" fill="#1E1008"/>
+  <rect x="0" y="342" width="36" height="18" fill="#1E1008"/>
+  <rect x="0" y="330" width="20" height="14" fill="#1E1008"/>
+  <!-- Kopje esq topo -->
+  <rect x="0" y="316" width="16" height="16" fill="#1E1008"/>
+  <rect x="0" y="302" width="10" height="16" fill="#1E1008"/>
+  <rect x="60" y="350" width="50" height="18" fill="#1E1008"/>
+  <rect x="68" y="334" width="34" height="18" fill="#1E1008"/>
+  <rect x="74" y="318" width="22" height="18" fill="#1E1008"/>
+  <rect x="80" y="304" width="12" height="16" fill="#1E1008"/>
+
+  <!-- Linha de colinas direita -->
+  <rect x="760" y="480" width="480" height="200" fill="#1E1008"/>
+  <rect x="800" y="462" width="440" height="24" fill="#1E1008"/>
+  <rect x="850" y="444" width="390" height="22" fill="#1E1008"/>
+  <rect x="910" y="426" width="330" height="22" fill="#1E1008"/>
+  <rect x="970" y="408" width="270" height="22" fill="#1E1008"/>
+  <rect x="1030" y="390" width="210" height="22" fill="#1E1008"/>
+  <rect x="1090" y="372" width="150" height="22" fill="#1E1008"/>
+  <rect x="1140" y="356" width="100" height="20" fill="#1E1008"/>
+  <rect x="1180" y="340" width="60" height="18" fill="#1E1008"/>
+  <rect x="1210" y="326" width="30" height="16" fill="#1E1008"/>
+  <rect x="1228" y="314" width="12" height="14" fill="#1E1008"/>
+  <!-- Kopje dir -->
+  <rect x="1100" y="352" width="46" height="18" fill="#1E1008"/>
+  <rect x="1110" y="336" width="30" height="18" fill="#1E1008"/>
+  <rect x="1118" y="322" width="18" height="16" fill="#1E1008"/>
+  <rect x="1124" y="308" width="10" height="16" fill="#1E1008"/>
+
+  <!-- RIO MUTIRIKWE brilhando ao fundo - reflexo laranja do sol -->
+  <rect x="0" y="490" width="1240" height="40" fill="#E87820" opacity="0.6"/>
+  <rect x="100" y="494" width="1040" height="28" fill="#F08C30" opacity="0.5"/>
+  <rect x="200" y="498" width="840" height="20" fill="#F8A040" opacity="0.4"/>
+  <!-- Cintilação do rio -->
+  <rect x="180" y="492" width="12" height="6" fill="#FFDE80" opacity="0.6"/>
+  <rect x="320" y="496" width="10" height="6" fill="#FFDE80" opacity="0.55"/>
+  <rect x="500" y="493" width="12" height="6" fill="#FFDE80" opacity="0.6"/>
+  <rect x="680" y="497" width="10" height="6" fill="#FFDE80" opacity="0.55"/>
+  <rect x="860" y="494" width="12" height="6" fill="#FFDE80" opacity="0.6"/>
+  <rect x="1020" y="498" width="10" height="6" fill="#FFDE80" opacity="0.55"/>
+
+  <!-- ROTA COMERCIAL - animação estática sugerida por pontos no horizonte -->
+  <!-- Pontos de luz no horizonte representando a rota Sofala -->
+  <rect x="1060" y="462" width="4" height="4" fill="#F8E080" opacity="0.7"/>
+  <rect x="1090" y="460" width="4" height="4" fill="#F8E080" opacity="0.65"/>
+  <rect x="1120" y="458" width="4" height="4" fill="#F8E080" opacity="0.6"/>
+
+  <!-- TOPO DA TORRE CÔNICA - onde estamos -->
+  <!-- Parede curva da torre ao redor - visão do topo -->
+
+  <!-- Borda esquerda da torre (nós estamos em cima) -->
+  <rect x="0" y="510" width="200" height="320" fill="#2A2010"/>
+  <rect x="0" y="496" width="180" height="20" fill="#3A2E18"/>
+  <rect x="0" y="478" width="150" height="22" fill="#2A2010"/>
+  <rect x="0" y="460" width="110" height="22" fill="#201808"/>
+  <rect x="0" y="444" width="70" height="20" fill="#1A1408"/>
+  <rect x="0" y="430" width="40" height="18" fill="#141008"/>
+  <!-- Textura blocos granito topo esquerdo -->
+  <rect x="0" y="510" width="80" height="16" fill="#343028"/>
+  <rect x="84" y="510" width="72" height="16" fill="#2E2820"/>
+  <rect x="160" y="510" width="40" height="16" fill="#343028"/>
+  <rect x="0" y="530" width="64" height="16" fill="#2E2820"/>
+  <rect x="68" y="530" width="80" height="16" fill="#343028"/>
+  <rect x="152" y="530" width="48" height="16" fill="#2E2820"/>
+  <rect x="0" y="550" width="88" height="16" fill="#343028"/>
+  <rect x="92" y="550" width="72" height="16" fill="#2E2820"/>
+  <rect x="168" y="550" width="32" height="16" fill="#343028"/>
+  <rect x="0" y="570" width="60" height="16" fill="#2E2820"/>
+  <rect x="64" y="570" width="80" height="16" fill="#343028"/>
+  <rect x="148" y="570" width="52" height="16" fill="#2E2820"/>
+  <!-- Líquen esquerdo -->
+  <rect x="40" y="514" width="16" height="8" fill="#4A5835" opacity="0.5"/>
+  <rect x="110" y="532" width="14" height="7" fill="#5A6840" opacity="0.45"/>
+  <rect x="70" y="552" width="12" height="6" fill="#4A5835" opacity="0.5"/>
+
+  <!-- Borda direita da torre -->
+  <rect x="1040" y="510" width="200" height="320" fill="#2A2010"/>
+  <rect x="1060" y="496" width="180" height="20" fill="#3A2E18"/>
+  <rect x="1090" y="478" width="150" height="22" fill="#2A2010"/>
+  <rect x="1130" y="460" width="110" height="22" fill="#201808"/>
+  <rect x="1170" y="444" width="70" height="20" fill="#1A1408"/>
+  <rect x="1200" y="430" width="40" height="18" fill="#141008"/>
+  <!-- Textura blocos direito -->
+  <rect x="1040" y="510" width="72" height="16" fill="#343028"/>
+  <rect x="1116" y="510" width="80" height="16" fill="#2E2820"/>
+  <rect x="1200" y="510" width="40" height="16" fill="#343028"/>
+  <rect x="1040" y="530" width="60" height="16" fill="#2E2820"/>
+  <rect x="1104" y="530" width="80" height="16" fill="#343028"/>
+  <rect x="1188" y="530" width="52" height="16" fill="#2E2820"/>
+  <rect x="1040" y="550" width="80" height="16" fill="#343028"/>
+  <rect x="1124" y="550" width="72" height="16" fill="#2E2820"/>
+  <rect x="1200" y="550" width="40" height="16" fill="#343028"/>
+  <rect x="1040" y="570" width="64" height="16" fill="#2E2820"/>
+  <rect x="1108" y="570" width="80" height="16" fill="#343028"/>
+  <rect x="1192" y="570" width="48" height="16" fill="#2E2820"/>
+  <!-- Líquen direito -->
+  <rect x="1100" y="514" width="16" height="8" fill="#4A5835" opacity="0.5"/>
+  <rect x="1160" y="532" width="14" height="7" fill="#5A6840" opacity="0.45"/>
+
+  <!-- PLATAFORMA DO TOPO da torre - onde estamos em pé -->
+  <rect x="0" y="590" width="1240" height="240" fill="#2A2010"/>
+  <rect x="0" y="610" width="1240" height="220" fill="#342814"/>
+  <rect x="0" y="640" width="1240" height="190" fill="#3C3018"/>
+  <rect x="0" y="680" width="1240" height="150" fill="#443820"/>
+  <rect x="0" y="730" width="1240" height="100" fill="#4C4028"/>
+  <rect x="0" y="780" width="1240" height="50" fill="#544830"/>
+
+  <!-- Blocos do piso do topo -->
+  <!-- Linha de blocos 1 -->
+  <rect x="0" y="590" width="120" height="20" fill="#343028"/>
+  <rect x="124" y="590" width="100" height="20" fill="#2E2A20"/>
+  <rect x="228" y="590" width="120" height="20" fill="#343028"/>
+  <rect x="352" y="590" width="100" height="20" fill="#2E2A20"/>
+  <rect x="456" y="590" width="120" height="20" fill="#343028"/>
+  <rect x="580" y="590" width="80" height="20" fill="#2E2A20"/>
+  <rect x="664" y="590" width="120" height="20" fill="#343028"/>
+  <rect x="788" y="590" width="100" height="20" fill="#2E2A20"/>
+  <rect x="892" y="590" width="120" height="20" fill="#343028"/>
+  <rect x="1016" y="590" width="100" height="20" fill="#2E2A20"/>
+  <rect x="1120" y="590" width="120" height="20" fill="#343028"/>
+
+  <!-- Linha de blocos 2 -->
+  <rect x="0" y="614" width="100" height="20" fill="#2E2A20"/>
+  <rect x="104" y="614" width="120" height="20" fill="#343028"/>
+  <rect x="228" y="614" width="100" height="20" fill="#2E2A20"/>
+  <rect x="332" y="614" width="120" height="20" fill="#343028"/>
+  <rect x="456" y="614" width="100" height="20" fill="#2E2A20"/>
+  <rect x="560" y="614" width="120" height="20" fill="#343028"/>
+  <rect x="684" y="614" width="100" height="20" fill="#2E2A20"/>
+  <rect x="788" y="614" width="120" height="20" fill="#343028"/>
+  <rect x="912" y="614" width="100" height="20" fill="#2E2A20"/>
+  <rect x="1016" y="614" width="120" height="20" fill="#343028"/>
+  <rect x="1140" y="614" width="100" height="20" fill="#2E2A20"/>
+
+  <!-- Linha 3 -->
+  <rect x="0" y="638" width="120" height="20" fill="#343028"/>
+  <rect x="124" y="638" width="100" height="20" fill="#2E2A20"/>
+  <rect x="228" y="638" width="120" height="20" fill="#343028"/>
+  <rect x="352" y="638" width="80" height="20" fill="#2E2A20"/>
+  <rect x="436" y="638" width="120" height="20" fill="#343028"/>
+  <rect x="560" y="638" width="100" height="20" fill="#2E2A20"/>
+  <rect x="664" y="638" width="120" height="20" fill="#343028"/>
+  <rect x="788" y="638" width="100" height="20" fill="#2E2A20"/>
+  <rect x="892" y="638" width="120" height="20" fill="#343028"/>
+  <rect x="1016" y="638" width="100" height="20" fill="#2E2A20"/>
+  <rect x="1120" y="638" width="120" height="20" fill="#343028"/>
+
+  <!-- Borda/parapeito do topo da torre -->
+  <!-- Parapeito frontal (borda inferior da visão) -->
+  <rect x="0" y="580" width="1240" height="14" fill="#1A1408"/>
+  <rect x="0" y="570" width="1240" height="12" fill="#120E06"/>
+  <!-- Ameias (merlões) do topo -->
+  <rect x="0" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="56" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="100" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="156" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="200" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="256" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="300" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="356" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="400" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="456" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="500" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="556" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="600" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="656" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="700" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="756" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="800" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="856" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="900" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="956" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="1000" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="1056" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="1100" y="550" width="40" height="30" fill="#1A1408"/>
+  <rect x="1156" y="558" width="32" height="22" fill="#1E1810"/>
+  <rect x="1200" y="550" width="40" height="30" fill="#1A1408"/>
+
+  <!-- LUZ ÂMBAR DO PÔR DO SOL nas pedras da torre -->
+  <!-- Brilho laranja nas pedras do topo -->
+  <rect x="0" y="590" width="1240" height="4" fill="#D87030" opacity="0.3"/>
+  <rect x="0" y="550" width="1240" height="4" fill="#E88030" opacity="0.25"/>
+
+  <!-- Sombra longa - projetada pelas ameias no piso -->
+  <rect x="10" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="110" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="210" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="310" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="410" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="510" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="610" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="710" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="810" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="910" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="1010" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="1110" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+  <rect x="1210" y="594" width="30" height="80" fill="#140E04" opacity="0.4"/>
+
+  <!-- Reflexo dourado-âmbar do sol no piso da torre -->
+  <rect x="400" y="590" width="440" height="200" fill="#E87028" opacity="0.08"/>
+  <rect x="440" y="600" width="360" height="160" fill="#F08030" opacity="0.06"/>
+  <rect x="480" y="614" width="280" height="120" fill="#F89038" opacity="0.05"/>
+
+  <!-- POMBOS nas ameias (silhuetas) -->
+  <!-- Pombo 1 -->
+  <rect x="140" y="548" width="12" height="8" fill="#1A1610"/>
+  <rect x="138" y="544" width="6" height="6" fill="#1A1610"/><!-- cabeça -->
+  <rect x="148" y="548" width="6" height="4" fill="#1A1610"/><!-- asa -->
+
+  <!-- Pombo 2 -->
+  <rect x="640" y="546" width="12" height="8" fill="#1A1610"/>
+  <rect x="638" y="542" width="6" height="6" fill="#1A1610"/>
+  <rect x="648" y="546" width="6" height="4" fill="#1A1610"/>
+
+  <!-- Pombo 3 voando (silhueta simplificada) -->
+  <rect x="940" y="420" width="20" height="6" fill="#1E1208" opacity="0.7"/>
+  <rect x="934" y="416" width="8" height="6" fill="#1E1208" opacity="0.7"/>
+  <rect x="956" y="416" width="8" height="6" fill="#1E1208" opacity="0.7"/>
+
+  <!-- Pássaro de Água voando ao longe -->
+  <rect x="820" y="388" width="16" height="4" fill="#1A1008" opacity="0.6"/>
+  <rect x="816" y="385" width="6" height="5" fill="#1A1008" opacity="0.6"/>
+  <rect x="832" y="385" width="6" height="5" fill="#1A1008" opacity="0.6"/>
+
+  <!-- Peixe-Águia ao longe (silhueta pequena no horizonte) -->
+  <rect x="1150" y="448" width="22" height="6" fill="#1E1208" opacity="0.65"/>
+  <rect x="1144" y="444" width="8" height="7" fill="#1E1208" opacity="0.65"/>
+  <rect x="1168" y="443" width="8" height="7" fill="#1E1208" opacity="0.65"/>
+  <rect x="1160" y="452" width="6" height="10" fill="#1E1208" opacity="0.65"/>
+
+  <!-- ESTRELA DA TARDE - Vênus aparecendo -->
+  <rect x="780" y="48" width="4" height="4" fill="#F8F0D0" opacity="0.9"/>
+  <rect x="778" y="46" width="2" height="2" fill="#FFFFFF" opacity="0.8"/>
+
+  <!-- Luz dourada intensa batendo nas pedras do topo -->
+  <rect x="0" y="580" width="1240" height="8" fill="#E07828" opacity="0.15"/>
+  <rect x="0" y="550" width="1240" height="6" fill="#D86820" opacity="0.12"/>
+
+</svg>

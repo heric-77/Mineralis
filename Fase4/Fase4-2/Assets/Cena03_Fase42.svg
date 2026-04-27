@@ -1,0 +1,355 @@
+<svg width="100%" viewBox="0 0 1240 830" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <title>Fase 4.2 Cena 03 - Interior da Torre Cônica e Rio para Garimpagem</title>
+
+  <!-- FUNDO GERAL - interior da torre e vista do rio -->
+  <rect x="0" y="0" width="1240" height="830" fill="#1A1408"/>
+
+  <!-- ======= PARTE ESQUERDA - INTERIOR DA TORRE CÔNICA ======= -->
+  <!-- Parede curva da torre - granito sem argamassa, muito escuro -->
+  <rect x="0" y="0" width="580" height="830" fill="#1E1A10"/>
+
+  <!-- Paredes de granito - curva cônica, blocos empilhados SEM argamassa -->
+  <!-- Parede de fundo da torre -->
+  <rect x="0" y="0" width="560" height="800" fill="#2A2418"/>
+  <rect x="0" y="0" width="540" height="750" fill="#262018"/>
+  <rect x="20" y="0" width="520" height="720" fill="#2E2820"/>
+
+  <!-- Blocos de granito - fiadas horizontais na parede -->
+  <!-- Fiada 1 topo -->
+  <rect x="20" y="20" width="100" height="20" fill="#343028"/>
+  <rect x="124" y="20" width="88" height="20" fill="#2E2A20"/>
+  <rect x="216" y="20" width="96" height="20" fill="#343028"/>
+  <rect x="316" y="20" width="80" height="20" fill="#2E2A20"/>
+  <rect x="400" y="20" width="92" height="20" fill="#343028"/>
+  <rect x="496" y="20" width="64" height="20" fill="#2E2A20"/>
+
+  <!-- Fiada 2 -->
+  <rect x="20" y="44" width="84" height="20" fill="#2E2A20"/>
+  <rect x="108" y="44" width="96" height="20" fill="#343028"/>
+  <rect x="208" y="44" width="88" height="20" fill="#2E2A20"/>
+  <rect x="300" y="44" width="100" height="20" fill="#343028"/>
+  <rect x="404" y="44" width="80" height="20" fill="#2E2A20"/>
+  <rect x="488" y="44" width="72" height="20" fill="#343028"/>
+
+  <!-- Fiada 3 -->
+  <rect x="20" y="68" width="96" height="20" fill="#343028"/>
+  <rect x="120" y="68" width="80" height="20" fill="#2E2A20"/>
+  <rect x="204" y="68" width="100" height="20" fill="#343028"/>
+  <rect x="308" y="68" width="88" height="20" fill="#2E2A20"/>
+  <rect x="400" y="68" width="92" height="20" fill="#343028"/>
+  <rect x="496" y="68" width="64" height="20" fill="#2E2A20"/>
+
+  <!-- Fiadas 4-12 (continuam padrão) -->
+  <rect x="20" y="92" width="80" height="20" fill="#2E2A20"/>
+  <rect x="104" y="92" width="96" height="20" fill="#343028"/>
+  <rect x="204" y="92" width="88" height="20" fill="#2E2A20"/>
+  <rect x="296" y="92" width="100" height="20" fill="#343028"/>
+  <rect x="400" y="92" width="84" height="20" fill="#2E2A20"/>
+  <rect x="488" y="92" width="72" height="20" fill="#343028"/>
+
+  <rect x="20" y="116" width="100" height="20" fill="#343028"/>
+  <rect x="124" y="116" width="80" height="20" fill="#2E2A20"/>
+  <rect x="208" y="116" width="96" height="20" fill="#343028"/>
+  <rect x="308" y="116" width="88" height="20" fill="#2E2A20"/>
+  <rect x="400" y="116" width="80" height="20" fill="#343028"/>
+  <rect x="484" y="116" width="76" height="20" fill="#2E2A20"/>
+
+  <rect x="20" y="140" width="88" height="20" fill="#2E2A20"/>
+  <rect x="112" y="140" width="96" height="20" fill="#343028"/>
+  <rect x="212" y="140" width="80" height="20" fill="#2E2A20"/>
+  <rect x="296" y="140" width="100" height="20" fill="#343028"/>
+  <rect x="400" y="140" width="88" height="20" fill="#2E2A20"/>
+  <rect x="492" y="140" width="68" height="20" fill="#343028"/>
+
+  <rect x="20" y="164" width="96" height="20" fill="#343028"/>
+  <rect x="120" y="164" width="80" height="20" fill="#2E2A20"/>
+  <rect x="204" y="164" width="100" height="20" fill="#343028"/>
+  <rect x="308" y="164" width="84" height="20" fill="#2E2A20"/>
+  <rect x="396" y="164" width="96" height="20" fill="#343028"/>
+  <rect x="496" y="164" width="64" height="20" fill="#2E2A20"/>
+
+  <rect x="20" y="188" width="80" height="20" fill="#2E2A20"/>
+  <rect x="104" y="188" width="100" height="20" fill="#343028"/>
+  <rect x="208" y="188" width="88" height="20" fill="#2E2A20"/>
+  <rect x="300" y="188" width="96" height="20" fill="#343028"/>
+  <rect x="400" y="188" width="80" height="20" fill="#2E2A20"/>
+  <rect x="484" y="188" width="76" height="20" fill="#343028"/>
+
+  <rect x="20" y="212" width="96" height="20" fill="#343028"/>
+  <rect x="120" y="212" width="88" height="20" fill="#2E2A20"/>
+  <rect x="212" y="212" width="80" height="20" fill="#343028"/>
+  <rect x="296" y="212" width="100" height="20" fill="#2E2A20"/>
+  <rect x="400" y="212" width="84" height="20" fill="#343028"/>
+  <rect x="488" y="212" width="72" height="20" fill="#2E2A20"/>
+
+  <!-- Fiadas 10-20 (mais em baixo) -->
+  <rect x="20" y="236" width="84" height="20" fill="#2A2418"/>
+  <rect x="108" y="236" width="96" height="20" fill="#302C20"/>
+  <rect x="208" y="236" width="88" height="20" fill="#2A2418"/>
+  <rect x="300" y="236" width="80" height="20" fill="#302C20"/>
+  <rect x="384" y="236" width="100" height="20" fill="#2A2418"/>
+  <rect x="488" y="236" width="72" height="20" fill="#302C20"/>
+
+  <rect x="20" y="260" width="100" height="20" fill="#302C20"/>
+  <rect x="124" y="260" width="80" height="20" fill="#2A2418"/>
+  <rect x="208" y="260" width="96" height="20" fill="#302C20"/>
+  <rect x="308" y="260" width="84" height="20" fill="#2A2418"/>
+  <rect x="396" y="260" width="96" height="20" fill="#302C20"/>
+  <rect x="496" y="260" width="64" height="20" fill="#2A2418"/>
+
+  <rect x="20" y="284" width="88" height="20" fill="#2A2418"/>
+  <rect x="112" y="284" width="96" height="20" fill="#302C20"/>
+  <rect x="212" y="284" width="80" height="20" fill="#2A2418"/>
+  <rect x="296" y="284" width="100" height="20" fill="#302C20"/>
+  <rect x="400" y="284" width="84" height="20" fill="#2A2418"/>
+  <rect x="488" y="284" width="72" height="20" fill="#302C20"/>
+
+  <rect x="20" y="308" width="96" height="20" fill="#302C20"/>
+  <rect x="120" y="308" width="88" height="20" fill="#2A2418"/>
+  <rect x="212" y="308" width="80" height="20" fill="#302C20"/>
+  <rect x="296" y="308" width="96" height="20" fill="#2A2418"/>
+  <rect x="396" y="308" width="84" height="20" fill="#302C20"/>
+  <rect x="484" y="308" width="76" height="20" fill="#2A2418"/>
+
+  <rect x="20" y="332" width="80" height="20" fill="#2A2418"/>
+  <rect x="104" y="332" width="96" height="20" fill="#302C20"/>
+  <rect x="204" y="332" width="88" height="20" fill="#2A2418"/>
+  <rect x="296" y="332" width="100" height="20" fill="#302C20"/>
+  <rect x="400" y="332" width="80" height="20" fill="#2A2418"/>
+  <rect x="484" y="332" width="76" height="20" fill="#302C20"/>
+
+  <rect x="20" y="356" width="96" height="20" fill="#302C20"/>
+  <rect x="120" y="356" width="80" height="20" fill="#2A2418"/>
+  <rect x="204" y="356" width="100" height="20" fill="#302C20"/>
+  <rect x="308" y="356" width="84" height="20" fill="#2A2418"/>
+  <rect x="396" y="356" width="96" height="20" fill="#302C20"/>
+  <rect x="496" y="356" width="64" height="20" fill="#2A2418"/>
+
+  <rect x="20" y="380" width="84" height="20" fill="#2A2418"/>
+  <rect x="108" y="380" width="96" height="20" fill="#2E2820"/>
+  <rect x="208" y="380" width="80" height="20" fill="#2A2418"/>
+  <rect x="292" y="380" width="100" height="20" fill="#2E2820"/>
+  <rect x="396" y="380" width="88" height="20" fill="#2A2418"/>
+  <rect x="488" y="380" width="72" height="20" fill="#2E2820"/>
+
+  <rect x="20" y="404" width="100" height="20" fill="#2E2820"/>
+  <rect x="124" y="404" width="84" height="20" fill="#2A2418"/>
+  <rect x="212" y="404" width="96" height="20" fill="#2E2820"/>
+  <rect x="312" y="404" width="80" height="20" fill="#2A2418"/>
+  <rect x="396" y="404" width="92" height="20" fill="#2E2820"/>
+  <rect x="492" y="404" width="68" height="20" fill="#2A2418"/>
+
+  <rect x="20" y="428" width="88" height="20" fill="#2A2418"/>
+  <rect x="112" y="428" width="80" height="20" fill="#2E2820"/>
+  <rect x="196" y="428" width="100" height="20" fill="#2A2418"/>
+  <rect x="300" y="428" width="88" height="20" fill="#2E2820"/>
+  <rect x="392" y="428" width="80" height="20" fill="#2A2418"/>
+  <rect x="476" y="428" width="84" height="20" fill="#2E2820"/>
+
+  <!-- Fiadas finais até o chão -->
+  <rect x="20" y="452" width="96" height="20" fill="#2E2820"/>
+  <rect x="120" y="452" width="80" height="20" fill="#2A2418"/>
+  <rect x="204" y="452" width="96" height="20" fill="#2E2820"/>
+  <rect x="304" y="452" width="84" height="20" fill="#2A2418"/>
+  <rect x="392" y="452" width="100" height="20" fill="#2E2820"/>
+  <rect x="496" y="452" width="64" height="20" fill="#2A2418"/>
+
+  <rect x="20" y="476" width="80" height="20" fill="#2A2418"/>
+  <rect x="104" y="476" width="100" height="20" fill="#2E2820"/>
+  <rect x="208" y="476" width="84" height="20" fill="#2A2418"/>
+  <rect x="296" y="476" width="96" height="20" fill="#2E2820"/>
+  <rect x="396" y="476" width="80" height="20" fill="#2A2418"/>
+  <rect x="480" y="476" width="80" height="20" fill="#2E2820"/>
+
+  <!-- Fiadas baixas da câmara interna -->
+  <rect x="0" y="500" width="560" height="20" fill="#2A2418"/>
+  <rect x="0" y="524" width="560" height="20" fill="#242018"/>
+  <rect x="0" y="548" width="560" height="20" fill="#2A2418"/>
+  <rect x="0" y="572" width="560" height="20" fill="#242018"/>
+  <rect x="0" y="596" width="560" height="20" fill="#2A2418"/>
+  <rect x="0" y="620" width="560" height="20" fill="#242018"/>
+  <rect x="0" y="644" width="560" height="20" fill="#2A2418"/>
+
+  <!-- ENTALHE NA PAREDE - onde a sombra do Bastão aponta -->
+  <!-- Fenda/nicho na parede da torre - câmara secreta -->
+  <rect x="180" y="280" width="200" height="280" fill="#120E08"/>
+  <rect x="190" y="288" width="180" height="264" fill="#0E0A06"/>
+  <rect x="198" y="296" width="164" height="248" fill="#0A0806"/>
+  <!-- Borda do nicho -->
+  <rect x="176" y="276" width="4" height="288" fill="#3A3428"/>
+  <rect x="376" y="276" width="4" height="288" fill="#3A3428"/>
+  <rect x="180" y="276" width="200" height="8" fill="#3A3428"/>
+  <rect x="180" y="556" width="200" height="8" fill="#2E2820"/>
+
+  <!-- Detalhe do entalhe - entalhes solares na parede -->
+  <rect x="196" y="300" width="160" height="4" fill="#4A4438" opacity="0.5"/>
+  <rect x="196" y="320" width="160" height="4" fill="#4A4438" opacity="0.4"/>
+  <rect x="196" y="340" width="160" height="4" fill="#4A4438" opacity="0.5"/>
+
+  <!-- CÂMARA SECRETA - onde está o Pássaro de Esteatita -->
+  <rect x="220" y="360" width="120" height="120" fill="#080604"/>
+  <rect x="228" y="368" width="104" height="104" fill="#060402"/>
+  <!-- Fresta de luz solar entrando na câmara (orientação solar) -->
+  <rect x="270" y="295" width="20" height="70" fill="#E8C860" opacity="0.15"/>
+  <rect x="274" y="295" width="12" height="70" fill="#F0D870" opacity="0.12"/>
+  <rect x="278" y="295" width="4" height="70" fill="#F8E880" opacity="0.10"/>
+
+  <!-- Calor de luz refletido na câmara -->
+  <rect x="220" y="360" width="120" height="60" fill="#B08020" opacity="0.08"/>
+  <rect x="240" y="368" width="80" height="48" fill="#C89030" opacity="0.06"/>
+
+  <!-- PAREDE ESQUERDA da torre -->
+  <rect x="0" y="0" width="24" height="830" fill="#0E0C08"/>
+  <rect x="24" y="0" width="12" height="830" fill="#1A1610"/>
+  <!-- Parede direita interna -->
+  <rect x="548" y="0" width="12" height="830" fill="#1A1610"/>
+  <rect x="560" y="0" width="20" height="830" fill="#0E0C08"/>
+
+  <!-- CHÃO da câmara interna da torre -->
+  <rect x="0" y="668" width="560" height="162" fill="#1A1610"/>
+  <rect x="0" y="686" width="560" height="144" fill="#221E14"/>
+  <rect x="0" y="710" width="560" height="120" fill="#2A2618"/>
+  <rect x="0" y="740" width="560" height="90" fill="#322C1C"/>
+  <rect x="0" y="780" width="560" height="50" fill="#3A3420"/>
+
+  <!-- Pedras no chão da câmara -->
+  <rect x="40" y="690" width="48" height="20" fill="#2E2A1A"/>
+  <rect x="48" y="682" width="32" height="12" fill="#3A3420"/>
+  <rect x="150" y="700" width="40" height="18" fill="#2E2A1A"/>
+  <rect x="350" y="694" width="44" height="20" fill="#3A3420"/>
+  <rect x="460" y="698" width="36" height="18" fill="#2E2A1A"/>
+
+  <!-- LUZ SOLAR entrando - raia de luz do solstício -->
+  <rect x="240" y="0" width="60" height="280" fill="#E8C040" opacity="0.06"/>
+  <rect x="252" y="0" width="36" height="280" fill="#F0CC50" opacity="0.05"/>
+  <rect x="260" y="0" width="20" height="280" fill="#F8D860" opacity="0.04"/>
+  <!-- Mancha de luz no chão -->
+  <rect x="230" y="660" width="100" height="30" fill="#E8C040" opacity="0.10"/>
+  <rect x="248" y="668" width="64" height="20" fill="#F0CC50" opacity="0.08"/>
+
+  <!-- SEPARADOR - divisória entre cenas -->
+  <rect x="580" y="0" width="80" height="830" fill="#0A0804"/>
+  <rect x="600" y="0" width="40" height="830" fill="#060402"/>
+
+  <!-- ======= PARTE DIREITA - RIO PARA GARIMPAGEM ======= -->
+  <rect x="660" y="0" width="580" height="830" fill="#2A5A7A"/>
+
+  <!-- Céu da cena rio -->
+  <rect x="660" y="0" width="580" height="300" fill="#2A5A7A"/>
+  <rect x="660" y="0" width="580" height="200" fill="#2E6282" opacity="0.8"/>
+  <rect x="660" y="0" width="580" height="120" fill="#326A8A" opacity="0.6"/>
+
+  <!-- Colinas ao fundo (direita) -->
+  <rect x="660" y="160" width="580" height="200" fill="#2A4260"/>
+  <rect x="660" y="140" width="560" height="26" fill="#2A4260"/>
+  <rect x="680" y="118" width="500" height="26" fill="#2A4260"/>
+  <rect x="710" y="98" width="430" height="24" fill="#2A4260"/>
+  <rect x="750" y="78" width="340" height="24" fill="#2A4260"/>
+  <rect x="800" y="60" width="250" height="22" fill="#2A4260"/>
+  <rect x="850" y="44" width="150" height="20" fill="#2A4260"/>
+
+  <!-- Muralha distante (direita) -->
+  <rect x="660" y="200" width="200" height="160" fill="#3A3218" opacity="0.7"/>
+  <rect x="660" y="185" width="180" height="18" fill="#3A3218" opacity="0.7"/>
+  <rect x="660" y="170" width="150" height="18" fill="#3A3218" opacity="0.7"/>
+  <rect x="660" y="156" width="120" height="16" fill="#3A3218" opacity="0.7"/>
+
+  <!-- Margem do rio e vegetação -->
+  <rect x="660" y="300" width="580" height="120" fill="#3A5828"/>
+  <rect x="660" y="290" width="580" height="16" fill="#4A6830"/>
+  <rect x="660" y="276" width="560" height="18" fill="#3A5828"/>
+  <!-- Capim alto das margens -->
+  <rect x="680" y="265" width="6" height="28" fill="#4A6030"/>
+  <rect x="676" y="259" width="4" height="14" fill="#5A7038"/>
+  <rect x="710" y="268" width="6" height="24" fill="#4A6030"/>
+  <rect x="750" y="262" width="6" height="30" fill="#5A7038"/>
+  <rect x="800" y="266" width="6" height="26" fill="#4A6030"/>
+  <rect x="850" y="260" width="6" height="32" fill="#5A7038"/>
+  <rect x="900" y="265" width="6" height="27" fill="#4A6030"/>
+  <rect x="950" y="262" width="6" height="30" fill="#5A7038"/>
+  <rect x="1000" y="266" width="6" height="26" fill="#4A6030"/>
+  <rect x="1060" y="268" width="6" height="24" fill="#5A7038"/>
+  <rect x="1120" y="264" width="6" height="28" fill="#4A6030"/>
+  <rect x="1180" y="260" width="6" height="32" fill="#5A7038"/>
+  <rect x="1220" y="265" width="6" height="27" fill="#4A6030"/>
+
+  <!-- LEITO DO RIO (parte direita) -->
+  <rect x="660" y="380" width="580" height="450" fill="#8A7040"/>
+  <rect x="660" y="394" width="580" height="436" fill="#9A8048"/>
+  <rect x="660" y="410" width="580" height="420" fill="#A8904E"/>
+
+  <!-- ÁGUA no rio (cena garimpagem) -->
+  <rect x="660" y="380" width="580" height="200" fill="#4A7890" opacity="0.5"/>
+  <rect x="660" y="390" width="580" height="180" fill="#5A88A0" opacity="0.4"/>
+  <rect x="660" y="400" width="580" height="160" fill="#6898B0" opacity="0.3"/>
+
+  <!-- Reflexo e ondulação da água -->
+  <rect x="680" y="382" width="10" height="4" fill="#FFFFFF" opacity="0.25"/>
+  <rect x="740" y="386" width="8" height="4" fill="#FFFFFF" opacity="0.2"/>
+  <rect x="810" y="382" width="10" height="4" fill="#FFFFFF" opacity="0.25"/>
+  <rect x="880" y="388" width="8" height="4" fill="#FFFFFF" opacity="0.2"/>
+  <rect x="950" y="384" width="10" height="4" fill="#FFFFFF" opacity="0.25"/>
+  <rect x="1020" y="386" width="8" height="4" fill="#FFFFFF" opacity="0.2"/>
+  <rect x="1100" y="382" width="10" height="4" fill="#FFFFFF" opacity="0.25"/>
+  <rect x="1180" y="388" width="8" height="4" fill="#FFFFFF" opacity="0.2"/>
+
+  <!-- Blocos de granito mel no leito do rio (cena garimpagem) -->
+  <!-- Bloco 1 -->
+  <rect x="700" y="420" width="100" height="50" fill="#7A6030"/>
+  <rect x="700" y="416" width="100" height="8" fill="#8A7038"/>
+  <rect x="738" y="420" width="4" height="42" fill="#D8D0B0" opacity="0.8"/>
+  <rect x="734" y="436" width="12" height="4" fill="#E8E0C0" opacity="0.75"/>
+  <rect x="738" y="428" width="4" height="4" fill="#D4A830" opacity="0.95"/>
+  <rect x="738" y="446" width="4" height="4" fill="#C89820" opacity="0.95"/>
+
+  <!-- Bloco 2 -->
+  <rect x="860" y="430" width="120" height="56" fill="#7A6030"/>
+  <rect x="860" y="426" width="120" height="8" fill="#906E38"/>
+  <rect x="906" y="430" width="4" height="48" fill="#D8D4B8" opacity="0.85"/>
+  <rect x="900" y="446" width="16" height="4" fill="#E8E4C8" opacity="0.8"/>
+  <rect x="906" y="438" width="4" height="4" fill="#E0B840" opacity="0.95"/>
+  <rect x="906" y="456" width="4" height="4" fill="#D4A830" opacity="0.9"/>
+
+  <!-- Bloco 3 -->
+  <rect x="1060" y="415" width="140" height="60" fill="#7A6030"/>
+  <rect x="1060" y="411" width="140" height="8" fill="#8A7038"/>
+  <rect x="1114" y="415" width="4" height="52" fill="#C8C0A0" opacity="0.75"/>
+  <rect x="1110" y="432" width="12" height="4" fill="#D8D0B0" opacity="0.7"/>
+  <rect x="1114" y="424" width="4" height="4" fill="#D4A830" opacity="0.9"/>
+  <rect x="1114" y="442" width="4" height="4" fill="#E0B840" opacity="0.9"/>
+  <rect x="1114" y="458" width="4" height="4" fill="#C89820" opacity="0.9"/>
+
+  <!-- FLOCOS DE MICA brilhantes na água (obstáculo) -->
+  <rect x="670" y="405" width="6" height="3" fill="#E8D860" opacity="0.8"/>
+  <rect x="720" y="408" width="8" height="3" fill="#D4C450" opacity="0.75"/>
+  <rect x="780" y="404" width="6" height="3" fill="#E8D860" opacity="0.8"/>
+  <rect x="840" y="408" width="8" height="3" fill="#D4C450" opacity="0.75"/>
+  <rect x="920" y="405" width="6" height="3" fill="#E8D860" opacity="0.8"/>
+  <rect x="990" y="407" width="8" height="3" fill="#D4C450" opacity="0.75"/>
+  <rect x="1040" y="404" width="6" height="3" fill="#E8D860" opacity="0.8"/>
+  <rect x="1130" y="406" width="8" height="3" fill="#D4C450" opacity="0.75"/>
+  <rect x="1200" y="405" width="6" height="3" fill="#E8D860" opacity="0.8"/>
+
+  <!-- Seixos pequenos no leito -->
+  <rect x="680" y="450" width="16" height="8" fill="#6A5828"/>
+  <rect x="800" y="460" width="14" height="7" fill="#7A6830"/>
+  <rect x="960" y="448" width="18" height="8" fill="#6A5828"/>
+  <rect x="1150" y="454" width="16" height="7" fill="#7A6830"/>
+
+  <!-- Fundo arenoso do rio mais distante -->
+  <rect x="660" y="540" width="580" height="290" fill="#9A8A50"/>
+  <rect x="660" y="580" width="580" height="250" fill="#A89A58"/>
+  <rect x="660" y="630" width="580" height="200" fill="#B0A260"/>
+  <rect x="660" y="700" width="580" height="130" fill="#B8AA68"/>
+  <rect x="660" y="760" width="580" height="70" fill="#C0B270"/>
+
+  <!-- Juncos e capim beira-rio (zona inferior) -->
+  <rect x="660" y="560" width="8" height="60" fill="#2A4820"/>
+  <rect x="656" y="548" width="16" height="18" fill="#3A5828"/>
+  <rect x="690" y="565" width="6" height="55" fill="#2A4820"/>
+  <rect x="720" y="558" width="8" height="62" fill="#344E24"/>
+  <rect x="1200" y="562" width="8" height="58" fill="#2A4820"/>
+  <rect x="1196" y="550" width="16" height="18" fill="#3A5828"/>
+  <rect x="1224" y="565" width="16" height="55" fill="#2A4820"/>
+
+</svg>
