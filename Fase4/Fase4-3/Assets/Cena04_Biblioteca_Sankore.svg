@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1456"
+   viewBox="0 0 1456 839"
+   height="839"
+   role="img"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <title>Fase 4.3 Cena 04 – Biblioteca de Sankoré ao entardecer, Rio Níger ao fundo</title>
+  <desc>Pixel art 2D – Interior/pátio da Biblioteca de Sankoré, luz dourada de entardecer, rio Níger pela janela. Fundo sem personagens.</desc>
+
+  <defs>
+    <!-- Adobe interno – parede de terra crua, tom interno -->
+    <pattern id="pAdobe" x="0" y="0" width="48" height="24" patternUnits="userSpaceOnUse">
+      <rect width="48" height="24" fill="#B07840"/>
+      <rect width="48" height="1" fill="#906030"/>
+      <rect y="12" width="48" height="1" fill="#906030"/>
+      <rect width="1" height="12" fill="#906030"/>
+      <rect x="47" width="1" height="12" fill="#906030"/>
+      <rect x="24" y="12" width="1" height="12" fill="#906030"/>
+    </pattern>
+    <!-- Piso de pedra lascada -->
+    <pattern id="pPiso" x="0" y="0" width="48" height="32" patternUnits="userSpaceOnUse">
+      <rect width="48" height="32" fill="#8A7050"/>
+      <rect width="48" height="1" fill="#6A5038"/>
+      <rect y="16" width="48" height="1" fill="#6A5038"/>
+      <rect width="1" height="16" fill="#6A5038"/>
+      <rect x="47" width="1" height="16" fill="#6A5038"/>
+      <rect x="24" y="16" width="1" height="16" fill="#6A5038"/>
+    </pattern>
+    <!-- Sub-solo escuro -->
+    <pattern id="pSub" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#3A2010"/>
+      <rect width="64" height="1" fill="#281408"/>
+      <rect y="10" width="64" height="1" fill="#281408"/>
+      <rect width="1" height="10" fill="#281408"/>
+      <rect x="63" width="1" height="10" fill="#281408"/>
+      <rect x="32" y="10" width="1" height="10" fill="#281408"/>
+    </pattern>
+    <!-- Prateleira de manuscritos (textura de papel e madeira) -->
+    <pattern id="pShelf" x="0" y="0" width="40" height="30" patternUnits="userSpaceOnUse">
+      <rect width="40" height="30" fill="#8B5A28"/>
+      <!-- livros/manuscritos individais na prateleira -->
+      <rect x="1"  y="2" width="6"  height="24" fill="#C8A030"/>
+      <rect x="9"  y="4" width="5"  height="22" fill="#8B3A20"/>
+      <rect x="16" y="2" width="7"  height="24" fill="#D8C090"/>
+      <rect x="25" y="4" width="5"  height="22" fill="#6A4818"/>
+      <rect x="32" y="2" width="6"  height="24" fill="#A87030"/>
+    </pattern>
+  </defs>
+
+  <!-- ===================== JANELA AO FUNDO – visão do Rio Níger ===================== -->
+  <!-- Esta cena é um interior: paredes laterais e a janela grande ao fundo é o "céu" -->
+  <!-- Céu pelo vão da janela – laranja-ouro do entardecer -->
+  <rect x="0" y="0" width="1456" height="839" fill="#2A1808"/>
+
+  <!-- Abertura central (janela/arco de visão para fora) -->
+  <!-- Fundo do exterior pela janela – céu entardecer -->
+  <rect x="280" y="0"   width="896" height="540" fill="#E88830"/>
+  <rect x="280" y="0"   width="896" height="80"  fill="#C05818"/>
+  <rect x="280" y="80"  width="896" height="100" fill="#D87020"/>
+  <rect x="280" y="180" width="896" height="100" fill="#E88830"/>
+  <rect x="280" y="280" width="896" height="80"  fill="#F0A040"/>
+  <rect x="280" y="360" width="896" height="80"  fill="#F8C060"/>
+  <rect x="280" y="440" width="896" height="100" fill="#E0A050"/>
+
+  <!-- Rio Níger brilhando ao longe (dourado-cobre) -->
+  <rect x="280" y="430" width="896" height="24"  fill="#CC7818"/>
+  <rect x="280" y="430" width="896" height="4"   fill="#E8A030"/>
+  <!-- Reflexo do sol no rio -->
+  <rect x="560" y="434" width="200" height="6"   fill="#FFD060" opacity="0.6"/>
+  <rect x="580" y="440" width="160" height="4"   fill="#FFD060" opacity="0.4"/>
+  <!-- Silhueta de palmeiras à beira do Níger -->
+  <rect x="320" y="400" width="6"   height="50"  fill="#1A0C04"/>
+  <rect x="310" y="392" width="26"  height="10"  fill="#1A3010"/>
+  <rect x="306" y="384" width="34"  height="10"  fill="#1E3814"/>
+  <rect x="314" y="376" width="18"  height="10"  fill="#1A3010"/>
+  <rect x="370" y="408" width="6"   height="42"  fill="#1A0C04"/>
+  <rect x="360" y="400" width="26"  height="10"  fill="#1A3010"/>
+  <rect x="356" y="392" width="34"  height="10"  fill="#1E3814"/>
+  <rect x="364" y="386" width="18"  height="8"   fill="#1A3010"/>
+  <!-- Mais palmeiras à direita -->
+  <rect x="1080" y="398" width="6"  height="52"  fill="#1A0C04"/>
+  <rect x="1070" y="390" width="26" height="10"  fill="#1A3010"/>
+  <rect x="1066" y="382" width="34" height="10"  fill="#1E3814"/>
+  <rect x="1074" y="374" width="18" height="10"  fill="#1A3010"/>
+  <rect x="1120" y="406" width="6"  height="44"  fill="#1A0C04"/>
+  <rect x="1110" y="398" width="26" height="10"  fill="#1A3010"/>
+  <rect x="1106" y="390" width="34" height="10"  fill="#1E3814"/>
+
+  <!-- Silhueta de Timbuktu vista pela janela (minaretes ao longe) -->
+  <!-- Minarete esquerdo ao fundo -->
+  <rect x="430" y="310" width="18"  height="140" fill="#1A0C04" opacity="0.7"/>
+  <rect x="434" y="295" width="10"  height="16"  fill="#1A0C04" opacity="0.7"/>
+  <rect x="436" y="283" width="6"   height="14"  fill="#1A0C04" opacity="0.7"/>
+  <rect x="438" y="272" width="2"   height="12"  fill="#1A0C04" opacity="0.7"/>
+  <!-- Casas da cidade ao longe (silhueta baixa) -->
+  <rect x="390" y="390" width="700" height="60"  fill="#1A0C04" opacity="0.5"/>
+  <rect x="400" y="382" width="80"  height="12"  fill="#1A0C04" opacity="0.5"/>
+  <rect x="520" y="376" width="60"  height="16"  fill="#1A0C04" opacity="0.5"/>
+  <rect x="640" y="370" width="100" height="22"  fill="#1A0C04" opacity="0.5"/>
+  <rect x="800" y="378" width="70"  height="14"  fill="#1A0C04" opacity="0.5"/>
+  <rect x="940" y="384" width="60"  height="10"  fill="#1A0C04" opacity="0.5"/>
+  <!-- Minarete direito ao fundo -->
+  <rect x="1000" y="320" width="18" height="130" fill="#1A0C04" opacity="0.7"/>
+  <rect x="1004" y="305" width="10" height="16"  fill="#1A0C04" opacity="0.7"/>
+  <rect x="1006" y="293" width="6"  height="14"  fill="#1A0C04" opacity="0.7"/>
+  <rect x="1008" y="282" width="2"  height="12"  fill="#1A0C04" opacity="0.7"/>
+
+  <!-- ===================== PAREDES INTERNAS DA BIBLIOTECA ===================== -->
+  <!-- Parede esquerda – com prateleiras -->
+  <rect x="0"   y="0"   width="280" height="620" fill="url(#pAdobe)"/>
+  <rect x="0"   y="0"   width="4"   height="620" fill="#C09050" opacity="0.4"/>
+  <rect x="276" y="0"   width="4"   height="620" fill="#602808" opacity="0.6"/>
+
+  <!-- Parede direita – com prateleiras -->
+  <rect x="1176" y="0"  width="280" height="620" fill="url(#pAdobe)"/>
+  <rect x="1176" y="0"  width="4"   height="620" fill="#602808" opacity="0.6"/>
+  <rect x="1452" y="0"  width="4"   height="620" fill="#C09050" opacity="0.3"/>
+
+  <!-- Moldura do arco da janela (borda interna em adobe) -->
+  <!-- Borda superior do arco -->
+  <rect x="280" y="0"   width="896" height="40"  fill="#8B5A28"/>
+  <!-- Padrão geométrico islâmico no arco (zellij/estuque pixelado) -->
+  <!-- Losangos brancos no arco superior -->
+  <rect x="360" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="400" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="440" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="480" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="520" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="560" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="600" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="640" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="680" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="720" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="760" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="800" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="840" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="880" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="920" y="8"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="960" y="4"   width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="1000" y="8"  width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="1040" y="4"  width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <rect x="1080" y="8"  width="12"  height="12"  fill="#E8D8C0" opacity="0.6"/>
+  <!-- Moldura lateral esquerda do arco -->
+  <rect x="280" y="0"   width="40"  height="540" fill="#8B5A28"/>
+  <rect x="288" y="40"  width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="80"  width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="120" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="160" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="200" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="240" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="280" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="320" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="360" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="400" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="440" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="288" y="480" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <!-- Moldura lateral direita do arco -->
+  <rect x="1136" y="0"  width="40"  height="540" fill="#8B5A28"/>
+  <rect x="1142" y="40" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="80" width="6"   height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="120" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="160" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="200" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="240" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="280" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="320" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="360" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="400" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="440" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+  <rect x="1142" y="480" width="6"  height="10"  fill="#E8D8C0" opacity="0.4"/>
+
+  <!-- ===================== PRATELEIRAS DE MANUSCRITOS ===================== -->
+  <!-- Parede esquerda: 4 prateleiras empilhadas -->
+  <rect x="12"  y="40"  width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="40"  width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="68"  width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="90"  width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="90"  width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="118" width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="140" width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="140" width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="168" width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="190" width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="190" width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="218" width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="240" width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="240" width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="268" width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="290" width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="290" width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="318" width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="340" width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="340" width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="368" width="256" height="4"   fill="#6A3A10"/>
+  <rect x="12"  y="390" width="256" height="30"  fill="url(#pShelf)"/>
+  <rect x="12"  y="390" width="256" height="3"   fill="#A87030"/>
+  <rect x="12"  y="418" width="256" height="4"   fill="#6A3A10"/>
+
+  <!-- Parede direita: prateleiras espelhadas -->
+  <rect x="1188" y="40"  width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="40"  width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="68"  width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="90"  width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="90"  width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="118" width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="140" width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="140" width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="168" width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="190" width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="190" width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="218" width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="240" width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="240" width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="268" width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="290" width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="290" width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="318" width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="340" width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="340" width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="368" width="256" height="4"  fill="#6A3A10"/>
+  <rect x="1188" y="390" width="256" height="30" fill="url(#pShelf)"/>
+  <rect x="1188" y="390" width="256" height="3"  fill="#A87030"/>
+  <rect x="1188" y="418" width="256" height="4"  fill="#6A3A10"/>
+
+  <!-- Luz dourada de entardecer entrando pela janela (faixa de luz no interior) -->
+  <rect x="320" y="440" width="816" height="120" fill="#F0A040" opacity="0.12"/>
+  <rect x="400" y="460" width="656" height="80"  fill="#FFD060" opacity="0.08"/>
+
+  <!-- Aberturas geométricas nas paredes laterais (mashrabiya – grades de madeira) -->
+  <!-- Esquerda -->
+  <rect x="0"   y="450" width="80"  height="90"  fill="#3A2010"/>
+  <rect x="4"   y="454" width="72"  height="82"  fill="#1A0C04" opacity="0.6"/>
+  <!-- Grade mashrabiya – padrão geométrico -->
+  <rect x="4"   y="454" width="4"   height="82"  fill="#5A3810"/>
+  <rect x="16"  y="454" width="4"   height="82"  fill="#5A3810"/>
+  <rect x="28"  y="454" width="4"   height="82"  fill="#5A3810"/>
+  <rect x="40"  y="454" width="4"   height="82"  fill="#5A3810"/>
+  <rect x="52"  y="454" width="4"   height="82"  fill="#5A3810"/>
+  <rect x="64"  y="454" width="4"   fill="#5A3810" height="82"/>
+  <rect x="4"   y="470" width="72"  height="4"   fill="#5A3810"/>
+  <rect x="4"   y="490" width="72"  height="4"   fill="#5A3810"/>
+  <rect x="4"   y="510" width="72"  height="4"   fill="#5A3810"/>
+  <rect x="4"   y="530" width="72"  height="4"   fill="#5A3810"/>
+  <!-- Luz vaza pela mashrabiya (pontos amarelos) -->
+  <rect x="8"   y="458" width="6"   height="10"  fill="#F0C040" opacity="0.3"/>
+  <rect x="20"  y="458" width="6"   height="10"  fill="#F0C040" opacity="0.3"/>
+  <rect x="32"  y="458" width="6"   height="10"  fill="#F0C040" opacity="0.3"/>
+  <rect x="44"  y="458" width="6"   height="10"  fill="#F0C040" opacity="0.3"/>
+  <rect x="56"  y="458" width="6"   height="10"  fill="#F0C040" opacity="0.3"/>
+  <!-- Direita -->
+  <rect x="1376" y="450" width="80" height="90"  fill="#3A2010"/>
+  <rect x="1380" y="454" width="72" height="82"  fill="#1A0C04" opacity="0.6"/>
+  <rect x="1380" y="454" width="4"  height="82"  fill="#5A3810"/>
+  <rect x="1392" y="454" width="4"  height="82"  fill="#5A3810"/>
+  <rect x="1404" y="454" width="4"  height="82"  fill="#5A3810"/>
+  <rect x="1416" y="454" width="4"  height="82"  fill="#5A3810"/>
+  <rect x="1428" y="454" width="4"  height="82"  fill="#5A3810"/>
+  <rect x="1440" y="454" width="4"  height="82"  fill="#5A3810"/>
+  <rect x="1380" y="470" width="72" height="4"   fill="#5A3810"/>
+  <rect x="1380" y="490" width="72" height="4"   fill="#5A3810"/>
+  <rect x="1380" y="510" width="72" height="4"   fill="#5A3810"/>
+  <rect x="1380" y="530" width="72" height="4"   fill="#5A3810"/>
+
+  <!-- ===================== MESA DE LEITURA CENTRAL ===================== -->
+  <!-- Tampo da mesa (madeira escura) -->
+  <rect x="528" y="510" width="400" height="24"  fill="#4A2C0E"/>
+  <rect x="528" y="510" width="400" height="3"   fill="#6A4020"/>
+  <rect x="528" y="531" width="400" height="3"   fill="#2A1808"/>
+  <!-- Pés da mesa -->
+  <rect x="540" y="534" width="16"  height="50"  fill="#3A2010"/>
+  <rect x="900" y="534" width="16"  height="50"  fill="#3A2010"/>
+  <rect x="640" y="534" width="10"  height="46"  fill="#3A2010"/>
+  <rect x="806" y="534" width="10"  height="46"  fill="#3A2010"/>
+  <!-- Manuscrito aberto sobre a mesa -->
+  <rect x="600" y="498" width="120" height="16"  fill="#E8D8B0"/>
+  <rect x="600" y="498" width="120" height="2"   fill="#F0E0C0"/>
+  <rect x="600" y="498" width="2"   height="16"  fill="#C0B090"/>
+  <rect x="718" y="498" width="2"   height="16"  fill="#C0B090"/>
+  <!-- Linha do texto (escrita árabe estilizada) -->
+  <rect x="608" y="503" width="50"  height="2"   fill="#3A2010" opacity="0.6"/>
+  <rect x="612" y="508" width="40"  height="2"   fill="#3A2010" opacity="0.6"/>
+  <rect x="608" y="513" width="45"  height="2"   fill="#3A2010" opacity="0.6"/>
+  <rect x="666" y="503" width="50"  height="2"   fill="#3A2010" opacity="0.6"/>
+  <rect x="670" y="508" width="40"  height="2"   fill="#3A2010" opacity="0.6"/>
+  <rect x="666" y="513" width="45"  height="2"   fill="#3A2010" opacity="0.6"/>
+  <!-- Suporte de leitura (rak-hal árabe) -->
+  <rect x="728" y="492" width="80"  height="22"  fill="#E8D8B0"/>
+  <rect x="728" y="492" width="80"  height="2"   fill="#F0E0C0"/>
+  <rect x="736" y="492" width="2"   height="22"  fill="#C0B090"/>
+  <rect x="800" y="492" width="2"   height="22"  fill="#C0B090"/>
+  <rect x="736" y="500" width="66"  height="2"   fill="#3A2010" opacity="0.5"/>
+  <rect x="740" y="506" width="56"  height="2"   fill="#3A2010" opacity="0.5"/>
+  <rect x="736" y="512" width="66"  height="2"   fill="#3A2010" opacity="0.5"/>
+  <!-- Suporte em X do rak-hal -->
+  <rect x="748" y="514" width="4"   height="30"  fill="#5A3810"/>
+  <rect x="784" y="514" width="4"   height="30"  fill="#5A3810"/>
+  <rect x="748" y="540" width="40"  height="4"   fill="#5A3810"/>
+
+  <!-- Lanternas de azeite na mesa -->
+  <!-- Lanterna 1 -->
+  <rect x="548" y="494" width="20"  height="18"  fill="#8B5A28"/>
+  <rect x="552" y="490" width="12"  height="6"   fill="#A87040"/>
+  <rect x="555" y="484" width="6"   height="8"   fill="#C0A050"/>
+  <rect x="557" y="480" width="2"   height="6"   fill="#FFE040"/>
+  <!-- Lanterna 2 -->
+  <rect x="888" y="494" width="20"  height="18"  fill="#8B5A28"/>
+  <rect x="892" y="490" width="12"  height="6"   fill="#A87040"/>
+  <rect x="895" y="484" width="6"   height="8"   fill="#C0A050"/>
+  <rect x="897" y="480" width="2"   height="6"   fill="#FFE040"/>
+
+  <!-- Ampulheta de areia (medição de tempo do oráculo) -->
+  <rect x="856" y="488" width="16"  height="26"  fill="#C8B090" opacity="0.8"/>
+  <rect x="856" y="502" width="16"  height="2"   fill="#A89070"/>
+  <rect x="860" y="490" width="8"   height="12"  fill="#E8D8B8" opacity="0.6"/>
+  <rect x="860" y="504" width="8"   height="8"   fill="#D0B060" opacity="0.4"/>
+
+  <!-- ===================== PISO E SOLO ===================== -->
+  <!-- Piso interno da biblioteca -->
+  <rect x="0"   y="540" width="1456" height="60" fill="url(#pPiso)"/>
+  <rect x="0"   y="540" width="1456" height="4"  fill="#A09070"/>
+  <!-- Tapete de oração no centro (kilim de lã colorida) -->
+  <rect x="480" y="542" width="496" height="48"  fill="#8B2020"/>
+  <rect x="480" y="542" width="496" height="3"   fill="#A83030"/>
+  <rect x="480" y="587" width="496" height="3"   fill="#6A1818"/>
+  <!-- Bordas geométricas do tapete -->
+  <rect x="480" y="542" width="496" height="6"   fill="#C84030"/>
+  <rect x="480" y="584" width="496" height="6"   fill="#C84030"/>
+  <rect x="480" y="542" width="6"   height="48"  fill="#C84030"/>
+  <rect x="970" y="542" width="6"   height="48"  fill="#C84030"/>
+  <!-- Padrão interno do tapete (losangos) -->
+  <rect x="600" y="556" width="16"  height="16"  fill="#D08020"/>
+  <rect x="640" y="556" width="16"  height="16"  fill="#D08020"/>
+  <rect x="680" y="556" width="16"  height="16"  fill="#D08020"/>
+  <rect x="720" y="556" width="16"  height="16"  fill="#D08020"/>
+  <rect x="760" y="556" width="16"  height="16"  fill="#D08020"/>
+  <rect x="800" y="556" width="16"  height="16"  fill="#D08020"/>
+  <rect x="840" y="556" width="16"  height="16"  fill="#D08020"/>
+
+  <!-- Camadas de sub-solo -->
+  <rect x="0"   y="600" width="1456" height="50" fill="url(#pSub)"/>
+  <rect x="0"   y="600" width="1456" height="4"  fill="#6A4020"/>
+  <rect x="0"   y="650" width="1456" height="189" fill="#1A0C04"/>
+</svg>

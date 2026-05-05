@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1456"
+   viewBox="0 0 1456 839"
+   height="839"
+   role="img"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <title>Fase 4.3 Cena 03 – Bazar de Timbuktu, tempestade de areia no horizonte</title>
+  <desc>Pixel art 2D – Ruelas do bazar medieval de Timbuktu, harmattan surgindo ao norte, luz quente de fim de tarde. Fundo sem personagens.</desc>
+
+  <defs>
+    <!-- Adobe – terra crua compactada -->
+    <pattern id="pAdobe" x="0" y="0" width="48" height="24" patternUnits="userSpaceOnUse">
+      <rect width="48" height="24" fill="#B07840"/>
+      <rect width="48" height="1" fill="#906030"/>
+      <rect y="12" width="48" height="1" fill="#906030"/>
+      <rect width="1" height="12" fill="#906030"/>
+      <rect x="47" width="1" height="12" fill="#906030"/>
+      <rect x="24" y="12" width="1" height="12" fill="#906030"/>
+    </pattern>
+    <!-- Pedra de calçada -->
+    <pattern id="pPedra" x="0" y="0" width="40" height="20" patternUnits="userSpaceOnUse">
+      <rect width="40" height="20" fill="#A08860"/>
+      <rect width="40" height="1" fill="#786848"/>
+      <rect y="10" width="40" height="1" fill="#786848"/>
+      <rect width="1" height="10" fill="#786848"/>
+      <rect x="39" width="1" height="10" fill="#786848"/>
+      <rect x="20" y="10" width="1" height="10" fill="#786848"/>
+    </pattern>
+    <!-- Sub-solo ocre -->
+    <pattern id="pSub" x="0" y="0" width="64" height="20" patternUnits="userSpaceOnUse">
+      <rect width="64" height="20" fill="#5A3818"/>
+      <rect width="64" height="1" fill="#3A2010"/>
+      <rect y="10" width="64" height="1" fill="#3A2010"/>
+      <rect width="1" height="10" fill="#3A2010"/>
+      <rect x="63" width="1" height="10" fill="#3A2010"/>
+      <rect x="32" y="10" width="1" height="10" fill="#3A2010"/>
+    </pattern>
+  </defs>
+
+  <!-- ===================== CÉU – ameaça da tempestade ao norte ===================== -->
+  <!-- Fundo de céu normal (azul-Sahel claro) – sobreposto pela parede de areia -->
+  <rect x="0" y="0" width="1456" height="839" fill="#D4A860"/>
+  <!-- Céu normal à direita (onde ainda não chegou a tempestade) -->
+  <rect x="720" y="0" width="736" height="440" fill="#7AAAC0"/>
+  <rect x="720" y="0" width="736" height="80"  fill="#5A88A8"/>
+  <rect x="720" y="80"  width="736" height="120" fill="#6898B0"/>
+  <rect x="720" y="200" width="736" height="120" fill="#7AAAC0"/>
+  <rect x="720" y="320" width="736" height="120" fill="#9AC0CC"/>
+
+  <!-- PAREDE DE AREIA DO HARMATTAN (esquerda para direita, encobrindo o céu) -->
+  <!-- Borda superior da parede de areia – poligonal e irregular -->
+  <polygon points="0,0 0,500 160,380 280,420 360,350 480,400 560,320 640,370 720,300 720,0" fill="#C8904A"/>
+  <polygon points="0,0 0,440 140,330 250,370 340,300 440,350 520,280 620,330 720,260 720,0" fill="#D8A860" opacity="0.7"/>
+  <polygon points="0,0 0,380 120,280 220,320 310,250 400,300 490,230 590,280 720,200 720,0" fill="#E0B870" opacity="0.5"/>
+  <polygon points="0,0 0,320 100,230 200,270 280,200 370,250 460,180 560,230 720,140 720,0" fill="#E8C880" opacity="0.35"/>
+  <polygon points="0,0 0,260 80,180 170,220 250,150 340,200 430,130 530,180 720,80  720,0" fill="#F0D890" opacity="0.2"/>
+
+  <!-- Partículas de areia em suspensão (pixel art) -->
+  <rect x="20"  y="150" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="80"  y="200" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="150" y="180" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="200" y="240" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="280" y="160" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="380" y="220" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="440" y="170" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="560" y="240" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="620" y="200" width="4" height="2" fill="#D4A850" opacity="0.6"/>
+  <rect x="100" y="280" width="4" height="2" fill="#C89840" opacity="0.5"/>
+  <rect x="320" y="290" width="4" height="2" fill="#C89840" opacity="0.5"/>
+  <rect x="500" y="300" width="4" height="2" fill="#C89840" opacity="0.5"/>
+  <rect x="680" y="270" width="4" height="2" fill="#C89840" opacity="0.5"/>
+
+  <!-- Sol parcialmente encoberto pela areia (direita, ainda visível) -->
+  <rect x="1100" y="80"  width="72" height="72" fill="#FFD040"/>
+  <rect x="1108" y="68"  width="56" height="12" fill="#FFD040"/>
+  <rect x="1108" y="140" width="56" height="12" fill="#FFD040"/>
+  <rect x="1088" y="96"  width="12" height="40" fill="#FFD040"/>
+  <rect x="1160" y="96"  width="12" height="40" fill="#FFD040"/>
+  <rect x="1060" y="80"  width="200" height="72" fill="#FFE880" opacity="0.2"/>
+
+  <!-- Nuvens normais lado direito -->
+  <rect x="900"  y="60"  width="140" height="12" fill="#F0E8C8" opacity="0.7"/>
+  <rect x="1200" y="40"  width="120" height="10" fill="#F0E8C8" opacity="0.65"/>
+  <rect x="1320" y="80"  width="100" height="8"  fill="#F0E8C8" opacity="0.6"/>
+
+  <!-- ===================== MINARETE DE SANKORÉ (fundo) ===================== -->
+  <rect x="640"  y="280" width="80" height="180" fill="#8B5A28"/>
+  <rect x="640"  y="280" width="80" height="4"   fill="#A87040"/>
+  <!-- Janelas -->
+  <rect x="654"  y="300" width="12" height="16" fill="#3A2010" opacity="0.8"/>
+  <rect x="694"  y="300" width="12" height="16" fill="#3A2010" opacity="0.8"/>
+  <rect x="654"  y="330" width="12" height="16" fill="#3A2010" opacity="0.8"/>
+  <rect x="694"  y="330" width="12" height="16" fill="#3A2010" opacity="0.8"/>
+  <!-- Torre -->
+  <rect x="660"  y="200" width="40" height="80" fill="#A06830"/>
+  <rect x="660"  y="200" width="40" height="3"  fill="#C08848"/>
+  <rect x="664"  y="190" width="32" height="12" fill="#A87038"/>
+  <rect x="668"  y="180" width="24" height="12" fill="#A87038"/>
+  <rect x="672"  y="170" width="16" height="12" fill="#A87038"/>
+  <rect x="676"  y="160" width="8"  height="12" fill="#B07840"/>
+  <rect x="679"  y="148" width="2"  height="14" fill="#D0A060"/>
+  <!-- Spikes decorativos de adobe -->
+  <rect x="648"  y="246" width="4"  height="4" fill="#6A4018"/>
+  <rect x="658"  y="240" width="4"  height="4" fill="#6A4018"/>
+  <rect x="698"  y="240" width="4"  height="4" fill="#6A4018"/>
+  <rect x="708"  y="246" width="4"  height="4" fill="#6A4018"/>
+
+  <!-- ===================== RUAS DO BAZAR ===================== -->
+  <!-- Rua principal central (perspectiva em fuga ao centro) -->
+  <!-- Calçamento da rua -->
+  <rect x="400" y="460" width="656" height="110" fill="url(#pPedra)"/>
+  <rect x="400" y="460" width="656" height="3"   fill="#B09870"/>
+
+  <!-- Parede esquerda do bazar – fachadas de adobe -->
+  <!-- Loja 1 esquerda (tecidos) -->
+  <rect x="0"   y="380" width="260" height="240" fill="url(#pAdobe)"/>
+  <rect x="0"   y="380" width="260" height="4"   fill="#C09050"/>
+  <!-- Porta aberta -->
+  <rect x="30"  y="430" width="50"  height="70"  fill="#201008" opacity="0.85"/>
+  <rect x="30"  y="430" width="50"  height="4"   fill="#402010" opacity="0.5"/>
+  <!-- Janelas -->
+  <rect x="100" y="400" width="40"  height="30"  fill="#201008" opacity="0.7"/>
+  <rect x="160" y="400" width="40"  height="30"  fill="#201008" opacity="0.7"/>
+  <!-- Toldo de tecido colorido (típico do bazar) -->
+  <rect x="0"   y="418" width="260" height="14"  fill="#D04020"/>
+  <rect x="0"   y="418" width="260" height="3"   fill="#E05030"/>
+  <rect x="0"   y="429" width="260" height="3"   fill="#A02810"/>
+  <!-- Faixas de cor no toldo -->
+  <rect x="0"   y="420" width="40"  height="10"  fill="#F06020"/>
+  <rect x="60"  y="420" width="40"  height="10"  fill="#C8A020"/>
+  <rect x="120" y="420" width="40"  height="10"  fill="#D04020"/>
+  <rect x="180" y="420" width="40"  height="10"  fill="#C8A020"/>
+  <rect x="220" y="420" width="40"  height="10"  fill="#F06020"/>
+  <!-- Fardos de mercadoria na porta -->
+  <rect x="100" y="520" width="40"  height="20"  fill="#E8E0D0"/>
+  <rect x="100" y="520" width="40"  height="2"   fill="#F8F0E0"/>
+  <rect x="160" y="524" width="36"  height="16"  fill="#C8B890"/>
+
+  <!-- Loja 2 esquerda (especiarias) -->
+  <rect x="0"   y="290" width="180" height="92"  fill="#9A6A30"/>
+  <rect x="0"   y="290" width="180" height="4"   fill="#B88040"/>
+  <rect x="20"  y="310" width="60"  height="24"  fill="#201008" opacity="0.7"/>
+  <rect x="100" y="310" width="60"  height="24"  fill="#201008" opacity="0.7"/>
+  <!-- Telhado plano com ameias -->
+  <rect x="0"   y="282" width="20"  height="10"  fill="#9A6A30"/>
+  <rect x="30"  y="282" width="20"  height="10"  fill="#9A6A30"/>
+  <rect x="60"  y="282" width="20"  height="10"  fill="#9A6A30"/>
+  <rect x="90"  y="282" width="20"  height="10"  fill="#9A6A30"/>
+  <rect x="120" y="282" width="20"  height="10"  fill="#9A6A30"/>
+  <rect x="150" y="282" width="20"  height="10"  fill="#9A6A30"/>
+
+  <!-- Parede direita – fachadas de adobe -->
+  <!-- Loja 3 direita (ouro e especiarias) -->
+  <rect x="1196" y="370" width="260" height="250" fill="url(#pAdobe)"/>
+  <rect x="1196" y="370" width="260" height="4"   fill="#C09050"/>
+  <!-- Porta -->
+  <rect x="1220" y="420" width="54"  height="72"  fill="#201008" opacity="0.85"/>
+  <rect x="1220" y="420" width="54"  height="4"   fill="#402010" opacity="0.5"/>
+  <!-- Janelas -->
+  <rect x="1300" y="390" width="40"  height="30"  fill="#201008" opacity="0.7"/>
+  <rect x="1360" y="390" width="40"  height="30"  fill="#201008" opacity="0.7"/>
+  <!-- Toldo amarelo-ouro (mercadores de ouro) -->
+  <rect x="1196" y="408" width="260" height="14"  fill="#C8A020"/>
+  <rect x="1196" y="408" width="260" height="3"   fill="#E0C040"/>
+  <rect x="1196" y="419" width="260" height="3"   fill="#A08010"/>
+  <rect x="1196" y="410" width="40"  height="10"  fill="#D4B030"/>
+  <rect x="1256" y="410" width="40"  height="10"  fill="#E8C840"/>
+  <rect x="1316" y="410" width="40"  height="10"  fill="#D4B030"/>
+  <rect x="1376" y="410" width="80"  height="10"  fill="#E8C840"/>
+  <!-- Bandejas de ouro em pó expostas -->
+  <rect x="1290" y="510" width="60"  height="8"   fill="#C09020"/>
+  <rect x="1290" y="510" width="60"  height="2"   fill="#D8A830"/>
+  <rect x="1360" y="512" width="60"  height="6"   fill="#B08020"/>
+
+  <!-- Loja 4 direita alta (livros e manuscritos) -->
+  <rect x="1280" y="280" width="176" height="92"  fill="#906030"/>
+  <rect x="1280" y="280" width="176" height="4"   fill="#A87040"/>
+  <rect x="1300" y="300" width="60"  height="24"  fill="#201008" opacity="0.7"/>
+  <rect x="1380" y="300" width="60"  height="24"  fill="#201008" opacity="0.7"/>
+  <!-- Ameias -->
+  <rect x="1280" y="272" width="20"  height="10"  fill="#906030"/>
+  <rect x="1310" y="272" width="20"  height="10"  fill="#906030"/>
+  <rect x="1340" y="272" width="20"  height="10"  fill="#906030"/>
+  <rect x="1370" y="272" width="20"  height="10"  fill="#906030"/>
+  <rect x="1400" y="272" width="20"  height="10"  fill="#906030"/>
+  <rect x="1430" y="272" width="26"  height="10"  fill="#906030"/>
+
+  <!-- Edifício central do fundo (mesquita lateral) -->
+  <rect x="550"  y="330" width="356" height="200" fill="#9A6E30"/>
+  <rect x="550"  y="330" width="356" height="5"   fill="#B88040"/>
+  <!-- Arco de entrada da mesquita/bazar -->
+  <rect x="680"  y="360" width="96"  height="100" fill="#201008" opacity="0.7"/>
+  <!-- Detalhe do arco (semicircular pixelado) -->
+  <rect x="688"  y="352" width="80"  height="10"  fill="#8B5A28"/>
+  <rect x="692"  y="346" width="72"  height="8"   fill="#8B5A28"/>
+  <rect x="700"  y="340" width="56"  height="8"   fill="#8B5A28"/>
+  <rect x="708"  y="336" width="40"  height="6"   fill="#8B5A28"/>
+  <rect x="716"  y="332" width="24"  height="6"   fill="#8B5A28"/>
+  <!-- Janelas laterais -->
+  <rect x="570"  y="360" width="50"  height="40"  fill="#201008" opacity="0.65"/>
+  <rect x="640"  y="360" width="30"  height="30"  fill="#201008" opacity="0.65"/>
+  <rect x="790"  y="360" width="30"  height="30"  fill="#201008" opacity="0.65"/>
+  <rect x="840"  y="360" width="50"  height="40"  fill="#201008" opacity="0.65"/>
+  <!-- Ameias do topo -->
+  <rect x="550"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="586"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="626"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="666"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="744"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="784"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="824"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+  <rect x="864"  y="320" width="24"  height="12"  fill="#9A6E30"/>
+
+  <!-- Palmeiras entre as construções -->
+  <rect x="380"  y="430" width="6"   height="100" fill="#5A3A10"/>
+  <rect x="366"  y="420" width="34"  height="12"  fill="#2A6018" opacity="0.9"/>
+  <rect x="362"  y="410" width="42"  height="12"  fill="#347820" opacity="0.85"/>
+  <rect x="370"  y="402" width="26"  height="10"  fill="#2A6018"/>
+  <rect x="376"  y="394" width="14"  height="10"  fill="#347820"/>
+  <!-- Palmeira 2 -->
+  <rect x="1080" y="440" width="6"   height="90"  fill="#5A3A10"/>
+  <rect x="1066" y="430" width="34"  height="12"  fill="#2A6018" opacity="0.9"/>
+  <rect x="1062" y="420" width="42"  height="12"  fill="#347820" opacity="0.85"/>
+  <rect x="1070" y="412" width="26"  height="10"  fill="#2A6018"/>
+  <rect x="1076" y="404" width="14"  height="10"  fill="#347820"/>
+
+  <!-- Poço central da praça (sabil) -->
+  <rect x="680"  y="522" width="96"  height="24"  fill="#8B5A28"/>
+  <rect x="680"  y="514" width="96"  height="10"  fill="#A87040"/>
+  <rect x="684"  y="516" width="88"  height="8"   fill="#201008" opacity="0.4"/>
+  <!-- Balde e corda do poço -->
+  <rect x="726"  y="498" width="4"   height="20"  fill="#C8A050"/>
+  <rect x="718"  y="494" width="20"  height="6"   fill="#7A4A18"/>
+  <rect x="720"  y="488" width="16"  height="8"   fill="#8B5A28"/>
+  <rect x="722"  y="484" width="12"  height="6"   fill="#4A2A10"/>
+  <rect x="722"  y="478" width="12"  height="8"   fill="#6090C0"/>
+  <!-- Água no balde (azul) -->
+
+  <!-- Mercadorias na rua – fardos de sal e ouro -->
+  <rect x="440"  y="536" width="50"  height="18"  fill="#E8E0D0"/>
+  <rect x="440"  y="536" width="50"  height="2"   fill="#F8F0E0"/>
+  <rect x="440"  y="552" width="50"  height="2"   fill="#C0B8A8"/>
+  <rect x="500"  y="540" width="50"  height="14"  fill="#E0D8C8"/>
+  <!-- Jarro de especiarias -->
+  <rect x="1000" y="534" width="24"  height="28"  fill="#8B5A28"/>
+  <rect x="1004" y="530" width="16"  height="6"   fill="#A87040"/>
+  <rect x="1006" y="526" width="12"  height="6"   fill="#906030"/>
+  <rect x="1008" y="522" width="8"   height="6"   fill="#806028"/>
+
+  <!-- ===================== CAMADAS DE CHÃO ===================== -->
+  <rect x="0"   y="570" width="1456" height="26"  fill="url(#pPedra)"/>
+  <rect x="0"   y="570" width="1456" height="4"   fill="#B09870"/>
+  <!-- Areia acumulada ao longo das paredes -->
+  <rect x="0"   y="596" width="1456" height="12"  fill="#C8A050" opacity="0.6"/>
+  <rect x="0"   y="608" width="1456" height="60"  fill="url(#pSub)"/>
+  <rect x="0"   y="668" width="1456" height="171" fill="#2A1408"/>
+</svg>
