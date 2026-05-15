@@ -44,8 +44,8 @@ function sfx(type){
 // ─── ASSETS ──────────────────────────────────────────────────────────────────
 const IMG={};
 let assetsLoaded=0,totalAssets=4,gameReady=false;
-[['bg01','Assets/Fase2-1/Cena01.svg'],['bg02','Assets/Fase2-1/Cena02.svg'],
- ['bg03','Assets/Fase2-1/Cena03.svg'],['bg04','Assets/Fase2-1/Cena04.svg']].forEach(([key,src])=>{
+[['bg01','Assets/cena1.svg'],['bg02','Assets/cena2.svg'],
+ ['bg03','Assets/cena3.svg'],['bg04','Assets/cena4.svg']].forEach(([key,src])=>{
   const img=new Image();
   img.onload=()=>{IMG[key]=img;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
@@ -239,10 +239,10 @@ function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-c
 const GRAV=0.46,PSPD=4.5,JUMPF=-12.2,MAXFALL=16;
 
 const TILE_THEMES={
-  1:{top:'#7a9870',body:'#4a6848',dark:'#2a3828'},   // exterior: forest green
-  2:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},   // rocky outcrop: brown
-  3:{top:'#6a8898',body:'#4a6878',dark:'#2a3848'},   // riverbank: blue-grey
-  4:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},   // sunset exterior
+  1:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},
+  2:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},
+  3:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},
+  4:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},
 };
 let tileTheme=TILE_THEMES[1];
 
@@ -310,15 +310,15 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Shirt (blue denim for California miner)
-  r(8,16,16,13,'#2850a0');r(15,17,2,1,'#1a3870');r(15,20,2,1,'#1a3870');r(15,23,2,1,'#1a3870');
-  r(12,16,3,3,'#3060b0');r(17,16,3,3,'#3060b0');
+  // Shirt (red — same as Phase 1.1)
+  r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
+  r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
   // Belt
   r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
   // Pants (brown)
   r(9,30,14,12,'#6a4820');r(15,36,2,6,'#5a3810');
   // Left arm
-  r(3,16,5,12,'#2850a0');r(3,28,5,3,'#a86030');
+  r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
   // Left hand tool
   if(showPickaxe){
     const wb=Math.sin(frame*0.2)*1.5;
@@ -331,7 +331,7 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
     ctx.beginPath();ctx.moveTo(1*S,26*S);ctx.lineTo(6*S,28*S);ctx.stroke();
   }
   // Right arm
-  r(24,16,5,12,'#2850a0');r(24,28,5,3,'#a86030');
+  r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
   // Right hand tool
   if(showBateia){
     // Bateia na mão direita — pan redonda
@@ -970,7 +970,7 @@ function drawRiver(floorY){
 function drawSignPost(worldX,floorY){
   const sx=worldX-cam.x,sy=floorY-cam.y;
   if(sx<-200||sx>W+200)return;
-  ctx.fillStyle='#7a5020';ctx.fillRect(sx-4,sy-140,8,140);
+  ctx.fillStyle='#7a5020';ctx.fillRect(sx-4,sy-140,8,160);  // pole embeds 20px into ground
   ctx.fillStyle='#9a6830';ctx.fillRect(sx-60,sy-140,120,44);
   ctx.fillStyle='#8a5820';ctx.fillRect(sx-60,sy-140,120,5);
   ctx.font='bold 11px "Courier New"';ctx.fillStyle='#f0e0b0';ctx.textAlign='center';
@@ -1138,7 +1138,7 @@ function buildL1(){
   const cols=[
     ...[100,240,500,780,1060,1360,1660,1960,2260,2580,2820,3000].map(x=>new Col(x,FL-50,'ouro')),
   ];
-  const grizzly={x:3060,y:FL-80,gifted:false};
+  const grizzly={x:3060,y:FL-40,gifted:false};
   const triggers=[
     new Trigger(3200,FL-200,120,200,'Avançar para Cena 2',(player,level)=>{
       if(!player.items.includes('pedra_de_toque')){notify('Interaja com o Grizzly para obter a Pedra de Toque!');return;}
@@ -1173,7 +1173,7 @@ function buildL1(){
     },
     draw(player){
       drawStars();drawWind();
-      drawSignPost(700,FL);
+      drawSignPost(550,FL);
       // River visual below platforms
       const ry=FL-cam.y;
       if(ry>0&&ry<H){
