@@ -1,14 +1,11 @@
-/* ═══════════════════════════════════════════════════════════════
-   FASE 2.1 – O Brilho do American River
-   Engine canvas idêntica à Fase 1.1 — Sierra Nevada, Califórnia, 1848
-   ═══════════════════════════════════════════════════════════════ */
-
-const SAVE_KEY = 'mineralis_save_v2';
+// ─── SAVE ────────────────────────────────────────────────────────────────────
+const SAVE_KEY='mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
 function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
+// ─── CANVAS ──────────────────────────────────────────────────────────────────
 const W=1280,H=720;
 const wrap=document.getElementById('wrap');
 const canvas=document.getElementById('c');
@@ -26,40 +23,38 @@ function resize(){
 }
 resize();window.addEventListener('resize',resize);
 
-// ── Áudio ────────────────────────────────────────────────────────
+// ─── AUDIO ───────────────────────────────────────────────────────────────────
 let AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
 function sfx(type){
   if(!AC)return;if(AC.state==='suspended')AC.resume();
   const o=AC.createOscillator(),g=AC.createGain();
   o.connect(g);g.connect(AC.destination);const t=AC.currentTime;
-  if(type==='jump')   {o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(440,t+.14);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);}
-  else if(type==='ouro')   {o.type='triangle';o.frequency.setValueAtTime(880,t);o.frequency.exponentialRampToValueAtTime(1760,t+.18);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.28);}
+  if(type==='jump')      {o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(440,t+.14);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);}
+  else if(type==='ouro') {o.type='triangle';o.frequency.setValueAtTime(1100,t);o.frequency.exponentialRampToValueAtTime(1760,t+.1);g.gain.setValueAtTime(.14,t);g.gain.exponentialRampToValueAtTime(.001,t+.28);}
+  else if(type==='pirita'){o.type='square';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(90,t+.18);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);}
+  else if(type==='pan')  {o.type='sine';o.frequency.setValueAtTime(320,t);o.frequency.setValueAtTime(280,t+.08);o.frequency.setValueAtTime(320,t+.16);g.gain.setValueAtTime(.09,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);}
   else if(type==='picareta'){o.type='square';o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(70,t+.15);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);}
-  else if(type==='item')   {o.frequency.setValueAtTime(440,t);o.frequency.setValueAtTime(660,t+.1);o.frequency.setValueAtTime(880,t+.2);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);}
-  else if(type==='unlock') {o.frequency.setValueAtTime(330,t);o.frequency.setValueAtTime(440,t+.15);o.frequency.setValueAtTime(660,t+.3);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);}
-  else if(type==='hit')    {o.type='sawtooth';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(60,t+.2);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);}
-  else if(type==='water')  {o.type='sine';o.frequency.setValueAtTime(320,t);o.frequency.setValueAtTime(280,t+.05);o.frequency.setValueAtTime(350,t+.12);g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);}
-  else if(type==='pirita') {o.type='sawtooth';o.frequency.setValueAtTime(250,t);o.frequency.exponentialRampToValueAtTime(180,t+.2);g.gain.setValueAtTime(.10,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);}
+  else if(type==='item') {o.frequency.setValueAtTime(440,t);o.frequency.setValueAtTime(660,t+.1);o.frequency.setValueAtTime(880,t+.2);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);}
+  else if(type==='unlock'){o.frequency.setValueAtTime(330,t);o.frequency.setValueAtTime(440,t+.15);o.frequency.setValueAtTime(660,t+.3);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);}
+  else if(type==='hit')  {o.type='sawtooth';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(60,t+.2);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);}
+  else if(type==='teste'){o.type='triangle';o.frequency.setValueAtTime(520,t);o.frequency.setValueAtTime(880,t+.12);o.frequency.setValueAtTime(660,t+.24);g.gain.setValueAtTime(.11,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);}
   o.start(t);o.stop(t+.6);
 }
 
-// ── Assets ──────────────────────────────────────────────────────
+// ─── ASSETS ──────────────────────────────────────────────────────────────────
 const IMG={};
-let assetsLoaded=0,totalAssets=5,gameReady=false;
-[
-  ['bg01','Assets/cena1.svg'],
-  ['bg02','Assets/cena2.svg'],
-  ['bg03','Assets/cena3.svg'],
-  ['bg04','Assets/cena4.svg'],
-  ['card21','Assets/2_1_california.svg'],
-].forEach(([key,src])=>{
+let assetsLoaded=0,totalAssets=4,gameReady=false;
+[['bg01','Assets/Fase2-1/Cena01.svg'],['bg02','Assets/Fase2-1/Cena02.svg'],
+ ['bg03','Assets/Fase2-1/Cena03.svg'],['bg04','Assets/Fase2-1/Cena04.svg']].forEach(([key,src])=>{
   const img=new Image();
   img.onload=()=>{IMG[key]=img;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.src=src;
 });
+IMG.card21=null;
+(function(){const ci=new Image();ci.onload=()=>{IMG.card21=ci;};ci.onerror=()=>{IMG.card21=null;};ci.src='Assets/2_1_california.svg';})();
 
-// ── Input ────────────────────────────────────────────────────────
+// ─── INPUT ───────────────────────────────────────────────────────────────────
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
@@ -79,30 +74,58 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){for(const k in jp)delete jp[k];}
 
-// ── Item Defs ────────────────────────────────────────────────────
+// ─── ITEM DEFS ────────────────────────────────────────────────────────────────
 const ITEM_DEFS={
-  bateia:     {cat:'ferramenta',nome:'Bateia',icon:'🪣',journalId:'bateia',desc:'Separa o ouro do sedimento pela diferença de densidade.\nGire em círculos: os leves saem, o ouro fica no centro.',drawHand:'left'},
-  picareta:   {cat:'ferramenta',nome:'Picareta',icon:'⛏',journalId:'picareta_basica',desc:'Extrai veios de quartzo aurífero das paredes rochosas.\nUse [E] próximo a um veio brilhante.',drawHand:'left'},
-  touchstone: {cat:'ferramenta',nome:'Pedra de Toque',icon:'🪨',journalId:'pedra_toque',desc:'Testa a autenticidade do ouro.\nTraço dourado = ouro real. Traço verde-escuro = pirita.',drawHand:'right'},
-  ouro:       {cat:'minerio',nome:'Ouro (Au)',icon:'✨',journalId:'ouro',desc:'Metal mais maleável que existe.\n1g pode virar um fio de 3km ou uma folha translúcida.'},
-  pirita:     {cat:'minerio',nome:'Pirita (FeS₂)',icon:'🟡',journalId:'pirita',desc:'O "Ouro de Tolo" — cor dourada similar ao ouro.\nMas é frágil, mais leve e deixa traço esverdeado.'},
-  placa:      {cat:'artefato',nome:'Placa de Reivindicação',icon:'📋',journalId:'placa_claim',desc:'Registrava o direito exclusivo de garimpar um lote.\nBase do sistema legal de propriedade dos EUA.'},
+  bateia:{
+    cat:'ferramenta',nome:'Bateia',icon:'🥣',
+    journalId:'bateia',
+    desc:'Separação por densidade: o ouro (19,3 g/cm³)\nsubmerge enquanto areia e sedimento flutuam.\nGire em círculos na água para garimpar.',
+    drawHand:'right',
+  },
+  picareta:{
+    cat:'ferramenta',nome:'Picareta Básica',icon:'⛏',
+    journalId:'picareta_basica',
+    desc:'Extrai veios de ouro do quartzo.\nUse [E] próximo a um veio brilhante.',
+    drawHand:'left',
+  },
+  pedra_de_toque:{
+    cat:'ferramenta',nome:'Pedra de Toque',icon:'🪨',
+    journalId:'pedra_de_toque',
+    desc:'Usada por ensaiadores do século XIX.\nRisque o mineral: traço dourado = ouro puro;\ntraço esverdeado/escuro = pirita (ouro de tolo).',
+    drawHand:'left',
+  },
+  ouro:{
+    cat:'minerio',nome:'Ouro (Pepita)',icon:'◎',
+    journalId:'ouro_pepita',
+    desc:'1g de ouro pode formar um fio de 3km.\nFormado há 120 mi de anos em fluidos\nhidrotermais que infiltraram fissuras de quartzo.',
+  },
+  quartzo_aureo:{
+    cat:'minerio',nome:'Quartzo Aurífero',icon:'◈',
+    journalId:'quartzo_aureo',
+    desc:'Veios da Mother Lode — 200 km de quartzo\nauríferoa percorrem a Sierra Nevada.\nA erosão dos rios libera as pepitas.',
+  },
+  placa_reivindicacao:{
+    cat:'artefato',nome:'Placa de Reivindicação',icon:'📋',
+    journalId:'placa_reivindicacao',
+    desc:'Registro legal do "claim" de um garimpeiro.\nInfluenciou a legislação de propriedade dos EUA.\nData de 1849 — assinada J. W. Garrett.',
+  },
 };
 
-// ── Inventário / Diário ──────────────────────────────────────────
+// ─── INVENTORY ────────────────────────────────────────────────────────────────
 const INV={
   open:false,tab:0,cursor:0,
   TABS:[
     {id:'ferramenta',label:'🔧 Ferramentas',color:'#e0b840'},
-    {id:'minerio',   label:'⛏ Minérios',   color:'#f0d060'},
+    {id:'minerio',   label:'⛏ Minérios',   color:'#c0c8d8'},
     {id:'artefato',  label:'🏺 Artefatos',  color:'#d4a060'},
   ],
   tabItems(player){
     const cat=this.TABS[this.tab].id;
-    let saved={};try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
+    let saved={};
+    try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
     return Object.entries(ITEM_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
-      return player.items.includes(id)||player.items.includes(id+'_ok')||saved[def.journalId||id];
+      return player.items.includes(id)||player.items.includes(id+'_ok')||player.items.includes(id+'_col')||saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
   toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open;},
@@ -118,6 +141,12 @@ const INV={
     const items=this.tabItems(player);
     if(this.isUpKey()){this.cursor=Math.max(0,this.cursor-1);return true;}
     if(this.isDownKey()){this.cursor=Math.min(items.length-1,this.cursor+1);return true;}
+    if(isE()&&items.length>0&&this.tab===0){
+      const item=items[this.cursor];
+      if(player.activeTools.has(item.id))player.activeTools.delete(item.id);
+      else player.activeTools.add(item.id);
+      return true;
+    }
     return false;
   },
   draw(player){
@@ -125,51 +154,75 @@ const INV={
     ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,0,W,H);
     const PW=780,PH=480,PX=(W-PW)/2,PY=(H-PH)/2;
     ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=20;
-    ctx.fillStyle='rgba(10,6,2,0.97)';roundRect(PX,PY,PW,PH,16);ctx.fill();ctx.shadowBlur=0;
-    ctx.strokeStyle='#c08820';ctx.lineWidth=2.5;roundRect(PX,PY,PW,PH,16);ctx.stroke();
-    ctx.fillStyle='#e0b840';ctx.font='bold 16px "Courier New"';ctx.textAlign='center';
-    ctx.fillText('📔 DIÁRIO DE BORDO',W/2,PY+28);ctx.textAlign='left';
+    ctx.fillStyle='rgba(10,6,2,0.97)';roundRect(PX,PY,PW,PH,16);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='#8a6820';ctx.lineWidth=2.5;roundRect(PX,PY,PW,PH,16);ctx.stroke();
+    ctx.strokeStyle='rgba(200,160,40,0.2)';ctx.lineWidth=1;roundRect(PX+4,PY+4,PW-8,PH-8,12);ctx.stroke();
+    ctx.fillStyle='#e0b840';ctx.font='bold 16px "Courier New"';
+    ctx.textAlign='center';ctx.fillText('📔DIÁRIO DE BORDO',W/2,PY+28);ctx.textAlign='left';
     ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+16,PY+38,PW-32,1);
     const TAB_W=PW/3,TAB_Y=PY+44;
     this.TABS.forEach((tab,i)=>{
       const tx=PX+i*TAB_W,active=(i===this.tab);
-      ctx.fillStyle=active?'rgba(200,160,40,0.18)':'rgba(0,0,0,0.3)';ctx.fillRect(tx+2,TAB_Y,TAB_W-4,34);
-      ctx.fillStyle=active?tab.color:'#666';ctx.font=(active?'bold ':'')+'13px "Courier New"';
+      ctx.fillStyle=active?'rgba(200,160,40,0.18)':'rgba(0,0,0,0.3)';
+      ctx.fillRect(tx+2,TAB_Y,TAB_W-4,34);
+      ctx.fillStyle=active?tab.color:'#666';
+      ctx.font=(active?'bold ':'')+'13px "Courier New"';
       ctx.textAlign='center';ctx.fillText(tab.label,tx+TAB_W/2,TAB_Y+22);ctx.textAlign='left';
       if(active){ctx.fillStyle=tab.color;ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3);}
     });
-    const CY=TAB_Y+40,CH=PH-(CY-PY)-50,items=this.tabItems(player);
-    const COL_W=260,DESC_X=PX+280;
+    const CY=TAB_Y+40,CH=PH-(CY-PY)-50;
+    const items=this.tabItems(player);
+    const COL_W=260,DESC_X=PX+280,DESC_Y=CY+20;
     if(items.length===0){
-      ctx.fillStyle='#554';ctx.font='14px "Courier New"';ctx.textAlign='center';
-      ctx.fillText('Nenhum item ainda.',W/2,CY+CH/2);ctx.fillText('Explore para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left';
+      ctx.fillStyle='#554';ctx.font='14px "Courier New"';
+      ctx.textAlign='center';ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
+      ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left';
     } else {
       items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor);
+        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
         if(selected){ctx.fillStyle='rgba(200,160,40,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         ctx.font='24px serif';ctx.fillText(item.icon,PX+28,iy+22);
-        ctx.font='14px "Courier New"';ctx.fillStyle=selected?'#e8d8a0':'#aaa';ctx.fillText(item.nome,PX+62,iy+16);
+        ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
+        ctx.fillStyle=equipped?'#f0c840':(selected?'#e8d8a0':'#aaa');
+        ctx.fillText(item.nome,PX+62,iy+16);
+        if(equipped){ctx.fillStyle='rgba(200,160,40,0.22)';roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle='#e0b840';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
+        else if(item.consumivel){ctx.font='10px "Courier New"';ctx.fillStyle='#5a8a50';ctx.fillText('CONSUMÍVEL',PX+62,iy+32);}
       });
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(200,160,40,0.08)';roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
         ctx.font='48px serif';ctx.textAlign='center';ctx.fillText(sel.icon,DESC_X+(PW-DESC_X+PX-16)/2,CY+70);ctx.textAlign='left';
-        ctx.font='bold 15px "Courier New"';ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+100);ctx.textAlign='left';
+        ctx.font='bold 15px "Courier New"';ctx.fillStyle='#e0b840';
+        ctx.textAlign='center';ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+100);ctx.textAlign='left';
         const catLabel={ferramenta:'🔧 Ferramenta',minerio:'⛏ Minério',artefato:'🏺 Artefato'};
-        ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.textAlign='center';ctx.fillText(catLabel[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+118);ctx.textAlign='left';
+        ctx.font='11px "Courier New"';ctx.fillStyle='#888';
+        ctx.textAlign='center';ctx.fillText(catLabel[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+118);ctx.textAlign='left';
         ctx.fillStyle='rgba(200,160,40,0.25)';ctx.fillRect(DESC_X+20,CY+126,PW-DESC_X+PX-56,1);
-        const descLines=sel.desc.split('\n');ctx.font='13px "Courier New"';ctx.fillStyle='#d8c898';
-        descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+146+i*22);});ctx.textAlign='left';
+        const descLines=sel.desc.split('\n');
+        ctx.font='13px "Courier New"';ctx.fillStyle='#d8c898';
+        descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+146+i*22);});
+        ctx.textAlign='left';
+        if(sel.cat==='ferramenta'){
+          const btnTxt=player.activeTools.has(sel.id)?'[E] Desequipar':'[E] Equipar';
+          const btnColor=player.activeTools.has(sel.id)?'rgba(180,60,20,0.3)':'rgba(200,160,40,0.2)';
+          ctx.fillStyle=btnColor;roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();
+          ctx.strokeStyle=player.activeTools.has(sel.id)?'#c04020':'#e0b840';ctx.lineWidth=1.5;
+          roundRect(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke();
+          ctx.font='bold 13px "Courier New"';ctx.fillStyle=player.activeTools.has(sel.id)?'#e06040':'#e0b840';
+          ctx.textAlign='center';ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left';
+        }
       }
     }
     ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(PX,PY+PH-38,PW,38);
     ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+16,PY+PH-39,PW-32,1);
     ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.textAlign='center';
-    ctx.fillText('◀ ▶ Abas   ↑ ↓ Navegar   I Fechar',W/2,PY+PH-14);ctx.textAlign='left';
+    ctx.fillText('◀ ▶ Abas   ↑ ↓ Navegar   E Equipar/Desequipar   I Fechar',W/2,PY+PH-14);
+    ctx.textAlign='left';
   }
 };
 
-// ── Partículas ───────────────────────────────────────────────────
+// ─── PARTICLES ────────────────────────────────────────────────────────────────
 let particles=[];
 function burst(x,y,color,n=8,spd=3.2){
   for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2+Math.random()*.5;
@@ -178,44 +231,58 @@ function burst(x,y,color,n=8,spd=3.2){
 function tickParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;if(p.life<=0)particles.splice(i,1);}}
 function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
 
-// ── Câmera ───────────────────────────────────────────────────────
+// ─── CAMERA ───────────────────────────────────────────────────────────────────
 const cam={x:0,y:0};
 function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-cam.x)*0.12;}
 
-// ── Física ───────────────────────────────────────────────────────
+// ─── PHYSICS ──────────────────────────────────────────────────────────────────
 const GRAV=0.46,PSPD=4.5,JUMPF=-12.2,MAXFALL=16;
 
-// ── Tiles ────────────────────────────────────────────────────────
 const TILE_THEMES={
-  1:{top:'#7a9858',body:'#5a7840',dark:'#3a5820'},  // exterior verde
-  2:{top:'#6a5840',body:'#4a3828',dark:'#2a1810'},  // interior pedra/mina
-  3:{top:'#7a9858',body:'#5a7840',dark:'#3a5820'},  // rio
-  4:{top:'#7a9858',body:'#5a7840',dark:'#3a5820'},  // conclusão
+  1:{top:'#7a9870',body:'#4a6848',dark:'#2a3828'},   // exterior: forest green
+  2:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},   // rocky outcrop: brown
+  3:{top:'#6a8898',body:'#4a6878',dark:'#2a3848'},   // riverbank: blue-grey
+  4:{top:'#9a8870',body:'#6a5040',dark:'#3a2a18'},   // sunset exterior
 };
 let tileTheme=TILE_THEMES[1];
 
 function solid(x,y,w,h){return{type:'solid',x,y,w,h};}
 function movH(x,y,w,x0,x1,spd){return{type:'solid',moving:true,x,y,w,h:16,x0,x1,spd,vx:spd,vy:0};}
+function trap(x,y,w){return{type:'trapdoor',x,y,w,h:14};}
+function spike(x,y,w){return{type:'spike',x,y,w,h:18};}
+
 function tickMoving(plats){for(const p of plats){if(!p.moving)continue;if(p.x0!==undefined){p.x+=p.vx;if(p.x<=p.x0||p.x+p.w>=p.x1)p.vx=-p.vx;}}}
+function tickTrapdoors(plats){for(const p of plats){if(p.type!=='trapdoor')continue;if(p.crumble!==undefined){p.crumble--;if(p.crumble<=0){p.crumble=undefined;p.type='_dead';}}}}
 
 function drawPlatform(p){
   const sx=p.x-cam.x,sy=p.y-cam.y;
   if(sx>W+80||sx+p.w<-80||sy>H+40||sy+p.h<-40)return;
+  if(p.type==='spike'){
+    ctx.fillStyle='#8a6840';const nc=Math.max(1,Math.floor(p.w/20));
+    for(let i=0;i<nc;i++){const tx=sx+i*(p.w/nc);ctx.beginPath();ctx.moveTo(tx,sy+p.h);ctx.lineTo(tx+p.w/nc/2,sy);ctx.lineTo(tx+p.w/nc,sy+p.h);ctx.fill();}return;
+  }
   if(p.type==='_dead')return;
+  if(p.type==='trapdoor'){
+    const al=p.crumble!==undefined?p.crumble/70:1;ctx.globalAlpha=al;
+    ctx.fillStyle='#5a7040';ctx.fillRect(sx,sy,p.w,p.h);
+    ctx.fillStyle='#7a9060';ctx.fillRect(sx,sy,p.w,3);ctx.globalAlpha=1;return;
+  }
   const ts=24,cols=Math.ceil(p.w/ts),rows=Math.ceil(p.h/ts);
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
       const tx=sx+c*ts,ty=sy+r*ts,tw=Math.min(ts,sx+p.w-tx),th=Math.min(ts,sy+p.h-ty);
-      ctx.fillStyle=r===0?tileTheme.body:(r%2===0?tileTheme.dark:tileTheme.body);ctx.fillRect(tx,ty,tw,th);
+      ctx.fillStyle=r===0?tileTheme.body:(r%2===0?tileTheme.dark:tileTheme.body);
+      ctx.fillRect(tx,ty,tw,th);
       ctx.fillStyle='rgba(0,0,0,0.1)';ctx.fillRect(tx+tw-1,ty,1,th);ctx.fillRect(tx,ty+th-1,tw,1);
     }
   }
   ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,4);
-  ctx.fillStyle='rgba(180,200,140,0.3)';
+  ctx.fillStyle='rgba(180,220,160,0.2)';
   for(let i=0;i<Math.floor(p.w/20);i++)ctx.fillRect(sx+i*20+4,sy-2,6,4);
-  if(p.moving){ctx.fillStyle='rgba(200,180,100,0.35)';ctx.fillRect(sx,sy,p.w,4);}
+  if(p.moving){ctx.fillStyle='rgba(160,220,180,0.35)';ctx.fillRect(sx,sy,p.w,4);}
 }
 
+// ─── roundRect ────────────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
   ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
@@ -223,178 +290,271 @@ function roundRect(x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
-// ── Corvan (pixel art) ───────────────────────────────────────────
+// ─── DRAW CORVAN (adapted for Phase 2.1 tools) ────────────────────────────────
 function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const S=scale;
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
   const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
   const lb=0.7+Math.sin(frame*0.4)*0.3;
-  const showPicareta=activeTool==='picareta';
-  const showBateia=activeTool==='bateia';
-  const showTouchstone=activeTool==='touchstone';
-  const showPlaca=activeTool==='placa';
-  // Chapéu
+  const showPickaxe   = activeTool==='picareta';
+  const showBateia    = activeTool==='bateia';
+  const showPedra     = activeTool==='pedra_de_toque';
+  // Hat
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
-  r(13,0,6,3,'#c8a020');r(14,0,4,2,'#ffe060');
-  // Cabeça
+  // Hat brim decorative — miners' hat adapted (no feather, simple wide brim)
+  r(5,3,22,2,'#5a3a10');
+  r(13,0,6,3,'#c89820');r(14,0,4,2,'#ffe060');
+  // Face
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Corpo
-  r(8,16,16,13,'#3a6030');r(15,17,2,1,'#2a5020');r(15,20,2,1,'#2a5020');r(15,23,2,1,'#2a5020');
-  r(12,16,3,3,'#4a7040');r(17,16,3,3,'#4a7040');
-  r(8,28,16,2,'#2a1408');r(14,28,4,2,'#c88020');
-  // Calças
-  r(9,30,14,12,'#383838');r(15,36,2,6,'#282828');
-  // Braço esq
-  r(3,16,5,12,'#3a6030');r(3,28,5,3,'#a86030');
-  // Ferramenta mão esquerda
-  if(showPicareta){
+  // Shirt (blue denim for California miner)
+  r(8,16,16,13,'#2850a0');r(15,17,2,1,'#1a3870');r(15,20,2,1,'#1a3870');r(15,23,2,1,'#1a3870');
+  r(12,16,3,3,'#3060b0');r(17,16,3,3,'#3060b0');
+  // Belt
+  r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
+  // Pants (brown)
+  r(9,30,14,12,'#6a4820');r(15,36,2,6,'#5a3810');
+  // Left arm
+  r(3,16,5,12,'#2850a0');r(3,28,5,3,'#a86030');
+  // Left hand tool
+  if(showPickaxe){
     const wb=Math.sin(frame*0.2)*1.5;
     r(0,24+wb,6,1,'#7a4818');r(0,25+wb,1,7,'#7a4818');
     r(0,22+wb,6,3,'#888888');r(4,20+wb,2,3,'#aaaaaa');
-  } else if(showBateia){
-    // Bateia na mão — forma de tigela
-    r(-2,26,10,2,'#8a6020');r(-3,28,12,1,'#6a4810');
-    r(-2,25,10,3,'rgba(180,150,80,0.6)');
-    ctx.fillStyle='rgba(100,180,255,0.35)';ctx.fillRect(-2*S,26*S,10*S,2*S);
+  } else if(showPedra){
+    // Pedra de toque na mão esquerda — pequena pedra escura
+    r(1,25,5,4,'#302820');r(0,24,7,2,'#443830');
+    ctx.fillStyle='rgba(220,180,40,0.6)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(1*S,26*S);ctx.lineTo(6*S,28*S);ctx.stroke();
   }
-  // Braço dir
-  r(24,16,5,12,'#3a6030');r(24,28,5,3,'#a86030');
-  if(showTouchstone){
-    r(26,30,3,4,'#6a5848');r(24,33,7,3,'#5a4838');
-    ctx.fillStyle='rgba(255,200,60,0.6)';ctx.fillRect(25*S,31*S,4*S,2*S);
+  // Right arm
+  r(24,16,5,12,'#2850a0');r(24,28,5,3,'#a86030');
+  // Right hand tool
+  if(showBateia){
+    // Bateia na mão direita — pan redonda
+    ctx.fillStyle='#7a5a30';
+    ctx.beginPath();ctx.ellipse(29*S,34*S,10*S,5*S,0.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#5a4020';
+    ctx.beginPath();ctx.ellipse(29*S,33*S,7*S,3*S,0.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(160,210,230,0.35)';
+    ctx.beginPath();ctx.ellipse(28*S,33*S,4*S,2*S,0.2,0,Math.PI*2);ctx.fill();
   }
-  if(showPlaca){
-    r(25,28,5,8,'#8a5820');r(26,29,3,6,'#c0a060');
-    ctx.fillStyle='#5a3010';ctx.font=(2*S)+'px monospace';
-    ctx.fillText('⛏',25*S,35*S);
-  }
-  // Pés
+  // Boots
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
-  // Brilho chapéu
+  // Hat glow
   ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
   ctx.globalAlpha=1;ctx.restore();
 }
 
-// ── Desenho de colecionáveis ─────────────────────────────────────
-function drawOuro(cx,cy,bobT=0){
+// ─── ITEM DRAW FUNCTIONS ──────────────────────────────────────────────────────
+function drawPicareta(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,0,0,0,0,22);
-  glow.addColorStop(0,'rgba(255,220,60,0.5)');glow.addColorStop(1,'rgba(255,180,0,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#e0b820';
-  ctx.beginPath();ctx.moveTo(-10,-6);ctx.lineTo(0,-14);ctx.lineTo(10,-6);ctx.lineTo(12,4);ctx.lineTo(4,12);ctx.lineTo(-4,12);ctx.lineTo(-12,4);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#ffe060';ctx.beginPath();ctx.ellipse(-2,-4,5,4,0.3,0,Math.PI*2);ctx.fill();
-  const sa=Math.abs(Math.sin(Date.now()/400));
-  ctx.strokeStyle=`rgba(255,240,80,${sa*0.9})`;ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(6,-8);ctx.lineTo(10,-12);ctx.stroke();
+  ctx.fillStyle='#8a5820';ctx.fillRect(-3,-24,6,28);
+  ctx.fillStyle='#aa7030';ctx.fillRect(-2,-22,4,24);
+  ctx.fillStyle='#9090a8';ctx.fillRect(-14,-26,28,8);
+  ctx.fillStyle='#b0b0c8';ctx.fillRect(-14,-26,28,3);
+  ctx.fillStyle='#c0c0d8';ctx.fillRect(-16,-24,4,6);ctx.fillRect(12,-24,4,6);
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.beginPath();ctx.arc(-12,-22,2,0,Math.PI*2);ctx.fill();
+  const gg=ctx.createRadialGradient(0,-22,0,0,-22,18);
+  gg.addColorStop(0,'rgba(180,180,220,0.2)');gg.addColorStop(1,'rgba(180,180,220,0)');
+  ctx.fillStyle=gg;ctx.beginPath();ctx.arc(0,-22,18,0,Math.PI*2);ctx.fill();
   ctx.restore();
-}
-function drawPirita(cx,cy,bobT=0){
-  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  ctx.fillStyle='#c8a820';
-  ctx.beginPath();ctx.moveTo(-9,-7);ctx.lineTo(2,-12);ctx.lineTo(12,-4);ctx.lineTo(10,8);ctx.lineTo(-2,11);ctx.lineTo(-11,3);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#9a8010';ctx.beginPath();ctx.ellipse(0,0,4,3,0.4,0,Math.PI*2);ctx.fill();
-  ctx.restore();
-}
-function drawTouchstone(cx,cy,bobT=0){
-  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  ctx.fillStyle='#5a4838';
-  ctx.beginPath();ctx.moveTo(-14,-8);ctx.lineTo(14,-8);ctx.lineTo(16,8);ctx.lineTo(-16,8);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#7a6858';ctx.beginPath();ctx.ellipse(-3,-2,5,3,0.2,0,Math.PI*2);ctx.fill();
-  const streak=ctx.createLinearGradient(-6,2,6,2);
-  streak.addColorStop(0,'rgba(200,180,40,0.8)');streak.addColorStop(1,'rgba(200,180,40,0)');
-  ctx.fillStyle=streak;ctx.fillRect(-6,1,12,3);
-  ctx.restore();
-}
-function drawPlaca(cx,cy,bobT=0){
-  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,0,0,0,0,26);
-  glow.addColorStop(0,'rgba(200,160,80,0.35)');glow.addColorStop(1,'rgba(200,160,80,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,26,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#8a5820';ctx.fillRect(-14,-12,28,24);
-  ctx.fillStyle='#c0a060';ctx.fillRect(-12,-10,24,20);
-  ctx.fillStyle='#8a5820';ctx.font='8px monospace';ctx.textAlign='center';
-  ctx.fillText('⛏ CLAIM',0,-2);ctx.fillText('R. MASON',0,8);ctx.textAlign='left';
-  ctx.restore();
-}
-function drawBateia(cx,cy,bobT=0){
-  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,0,0,0,0,22);
-  glow.addColorStop(0,'rgba(180,150,60,0.4)');glow.addColorStop(1,'rgba(180,150,60,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#8a6020';
-  ctx.beginPath();ctx.ellipse(0,2,18,10,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#6a4810';ctx.beginPath();ctx.ellipse(0,4,14,7,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(100,180,255,0.4)';ctx.beginPath();ctx.ellipse(0,4,10,5,0,0,Math.PI*2);ctx.fill();
-  ctx.restore();
-}
-function drawGrizzly(cx,cy,frame=0){
-  ctx.save();ctx.translate(cx,cy);
-  const bob=Math.sin(frame*0.5)*3;
-  // Corpo
-  ctx.fillStyle='#8a5830';ctx.beginPath();ctx.ellipse(0,-10+bob,28,22,0,0,Math.PI*2);ctx.fill();
-  // Cabeça
-  ctx.fillStyle='#9a6840';ctx.beginPath();ctx.ellipse(2,-40+bob,18,16,0.1,0,Math.PI*2);ctx.fill();
-  // Orelhas
-  ctx.fillStyle='#8a5830';ctx.beginPath();ctx.arc(-12,-54+bob,7,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(16,-54+bob,7,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#c09070';ctx.beginPath();ctx.arc(-12,-54+bob,4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(16,-54+bob,4,0,Math.PI*2);ctx.fill();
-  // Focinho
-  ctx.fillStyle='#c09070';ctx.beginPath();ctx.ellipse(2,-34+bob,10,7,0,0,Math.PI*2);ctx.fill();
-  // Olhos
-  ctx.fillStyle='#1a0a04';ctx.beginPath();ctx.arc(-6,-42+bob,3,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(10,-42+bob,3,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.6)';ctx.beginPath();ctx.arc(-5,-43+bob,1,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(11,-43+bob,1,0,Math.PI*2);ctx.fill();
-  // Nariz
-  ctx.fillStyle='#2a1808';ctx.beginPath();ctx.ellipse(2,-32+bob,4,3,0,0,Math.PI*2);ctx.fill();
-  // Pernas
-  ctx.fillStyle='#7a4820';ctx.fillRect(-24,8+bob,12,22);ctx.fillRect(12,8+bob,12,22);
-  ctx.fillRect(-20,18+bob,10,16);ctx.fillRect(10,18+bob,10,16);
-  ctx.fillStyle='#5a3210';ctx.fillRect(-22,28+bob,10,8);ctx.fillRect(12,28+bob,10,8);
-  ctx.restore();
-}
-function drawQuartzVein(x,y,frame=0){
-  const sx=x-cam.x,sy=y-cam.y;
-  if(sx<-80||sx>W+80)return;
-  const a=0.5+Math.abs(Math.sin(frame))*0.5;
-  // Quartzo branco
-  ctx.fillStyle=`rgba(240,240,220,${a*0.9})`;
-  ctx.beginPath();ctx.moveTo(sx-20,sy-4);ctx.lineTo(sx-4,sy-16);ctx.lineTo(sx+14,sy-10);ctx.lineTo(sx+20,sy+6);ctx.lineTo(sx+6,sy+14);ctx.lineTo(sx-10,sy+10);ctx.closePath();ctx.fill();
-  // Motas douradas
-  ctx.fillStyle=`rgba(220,180,20,${a})`;
-  for(let i=0;i<5;i++){
-    const gx=sx-12+i*8,gy=sy-6+Math.sin(i*1.7)*6;
-    ctx.beginPath();ctx.arc(gx,gy,2+Math.random(),0,Math.PI*2);ctx.fill();
-  }
-  ctx.fillStyle=`rgba(255,230,60,${a*0.7})`;ctx.beginPath();ctx.ellipse(sx-2,sy-4,6,4,0.3,0,Math.PI*2);ctx.fill();
-}
-function drawRiverFord(x,y,w,frame=0){
-  // Seção de rio onde garimpar
-  const sx=x-cam.x,sy=y-cam.y;
-  if(sx>W+200||sx+w<-200)return;
-  // Água
-  const wg=ctx.createLinearGradient(sx,sy,sx,sy+40);
-  wg.addColorStop(0,'rgba(60,130,200,0.7)');wg.addColorStop(1,'rgba(40,100,170,0.5)');
-  ctx.fillStyle=wg;ctx.fillRect(sx,sy,w,40);
-  // Ondas
-  ctx.strokeStyle='rgba(180,220,255,0.4)';ctx.lineWidth=1.5;
-  for(let i=0;i<3;i++){
-    const woff=((frame*2+i*40)%w);
-    ctx.beginPath();ctx.moveTo(sx+woff,sy+10+i*10);ctx.lineTo(sx+woff+30,sy+10+i*10);ctx.stroke();
-  }
-  // Pedras
-  ctx.fillStyle='#8a7a68';
-  for(let i=0;i<6;i++){const rx=sx+30+i*(w/6),ry=sy+20;ctx.beginPath();ctx.ellipse(rx,ry,8+i%3*3,5+i%2*2,i*0.4,0,Math.PI*2);ctx.fill();}
 }
 
-// ── Colecionável ─────────────────────────────────────────────────
+function drawBateia(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
+  const glow=ctx.createRadialGradient(0,0,0,0,0,24);
+  glow.addColorStop(0,'rgba(160,130,80,0.3)');glow.addColorStop(1,'rgba(140,110,60,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,24,0,Math.PI*2);ctx.fill();
+  // Pan body
+  ctx.fillStyle='#8a6840';
+  ctx.beginPath();ctx.ellipse(0,0,20,11,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#6a4820';
+  ctx.beginPath();ctx.ellipse(0,-2,14,7,0,0,Math.PI*2);ctx.fill();
+  // Water in pan
+  ctx.fillStyle='rgba(160,210,240,0.45)';
+  ctx.beginPath();ctx.ellipse(-1,-3,9,4.5,0.2,0,Math.PI*2);ctx.fill();
+  // Handle
+  ctx.fillStyle='#9a7030';
+  ctx.fillRect(16,-3,14,6);ctx.fillRect(28,-4,4,8);
+  ctx.restore();
+}
+
+function drawOuro(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
+  const glow=ctx.createRadialGradient(0,0,0,0,0,26);
+  glow.addColorStop(0,'rgba(255,210,50,0.55)');glow.addColorStop(1,'rgba(255,200,40,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,26,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#c89820';
+  ctx.beginPath();ctx.moveTo(-8,-10);ctx.lineTo(4,-14);ctx.lineTo(14,-4);
+  ctx.lineTo(12,6);ctx.lineTo(2,12);ctx.lineTo(-8,8);ctx.lineTo(-12,-2);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#f0c840';
+  ctx.beginPath();ctx.moveTo(-6,-8);ctx.lineTo(2,-12);ctx.lineTo(10,-4);ctx.lineTo(8,4);ctx.lineTo(-2,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.7)';ctx.beginPath();ctx.ellipse(-3,-5,3.5,2.5,0.5,0,Math.PI*2);ctx.fill();
+  const sa=Math.abs(Math.sin(Date.now()/450));
+  ctx.strokeStyle=`rgba(255,225,80,${sa*0.9})`;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(6,-8);ctx.lineTo(10,-13);ctx.stroke();
+  ctx.restore();
+}
+
+function drawPirita(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
+  const glow=ctx.createRadialGradient(0,0,0,0,0,20);
+  glow.addColorStop(0,'rgba(185,185,50,0.3)');glow.addColorStop(1,'rgba(185,185,50,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,20,0,Math.PI*2);ctx.fill();
+  // Cubic pyrite — geometric/angular
+  ctx.fillStyle='#aaaa20';
+  ctx.beginPath();ctx.moveTo(-10,-12);ctx.lineTo(10,-12);ctx.lineTo(14,-4);
+  ctx.lineTo(10,8);ctx.lineTo(-6,10);ctx.lineTo(-14,0);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#c0c030';
+  ctx.beginPath();ctx.moveTo(-8,-10);ctx.lineTo(8,-10);ctx.lineTo(10,-4);ctx.lineTo(-6,6);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(200,200,60,0.5)';ctx.beginPath();ctx.ellipse(-2,-4,4,3,0.4,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function drawPedraDeToque(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
+  const glow=ctx.createRadialGradient(0,0,0,0,0,18);
+  glow.addColorStop(0,'rgba(80,60,40,0.3)');glow.addColorStop(1,'rgba(60,40,20,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#282018';
+  ctx.beginPath();ctx.moveTo(-14,-5);ctx.lineTo(14,-8);ctx.lineTo(16,5);ctx.lineTo(-12,7);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#3c3028';
+  ctx.beginPath();ctx.moveTo(-12,-3);ctx.lineTo(12,-6);ctx.lineTo(10,-1);ctx.lineTo(-10,-1);ctx.closePath();ctx.fill();
+  // Gold streak on stone
+  ctx.strokeStyle='rgba(220,185,50,0.75)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(-7,1);ctx.lineTo(7,3);ctx.stroke();
+  ctx.restore();
+}
+
+function drawPlaca(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
+  const glow=ctx.createRadialGradient(0,0,0,0,0,24);
+  glow.addColorStop(0,'rgba(165,120,60,0.35)');glow.addColorStop(1,'rgba(140,100,40,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,24,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#8a5020';ctx.fillRect(-16,-14,32,28);
+  ctx.fillStyle='#a86030';ctx.fillRect(-16,-14,32,6);
+  ctx.fillStyle='rgba(255,225,160,0.8)';
+  ctx.fillRect(-11,-4,22,2);ctx.fillRect(-11,2,16,2);ctx.fillRect(-11,8,19,2);
+  ctx.fillStyle='#5a3010';
+  ctx.beginPath();ctx.arc(-12,-12,2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(12,-12,2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(-12,12,2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(12,12,2,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function drawQuartzoItem(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
+  const glow=ctx.createRadialGradient(0,0,0,0,0,22);
+  glow.addColorStop(0,'rgba(240,235,220,0.4)');glow.addColorStop(1,'rgba(240,235,220,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e0dcd0';
+  ctx.beginPath();ctx.moveTo(-8,-14);ctx.lineTo(0,-18);ctx.lineTo(10,-10);
+  ctx.lineTo(12,4);ctx.lineTo(4,12);ctx.lineTo(-8,8);ctx.lineTo(-10,-4);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,225,80,0.7)';
+  ctx.beginPath();ctx.arc(-2,-4,3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(5,2,2,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+// ─── GRIZZLY BEAR NPC ─────────────────────────────────────────────────────────
+function drawGrizzly(cx,cy,frame=0){
+  ctx.save();ctx.translate(cx,cy);
+  const bob=Math.sin(frame)*2;
+  // Body hump (characteristic of grizzly)
+  ctx.fillStyle='#5a4838';ctx.fillRect(-26,-24,52,42);
+  ctx.fillStyle='#6a5848';ctx.fillRect(-22,-30,44,12);// shoulder hump
+  // Legs
+  ctx.fillStyle='#4a3828';
+  ctx.fillRect(-24,14,16,26);ctx.fillRect(-6,14,16,26);
+  ctx.fillRect(6,14,16,26);ctx.fillRect(18,14,16,26);
+  // Head
+  ctx.fillStyle='#6a5848';ctx.fillRect(-20,-56+bob,40,32);
+  // Snout
+  ctx.fillStyle='#7a6858';ctx.fillRect(-14,-44+bob,28,22);
+  // Eyes
+  ctx.fillStyle='#1a1008';
+  ctx.fillRect(-14,-50+bob,9,9);ctx.fillRect(5,-50+bob,9,9);
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.fillRect(-12,-48+bob,4,4);ctx.fillRect(7,-48+bob,4,4);
+  // Ears
+  ctx.fillStyle='#5a4838';ctx.fillRect(-24,-62+bob,16,16);ctx.fillRect(8,-62+bob,16,16);
+  ctx.fillStyle='#7a6060';ctx.fillRect(-21,-59+bob,10,10);ctx.fillRect(11,-59+bob,10,10);
+  // Nose
+  ctx.fillStyle='#1a1008';ctx.fillRect(-8,-34+bob,16,10);
+  ctx.fillStyle='#2a2018';ctx.beginPath();ctx.ellipse(0,-29+bob,6,4,0,0,Math.PI*2);ctx.fill();
+  // Fur texture lines
+  ctx.strokeStyle='rgba(40,30,20,0.3)';ctx.lineWidth=1.5;
+  for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-22+i*9,-22);ctx.lineTo(-20+i*9,12);ctx.stroke();}
+  // California star badge (fun detail — CA flag reference)
+  ctx.fillStyle='#c83010';
+  ctx.beginPath();const starX=-2,starY=-10+bob;
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2,ao=a+Math.PI/5;ctx.lineTo(starX+Math.cos(a)*8,starY+Math.sin(a)*8);ctx.lineTo(starX+Math.cos(ao)*3,starY+Math.sin(ao)*3);}
+  ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+
+// ─── QUARTZ VEIN (examinar, não minerar) ──────────────────────────────────────
+class QuartzVein{
+  constructor(x,y){this.x=x;this.y=y;this.examined=false;this.glowT=0;}
+  tick(){this.glowT+=0.04;}
+  examine(){
+    if(!this.examined){this.examined=true;sfx('ouro');burst(this.x,this.y-10,'#f0d060',10,2.5);}
+  }
+  draw(){
+    const sx=this.x-cam.x,sy=this.y-cam.y;
+    if(sx<-80||sx>W+80)return;
+    const a=this.examined?0.35:(0.5+Math.abs(Math.sin(this.glowT))*0.45);
+    // Quartz body — milky white irregular mass
+    ctx.fillStyle=`rgba(240,236,225,${a})`;
+    ctx.beginPath();ctx.moveTo(sx-22,sy-8);ctx.lineTo(sx-8,sy-18);ctx.lineTo(sx+12,sy-12);
+    ctx.lineTo(sx+22,sy+6);ctx.lineTo(sx+10,sy+14);ctx.lineTo(sx-10,sy+12);ctx.lineTo(sx-20,sy+4);ctx.closePath();ctx.fill();
+    // Gold specks in quartz
+    const ga=this.examined?0.5:(a*0.8);
+    ctx.fillStyle=`rgba(225,185,45,${ga})`;
+    ctx.beginPath();ctx.arc(sx-3,sy-4,3.5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(sx+8,sy+2,2.5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(sx-8,sy+5,2,0,Math.PI*2);ctx.fill();
+    if(!this.examined){
+      const ha=0.5+Math.sin(Date.now()/400)*0.5;
+      ctx.fillStyle=`rgba(255,220,80,${ha*0.8})`;ctx.font='bold 12px "Courier New"';
+      ctx.textAlign='center';ctx.fillText('[E] Examinar Veio',sx,sy-28);ctx.textAlign='left';
+    } else {
+      ctx.fillStyle='rgba(180,160,100,0.55)';ctx.font='11px "Courier New"';
+      ctx.textAlign='center';ctx.fillText('✔ Examinado',sx,sy-26);ctx.textAlign='left';
+    }
+  }
+}
+
+// ─── PAN SPOT ─────────────────────────────────────────────────────────────────
+class PanSpot{
+  constructor(x,y,type){this.x=x;this.y=y;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
+  tick(){if(!this.done)this.t+=0.05;}
+  draw(){
+    if(this.done)return;
+    const sx=this.x-cam.x,sy=this.y-cam.y;
+    if(sx<-80||sx>W+80)return;
+    const a=0.45+Math.abs(Math.sin(this.t))*0.5;
+    const isPlaca=this.type==='placa_reivindicacao';
+    const col=isPlaca?`rgba(180,140,80,${a})`:`rgba(220,190,55,${a*0.85})`;
+    // Ripple in river
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(sx,sy,18+Math.sin(this.t)*4,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(sx,sy,28+Math.sin(this.t+1)*5,0,Math.PI*2);ctx.stroke();
+    // Sparkle
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(sx,sy,7+Math.sin(this.t)*2,0,Math.PI*2);ctx.fill();
+    const ha=0.5+Math.sin(Date.now()/350)*0.5;
+    ctx.fillStyle=`rgba(255,220,80,${ha*0.8})`;ctx.font='bold 12px "Courier New"';
+    ctx.textAlign='center';ctx.fillText('[E] Garimpar',sx,sy-28);ctx.textAlign='left';
+  }
+}
+
+// ─── COL (floating collectible) ───────────────────────────────────────────────
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=34;this.h=34;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
@@ -402,7 +562,7 @@ class Col{
     if(this.done)return;
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-60||sx>W+60)return;
-    const TOOL_TYPES=['bateia','picareta','touchstone'];
+    const TOOL_TYPES=['bateia','picareta','pedra_de_toque'];
     const isTool=TOOL_TYPES.includes(this.type);
     if(isTool){
       const a=0.3+Math.abs(Math.sin(this.t*0.8))*0.5;
@@ -411,29 +571,35 @@ class Col{
       ctx.fillStyle=glow;ctx.fillRect(sx-15,sy-15,64,64);
     }
     ctx.save();ctx.translate(sx+this.w/2,sy+this.h/2);
-    if(this.type==='ouro')         drawOuro(0,0,this.t);
-    else if(this.type==='pirita')  drawPirita(0,0,this.t);
-    else if(this.type==='touchstone') drawTouchstone(0,0,this.t);
-    else if(this.type==='placa')   drawPlaca(0,0,this.t);
-    else if(this.type==='bateia')  drawBateia(0,0,this.t);
+    if(this.type==='picareta')   drawPicareta(0,0,this.t);
+    else if(this.type==='bateia')drawBateia(0,0,this.t);
+    else if(this.type==='pedra_de_toque')drawPedraDeToque(0,0,this.t);
+    else if(this.type==='ouro')  drawOuro(0,0,this.t);
+    else if(this.type==='quartzo_aureo')drawQuartzoItem(0,0,this.t);
     ctx.restore();
     if(isTool&&playerX!==undefined){
       const dist=Math.hypot(playerX+20-(this.x+17),playerY+40-(this.y+17));
       if(dist<110){
-        const label=this.type==='bateia'?'🪣 Bateia':this.type==='touchstone'?'🪨 Pedra de Toque':'⛏ Picareta';
+        const label=this.type==='bateia'?'🥣 Bateia':this.type==='pedra_de_toque'?'🪨 Pedra de Toque':'⛏ Picareta';
         const txt=`[E] Pegar ${label}`;
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
-        const tw=ctx.measureText(txt).width+20,bx=sx+17-tw/2,by=sy-42;
+        const tw=ctx.measureText(txt).width+20;
+        const bx=sx+17-tw/2,by=sy-42;
         ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
-        ctx.fillStyle=`rgba(240,200,60,${pulse})`;ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
+        ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;
+        ctx.beginPath();ctx.moveTo(sx+10,by+24);ctx.lineTo(sx+24,by+24);ctx.lineTo(sx+17,by+32);ctx.closePath();ctx.fill();
+        ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(sx+10,by+24);ctx.lineTo(sx+17,by+32);ctx.lineTo(sx+24,by+24);ctx.stroke();
+        ctx.fillStyle=`rgba(240,200,60,${pulse})`;
+        ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
       }
     }
   }
 }
 
-// ── Trigger ──────────────────────────────────────────────────────
+// ─── TRIGGER ─────────────────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn,auto=false){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;this.auto=auto;}
   draw(px,py){
@@ -449,7 +615,7 @@ class Trigger{
   }
 }
 
-// ── Diálogos ─────────────────────────────────────────────────────
+// ─── DIALOG BUBBLE ───────────────────────────────────────────────────────────
 function wrapText(text,maxW){
   ctx.font='15px "Courier New"';
   const pars=text.split('\n'),result=[];
@@ -467,14 +633,17 @@ const BUBBLE={
   draw(player){
     if(!this.active)return;this.faceFrame+=0.03;
     ctx.font='15px "Courier New"';
-    const faceW=60,faceH=76,facePad=12,lineH=24,pad=20,textW=480;
+    const faceW=60,faceH=76,facePad=12;
+    const lineH=24,pad=20,textW=480;
     const bubW=facePad+faceW+facePad+textW+pad;
     const bubH=Math.max(faceH+pad*2,this.lines.length*lineH+70)+pad;
     const pcx=player.x-cam.x+player.w/2,pcy=player.y-cam.y;
     let bx=Math.max(10,Math.min(pcx-bubW/2,W-bubW-10)),by=Math.max(10,pcy-bubH-32);
     ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=14;
-    ctx.fillStyle='rgba(8,4,0,0.96)';roundRect(bx,by,bubW,bubH,14);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(8,4,0,0.96)';roundRect(bx,by,bubW,bubH,14);ctx.fill();
+    ctx.shadowBlur=0;
     ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2.5;roundRect(bx,by,bubW,bubH,14);ctx.stroke();
+    ctx.strokeStyle='rgba(200,160,40,0.2)';ctx.lineWidth=1;roundRect(bx+4,by+4,bubW-8,bubH-8,10);ctx.stroke();
     const tbx=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
     const tty=by+bubH,tipy=Math.min(pcy,tty+38);
     ctx.fillStyle='rgba(8,4,0,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
@@ -502,8 +671,8 @@ const BUBBLE={
 function showDialog(msgs,cb,speaker='CORVAN',color='#e0b840'){BUBBLE.show(msgs,cb,speaker,color);}
 function checkDlg(){if(G.dialog&&!INV.open&&isE())BUBBLE.advance();}
 
-// ── Popup flutuante ──────────────────────────────────────────────
-let popup={active:false,timer:0,title:'',lines:[],color:'#f0d060'};
+// ─── POPUP & NOTIF ────────────────────────────────────────────────────────────
+let popup={active:false,timer:0,title:'',lines:[],color:'#c0c8d8'};
 function showPopup(title,lines,color,ms=6500){popup={active:true,timer:ms,title,lines,color};}
 function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.timer<=0)popup.active=false;}}
 function drawPopup(){
@@ -513,6 +682,7 @@ function drawPopup(){
   const px=W-pw-18,py=56;
   ctx.fillStyle='rgba(8,4,0,0.94)';roundRect(px,py,pw,ph,10);ctx.fill();
   ctx.strokeStyle=popup.color;ctx.lineWidth=2;roundRect(px,py,pw,ph,10);ctx.stroke();
+  ctx.strokeStyle='rgba(200,200,220,0.2)';ctx.lineWidth=1;roundRect(px+4,py+4,pw-8,ph-8,7);ctx.stroke();
   ctx.font='bold 13px "Courier New"';ctx.fillStyle=popup.color;ctx.textAlign='center';ctx.fillText(popup.title,px+pw/2,py+22);
   ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(px+14,py+30,pw-28,1);
   ctx.font='12px "Courier New"';ctx.fillStyle='#e8e0d0';
@@ -520,7 +690,6 @@ function drawPopup(){
   ctx.textAlign='left';ctx.restore();
 }
 
-// ── Notificações ─────────────────────────────────────────────────
 let notifText='',notifAlpha=0,notifTimer=0;
 function notify(msg,ms=2800){notifText=msg;notifTimer=ms;notifAlpha=1;}
 function tickNotif(){if(notifTimer>0){notifTimer-=16;if(notifTimer<=0)notifAlpha=0;else notifAlpha=Math.min(1,notifTimer/300);}}
@@ -533,7 +702,7 @@ function drawNotif(){
   ctx.restore();
 }
 
-// ── Player ───────────────────────────────────────────────────────
+// ─── PLAYER ───────────────────────────────────────────────────────────────────
 class Player{
   constructor(x,y){
     this.x=x;this.y=y;this.w=32;this.h=68;
@@ -547,15 +716,19 @@ class Player{
   }
   overlaps(r){return this.x<r.x+r.w&&this.x+this.w>r.x&&this.y<r.y+r.h&&this.y+this.h>r.y;}
   near(r,d=80){return Math.abs(this.x+20-(r.x+r.w/2))<r.w/2+d&&Math.abs(this.y+40-(r.y+r.h/2))<r.h/2+d;}
+
   update(level){
     if(INV.open){INV.navigate(this);return;}
     if(G.dialog)return;
+
     if(isL()){this.vx=-PSPD;this.facing=-1;}
     else if(isR()){this.vx=PSPD;this.facing=1;}
     else this.vx*=0.7;
+
     if(this.onG)this.coyote=8;else if(this.coyote>0)this.coyote--;
     if(isJ())this.jbuf=10;if(this.jbuf>0)this.jbuf--;
     if(this.jbuf>0&&(this.onG||this.coyote>0)){this.vy=JUMPF;this.onG=false;this.coyote=0;this.jbuf=0;sfx('jump');}
+
     if(this.onMoving){this.x+=this.onMoving.vx||0;this.y+=this.onMoving.vy||0;}
     this.onMoving=null;
     this.vy=Math.min(this.vy+GRAV,MAXFALL);
@@ -563,101 +736,163 @@ class Player{
     this.onG=false;this.y+=this.vy;this._colY(level.plats);
     this.x=Math.max(0,this.x);
 
-    const TOOL_TYPES=['bateia','picareta','touchstone'];
+    if(!this.inv){
+      for(const p of level.plats){if(p.type==='spike'&&this.overlaps(p))this._hurt(2,level,'rocha');}
+    }
+    if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
+
+    // Auto-collect floating minerals
+    const TOOL_TYPES=['bateia','picareta','pedra_de_toque'];
     for(const c of level.cols){
       if(c.done||TOOL_TYPES.includes(c.type))continue;
       if(!this.overlaps(c))continue;
       c.done=true;
       if(c.type==='ouro'){
-        this.score+=20;sfx('ouro');burst(c.x+17,c.y+17,'#ffe060',10,3);
+        this.score+=25;sfx('ouro');
+        burst(c.x+17,c.y+17,'#f0d060',10,3);
         if(!this.items.includes('ouro_ok')){
-          this.items.push('ouro_ok');journalCollect('ouro');
-          showPopup('✨ OURO (Au)',['Metal mais maleável que existe','1g = fio de 3km ou folha translúcida','Densidade: 19,3 g/cm³ (7× mais que areia)','Ouro afunda na bateia pelo peso!'],'#f0d060');
+          this.items.push('ouro_ok');journalCollect('ouro_pepita');
+          showPopup('◎ PEPITA DE OURO',['Formada há 120 mi anos por fluidos hidrotermais','É o metal mais maleável da natureza','1g forma fio de 3km ou folha translúcida','Densidade: 19,3 g/cm³ — 7x a da água'],'#e0c040');
         }
-        const cnt=level.cols.filter(cc=>cc.done&&cc.type==='ouro').length;
-        const tot=level.cols.filter(cc=>cc.type==='ouro').length;
-        notify(`✨ Ouro coletado! (${cnt}/${tot})`);
-        addToInventory(this,'ouro');
-      } else if(c.type==='pirita'){
-        // Pirita — exige teste da pedra de toque
-        if(this.items.includes('touchstone')){
-          sfx('picareta');burst(c.x+17,c.y+17,'#c8a820',8,2);
-          journalCollect('pirita');
-          if(!this.items.includes('pirita_ok'))this.items.push('pirita_ok');
-          showPopup('🟡 PIRITA — "OURO DE TOLO"',['Traço esverdeado na Pedra de Toque','Mais frágil e leve que o ouro real','FeS₂ — Sulfeto de Ferro','Enganou muitos garimpeiros de 1849!'],'#c8a820');
-          notify('🪨 Pirita testada — "Ouro de Tolo" confirmado!');
-        } else {
-          notify('Obtenha a Pedra de Toque antes de testar a pirita!');
-          this.x=c.x-this.w;// empurra de volta
+        const cnt=this.items.filter(i=>i==='ouro_pepita').length;
+        this.items.push('ouro_pepita');
+        notify(`◎ Pepita de ouro coletada!`);
+      } else if(c.type==='quartzo_aureo'){
+        this.score+=15;sfx('ouro');
+        burst(c.x+17,c.y+17,'#e0d8b0',8,2.5);
+        if(!this.items.includes('quartzo_ok')){
+          this.items.push('quartzo_ok');journalCollect('quartzo_aureo');
+          showPopup('◈ QUARTZO AURÍFERO',['Veios da "Mother Lode" — 200 km de quartzo','Formados por atividade magmática há 120 mi a','A erosão fluvial libera pepitas do quartzo','Base geológica da Corrida do Ouro de 1849'],'#d8d0a0');
         }
-      } else if(c.type==='placa'){
-        this.score+=50;sfx('unlock');burst(c.x+17,c.y+17,'#d4a060',16,3);
-        this.items.push('placa');journalCollect('placa_claim');addToInventory(this,'placa');
-        showDialog([
-          '"Placa de Reivindicação! Este pequeno pedaço de madeira garantia o direito exclusivo de garimpar este trecho do rio."',
-          '"Os garimpeiros de 1849 criaram um sistema legal próprio baseado na posse pelo trabalho — que influenciou toda a legislação de propriedade mineral dos EUA."',
-          '"Mas este mesmo sistema expulsou os povos Miwok e Nisenan de suas terras ancestrais. O progresso americano tinha um preço humano e ambiental enorme."'
-        ],()=>{notify('✦ Placa de Reivindicação coletada!');});
+        notify('◈ Quartzo aurífero coletado!');
       }
     }
+
     if(isE()){
+      // Collect tools
       for(const c of level.cols){
         if(c.done||!TOOL_TYPES.includes(c.type))continue;
         if(!this.near({x:c.x,y:c.y,w:c.w,h:c.h},90))continue;
         c.done=true;
         if(c.type==='bateia'){
-          this.items.push('bateia');sfx('item');burst(c.x+17,c.y+17,'#c0a040',12);
-          journalCollect('bateia');addToInventory(this,'bateia');
-          showPopup('🪣 BATEIA COLETADA',['Separa materiais pela densidade','Gire em círculos na água','Ouro pesado fica no centro','Sedimento leve escoa pela borda'],'#c0a040');
-          notify('✦ Bateia coletada!');
+          this.items.push('bateia');this.activeTools.add('bateia');sfx('item');burst(c.x+17,c.y+17,'#c0a860',12);
+          journalCollect('bateia');
+          showPopup('🥣 BATEIA COLETADA',['Separação por densidade: ouro submerge','Gire em círculos para lavar o sedimento','Ouro: 19,3 g/cm³ vs areia: 2,7 g/cm³','Garimpeiros de 1849 usavam todo o dia'],'#c0a860');
+          notify('✦ Bateia coletada! Equipe-a no Diário [I].');
+        } else if(c.type==='pedra_de_toque'){
+          this.items.push('pedra_de_toque');this.activeTools.add('pedra_de_toque');sfx('item');burst(c.x+17,c.y+17,'#808060',12);
+          journalCollect('pedra_de_toque');
+          showPopup('🪨 PEDRA DE TOQUE',['Usada por ensaiadores do século XIX','Risque o mineral: traço dourado = ouro','Traço esverdeado/escuro = pirita!','Custo: $0. Precisão: impressionante.'],'#909080');
+          notify('✦ Pedra de Toque coletada!');
         } else if(c.type==='picareta'){
-          this.items.push('picareta');sfx('item');burst(c.x+17,c.y+17,'#c0c0d8',12);
-          journalCollect('picareta_basica');addToInventory(this,'picareta');
-          showPopup('⛏ PICARETA COLETADA',['Extrai veios de quartzo aurífero','Ângulo oblíquo preserva os cristais','Use [E] próximo a um veio brilhante','Equipe-a no Diário [I]'],'#c0c0d8');
-          notify('✦ Picareta coletada!');
-        } else if(c.type==='touchstone'){
-          this.items.push('touchstone');sfx('item');burst(c.x+17,c.y+17,'#a08868',12);
-          journalCollect('pedra_toque');addToInventory(this,'touchstone');
-          showPopup('🪨 PEDRA DE TOQUE!',['Ensaiadores do século XIX a usavam','Traço dourado = ouro verdadeiro','Traço esverdeado = pirita (FeS₂)','Obtida com o Grizzly da Califórnia'],'#c0a870');
-          notify('🪨 Pedra de Toque obtida! Use para testar minerais.');
+          this.items.push('picareta');sfx('item');
+          notify('✦ Picareta obtida!');
         }
         break;
       }
-      if(level.grizzly&&!level.grizzly.gifted&&this.near({x:level.grizzly.x-50,y:level.grizzly.y-80,w:100,h:80})){
+
+      // Examine quartz veins
+      if(level.veins){
+        for(const v of level.veins){
+          if(!v.examined&&this.near({x:v.x-28,y:v.y-28,w:56,h:56})){
+            if(!G.dialog){
+              v.examine();
+              const cnt=level.veins.filter(vv=>vv.examined).length;
+              const tot=level.veins.length;
+              if(cnt===1)showPopup('◈ VEIO DE QUARTZO',['O ouro se formou há 120 mi de anos','Fluidos hidrotermais infiltraram fissuras','A erosão dos rios liberou as pepitas','É por isso que garimpamos no leito fluvial!'],'#e0d8a0');
+              if(cnt===tot&&!level._veinsDialogDone){
+                level._veinsDialogDone=true;
+                showDialog([
+                  '"Cada veio de quartzo branco que vejo aqui tem motas douradas — é a Mother Lode, o cinturão aurífero de 200km que percorre a Sierra Nevada."',
+                  '"O ouro não surge solto. Há 120 milhões de anos, fluidos hidrotermais empurrados por magma infiltraram fissuras no quartzo. A erosão ao longo dos milênios é que carregou os fragmentos até este leito do rio."',
+                  '"Com a bateia, posso separar o ouro do sedimento usando a diferença de densidade. O ouro é 7 vezes mais denso que a água — ele sempre fica no fundo!"',
+                ],(()=>{notify('✦ Vá para o leito do rio e use a bateia!');level.triggers[0].done=false;}),'CORVAN','#e0b840');
+              }
+              notify(`◈ Veio examinado! (${cnt}/${tot})`);
+            }
+            break;
+          }
+        }
+      }
+
+      // Pan spots (Level 3)
+      if(level.panSpots){
+        for(const ps of level.panSpots){
+          if(ps.done||!this.near({x:ps.x-20,y:ps.y-20,w:40,h:40},70))continue;
+          if(!this.items.includes('bateia')){notify('Equipe a Bateia no Diário [I] primeiro!');break;}
+          if(!this.activeTools.has('bateia')){notify('Equipe a Bateia no Diário [I]!');break;}
+          ps.done=true;sfx('pan');
+          burst(ps.x,ps.y,'#80b8d0',8,2.5);
+          if(ps.type==='pirita'){
+            // Test with touchstone
+            if(this.items.includes('pedra_de_toque')){
+              sfx('pirita');burst(ps.x,ps.y,'#909040',10,2);
+              showPopup('⚠ PIRITA — OURO DE TOLO!',['A Pedra de Toque revelou traço esverdeado','Pirita (FeS₂) tem cor similar ao ouro','Mas é mais frágil, mais leve e frágil','Traço no pedra = esverdeado/escuro. Descartada!'],'#aaa040',7000);
+              notify('⚠ Era pirita! Testada e descartada pela Pedra de Toque.');
+            } else {
+              // Shouldn't reach here in normal flow
+              this.items.push('pirita_tmp');
+              notify('⚠ Mineral coletado — precisa de teste!');
+            }
+          } else if(ps.type==='ouro'){
+            this.items.push('ouro_pepita');this.score+=30;sfx('ouro');
+            burst(ps.x,ps.y,'#f0d060',14,3.5);
+            const cnt=this.items.filter(i=>i==='ouro_pepita').length;
+            if(!this.items.includes('ouro_ok')){this.items.push('ouro_ok');journalCollect('ouro_pepita');}
+            showPopup('◎ PEPITA DE OURO',['Ouro puro — traço dourado na Pedra de Toque','Densidade de 19,3 g/cm³ confirma pureza','Formado em veio de quartzo há 120 mi de anos','Garimpeiro do século XIX estaria orgulhoso!'],'#e0c040',5000);
+            notify(`◎ Ouro coletado! (${cnt}/3)`);
+          } else if(ps.type==='placa_reivindicacao'){
+            this.items.push('placa_reivindicacao');this.score+=60;sfx('unlock');
+            burst(ps.x,ps.y,'#c0a060',16,3);
+            journalCollect('placa_reivindicacao');this.interactAnim=40;
+            showDialog([
+              '"Uma Placa de Reivindicação de Mineração! J. W. Garrett, 1849. Um garimpeiro dos \'49ers\' registrava seu \'claim\' em cartório para garantir direito exclusivo de garimpar aquela área."',
+              '"O sistema de claims foi a primeira lei de propriedade que os EUA criaram às pressas para gerir a Corrida do Ouro. Tornou-se a base da legislação de recursos naturais americana."',
+              '"Mas havia um lado sombrio: os povos Miwok e Nisenan, que viviam aqui há milênios, foram sistematicamente expulsos. A lei protegia o claim do garimpeiro, mas não os direitos dos povos originários."',
+            ],null,'CORVAN','#e0b840');
+          }
+          break;
+        }
+      }
+
+      // Grizzly NPC interaction
+      if(level.grizzly&&!level.grizzly.gifted&&this.near({x:level.grizzly.x-60,y:level.grizzly.y-80,w:120,h:80})){
         level.grizzly.gifted=true;sfx('item');
-        burst(level.grizzly.x,level.grizzly.y-40,'#a08868',14);
+        for(let i=0;i<14;i++)burst(level.grizzly.x,level.grizzly.y-40,'#909060',1,2+Math.random()*2);
+        this.items.push('pedra_de_toque');this.activeTools.add('pedra_de_toque');journalCollect('pedra_de_toque');
         showDialog([
-          '"Um Grizzly da Califórnia! Este urso majestoso foi extinto em 1922, mas ainda habita a bandeira do estado. Está me oferecendo algo..."',
-          '"Uma Pedra de Toque! Ensaiadores do século XIX usavam essa pedra negra para testar o ouro: ao riscar o mineral, o traço dourado indica ouro puro — a pirita deixa um traço esverdeado-escuro."',
-          '"Com a Pedra de Toque, posso distinguir o ouro verdadeiro do \'Ouro de Tolo\'. Isso vai ser essencial na garimpagem!"'
-        ],()=>{
-          this.items.push('touchstone');journalCollect('pedra_toque');addToInventory(this,'touchstone');
-          notify('🪨 Pedra de Toque obtida do Grizzly!');
-        });
+          '"Um Grizzly da Califórnia! Este urso está extinto desde 1922 — foi caçado até o desaparecimento durante a Corrida do Ouro. Só sobrevive na bandeira estadual da Califórnia."',
+          '"Ele me deixou uma Pedra de Toque — os ensaiadores do século XIX usavam essa pedra escura para testar o ouro: ao riscar, o ouro deixa traço dourado, a pirita deixa traço esverdeado-escuro."',
+          '"No leito do American River vou encontrar tanto ouro quanto pirita. Preciso da Pedra de Toque para não ser enganado pelo \'ouro de tolo\'! Vamos garimpar!"',
+        ],null,'CORVAN','#e0b840');
       }
-      if(level.quartzVein&&!level.quartzVein.done&&this.near({x:level.quartzVein.x-40,y:level.quartzVein.y-40,w:80,h:80})){
-        level.quartzVein.done=true;sfx('picareta');burst(level.quartzVein.x,level.quartzVein.y,'#ffe060',14);
-        journalCollect('ouro');if(!this.items.includes('ouro_ok'))this.items.push('ouro_ok');
-        addToInventory(this,'ouro');this.score+=25;
+
+      // Placa da Reivindicação NPC object (Cena 3 direct object)
+      if(level.placaObj&&!level.placaObj.done&&this.near({x:level.placaObj.x-40,y:level.placaObj.y-40,w:80,h:40})){
+        level.placaObj.done=true;this.items.push('placa_reivindicacao');this.score+=60;sfx('unlock');
+        burst(level.placaObj.x,level.placaObj.y,'#c0a060',16,3);
+        journalCollect('placa_reivindicacao');this.interactAnim=40;
         showDialog([
-          '"Veio de quartzo aurífero! Estas formações brancas brilhantes abrigam o ouro que se infiltrou em fissuras rochosas há 120 milhões de anos."',
-          '"O ouro (Au) é o metal mais maleável que existe — 1 grama pode ser esticado em um fio de 3 quilômetros, ou laminado em uma folha tão fina que deixa a luz passar!"',
-          '"Densidade 19,3 g/cm³ — quase 7 vezes mais denso que a areia comum (2,7 g/cm³). É exatamente por isso que a bateia funciona: o ouro afunda, a areia flutua para fora."'
-        ],()=>{notify('✨ Veio de quartzo examinado! +25 pontos');});
+          '"Uma Placa de Reivindicação de Mineração! J. W. Garrett, 1849. Um garimpeiro dos \'49ers\' registrava seu \'claim\' em cartório para garantir o direito exclusivo de garimpar aquela área."',
+          '"Este sistema foi a primeira lei de recursos naturais que os EUA criaram às pressas para gerir a Corrida do Ouro. Tornou-se a base da legislação americana de propriedade."',
+          '"Mas havia um lado sombrio: os povos Miwok e Nisenan, que viviam aqui há milênios, foram sistematicamente expulsos. A lei protegia o claim do garimpeiro, mas não os povos originários."',
+        ],null,'CORVAN','#e0b840');
       }
+
       for(const t of level.triggers){if(!t.done&&this.near(t)){t.fn(this,level);break;}}
     }
-    if(this.y>level.H+200){this.hp=0;this.dead=true;this.deathCause='queda';}
+
+    if(this.y>level.H+200)this._hurt(3,level,'queda');
     if(!this.onG&&this.vy<0)this.state='jump';
     else if(!this.onG&&this.vy>0)this.state='fall';
     else if(Math.abs(this.vx)>0.5)this.state='run';
     else this.state='idle';
     if(Math.abs(this.vx)>0.5)this.walkT+=0.18;
-    if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
   }
+
   _colX(plats){
     const STEP=6;
-    for(const p of plats){if(p.type==='_dead')continue;
+    for(const p of plats){if(p.type==='spike'||p.type==='_dead')continue;
       if(this.overlaps(p)){
         if(this.y+this.h*0.5<=p.y)continue;
         const stepUp=p.y-(this.y+this.h);
@@ -666,26 +901,27 @@ class Player{
       }
     }
   }
-  _colY(plats){for(const p of plats){if(p.type==='_dead')continue;
+  _colY(plats){for(const p of plats){if(p.type==='spike'||p.type==='_dead')continue;
+    if(p.type==='trapdoor'&&this.vy<0)continue;
     if(this.overlaps(p)){
-      if(this.vy>=0){this.y=p.y-this.h;this.vy=0;this.onG=true;if(p.moving)this.onMoving=p;}
+      if(this.vy>=0){this.y=p.y-this.h;this.vy=0;this.onG=true;if(p.moving)this.onMoving=p;if(p.type==='trapdoor'&&p.crumble===undefined)p.crumble=70;}
       else{this.y=p.y+p.h;this.vy=Math.abs(this.vy)*0.2;}}}}
+  _hurt(dmg,level,cause='queda'){if(this.inv>0)return;this.hp-=dmg;this.inv=80;burst(this.x+20,this.y+40,'#ff4040',10);sfx('hit');if(this.hp<=0){this.hp=0;this.dead=true;this.deathCause=cause;}}
+
   draw(){
     if(this.dead)return;
     const S=1.5,FOOT_Y=46*S;
-    const dx=this.x-cam.x+this.w/2-16*S,dy=this.y-cam.y+this.h-FOOT_Y;
+    const dx=this.x-cam.x+this.w/2-16*S;
+    const dy=this.y-cam.y+this.h-FOOT_Y;
     const flip=this.facing===-1;
     const wf=this.state==='run'?this.walkT:(this.state==='idle'?Date.now()/800:0);
-    const _dispTool=this.activeTools.has('placa')?'placa':this.activeTools.has('picareta')?'picareta':this.activeTools.has('bateia')?'bateia':this.activeTools.has('touchstone')?'touchstone':null;
+    const _dispTool=this.activeTools.has('pedra_de_toque')?'pedra_de_toque':this.activeTools.has('bateia')?'bateia':this.activeTools.has('picareta')?'picareta':null;
     ctx.save();drawCorvan(dx,dy,S,flip,wf,_dispTool);ctx.restore();
     if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
   }
 }
 
-// Util
-function addToInventory(player,key){if(!player.items.includes(key))player.items.push(key);}
-
-// ── Backgrounds ──────────────────────────────────────────────────
+// ─── DRAW UTILITIES ──────────────────────────────────────────────────────────
 function drawBg(bgKey){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
@@ -693,223 +929,272 @@ function drawBg(bgKey){
     const iw=img.naturalWidth*sc,ih=img.naturalHeight*sc;
     ctx.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
   } else {
-    const fb={bg01:'#0a1a08',bg02:'#0a0e18',bg03:'#071520',bg04:'#0a1a08'};
+    const fb={bg01:'#0a1a0a',bg02:'#121008',bg03:'#08141a',bg04:'#1a0c04'};
     const grd=ctx.createLinearGradient(0,0,0,H);
     grd.addColorStop(0,fb[bgKey]||'#111');grd.addColorStop(1,'#050308');
     ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
   }
-  ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.fillRect(0,0,W,H);
 }
 
-// ── Estrelas & Ambiente ──────────────────────────────────────────
-let stars=Array.from({length:60},()=>({x:Math.random()*W,y:Math.random()*160,sz:Math.random()<0.2?2:1,br:Math.random()>0.7}));
+let stars=Array.from({length:80},()=>({x:Math.random()*W,y:Math.random()*200,sz:Math.random()<0.2?2:1,br:Math.random()>0.7}));
 function drawStars(){
   for(const s of stars){
     const a=0.5+Math.sin(Date.now()/1100+s.x*0.01)*0.5;
-    ctx.fillStyle=s.br?`rgba(255,255,255,${a})`:'rgba(200,220,255,0.6)';ctx.fillRect(s.x,s.y,s.sz,s.sz);
-  }
-}
-let windP=[];function initWind(){windP=[];for(let i=0;i<20;i++)windP.push({x:Math.random()*W,y:60+Math.random()*200,spd:0.8+Math.random()*1.5});}
-initWind();
-function drawWind(){
-  ctx.strokeStyle='rgba(200,220,180,0.14)';ctx.lineWidth=1;
-  for(const w of windP){w.x+=w.spd;if(w.x>W)w.x=-60;ctx.beginPath();ctx.moveTo(w.x,w.y);ctx.lineTo(w.x+35,w.y+1);ctx.stroke();}
-}
-let riverAnim=0;
-function drawRiverBg(y,w,frame){
-  // Faixa de rio decorativa no background da cena
-  const rg=ctx.createLinearGradient(0,y,0,y+50);
-  rg.addColorStop(0,'rgba(40,100,200,0.55)');rg.addColorStop(1,'rgba(20,70,160,0.35)');
-  ctx.fillStyle=rg;ctx.fillRect(0,y,w,50);
-  ctx.strokeStyle='rgba(180,220,255,0.25)';ctx.lineWidth=1.5;
-  for(let i=0;i<5;i++){
-    const off=((frame+i*80)%(W+100));
-    ctx.beginPath();ctx.moveTo(off-100,y+8+i*8);ctx.lineTo(off+30,y+8+i*8);ctx.stroke();
+    ctx.fillStyle=s.br?`rgba(255,255,255,${a})`:'rgba(180,200,255,0.6)';
+    ctx.fillRect(s.x,s.y,s.sz,s.sz);
   }
 }
 
-// ── HUD ─────────────────────────────────────────────────────────
+let windP=[];function initWind(){windP=[];for(let i=0;i<30;i++)windP.push({x:Math.random()*W,y:100+Math.random()*300,spd:1+Math.random()*2});}
+initWind();
+function drawWind(){
+  ctx.strokeStyle='rgba(200,220,255,0.12)';ctx.lineWidth=1;
+  for(const w of windP){w.x+=w.spd;if(w.x>W)w.x=-100;
+    ctx.beginPath();ctx.moveTo(w.x,w.y);ctx.lineTo(w.x+40,w.y+2);ctx.stroke();}
+}
+
+// River sparkle particles
+let riverP=[];function initRiver(){riverP=[];for(let i=0;i<40;i++)riverP.push({wx:Math.random()*4000,y:Math.random()*80,a:Math.random(),t:Math.random()*Math.PI*2});}
+initRiver();
+function drawRiver(floorY){
+  for(const p of riverP){
+    p.t+=0.025;p.a=0.2+Math.sin(p.t)*0.18;
+    const sx=p.wx-cam.x;if(sx<-10||sx>W+10)continue;
+    ctx.fillStyle=`rgba(120,200,240,${p.a})`;
+    ctx.beginPath();ctx.arc(sx,floorY-8+Math.sin(p.t+p.wx)*5,2.5,0,Math.PI*2);ctx.fill();
+  }
+}
+
+// Draw sign post (Cena 1 decoration)
+function drawSignPost(worldX,floorY){
+  const sx=worldX-cam.x,sy=floorY-cam.y;
+  if(sx<-200||sx>W+200)return;
+  ctx.fillStyle='#7a5020';ctx.fillRect(sx-4,sy-140,8,140);
+  ctx.fillStyle='#9a6830';ctx.fillRect(sx-60,sy-140,120,44);
+  ctx.fillStyle='#8a5820';ctx.fillRect(sx-60,sy-140,120,5);
+  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#f0e0b0';ctx.textAlign='center';
+  ctx.fillText('Sacramento Valley',sx,sy-120);
+  ctx.fillText('Ouro encontrado aqui!',sx,sy-103);
+  ctx.textAlign='left';
+}
+
+// ─── HUD ──────────────────────────────────────────────────────────────────────
 function drawHUD(player,level){
   ctx.fillStyle='rgba(8,4,0,0.82)';ctx.fillRect(0,0,W,38);
   ctx.fillStyle='rgba(200,160,40,0.18)';ctx.fillRect(0,36,W,2);
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#f0d060':'#334';
+    ctx.fillStyle=i<player.hp?'#e07040':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
     ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  ctx.fillStyle='#f0d060';ctx.font='20px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#f0d060';ctx.font='bold 20px "Courier New"';ctx.textAlign='right';ctx.fillText('✨ '+player.score,W-14,26);ctx.textAlign='left';
-  const PX=12,PY=46,PW=178;
-  const TOOL_DEFS=[{id:'bateia',icon:'🪣',nome:'Bateia'},{id:'picareta',icon:'⛏',nome:'Picareta'},{id:'touchstone',icon:'🪨',nome:'Pedra de Toque'}];
+  ctx.fillStyle='#c0c8d8';ctx.font='20px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
+  ctx.fillStyle='#e0c040';ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText('◎ '+player.score,W-14,26);ctx.textAlign='left';
+
+  // Mini tool panel
+  const PX=12,PY=46,PW=178,PH_BASE=52;
+  const TOOL_DEFS=[{id:'bateia',icon:'🥣',nome:'Bateia'},{id:'pedra_de_toque',icon:'🪨',nome:'Pedra de Toque'},{id:'picareta',icon:'⛏',nome:'Picareta'}];
   const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
-  const PH=52+(tools.length>0?6+tools.length*22:0);
-  ctx.save();ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
-  ctx.fillStyle='rgba(8,4,0,0.88)';roundRect(PX,PY,PW,PH,6);ctx.fill();ctx.shadowBlur=0;
+  const PH=PH_BASE+(tools.length>0?6+tools.length*22:0);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(8,4,0,0.88)';roundRect(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
   ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;roundRect(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.strokeStyle='rgba(200,160,40,0.25)';ctx.lineWidth=1;roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
   ctx.restore();
-  const midX=PX+PW/2;
-  ctx.font='11px serif';ctx.fillStyle='#c0a030';ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  const midX=PX+PW/2,kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#c0a030';ctx.fillText('📔',PX+8,PY+20);
   ctx.font='bold 10px "Courier New"';ctx.fillStyle='#c0a030';ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
-  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
   ctx.fillStyle='rgba(200,160,40,0.2)';roundRect(kx,ky,kw,18,3);ctx.fill();
   ctx.strokeStyle='#c0a030';ctx.lineWidth=1;roundRect(kx,ky,kw,18,3);ctx.stroke();
   ctx.font='bold 10px "Courier New"';ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
   ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
+  const atY=PY+44;ctx.textAlign='center';
+  ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8d8';
+  if(player.activeTools.size>0){
+    const eq=[...player.activeTools].filter(id=>ITEM_DEFS[id]).map(id=>ITEM_DEFS[id].icon+''+ITEM_DEFS[id].nome.split(' ')[0]).join(' ');
+    ctx.fillStyle='#f0c040';ctx.fillText(eq,midX,atY);
+  } else {ctx.fillText('Sem ferramenta',midX,atY);}
+  ctx.textAlign='left';
   if(tools.length>0){
-    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+6,PY+52,PW-12,1);
+    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
     tools.forEach((t,i)=>{
-      const ty=PY+52+8+i*22;ctx.textAlign='center';
-      ctx.font='11px serif';ctx.fillStyle='#f0d060';ctx.fillText(t.icon+' '+t.nome,midX,ty+10);ctx.textAlign='left';
+      const ty=PY+PH_BASE+8+i*22,equipped=player.activeTools.has(t.id);
+      ctx.textAlign='center';ctx.font='11px serif';ctx.fillStyle=equipped?'#f0c040':'#a08040';
+      ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);ctx.textAlign='left';
     });
   }
+
+  // Ouro counter (Level 3)
+  if(level.id===3){
+    const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+    const hasPlaca=player.items.includes('placa_reivindicacao');
+    const ox=W/2+180,oy=48;
+    ctx.fillStyle='rgba(8,4,0,0.85)';roundRect(ox,oy,180,70,6);ctx.fill();
+    ctx.strokeStyle='#e0c040';ctx.lineWidth=1.5;roundRect(ox,oy,180,70,6);ctx.stroke();
+    ctx.font='bold 12px "Courier New"';ctx.fillStyle='#e0c040';
+    ctx.textAlign='center';ctx.fillText('GARIMPAGEM',ox+90,oy+18);ctx.textAlign='left';
+    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(ox+8,oy+24,164,1);
+    for(let i=0;i<3;i++){
+      ctx.fillStyle=i<ouros?'#f0c840':'#334';
+      ctx.font='20px serif';ctx.fillText('◎',ox+14+i*54,oy+50);
+    }
+    ctx.fillStyle=hasPlaca?'#d4a060':'#334';
+    ctx.font='16px serif';ctx.fillText('📋',ox+14+3*54-6,oy+48);
+  }
+
   const hintText=typeof level.hint==='function'?level.hint(player):level.hint;
-  ctx.fillStyle='#b0d080';ctx.font='18px "Courier New"';ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
+  ctx.fillStyle='#b0b0c8';ctx.font='18px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
 }
 
-// ── Tela Título ──────────────────────────────────────────────────
+// ─── TITLE SCREEN ─────────────────────────────────────────────────────────────
 function drawTitle(){
-  const bgCapa=IMG['card21'];
-  const grd=ctx.createLinearGradient(0,0,0,H);
-  grd.addColorStop(0,'#0a1a06');grd.addColorStop(0.5,'#061220');grd.addColorStop(1,'#050308');
-  ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
-  drawStars();drawWind();
-  if(bgCapa){
-    const cardS=200,cardX=W/2-100,cardY=230;
-    const glow=ctx.createRadialGradient(W/2,cardY+100,0,W/2,cardY+100,160);
-    glow.addColorStop(0,'rgba(220,185,40,0.22)');glow.addColorStop(1,'rgba(220,185,40,0)');
-    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+100,160,0,Math.PI*2);ctx.fill();
-    ctx.drawImage(bgCapa,cardX,cardY,cardS,cardS);
-  }
+  drawBg('bg01');
+  ctx.fillStyle='rgba(0,0,0,0.52)';ctx.fillRect(0,0,W,H);
+  drawStars();
   ctx.textAlign='center';
-  ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
-  ctx.fillStyle='#e0b840';ctx.font='bold 20px "Courier New"';ctx.fillText('FASE 2.1',W/2,110);
-  ctx.shadowColor='#ffe060';ctx.shadowBlur=50;
-  ctx.fillStyle='#ffe060';ctx.font='bold 44px "Courier New"';ctx.fillText('O Brilho do American River',W/2,160);
+  ctx.shadowColor='#e0c040';ctx.shadowBlur=40;
+  ctx.fillStyle='#e0c040';ctx.font='bold 46px "Courier New"';ctx.fillText('O Brilho do American River',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#c8a060';ctx.font='19px "Courier New"';ctx.fillText('Sierra Nevada, Califórnia — Janeiro de 1848',W/2,200);
+  ctx.fillStyle='#c8a060';ctx.font='19px "Courier New"';ctx.fillText('Fase 2.1  —  Sierra Nevada, Califórnia',W/2,200);
+  if(IMG.card21){
+    const cardSize=160,cardX=W/2-80,cardY=230;
+    const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
+    glow.addColorStop(0,'rgba(220,185,80,0.25)');glow.addColorStop(1,'rgba(220,185,80,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
+    ctx.drawImage(IMG.card21,cardX,cardY,cardSize,cardSize);
+  }
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para iniciar  ◀',W/2,460);
-  ctx.fillStyle='#c0d0a0';ctx.font='17px "Courier New"';
-  ctx.fillText('← → Mover   ↑ / Espaço Pular   E Interagir   I Diário',W/2,500);
-  ctx.fillText('[M] Menu Principal',W/2,530);
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Garimpar',W/2,500);
+  ctx.fillText('[I] Diário de Bordo   [M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
-// ── Tela Morte ───────────────────────────────────────────────────
+// ─── DEATH SCREEN ─────────────────────────────────────────────────────────────
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msg=cause==='rocha'?'QUE PEDRA!':'VOCÊ CAIU!';
+  const sub=cause==='rocha'?'Cuidado com as rochas afiadas!':'Você caiu no abismo.';
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
-  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);ctx.shadowBlur=0;
-  ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText('O rio te levou. Tente novamente!',W/2,H/2-10);
+  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
   drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
-  ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';ctx.fillText('Pressione R para recomeçar',W/2,H/2+140);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+180);
+  ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
   ctx.textAlign='left';
 }
 
-// ── Tela Conclusão ───────────────────────────────────────────────
+// ─── COMPLETE SCREEN ──────────────────────────────────────────────────────────
 function drawComplete(){
-  const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#080a04');gr.addColorStop(1,'#100c04');ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+  const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#060c04');gr.addColorStop(1,'#180c04');ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
   drawStars();
-  const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);rg.addColorStop(0,'rgba(220,185,40,.14)');rg.addColorStop(1,'rgba(220,185,40,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
-  ctx.textAlign='center';ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
-  ctx.fillStyle='#e0b840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 2.1 CONCLUÍDA  ✦',W/2,110);ctx.shadowBlur=0;
-  drawCorvan(W/2-160,200,4,false,Date.now()/300,'placa');
-  // Placa animada
-  ctx.save();ctx.translate(W/2+80,270);ctx.scale(2.5,2.5);drawPlaca(0,0,Date.now()/600);ctx.restore();
-  ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Brilho do American River foi revelado!',W/2,188);
-  const lines=[
-    '✨  Ouro (Au) — metal mais maleável da natureza',
-    '🪣  Bateia — separa ouro de sedimento pela densidade',
-    '⛏  Picareta — extrai veios de quartzo aurífero',
-    '🪨  Pedra de Toque — distingue ouro de pirita',
-    '📋  Placa de Reivindicação — base do direito mineral EUA',
-  ];
-  ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,240+i*28));
-  ctx.fillStyle='#c0d090';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ✨ ${G.player?.score||0}`,W/2,412);
+  const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);rg.addColorStop(0,'rgba(220,185,80,.16)');rg.addColorStop(1,'rgba(220,185,80,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  ctx.textAlign='center';ctx.shadowColor='#e0c040';ctx.shadowBlur=40;
+  ctx.fillStyle='#e0c040';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 2.1 CONCLUÍDA  ✦',W/2,118);
+  ctx.shadowBlur=0;
+  drawCorvan(W/2-160,200,4,false,Date.now()/300);
+  // Floating placa
+  ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawPlaca(0,0,Date.now()/1000);ctx.restore();
+  ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Brilho do American River foi revelado!',W/2,196);
+  const lines=['🥣  Bateia — separação por densidade no garimpo','◎  Ouro — 1g forma fio de 3km, metal mais maleável','🪨  Pedra de Toque — ensaiadores de 1849 testavam ouro','📋  Placa de Reivindicação — base da lei de propriedade'];
+  ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
+  ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◎ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
   ctx.fillStyle=`rgba(220,185,80,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 2.2 desbloqueada!   [M] Menu Principal',W/2,450);
-  ctx.textAlign='left';
+  ctx.fillText('✦ Fase 2.2 desbloqueada!   [M] Menu Principal',W/2,458);ctx.textAlign='left';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// NÍVEL 1 — Margem do American River (Início)
-// ═══════════════════════════════════════════════════════════════
+// ═══ LEVEL BUILDERS ══════════════════════════════════════════════════════════
+
+// ─── LEVEL 1 — Cena 1: O Início no American River ─────────────────────────────
 function buildL1(){
-  const FL=600,WW=3200,WH=900;
+  const FL=590,WW=3400,WH=900;
   const plats=[
-    solid(0,FL,420,WH-FL),solid(500,FL,200,WH-FL),solid(780,FL,200,WH-FL),
-    solid(1060,FL,220,WH-FL),solid(1360,FL,200,WH-FL),solid(1640,FL,220,WH-FL),
-    solid(1920,FL,240,WH-FL),solid(2220,FL,200,WH-FL),solid(2500,FL,220,WH-FL),
-    solid(2780,FL,560,WH-FL),
-    solid(240,FL-180,130,18),solid(540,FL-240,110,18),solid(780,FL-180,130,18),
-    solid(1040,FL-230,120,18),solid(1280,FL-180,130,18),solid(1560,FL-250,110,18),
-    solid(1760,FL-180,130,18),solid(2060,FL-240,120,18),solid(2320,FL-180,110,18),
+    solid(0,FL,380,WH-FL),solid(460,FL,200,WH-FL),solid(740,FL,200,WH-FL),
+    solid(1020,FL,220,WH-FL),solid(1320,FL,200,WH-FL),solid(1600,FL,220,WH-FL),
+    solid(1900,FL,240,WH-FL),solid(2200,FL,200,WH-FL),solid(2480,FL,220,WH-FL),
+    solid(2760,FL,700,WH-FL),
+    solid(220,FL-200,130,18),solid(500,FL-240,110,18),solid(760,FL-180,130,18),
+    solid(1000,FL-230,120,18),solid(1260,FL-180,130,18),solid(1540,FL-250,110,18),
+    solid(1760,FL-180,130,18),solid(2040,FL-240,120,18),solid(2320,FL-180,110,18),
     solid(2560,FL-240,120,18),
+    solid(400,FL-36,80,14),solid(660,FL-36,80,14),solid(900,FL-36,80,14),
+    solid(1160,FL-36,80,14),solid(1460,FL-36,80,14),solid(1720,FL-36,80,14),
+    solid(2040,FL-36,80,14),solid(2360,FL-36,80,14),solid(2640,FL-36,80,14),
+    movH(1400,FL-120,100,1400,1560,1.8),
+    trap(1100,FL-60,100),
+    spike(860,FL-18,60),
   ];
-  const grizzly={x:2900,y:FL-60,gifted:false};
   const cols=[
-    // bateias e picaretas já vieram da fase 1, mas colocamos 1 de cada para a fase nova
-    new Col(200,FL-50,'bateia'),
-    ...[400,640,900,1180,1440,1720,2000,2280,2540].map(x=>new Col(x,FL-50,'ouro')),
-    new Col(1600,FL-50,'pirita'),
-    new Col(2100,FL-50,'pirita'),
+    ...[100,240,500,780,1060,1360,1660,1960,2260,2580,2820,3000].map(x=>new Col(x,FL-50,'ouro')),
   ];
+  const grizzly={x:3060,y:FL-80,gifted:false};
   const triggers=[
-    new Trigger(3050,FL-200,100,200,'Ir para as Rochas',(player,level)=>{
-      if(!player.items.includes('bateia')){notify('Colete a Bateia primeiro!');return;}
-      if(!player.items.includes('touchstone')){notify('Interaja com o Grizzly para obter a Pedra de Toque!');return;}
-      if(level._enterFired)return;level._enterFired=true;
+    new Trigger(3200,FL-200,120,200,'Avançar para Cena 2',(player,level)=>{
+      if(!player.items.includes('pedra_de_toque')){notify('Interaja com o Grizzly para obter a Pedra de Toque!');return;}
+      if(level._advFired)return;level._advFired=true;
       player.interactAnim=40;sfx('unlock');
       showDialog([
-        '"Sierra Nevada, Califórnia — 24 de janeiro de 1848. James Marshall encontrou pepitas brilhando no canal do moinho de John Sutter neste mesmo rio."',
-        '"Em menos de um ano, mais de 300.000 pessoas vieram de todo o mundo. Esta foi a maior migração voluntária da história americana — a Corrida do Ouro de 1849."',
-        '"Com a Bateia e a Pedra de Toque, estou pronto para examinar os veios de quartzo nas paredes rochosas. O ouro se forma onde o magma encontra a rocha!"',
-      ],()=>{notify('✦ Vamos examinar os veios de quartzo!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+        '"Estamos em janeiro de 1848, às margens do American River, na Sierra Nevada. James Marshall acabou de encontrar algo brilhando no canal do moinho de John Sutter — foi o gatilho da maior migração voluntária da história americana."',
+        '"Em menos de um ano, 300.000 pessoas de todo o mundo vieram para cá. Os \'49ers\', como ficaram conhecidos os garimpeiros de 1849, transformaram a Califórnia para sempre."',
+        '"Logo à frente posso ver veios de quartzo branco nas paredes das rochas. O ouro se formou neles há 120 milhões de anos — preciso examinar esses veios para entender a geologia antes de começar o garimpo!"',
+      ],()=>{notify('✦ Examine os veios de quartzo na próxima área!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
     },true),
   ];
   return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'American River — Início',
+    title:'O Início no American River',
     hint(player){
-      if(!player.items.includes('bateia'))return '🪣 Colete a Bateia →';
-      if(!player.items.includes('touchstone'))return '🐻 Interaja com o Urso Grizzly →';
-      return '→ Avance para os veios de quartzo!';
+      if(!player.items.includes('pedra_de_toque'))return '🐻 Interaja com o Grizzly da Califórnia para a Pedra de Toque →';
+      return '✦ Pedra de Toque obtida — avance para os veios de quartzo →';
     },
-    plats,cols,triggers,grizzly,quartzVein:null,
+    plats,cols,triggers,grizzly,veins:[],panSpots:null,
     intro:[
-      '"Estamos em janeiro de 1848, na Califórnia. Um carpinteiro chamado James Marshall encontrou algo brilhando no canal de um moinho à beira deste rio."',
-      '"Em menos de um ano, mais de 300.000 pessoas vieram de todo o mundo para cá. Esta foi a maior migração voluntária da história americana."',
-      'Colete a 🪣 Bateia e encontre o 🐻 Urso Grizzly da Califórnia para obter a Pedra de Toque!'
+      '"Estamos em 1848, Sierra Nevada, Califórnia. Um carpinteiro chamado James Marshall acabou de descobrir algo que mudaria a história americana para sempre."',
+      '"Em menos de um ano, 300.000 pessoas de todo o mundo virão para cá em busca de ouro. Já carrego a Bateia e a Picareta da expedição anterior."',
+      'Encontre o Grizzly da Califórnia para obter a Pedra de Toque — será essencial para identificar o ouro verdadeiro!'
     ],
-    update(player){tickMoving(this.plats);for(const c of this.cols)c.tick();
+    update(player){
+      tickMoving(this.plats);tickTrapdoors(this.plats);
+      for(const c of this.cols)c.tick();
       const ent=this.triggers[0];
-      if(!ent.done&&!G.dialog&&player.items.includes('bateia')&&player.items.includes('touchstone')){
+      if(!ent.done&&!G.dialog&&player.items.includes('pedra_de_toque')){
         if(player.x+player.w>=ent.x&&player.x<=ent.x+ent.w+80)ent.fn(player,this);
       }
     },
     draw(player){
       drawStars();drawWind();
-      riverAnim++;
-      // Rio decorativo no meio do cenário
-      drawRiverBg(FL-20,WW,riverAnim);
-      // Grizzly
+      drawSignPost(700,FL);
+      // River visual below platforms
+      const ry=FL-cam.y;
+      if(ry>0&&ry<H){
+        ctx.fillStyle='rgba(40,100,160,0.3)';ctx.fillRect(0,ry-12,W,20);
+        drawRiver(FL);
+      }
+      // Grizzly bear
       if(this.grizzly){
         const gx=this.grizzly.x-cam.x,gy=this.grizzly.y-cam.y;
-        if(gx>-120&&gx<W+120){
-          drawGrizzly(gx,gy,Date.now()/400);
+        if(gx>-150&&gx<W+150){
+          drawGrizzly(gx,gy,Date.now()/500);
           if(!this.grizzly.gifted&&Math.abs(player.x-this.grizzly.x)<160){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
             const t2='[E] Interagir com o Grizzly 🐻';const tw=ctx.measureText(t2).width+24;
             roundRect(gx-tw/2,gy-110,tw,24,4);ctx.fill();
-            ctx.strokeStyle='#c0a870';ctx.lineWidth=1.5;roundRect(gx-tw/2,gy-110,tw,24,4);ctx.stroke();
-            ctx.fillStyle='#c0a870';ctx.textAlign='center';ctx.fillText(t2,gx,gy-93);ctx.textAlign='left';
+            ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(gx-tw/2,gy-110,tw,24,4);ctx.stroke();
+            ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,gx,gy-93);ctx.textAlign='left';
           }
           if(this.grizzly.gifted){
-            const ha=Math.abs(Math.sin(Date.now()/1000))*0.7;
-            ctx.fillStyle=`rgba(180,220,100,${ha})`;ctx.font='15px serif';ctx.textAlign='center';
-            ctx.fillText('🐻',gx,gy-100+Math.sin(Date.now()/600)*6);ctx.textAlign='left';
+            ctx.fillStyle='rgba(200,200,100,0.6)';ctx.font='12px "Courier New"';
+            ctx.textAlign='center';ctx.fillText('Boa sorte, garimpeiro! 🐻',gx,gy-90);ctx.textAlign='left';
           }
         }
       }
@@ -919,251 +1204,237 @@ function buildL1(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// NÍVEL 2 — Geologia: Veios de Quartzo na Rocha
-// ═══════════════════════════════════════════════════════════════
+// ─── LEVEL 2 — Cena 2: Os Veios de Quartzo ─────────────────────────────────
 function buildL2(){
-  const FL=600,WW=3200,WH=900;
+  const FL=590,WW=3200,WH=900;
   const plats=[
-    solid(0,FL,320,WH-FL),solid(400,FL,200,WH-FL),solid(680,FL,200,WH-FL),
-    solid(960,FL,220,WH-FL),solid(1260,FL,200,WH-FL),solid(1540,FL,220,WH-FL),
-    solid(1840,FL,200,WH-FL),solid(2120,FL,240,WH-FL),solid(2440,FL,200,WH-FL),
-    solid(2720,FL,200,WH-FL),solid(3000,FL,300,WH-FL),
-    solid(180,FL-200,130,18),solid(440,FL-250,120,18),solid(700,FL-200,120,18),
-    solid(1000,FL-240,120,18),solid(1300,FL-200,130,18),solid(1580,FL-250,110,18),
+    solid(0,FL,340,WH-FL),solid(420,FL,200,WH-FL),solid(700,FL,200,WH-FL),
+    solid(980,FL,220,WH-FL),solid(1260,FL,200,WH-FL),solid(1540,FL,220,WH-FL),
+    solid(1820,FL,200,WH-FL),solid(2100,FL,200,WH-FL),solid(2380,FL,200,WH-FL),
+    solid(2660,FL,600,WH-FL),
+    solid(200,FL-200,130,18),solid(460,FL-250,120,18),solid(720,FL-200,120,18),
+    solid(1020,FL-240,120,18),solid(1300,FL-200,130,18),solid(1580,FL-250,110,18),
     solid(1880,FL-200,120,18),solid(2180,FL-250,120,18),solid(2480,FL-200,110,18),
-    solid(2760,FL-240,120,18),
-    movH(1500,FL-100,90,1500,1660,1.8),
+    solid(340,FL-36,80,14),solid(620,FL-36,80,14),solid(900,FL-36,80,14),
+    solid(1180,FL-36,80,14),solid(1460,FL-36,80,14),solid(1760,FL-36,80,14),
+    solid(2060,FL-36,80,14),solid(2360,FL-36,80,14),solid(2640,FL-36,80,14),
+    movH(1700,FL-100,100,1700,1860,2.0),
+    spike(900,FL-18,60),spike(1780,FL-18,60),
+    trap(1260,FL-60,100),
   ];
-  const quartzVein={x:1600,y:FL-280,done:false,glowT:0};
+  const veins=[
+    new QuartzVein(480,FL-280),
+    new QuartzVein(1080,FL-260),
+    new QuartzVein(1880,FL-270),
+  ];
   const cols=[
-    new Col(200,FL-50,'picareta'),
-    ...[60,380,660,940,1220,1500,1800,2100,2400,2700,2980].map(x=>new Col(x,FL-50,'ouro')),
-    new Col(1200,FL-50,'pirita'),new Col(2200,FL-50,'pirita'),
+    ...[80,220,460,740,1020,1300,1560,1840,2120,2400,2680,2900].map(x=>new Col(x,FL-50,'ouro')),
+    ...[520,1200,2200].map(x=>new Col(x,FL-90,'quartzo_aureo')),
   ];
   const triggers=[
-    new Trigger(3080,FL-200,120,200,'Ir para a Garimpagem',(player,level)=>{
-      if(!player.items.includes('picareta')){notify('Colete a Picareta primeiro!');return;}
-      if(!level.quartzVein.done){notify('Examine o veio de quartzo nas paredes! [E]');return;}
-      if(level._advFired)return;level._advFired=true;
-      sfx('unlock');
+    new Trigger(3000,FL-250,140,250,'Avançar para Cena 3',(player,level)=>{
+      const vDone=level.veins.filter(v=>v.examined).length;
+      if(vDone<2){notify(`Examine mais veios de quartzo! (${vDone}/3)`);return;}
+      if(level._advFired)return;level._advFired=true;sfx('unlock');
       showDialog([
-        '"As paredes rochosas desta região revelam o cinturão de quartzo aurífero — a \'Mother Lode\' — que percorre 200 km sob as encostas da Sierra Nevada."',
-        '"O ouro (Au) não surge solto. Ele se formou há 120 milhões de anos quando fluidos hidrotermais empurrados por atividade magmática se infiltraram nestas fissuras de quartzo."',
-        '"Com a erosão dos rios ao longo de milênios, esses veios foram expostos e os fragmentos de ouro carregados morro abaixo. É por isso que encontramos pepitas no leito do rio!"',
-        '"Agora que entendo a geologia, vamos à garimpagem prática. Com a bateia e a pedra de toque, posso separar o ouro verdadeiro do \'Ouro de Tolo\'!"'
-      ],()=>{notify('✦ Vamos garimpar!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
-    },true),
+        '"Esses veios de quartzo branco com motas douradas são a Mother Lode — o cinturão de 200km de quartzo aurífero que percorre as encostas da Sierra Nevada."',
+        '"O ouro não surge solto. Há 120 milhões de anos, fluidos hidrotermais infiltraram fissuras de quartzo. Com o tempo, a erosão fluvial expôs esses veios e carregou os fragmentos para o leito do rio."',
+        '"Com a bateia, separar ouro do sedimento é questão de densidade: o ouro (19,3 g/cm³) é quase 7 vezes mais denso que a água — ele sempre afunda e fica no centro da bateia!"',
+        '"Mas atenção à pirita — o \'ouro de tolo\'. Parece ouro, mas é FeS₂. A Pedra de Toque do Grizzly vai me salvar de um erro embaraçoso. Vamos ao rio!"',
+      ],()=>{notify('✦ Vá ao leito do rio garimpar!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+    }),
   ];
   return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Geologia — Veios de Quartzo',
+    title:'Os Veios de Quartzo',
     hint(player){
-      if(!player.items.includes('picareta'))return '⛏ Colete a Picareta →';
-      if(!player.quartzVeinDone)return '⛏ Examine o veio de quartzo brilhante [E]';
-      return '→ Avance para a garimpagem!';
+      const vDone=this.veins?this.veins.filter(v=>v.examined).length:0;
+      return vDone<3?`◈ Examine os veios de quartzo [E] (${vDone}/3) →`:'✦ Veios examinados — avance para o garimpo no rio →';
     },
-    plats,cols,triggers,quartzVein,grizzly:null,
+    plats,cols,triggers,veins,grizzly:null,panSpots:null,
     intro:[
-      '"Entramos nas margens rochosas do American River. Aqui estão os veios de quartzo aurífero — a fonte primária do ouro que desceu para o leito do rio."',
-      '"O ouro é o metal mais maleável que existe: 1g pode ser esticado em 3km de fio ou laminado em folha translúcida! Sua densidade de 19,3 g/cm³ é 7× maior que a areia."',
-      'Pegue a ⛏ Picareta e examine o veio de quartzo brilhante!'
+      '"As paredes rochosas próximas ao American River exibem veios brancos de quartzo com motas douradas — é a Mother Lode!"',
+      '"Examine os veios de quartzo [E] para entender como o ouro se formou antes de ir para o leito do rio garimpar.",',
+      'Examine ao menos 2 veios de quartzo para avançar para a garimpagem!'
     ],
-    update(player){tickMoving(this.plats);for(const c of this.cols)c.tick();
-      this.quartzVein.glowT+=0.04;
-      player.quartzVeinDone=this.quartzVein.done;
-      const adv=this.triggers[0];
-      if(!adv.done&&!G.dialog&&player.items.includes('picareta')&&this.quartzVein.done){
-        if(player.x+player.w>=adv.x&&player.x<=adv.x+adv.w+80)adv.fn(player,this);
-      }
-    },
+    update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const v of this.veins)v.tick();for(const c of this.cols)c.tick();},
     draw(player){
-      riverAnim++;drawRiverBg(FL-15,WW,riverAnim);
-      // Veio de quartzo
-      if(!this.quartzVein.done){
-        const qx=this.quartzVein.x-cam.x,qy=this.quartzVein.y-cam.y;
-        if(qx>-100&&qx<W+100){
-          drawQuartzVein(this.quartzVein.x,this.quartzVein.y,this.quartzVein.glowT);
-          if(Math.abs(player.x-this.quartzVein.x)<120){
-            ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
-            const lt='[E] Examinar Veio de Quartzo';const ltw=ctx.measureText(lt).width+24;
-            roundRect(qx-ltw/2,qy-60,ltw,24,4);ctx.fill();
-            ctx.strokeStyle='#f0e060';ctx.lineWidth=1.5;roundRect(qx-ltw/2,qy-60,ltw,24,4);ctx.stroke();
-            ctx.fillStyle='#f0e060';ctx.textAlign='center';ctx.fillText(lt,qx,qy-43);ctx.textAlign='left';
-          }
-        }
-      }
+      drawWind();
+      const ry=FL-cam.y;
+      if(ry>0&&ry<H){ctx.fillStyle='rgba(40,100,160,0.25)';ctx.fillRect(0,ry-10,W,18);drawRiver(FL);}
+      for(const v of this.veins)v.draw();
       for(const c of this.cols)c.draw(player.x,player.y);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// NÍVEL 3 — Coleta: Garimpagem no Rio (Mini-jogo no mundo)
-// ═══════════════════════════════════════════════════════════════
+// ─── LEVEL 3 — Cena 3: Garimpagem no Rio ─────────────────────────────────────
 function buildL3(){
-  const FL=600,WW=3400,WH=900;
+  const FL=590,WW=3200,WH=900;
+  // River level — platforms at water level, some stepping stones
   const plats=[
-    solid(0,FL,320,WH-FL),solid(420,FL,220,WH-FL),solid(700,FL,220,WH-FL),
-    solid(980,FL,220,WH-FL),solid(1260,FL,220,WH-FL),solid(1540,FL,220,WH-FL),
-    solid(1820,FL,220,WH-FL),solid(2100,FL,220,WH-FL),solid(2380,FL,220,WH-FL),
-    solid(2660,FL,220,WH-FL),solid(2940,FL,220,WH-FL),solid(3200,FL,600,WH-FL),
-    solid(200,FL-200,140,18),solid(480,FL-240,130,18),solid(760,FL-200,130,18),
-    solid(1040,FL-240,130,18),solid(1320,FL-200,140,18),solid(1600,FL-240,130,18),
-    solid(1880,FL-200,130,18),solid(2160,FL-240,130,18),solid(2440,FL-200,130,18),
-    solid(2720,FL-240,130,18),solid(3000,FL-200,140,18),
-    solid(320,FL-36,100,14),solid(600,FL-36,100,14),solid(880,FL-36,100,14),
-    solid(1160,FL-36,100,14),solid(1440,FL-36,100,14),solid(1720,FL-36,100,14),
-    solid(2000,FL-36,100,14),solid(2280,FL-36,100,14),solid(2560,FL-36,100,14),
-    solid(2840,FL-36,100,14),
-    movH(1400,FL-110,100,1400,1560,1.2),
+    solid(0,FL,340,WH-FL),solid(420,FL,200,WH-FL),solid(700,FL,200,WH-FL),
+    solid(980,FL,220,WH-FL),solid(1260,FL,200,WH-FL),solid(1540,FL,220,WH-FL),
+    solid(1820,FL,200,WH-FL),solid(2100,FL,240,WH-FL),solid(2380,FL,200,WH-FL),
+    solid(2660,FL,600,WH-FL),
+    // Stepping stones in river
+    solid(340,FL,80,WH-FL),solid(620,FL,80,WH-FL),solid(900,FL,80,WH-FL),
+    solid(1180,FL,80,WH-FL),solid(1460,FL,80,WH-FL),solid(1740,FL,80,WH-FL),
+    solid(2020,FL,80,WH-FL),solid(2300,FL,80,WH-FL),solid(2580,FL,80,WH-FL),
+    // Upper bank ledges
+    solid(200,FL-200,130,18),solid(480,FL-240,120,18),solid(760,FL-200,120,18),
+    solid(1060,FL-230,120,18),solid(1340,FL-200,130,18),
+    movH(1600,FL-130,100,1600,1780,1.8),movH(2400,FL-140,100,2400,2560,1.6),
+    spike(2220,FL-18,60),
+    trap(1040,FL-50,100),
   ];
-  const placaObj={x:3260,y:FL-80,done:false};
+  // Pan spots: ouro, pirita, ouro, ouro, placa_reivindicacao
+  const panSpots=[
+    new PanSpot(420,FL-30,'ouro'),
+    new PanSpot(780,FL-30,'pirita'),
+    new PanSpot(1200,FL-30,'ouro'),
+    new PanSpot(1700,FL-30,'ouro'),
+    new PanSpot(2200,FL-30,'placa_reivindicacao'),
+  ];
   const cols=[
-    ...[60,220,440,700,960,1220,1480,1740,2000,2260,2520,2780,3020].map(x=>new Col(x,FL-50,'ouro')),
-    new Col(600,FL-90,'pirita'),new Col(1400,FL-90,'pirita'),new Col(2200,FL-90,'pirita'),
+    ...[100,240,500,780,1060,1360,1660,1960,2260,2580,2820].map(x=>new Col(x,FL-55,'ouro')),
   ];
   const triggers=[
-    new Trigger(3260,FL-200,160,200,'Concluir Coleta',(player,level)=>{
-      if(!level.placaObj.done){notify('Encontre a Placa de Reivindicação mais à frente!');return;}
-      const goldCount=player.items.filter(i=>i==='ouro_ok'||i==='ouro').length;
-      if(goldCount<1&&player.score<60){notify('Colete mais ouro no caminho!');return;}
-      if(level._finFired)return;level._finFired=true;
-      player.activeTools.clear();player.activeTools.add('placa');
-      sfx('unlock');player.interactAnim=60;
-      for(let i=0;i<18;i++)burst(player.x+20,player.y,'#f0d040',2,5+Math.random()*3);
-      setTimeout(()=>{
-        showDialog([
-          '"Consegui! Esta Placa de Reivindicação pertenceu a um dos 300.000 garimpeiros que transformaram a Califórnia para sempre."',
-          '"O sistema de \'claims\' que emergia aqui — registrar em cartório o direito sobre um trecho de terra — influenciou toda a legislação de propriedade mineral dos Estados Unidos."',
-          '"Mas nem tudo era glória: os povos Miwok e Nisenan, que viviam aqui há milênios, foram expulsos. E a mineração hidráulica destruiu ecossistemas inteiros com toneladas de sedimento."',
-          '"O ouro que brilha nessa bateia carrega também essa sombra histórica. Vamos registrar nossas descobertas!"'
-        ],()=>{
-          unlockPhase('2.2');
-          try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
-          level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);
-        });
-      },1200);
-    },true),
+    new Trigger(3000,FL-250,140,250,'Avançar para Cena 4',(player,level)=>{
+      const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+      if(ouros<3){notify(`Colete mais ouro na bateia! (${ouros}/3)`);return;}
+      if(!player.items.includes('placa_reivindicacao')){notify('Encontre a Placa de Reivindicação no rio!');return;}
+      if(level._advFired)return;level._advFired=true;sfx('unlock');
+      showDialog([
+        '"Consegui! 3 pepitas de ouro e a Placa de Reivindicação de J. W. Garrett, um dos 49ers."',
+        '"A Pedra de Toque do Grizzly me salvou da pirita — o ouro de tolo. Sem ela, poderia ter comemorado e levado para casa FeS₂ sem valor nenhum."',
+        '"A bateia girou e o ouro ficou no centro pela lei da física: densidade. 19,3 g/cm³ contra 2,7 g/cm³ da areia. A diferença de densidade é o melhor detetive de ouro."',
+      ],()=>{notify('✦ Avançando para a conclusão!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),2000);});
+    }),
   ];
   return{id:3,bg:'bg03',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Garimpagem — Coleta no Rio',
+    title:'Garimpagem no Rio',
     hint(player){
-      if(!player.quartzVeinDone&&!player.items.includes('placa'))return '⛏ [E] nos veios brilhantes • 🪨 Pedra de Toque nos minerais suspeitos';
-      return '→ Chegue à Placa de Reivindicação ao fundo!';
+      const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+      const hasPlaca=player.items.includes('placa_reivindicacao');
+      if(ouros<3)return `🥣 Garimpe com a Bateia [E] — Ouro: ${ouros}/3`;
+      if(!hasPlaca)return '📋 Encontre a Placa de Reivindicação mais adiante!';
+      return '✦ Tudo coletado — avance para a conclusão →';
     },
-    plats,cols,triggers,placaObj,grizzly:null,quartzVein:null,
+    plats,cols,triggers,veins:null,panSpots,grizzly:null,
     intro:[
-      '"Agora que entendo a geologia, é hora da garimpagem prática! O ouro que vejo no leito do rio veio dos veios de quartzo que examino."',
-      '"Atenção: nem tudo que brilha é ouro! A pirita — o \'Ouro de Tolo\' — tem aparência similar mas é frágil e deixa traço esverdeado na Pedra de Toque."',
-      'Use a 🪨 Pedra de Toque (pickup) para testar minerais suspeitos. Encontre a 📋 Placa de Reivindicação!'
+      '"Estamos no leito do American River, a garimpagem começa! Uso a bateia para separar o ouro do sedimento pela diferença de densidade."',
+      '"Cuidado: vou encontrar pirita misturada ao ouro! Ela parece ouro mas deixa traço esverdeado na Pedra de Toque. Não me deixo enganar."',
+      'Colete 3 pepitas de ouro e encontre a Placa de Reivindicação para avançar!'
     ],
-    update(player){tickMoving(this.plats);for(const c of this.cols)c.tick();
-      player.quartzVeinDone=true;
-      // Auto-coleta da placa quando jogador chega perto
-      if(!this.placaObj.done&&!G.dialog&&Math.abs(player.x-this.placaObj.x)<140){
-        this.placaObj.done=true;
-        player.items.push('placa');addToInventory(player,'placa');
-        journalCollect('placa_claim');sfx('unlock');player.score+=50;
-        burst(this.placaObj.x,this.placaObj.y,'#d4a060',18,4);
-        showDialog([
-          '"Placa de Reivindicação! Este pedaço de madeira registrava o direito exclusivo de um garimpeiro sobre este trecho do rio."',
-          '"Os miners de 1849 criaram um sistema legal que influenciou toda a legislação de propriedade dos EUA — mas também expulsou os povos nativos de suas terras ancestrais."',
-        ],null);
-      }
-      const fin=this.triggers[0];
-      if(!fin.done&&!G.dialog&&this.placaObj.done){
-        if(player.x+player.w>=fin.x&&player.x<=fin.x+fin.w+80)fin.fn(player,this);
-      }
-    },
+    update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const ps of this.panSpots)ps.tick();for(const c of this.cols)c.tick();},
     draw(player){
-      riverAnim++;drawRiverBg(FL-20,WW,riverAnim);
-      // Placa de Reivindicação
-      if(!this.placaObj.done){
-        const px2=this.placaObj.x-cam.x,py2=this.placaObj.y-cam.y;
-        if(px2>-100&&px2<W+100){
-          ctx.fillStyle='#6a4020';ctx.fillRect(px2-30,py2,60,30);
-          ctx.fillStyle='#8a6040';ctx.fillRect(px2-30,py2,60,5);
-          ctx.save();ctx.translate(px2,py2-10);ctx.scale(2,2);drawPlaca(0,0,Date.now()/600);ctx.restore();
-          ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
-          const lt='📋 Placa de Reivindicação';const ltw=ctx.measureText(lt).width+24;
-          roundRect(px2-ltw/2,py2-70,ltw,24,4);ctx.fill();
-          ctx.strokeStyle='#d4a060';ctx.lineWidth=1.5;roundRect(px2-ltw/2,py2-70,ltw,24,4);ctx.stroke();
-          ctx.fillStyle='#d4a060';ctx.textAlign='center';ctx.fillText(lt,px2,py2-53);ctx.textAlign='left';
-        }
+      // River visual throughout level
+      const ry=FL-cam.y;
+      if(ry>0&&ry<H){
+        ctx.fillStyle='rgba(40,110,180,0.28)';ctx.fillRect(0,ry-14,W,22);
+        ctx.fillStyle='rgba(60,140,200,0.15)';ctx.fillRect(0,ry+8,W,H-(ry+8));
+        drawRiver(FL);
       }
+      drawWind();
+      for(const ps of this.panSpots)ps.draw();
       for(const c of this.cols)c.draw(player.x,player.y);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// NÍVEL 4 — Conclusão e Impacto
-// ═══════════════════════════════════════════════════════════════
+// ─── LEVEL 4 — Cena 4: Conclusão ao Entardecer ────────────────────────────────
 function buildL4(){
-  const FL=600,WW=1600,WH=900;
-  const plats=[solid(0,FL,1600,WH-FL),solid(300,FL-220,160,18),solid(800,FL-180,140,18),solid(1200,FL-240,140,18)];
-  const cols=[...[180,380,580,780,980,1180].map(x=>new Col(x,FL-50,'ouro'))];
+  const FL=590,WW=1400,WH=900;
+  const plats=[
+    solid(0,FL,1400,WH-FL),
+    solid(280,FL-220,160,18),solid(680,FL-180,140,18),solid(1040,FL-240,140,18),
+  ];
+  const cols=[...[180,360,540,720,900,1080].map(x=>new Col(x,FL-50,'ouro'))];
   const celebState={active:false,t:0};
   const triggers=[
-    new Trigger(1380,FL-200,160,200,'Concluir Fase 2.1',(player,level)=>{
-      if(level._finFired)return;level._finFired=true;
-      level.triggers[0].done=true;
-      player.activeTools.clear();player.activeTools.add('placa');
-      celebState.active=true;celebState.t=0;sfx('unlock');
-      for(let i=0;i<20;i++)burst(player.x+20,player.y,'#f0d040',2,5+Math.random()*3);
+    new Trigger(1200,FL-200,140,200,'Concluir Fase 2.1',(player,level)=>{
+      if(!player.items.includes('placa_reivindicacao')){notify('Volte e encontre a Placa de Reivindicação!');return;}
+      const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+      if(ouros<3){notify(`Volte e colete mais ouro! (${ouros}/3)`);return;}
+      if(level._finFired)return;level._finFired=true;level.triggers[0].done=true;
+      celebState.active=true;celebState.t=0;
+      sfx('unlock');
+      for(let i=0;i<20;i++)burst(player.x+20,player.y,'#f0d060',2,5+Math.random()*3);
+      for(let i=0;i<12;i++)burst(player.x+20,player.y,'#e0b840',1,4+Math.random()*3);
       player.interactAnim=60;
       setTimeout(()=>{
         showDialog([
-          '"Consegui! Esta placa pertenceu a um dos 300.000 garimpeiros que transformaram a Califórnia para sempre. Mas o ouro brilha com uma sombra."',
-          '"A pressa pelo ouro teve um custo humano imenso: os povos Miwok e Nisenan, que viviam aqui há milênios, foram expulsos de suas terras ancestrais."',
-          '"E a mineração hidráulica — que os garimpeiros desenvolveram após esgotar os depósitos superficiais — despejou toneladas de sedimento nos rios, destruindo ecossistemas inteiros."',
-          '"A Califórnia se tornou estado em 1850. O ouro que brilhava nessa bateia financiou essa transformação — e carrega também essa sombra histórica."',
+          '"Consegui! Esta Placa de Reivindicação pertenceu a um dos 300.000 garimpeiros que transformaram a Califórnia para sempre."',
+          '"Mas a pressa pelo ouro teve um custo: os povos Miwok e Nisenan, que viviam aqui há milênios, foram expulsos. A mineração hidráulica, desenvolvida quando os depósitos superficiais se esgotaram, despejou toneladas de sedimento nos rios — destruindo ecossistemas inteiros."',
+          '"O Grizzly da Califórnia que me deu a Pedra de Toque foi caçado até a extinção nessa mesma era. O ouro que brilha nessa bateia carrega também essa sombra."',
+          '"Itens registrados no Diário de Bordo. Fase 2.1 concluída!"',
         ],()=>{
-          unlockPhase('2.2');BUBBLE.active=false;G.dialog=false;
+          unlockPhase('2.2');
+          BUBBLE.active=false;G.dialog=false;
           try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
           G.state='complete';
         });
       },1200);
     },true),
   ];
-  return{id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'A Sombra do Ouro — Conclusão',
-    hint(player){return '→ Chegue ao marco final para concluir!';},
-    plats,cols,triggers,grizzly:null,quartzVein:null,celebState,
+  return{id:4,bg:'bg04',W:WW,H:WH,startX:105,startY:FL-90,
+    title:'A Saída do American River',
+    hint(player){
+      const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+      return (player.items.includes('placa_reivindicacao')&&ouros>=3)?'✦ Chegue ao marco final para concluir!':'← Volte e colete o ouro e a Placa de Reivindicação!';
+    },
+    plats,bats:[],cols,triggers,veins:null,panSpots:null,grizzly:null,celebState,
     intro:[
-      '"Corvan emerge do rio com a Placa de Reivindicação. O entardecer da Sierra Nevada pinta o céu de dourado — a ironia não passa desapercebida."',
-      '"Chegue ao marco final para registrar todas as descobertas e refletir sobre o legado da Corrida do Ouro!"',
+      '"Corvan emerge do American River ao entardecer, segurando a Placa de Reivindicação e as pepitas de ouro."',
+      '"Chegue ao marco dourado para registrar todas as descobertas e concluir a Fase 2.1!"',
     ],
-    update(player){for(const c of this.cols)c.tick();if(this.celebState.active)this.celebState.t+=0.06;
+    update(player){
+      for(const c of this.cols)c.tick();
+      if(this.celebState.active)this.celebState.t+=0.06;
       const fim=this.triggers[0];
-      if(!fim.done&&!G.dialog){if(player.x+player.w>=fim.x&&player.x<=fim.x+fim.w+60)fim.fn(player,this);}
+      if(!fim.done&&!G.dialog){
+        const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+        if(player.items.includes('placa_reivindicacao')&&ouros>=3){
+          if(player.x+player.w>=fim.x&&player.x<=fim.x+fim.w+60)fim.fn(player,this);
+        }
+      }
     },
     draw(player){
-      drawStars();drawWind();riverAnim++;
-      drawRiverBg(FL-15,WW,riverAnim);
-      // Marco final
-      const fx=1380-cam.x,fy=FL-cam.y;
+      drawStars();drawWind();
+      // Sunset mountain silhouettes (drawn procedurally as fallback)
+      const sy2=FL-cam.y;
+      if(sy2>50){
+        ctx.fillStyle='rgba(60,100,160,0.2)';ctx.fillRect(0,sy2-14,W,16);
+      }
+      // Marco final dourado
+      const fx=1240-cam.x,fy=FL-cam.y;
       ctx.fillStyle='#7a5020';ctx.fillRect(fx,fy-160,5,160);
       const flagWave=Math.sin(Date.now()/300)*4;
-      ctx.fillStyle='#d4a020';ctx.beginPath();
-      ctx.moveTo(fx+5,fy-158);ctx.lineTo(fx+55,fy-145+flagWave);ctx.lineTo(fx+5,fy-128);ctx.closePath();ctx.fill();
-      ctx.strokeStyle='#f0c040';ctx.lineWidth=1.5;ctx.beginPath();
-      ctx.moveTo(fx+5,fy-158);ctx.lineTo(fx+55,fy-145+flagWave);ctx.lineTo(fx+5,fy-128);ctx.stroke();
+      ctx.fillStyle='#c8a020';
+      ctx.beginPath();ctx.moveTo(fx+5,fy-158);ctx.lineTo(fx+55,fy-145+flagWave);ctx.lineTo(fx+5,fy-128);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#e0c040';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(fx+5,fy-158);ctx.lineTo(fx+55,fy-145+flagWave);ctx.lineTo(fx+5,fy-128);ctx.stroke();
       ctx.save();ctx.translate(fx+28,fy-143+flagWave*0.5);ctx.rotate(flagWave*0.01);
-      ctx.font='bold 10px "Courier New"';ctx.fillStyle='#3a1808';ctx.textAlign='center';ctx.fillText('FIM',0,4);ctx.textAlign='left';ctx.restore();
-
-      // Placa celebração
-      if(player.items.includes('placa')){
-        const now=Date.now()/1000;
+      ctx.font='bold 10px "Courier New"';ctx.fillStyle='#3a1808';
+      ctx.textAlign='center';ctx.fillText('FIM',0,4);ctx.textAlign='left';ctx.restore();
+      const mg=ctx.createRadialGradient(fx+30,fy-80,5,fx+30,fy-80,60);
+      mg.addColorStop(0,'rgba(200,160,40,0.18)');mg.addColorStop(1,'rgba(200,160,40,0)');
+      ctx.fillStyle=mg;ctx.fillRect(fx-30,fy-140,120,160);
+      // Celebração
+      if(this.celebState.active&&player.items.includes('placa_reivindicacao')){
+        const t=this.celebState.t;
         const px2=player.x-cam.x+20,py2=player.y-cam.y;
-        if(this.celebState.active){
-          const t=this.celebState.t;
-          ctx.save();ctx.translate(px2,py2-70+Math.sin(t*2)*10);ctx.rotate(Math.sin(t*1.5)*0.3);ctx.scale(2.5,2.5);drawPlaca(0,0,t);ctx.restore();
-          for(let i=0;i<8;i++){const a=t*0.9+i*(Math.PI*2/8);const sr=40+Math.sin(t*2+i)*8;const sx2=px2+Math.cos(a)*sr,sy2=py2-70+Math.sin(a)*sr;const sa=0.5+Math.abs(Math.sin(t*2.5+i))*0.5;ctx.fillStyle=`rgba(200,160,40,${sa})`;ctx.font='13px serif';ctx.textAlign='center';ctx.fillText('✦',sx2,sy2);ctx.textAlign='left';}
-        } else {
-          const bob=Math.sin(now*2)*5;ctx.save();ctx.translate(px2,py2-52+bob);ctx.rotate(Math.sin(now*1.2)*0.12);ctx.scale(1.5,1.5);drawPlaca(0,0,now);ctx.restore();
+        const tg=ctx.createRadialGradient(px2,py2-70,0,px2,py2-70,70);
+        tg.addColorStop(0,`rgba(220,185,80,${0.3+Math.sin(t*3)*0.15})`);tg.addColorStop(1,'rgba(220,185,80,0)');
+        ctx.fillStyle=tg;ctx.fillRect(px2-70,py2-140,140,140);
+        ctx.save();ctx.translate(px2,py2-65+Math.sin(t*2)*10);ctx.rotate(Math.sin(t*1.5)*0.25);ctx.scale(2.5,2.5);drawPlaca(0,0,t);ctx.restore();
+        for(let i=0;i<8;i++){
+          const a=t*0.9+i*(Math.PI*2/8),sr=40+Math.sin(t*2+i)*8;
+          const s2x=px2+Math.cos(a)*sr,s2y=py2-65+Math.sin(a)*sr;
+          const sa=0.5+Math.abs(Math.sin(t*2.5+i))*0.5;
+          ctx.fillStyle=`rgba(200,160,40,${sa})`;ctx.font='13px serif';ctx.textAlign='center';ctx.fillText('◎',s2x,s2y);ctx.textAlign='left';
         }
       }
       for(const c of this.cols)c.draw(player.x,player.y);
@@ -1172,28 +1443,37 @@ function buildL4(){
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// GAME ENGINE
-// ═══════════════════════════════════════════════════════════════
+// ═══ GAME CONTROLLER ═════════════════════════════════════════════════════════
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
-  dialog:false,deaths:0,timeOnLevel:0,_storedItems:[],_storedScore:0,
+  dialog:false,deaths:0,timeOnLevel:0,_storedItems:[],_storedScore:0,_storedTools:[],
   load(idx){
     this.lvIdx=idx;particles=[];
     tileTheme=TILE_THEMES[idx+1]||TILE_THEMES[1];
     this.level=LEVELS[idx]();cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
-    if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;}
-    // Ferramentas iniciais da Fase 2.1 (vêm da fase 1)
-    if(!this.player.items.includes('bateia')){}
+    if(idx===0){
+      // Phase 2.1 starts with bateia and picareta from Phase 1
+      this.player.items=['bateia','picareta'];
+      this.player.activeTools=new Set(['bateia']);
+    } else {
+      this.player.items=[...this._storedItems];
+      this.player.score=this._storedScore;
+      this.player.activeTools=new Set(this._storedTools||[]);
+    }
     this.dialog=false;this.state='playing';this.timeOnLevel=0;
     BUBBLE.active=false;popup.active=false;
     for(const k in jp)delete jp[k];
     setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},1200);
   },
-  nextLevel(){this._storedItems=[...this.player.items];this._storedScore=this.player.score;
-    if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);else{BUBBLE.active=false;this.dialog=false;this.state='complete';}},
+  nextLevel(){
+    this._storedItems=[...this.player.items];
+    this._storedScore=this.player.score;
+    this._storedTools=[...this.player.activeTools];
+    if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);
+    else{BUBBLE.active=false;this.dialog=false;this.state='complete';}
+  },
   update(){
     if(this.state!=='playing')return;this.timeOnLevel++;
     checkDlg();updateCam(this.player.x,this.level.W);
@@ -1203,8 +1483,8 @@ const G={
   },
   draw(){
     ctx.clearRect(0,0,W,H);
-    if(this.state==='title')    {drawTitle();return;}
-    if(this.state==='complete') {drawComplete();return;}
+    if(this.state==='title'){drawTitle();return;}
+    if(this.state==='complete'){drawComplete();return;}
     drawBg(this.level.bg);
     for(const p of this.level.plats)drawPlatform(p);
     this.level.draw(this.player);
@@ -1220,10 +1500,11 @@ const G={
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
-  if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
-  if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
-  if(G.state==='complete' &&jp['Enter']){
-    unlockPhase('2.2');G.deaths=0;G._storedItems=[];G._storedScore=0;
+  if(G.state==='title'&&(jp['Enter']||jp['Space']))G.load(0);
+  if(G.state==='dead'&&jp['KeyR'])G.load(G.lvIdx);
+  if(G.state==='complete'&&jp['Enter']){
+    unlockPhase('2.2');
+    G.deaths=0;G._storedItems=[];G._storedScore=0;G._storedTools=[];
     window.location.href='../../MenuPrincipal/index.html?unlocked=2.2';
   }
   G.update();G.draw();clearJP();
@@ -1231,8 +1512,8 @@ function loop(){
 
 if(!gameReady){(function loadLoop(){
   if(gameReady)return;requestAnimationFrame(loadLoop);
-  ctx.fillStyle='#0a1006';ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#e0b840';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
+  ctx.fillStyle='#080c04';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#e0c040';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
   ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
   ctx.textAlign='left';
 })();}
