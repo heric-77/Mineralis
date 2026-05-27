@@ -1,11 +1,9 @@
-// ─── SAVE ────────────────────────────────────────────────────────────────────
 const SAVE_KEY='mineralis_save_v3';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
 function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
-// ─── CANVAS ──────────────────────────────────────────────────────────────────
 const W=1280,H=720;
 const wrap=document.getElementById('wrap');
 const canvas=document.getElementById('c');
@@ -23,7 +21,6 @@ function resize(){
 }
 resize();window.addEventListener('resize',resize);
 
-// ─── AUDIO ───────────────────────────────────────────────────────────────────
 let AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
 function sfx(type){
   if(!AC)return;if(AC.state==='suspended')AC.resume();
@@ -42,7 +39,6 @@ function sfx(type){
   o.start(t);o.stop(t+.7);
 }
 
-// ─── ASSETS ──────────────────────────────────────────────────────────────────
 const IMG={};
 let assetsLoaded=0,totalAssets=4,gameReady=false;
 [['bg01','Assets/cena1_31.svg'],['bg02','Assets/cena2_31.svg'],
@@ -55,7 +51,6 @@ let assetsLoaded=0,totalAssets=4,gameReady=false;
 IMG.card31=null;
 (function(){const ci=new Image();ci.onload=()=>{IMG.card31=ci;};ci.onerror=()=>{IMG.card31=null;};ci.src='Assets/3_1_wieliczka.svg';})();
 
-// ─── INPUT ───────────────────────────────────────────────────────────────────
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
@@ -76,7 +71,6 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){for(const k in jp)delete jp[k];}
 
-// ─── ITEM DEFS ────────────────────────────────────────────────────────────────
 const ITEM_DEFS={
   talhadeira:{
     cat:'ferramenta',nome:'Talhadeira de Madeira',icon:'🪓',
@@ -123,7 +117,6 @@ const ITEM_DEFS={
   },
 };
 
-// ─── INVENTORY ────────────────────────────────────────────────────────────────
 const INV={
   open:false,tab:0,cursor:0,
   TABS:[
@@ -233,7 +226,6 @@ const INV={
   }
 };
 
-// ─── PARTICLES ────────────────────────────────────────────────────────────────
 let particles=[];
 function burst(x,y,color,n=8,spd=3.2){
   for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2+Math.random()*.5;
@@ -242,23 +234,20 @@ function burst(x,y,color,n=8,spd=3.2){
 function tickParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;if(p.life<=0)particles.splice(i,1);}}
 function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
 
-// ─── SCREEN SHAKE ─────────────────────────────────────────────────────────────
 let shakeAmt=0,shakeT=0;
 function shake(amt=8,dur=20){shakeAmt=amt;shakeT=dur;}
 function getShake(){if(shakeT>0){shakeT--;return{dx:(Math.random()-.5)*shakeAmt,dy:(Math.random()-.5)*shakeAmt};}shakeAmt=0;return{dx:0,dy:0};}
 
-// ─── CAMERA ───────────────────────────────────────────────────────────────────
 const cam={x:0,y:0};
 function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-cam.x)*0.12;}
 
-// ─── PHYSICS ──────────────────────────────────────────────────────────────────
 const GRAV=0.46,PSPD=5.2,JUMPF=-12.0,MAXFALL=16;
 
 const TILE_THEMES={
-  1:{top:'#4a5050',body:'#252c2c',dark:'#131818'},// exterior stone/snow
-  2:{top:'#6a6050',body:'#36301e',dark:'#1c1810'},// first gallery salt
-  3:{top:'#706050',body:'#3a3020',dark:'#1e1810'},// deep gallery
-  4:{top:'#7a6858',body:'#3e3225',dark:'#221a12'},// cathedral
+  1:{top:'#4a5050',body:'#252c2c',dark:'#131818'},
+  2:{top:'#6a6050',body:'#36301e',dark:'#1c1810'},
+  3:{top:'#706050',body:'#3a3020',dark:'#1e1810'},
+  4:{top:'#7a6858',body:'#3e3225',dark:'#221a12'},
 };
 let tileTheme=TILE_THEMES[1];
 
@@ -293,7 +282,6 @@ function drawPlatform(p){
     }
   }
   ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,4);
-  // Salt crystal deposits on top of platforms (underground only)
   if(tileTheme!==TILE_THEMES[1]){
     ctx.fillStyle='rgba(240,230,220,0.5)';
     for(let i=0;i<Math.floor(p.w/32);i++){
@@ -304,7 +292,6 @@ function drawPlatform(p){
   if(p.moving){ctx.fillStyle='rgba(200,200,240,0.35)';ctx.fillRect(sx,sy,p.w,4);}
 }
 
-// ─── roundRect ────────────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
   ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
@@ -312,7 +299,6 @@ function roundRect(x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
-// ─── DRAW CORVAN (Phase 3.1 tools) ────────────────────────────────────────────
 function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const S=scale;
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
@@ -321,109 +307,80 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const showTalhadeira = activeTool==='talhadeira';
   const showCorda      = activeTool==='corda_de_poco';
   const showLampada    = activeTool==='lampada_de_sal';
-  // Hat
   r(7,3,18,2,'#2a1a08');r(9,1,14,4,'#3a2610');
   r(5,3,22,2,'#4a3010');
   r(13,0,6,3,'#b08030');r(14,0,4,2,'#ffe060');
-  // Face
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Shirt (red)
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
-  // Belt
   r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
-  // Pants (brown/gray)
   r(9,30,14,12,'#5a4030');r(15,36,2,6,'#4a3020');
-  // Left arm
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
-  // Left hand — Talhadeira (chisel)
   if(showTalhadeira){
     const wb=Math.sin(frame*0.25)*2;
-    r(0,24+wb,5,1,'#8a5818');r(0,25+wb,1,10,'#8a5818'); // handle
-    r(-2,22+wb,7,4,'#909090');r(-3,20+wb,2,4,'#b0b0b0'); // chisel head
+    r(0,24+wb,5,1,'#8a5818');r(0,25+wb,1,10,'#8a5818'); 
+    r(-2,22+wb,7,4,'#909090');r(-3,20+wb,2,4,'#b0b0b0'); 
     ctx.fillStyle='rgba(200,200,255,0.4)';ctx.fillRect(-3*S,(20+wb)*S,2*S,2*S);
   }
-  // Right arm
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
-  // Right hand — Corda or Lampada
   if(showCorda){
-    // Rope coil
     ctx.strokeStyle='#b08850';ctx.lineWidth=3*S;
     ctx.beginPath();ctx.arc(30*S,30*S,7*S,0,Math.PI*1.6);ctx.stroke();
     ctx.beginPath();ctx.arc(30*S,30*S,4*S,0.3,Math.PI*1.8);ctx.stroke();
     ctx.fillStyle='#907040';ctx.fillRect(28*S,26*S,4*S,4*S);
   }
   if(showLampada){
-    // Salt lamp: pink crystal block with warm glow
     const lg=lb*0.6;
     ctx.fillStyle=`rgba(255,160,80,${lg})`;ctx.beginPath();ctx.arc(31*S,28*S,9*S,0,Math.PI*2);ctx.fill();
     r(26,24,9,8,'#e8b090');r(27,24,7,3,'#f0c8a0');
-    r(29,32,3,2,'#c09070');// wick base
+    r(29,32,3,2,'#c09070');
     ctx.fillStyle=`rgba(255,200,80,${lb})`;ctx.beginPath();ctx.arc(30*S,31*S,2*S,0,Math.PI*2);ctx.fill();
     ctx.fillStyle=`rgba(255,240,120,${lb*0.7})`;ctx.beginPath();ctx.ellipse(30*S,29*S,1*S,3*S,0,0,Math.PI*2);ctx.fill();
   }
-  // Boots
   r(9,42,6,4,'#2a1408');r(17,42,6,4,'#2a1408');
   r(8,44,8,2,'#1a0808');r(16,44,8,2,'#1a0808');
-  // Lamp glow on hat
   if(showLampada){ctx.fillStyle='#ffe060';ctx.globalAlpha=0.2*lb;ctx.beginPath();ctx.arc(16*S,1*S,5*S,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
   ctx.restore();
 }
 
-// ─── DRAW BISON (NPC — Bisão Europeu Żubr) ────────────────────────────────────
 function drawBison(cx,cy,frame=0){
   ctx.save();ctx.translate(cx,cy);
   const bob=Math.sin(frame*0.7)*1.5;
-  // Body — European bison: heavier front, lower hindquarters
   ctx.fillStyle='#5a4028';ctx.fillRect(-30,-20,60,38);
-  // Distinctive shoulder hump (larger than American bison)
   ctx.fillStyle='#6a5030';ctx.fillRect(-28,-36,36,20);
-  // Shaggy neck/chest fur
   ctx.fillStyle='#4a3018';ctx.fillRect(-30,-22,20,30);
-  // Head — lower and longer than grizzly
   ctx.fillStyle='#6a5030';ctx.fillRect(-36,-40+bob,28,26);
-  // Long snout
   ctx.fillStyle='#7a5a38';ctx.fillRect(-44,-32+bob,22,16);
-  // Eyes
   ctx.fillStyle='#1a1008';ctx.fillRect(-32,-38+bob,7,7);ctx.fillRect(-20,-38+bob,7,7);
   ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillRect(-31,-37+bob,3,3);ctx.fillRect(-19,-37+bob,3,3);
-  // Horns (characteristic upward curl)
   ctx.fillStyle='#3a2810';
   ctx.beginPath();ctx.moveTo(-30,-40+bob);ctx.quadraticCurveTo(-38,-54+bob,-28,-56+bob);ctx.lineTo(-26,-52+bob);ctx.quadraticCurveTo(-34,-52+bob,-28,-42+bob);ctx.fill();
   ctx.beginPath();ctx.moveTo(-18,-40+bob);ctx.quadraticCurveTo(-10,-54+bob,-20,-56+bob);ctx.lineTo(-22,-52+bob);ctx.quadraticCurveTo(-12,-52+bob,-18,-42+bob);ctx.fill();
-  // Nose
   ctx.fillStyle='#1a1008';ctx.fillRect(-42,-28+bob,12,8);
   ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fillRect(-40,-26+bob,4,3);
-  // Legs
   ctx.fillStyle='#4a3018';
   ctx.fillRect(-26,16,12,22);ctx.fillRect(-10,16,12,22);
   ctx.fillRect(8,16,12,22);ctx.fillRect(18,16,12,22);
-  // Tail
   ctx.fillStyle='#5a4028';ctx.fillRect(28,-14,8,16);
   ctx.fillStyle='#3a2818';ctx.fillRect(30,-4,4,8);
-  // Fur texture
   ctx.strokeStyle='rgba(30,20,8,0.35)';ctx.lineWidth=1.5;
   for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(-28+i*9,-18);ctx.lineTo(-26+i*9,12);ctx.stroke();}
   ctx.restore();
 }
 
-// ─── ITEM DRAW FUNCTIONS ──────────────────────────────────────────────────────
 function drawTalhadeira(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
   const glow=ctx.createRadialGradient(0,0,0,0,0,22);
   glow.addColorStop(0,'rgba(180,160,100,0.3)');glow.addColorStop(1,'rgba(180,160,100,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
-  // Wooden handle
   ctx.fillStyle='#9a6828';ctx.fillRect(-4,-24,8,28);
   ctx.fillStyle='#b07838';ctx.fillRect(-3,-22,6,24);
-  // Metal chisel head (flat, beveled)
   ctx.fillStyle='#8888a0';ctx.fillRect(-14,-28,28,8);
   ctx.fillStyle='#a0a0c0';ctx.fillRect(-14,-28,28,4);
-  // Beveled cutting edge
   ctx.fillStyle='#c0c0e0';
   ctx.beginPath();ctx.moveTo(-16,-22);ctx.lineTo(16,-22);ctx.lineTo(12,-18);ctx.lineTo(-12,-18);ctx.closePath();ctx.fill();
   ctx.fillStyle='rgba(255,255,255,0.6)';ctx.beginPath();ctx.arc(-10,-24,2,0,Math.PI*2);ctx.fill();
@@ -435,14 +392,12 @@ function drawCorda(cx,cy,bobT=0){
   const glow=ctx.createRadialGradient(0,0,0,0,0,20);
   glow.addColorStop(0,'rgba(180,150,80,0.3)');glow.addColorStop(1,'rgba(180,150,80,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,20,0,Math.PI*2);ctx.fill();
-  // Rope coil
   ctx.strokeStyle='#c09a50';ctx.lineWidth=4;
   ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*1.7);ctx.stroke();
   ctx.strokeStyle='#a07a30';ctx.lineWidth=4;
   ctx.beginPath();ctx.arc(0,2,9,0.3,Math.PI*1.5);ctx.stroke();
   ctx.strokeStyle='#c09a50';ctx.lineWidth=3;
   ctx.beginPath();ctx.arc(2,4,5,0.6,Math.PI*1.4);ctx.stroke();
-  // Knot
   ctx.fillStyle='#b08840';ctx.beginPath();ctx.arc(-4,-10,4,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#d0a850';ctx.beginPath();ctx.arc(-4,-10,2,0,Math.PI*2);ctx.fill();
   ctx.restore();
@@ -454,15 +409,11 @@ function drawLampada(cx,cy,bobT=0){
   const glow=ctx.createRadialGradient(0,-4,0,0,-4,32);
   glow.addColorStop(0,`rgba(255,160,80,${0.5+Math.sin(t)*0.15})`);glow.addColorStop(0.5,'rgba(240,100,60,0.2)');glow.addColorStop(1,'rgba(240,80,40,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,-4,32,0,Math.PI*2);ctx.fill();
-  // Salt block base (pink halite)
   ctx.fillStyle='#e8b0a0';ctx.fillRect(-11,-4,22,16);
   ctx.fillStyle='#f0c8b8';ctx.fillRect(-11,-4,22,6);
   ctx.fillStyle='#d49080';ctx.fillRect(-11,8,22,4);
-  // Crystal facets
   ctx.fillStyle='rgba(255,220,200,0.7)';ctx.fillRect(-8,-2,6,4);ctx.fillRect(2,2,4,3);
-  // Wick
   ctx.fillStyle='#6a4020';ctx.fillRect(-1,-8,2,8);
-  // Flame
   const fa=0.7+Math.sin(t*2.3)*0.3;
   ctx.fillStyle=`rgba(255,220,80,${fa})`;
   ctx.beginPath();ctx.ellipse(0,-14,4,8,Math.sin(t)*0.3,0,Math.PI*2);ctx.fill();
@@ -483,23 +434,19 @@ function drawHalitaItem(cx,cy,bobT=0,type='cubica'){
   glow.addColorStop(0,cg);glow.addColorStop(1,'rgba(240,230,220,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,24,0,Math.PI*2);ctx.fill();
   if(type==='cubica'){
-    // Perfect cube face
     ctx.fillStyle=c1;ctx.fillRect(-12,-14,24,24);
     ctx.fillStyle=c2;ctx.fillRect(-12,-14,24,8);
     ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillRect(-12,-14,4,24);
-    // Cubic cleavage lines
     ctx.strokeStyle='rgba(180,170,160,0.6)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.stroke();
     ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(0,10);ctx.stroke();
   } else if(type==='tabular'){
-    // Flat tabular plate
     ctx.fillStyle=c1;ctx.fillRect(-16,-6,32,14);
     ctx.fillStyle=c2;ctx.fillRect(-16,-6,32,4);
     ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillRect(-16,-6,8,14);
     ctx.strokeStyle='rgba(160,150,200,0.5)';ctx.lineWidth=1;
     for(let i=1;i<3;i++){ctx.beginPath();ctx.moveTo(-16,-6+i*4);ctx.lineTo(16,-6+i*4);ctx.stroke();}
   } else {
-    // Prismatic column
     ctx.fillStyle=c1;
     ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(10,-8);ctx.lineTo(8,8);ctx.lineTo(-8,8);ctx.lineTo(-10,-8);ctx.closePath();ctx.fill();
     ctx.fillStyle=c2;
@@ -517,29 +464,22 @@ function drawInsignia(cx,cy,bobT=0){
   const glow=ctx.createRadialGradient(0,0,0,0,0,28);
   glow.addColorStop(0,'rgba(180,160,220,0.45)');glow.addColorStop(1,'rgba(120,100,180,0)');
   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fill();
-  // Shield shape
   ctx.fillStyle='#3048a0';
   ctx.beginPath();ctx.moveTo(-14,-16);ctx.lineTo(14,-16);ctx.lineTo(18,-4);
   ctx.lineTo(0,16);ctx.lineTo(-18,-4);ctx.closePath();ctx.fill();
-  // Shield border
   ctx.strokeStyle='#c0b060';ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(-14,-16);ctx.lineTo(14,-16);ctx.lineTo(18,-4);
   ctx.lineTo(0,16);ctx.lineTo(-18,-4);ctx.closePath();ctx.stroke();
-  // Two crossed salt blocks
   ctx.fillStyle='#f0e8d8';
   ctx.save();ctx.translate(-5,-4);ctx.rotate(-0.4);ctx.fillRect(-6,-3,12,6);ctx.restore();
   ctx.save();ctx.translate(2,-2);ctx.rotate(0.4);ctx.fillRect(-6,-3,12,6);ctx.restore();
-  // Gold highlight
   const a=Math.abs(Math.sin(Date.now()/500));
   ctx.strokeStyle=`rgba(220,200,80,${a*0.8})`;ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(8,-14);ctx.lineTo(13,-20);ctx.stroke();
   ctx.restore();
 }
 
-// ─── SALT WALL CLASS ──────────────────────────────────────────────────────────
 class SaltWall{
-  // cleavage: 'cubica'|'tabular'|'prismatica'  humid: bool
-  // correctAngle: 'H'|'V'|'D'
   constructor(x,y,cleavage,humid=false){
     this.x=x;this.y=y;this.w=44;this.h=64;
     this.cleavage=cleavage;this.humid=humid;
@@ -552,10 +492,8 @@ class SaltWall{
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-100||sx>W+100)return;
     const a=this.cracked?0.4:(0.55+Math.abs(Math.sin(this.glowT))*0.35);
-    // Base wall block
     ctx.fillStyle=this.humid?`rgba(80,90,100,${a*0.8})`:`rgba(230,218,200,${a})`;
     ctx.fillRect(sx,sy,this.w,this.h);
-    // Wet patches on humid walls
     if(this.humid){
       ctx.fillStyle=`rgba(40,80,120,${a*0.6})`;
       ctx.fillRect(sx+4,sy+8,14,20);ctx.fillRect(sx+22,sy+18,12,16);
@@ -570,7 +508,6 @@ class SaltWall{
       }
       return;
     }
-    // Crystal facets (visual cleavage indicator)
     if(this.cleavage==='cubica'){
       ctx.strokeStyle=`rgba(180,170,160,${a*0.8})`;ctx.lineWidth=1.5;
       for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(sx,sy+i*22+10);ctx.lineTo(sx+this.w,sy+i*22+10);ctx.stroke();}
@@ -584,17 +521,14 @@ class SaltWall{
         ctx.beginPath();ctx.moveTo(sx+i*16,sy);ctx.lineTo(sx+i*16+8,sy+this.h);ctx.stroke();
       }
     }
-    // Glow
     const cg=ctx.createRadialGradient(sx+22,sy+32,4,sx+22,sy+32,36);
     cg.addColorStop(0,`rgba(255,240,220,${a*0.2})`);cg.addColorStop(1,'rgba(255,240,220,0)');
     ctx.fillStyle=cg;ctx.fillRect(sx-10,sy-10,this.w+20,this.h+20);
-    // Crack visual
     if(this.cracked){
       ctx.strokeStyle='rgba(60,40,20,0.7)';ctx.lineWidth=2;
       ctx.beginPath();ctx.moveTo(sx+10,sy);ctx.lineTo(sx+18,sy+20);ctx.lineTo(sx+12,sy+40);ctx.stroke();
       ctx.beginPath();ctx.moveTo(sx+30,sy+10);ctx.lineTo(sx+24,sy+30);ctx.stroke();
     }
-    // Label
     const ha=0.5+Math.sin(Date.now()/400)*0.5;
     const cleavLabel={cubica:'Clivagem Cúbica [← H]',tabular:'Clivagem Tabular [▲ V]',prismatica:'Cristal Prismático [→ D]'};
     ctx.fillStyle=`rgba(220,210,180,${ha*0.8})`;ctx.font='bold 11px "Courier New"';
@@ -604,7 +538,6 @@ class SaltWall{
   }
 }
 
-// ─── SALT EXPOSITION CLASS (geology teaching) ─────────────────────────────────
 class SaltExposition{
   constructor(x,y,type){this.x=x;this.y=y;this.type=type;this.examined=false;this.glowT=0;}
   tick(){this.glowT+=0.03;}
@@ -613,16 +546,13 @@ class SaltExposition{
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-100||sx>W+100)return;
     const a=this.examined?0.3:(0.5+Math.abs(Math.sin(this.glowT))*0.4);
-    // Crystalline outcrop in wall
     ctx.fillStyle=`rgba(240,230,215,${a})`;
     ctx.beginPath();
     ctx.moveTo(sx-20,sy);ctx.lineTo(sx-10,sy-22);ctx.lineTo(sx+4,sy-28);
     ctx.lineTo(sx+18,sy-18);ctx.lineTo(sx+22,sy+4);ctx.lineTo(sx+8,sy+10);
     ctx.lineTo(sx-14,sy+8);ctx.closePath();ctx.fill();
-    // Pink halite inner
     ctx.fillStyle=`rgba(240,200,185,${a*0.8})`;
     ctx.beginPath();ctx.ellipse(sx+2,sy-6,10,13,0.2,0,Math.PI*2);ctx.fill();
-    // Crystal sparkle
     ctx.fillStyle=`rgba(255,245,235,${a*0.9})`;
     ctx.beginPath();ctx.arc(sx-4,sy-14,3,0,Math.PI*2);ctx.fill();
     ctx.beginPath();ctx.arc(sx+12,sy-10,2.5,0,Math.PI*2);ctx.fill();
@@ -637,7 +567,6 @@ class SaltExposition{
   }
 }
 
-// ─── COL (floating collectible) ───────────────────────────────────────────────
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=34;this.h=34;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
@@ -683,7 +612,6 @@ class Col{
   }
 }
 
-// ─── TRIGGER ─────────────────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn,auto=false){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;this.auto=auto;}
   draw(px,py){
@@ -699,7 +627,6 @@ class Trigger{
   }
 }
 
-// ─── DIALOG BUBBLE ───────────────────────────────────────────────────────────
 function wrapText(text,maxW){
   ctx.font='15px "Courier New"';
   const pars=text.split('\n'),result=[];
@@ -756,7 +683,6 @@ const BUBBLE={
 function showDialog(msgs,cb,speaker='CORVAN',color='#d0a8e0'){BUBBLE.show(msgs,cb,speaker,color);}
 function checkDlg(){if(G.dialog&&!INV.open&&!G.miningWall&&isE())BUBBLE.advance();}
 
-// ─── POPUP & NOTIF ────────────────────────────────────────────────────────────
 let popup={active:false,timer:0,title:'',lines:[],color:'#d0e0f0'};
 function showPopup(title,lines,color,ms=6500){popup={active:true,timer:ms,title,lines,color};}
 function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.timer<=0)popup.active=false;}}
@@ -787,7 +713,6 @@ function drawNotif(){
   ctx.restore();
 }
 
-// ─── ANGLE CHOICE OVERLAY ─────────────────────────────────────────────────────
 function drawAngleChoice(wall){
   if(!wall)return;
   ctx.fillStyle='rgba(0,0,0,0.62)';ctx.fillRect(0,0,W,H);
@@ -826,7 +751,6 @@ function drawAngleChoice(wall){
   ctx.textAlign='left';
 }
 
-// ─── PLAYER ───────────────────────────────────────────────────────────────────
 class Player{
   constructor(x,y){
     this.x=x;this.y=y;this.w=26;this.h=68;
@@ -842,9 +766,7 @@ class Player{
   near(r,d=80){return Math.abs(this.x+20-(r.x+r.w/2))<r.w/2+d&&Math.abs(this.y+40-(r.y+r.h/2))<r.h/2+d;}
 
   update(level){
-    // Angle choice mode
     if(G.miningWall){
-      // Arrow keys choose angle, E confirms
       if(isL())G.angleChoice='H';
       if(isJ())G.angleChoice='V';
       if(isR())G.angleChoice='D';
@@ -877,7 +799,6 @@ class Player{
     }
     if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
 
-    // Auto-collect floating minerals
     const TOOL_TYPES=['talhadeira','corda_de_poco','lampada_de_sal'];
     for(const c of level.cols){
       if(c.done||TOOL_TYPES.includes(c.type))continue;
@@ -892,7 +813,6 @@ class Player{
     }
 
     if(isE()){
-      // Collect tools
       for(const c of level.cols){
         if(c.done||!TOOL_TYPES.includes(c.type))continue;
         if(!this.near({x:c.x,y:c.y,w:c.w,h:c.h},90))continue;
@@ -911,7 +831,6 @@ class Player{
         break;
       }
 
-      // Bison interaction
       if(level.bison&&!level.bison.gifted&&this.near({x:level.bison.x-60,y:level.bison.y-80,w:120,h:80})){
         level.bison.gifted=true;sfx('bison');
         for(let i=0;i<16;i++)burst(level.bison.x,level.bison.y-30,'#f0d0c0',1,2+Math.random()*2);
@@ -923,7 +842,6 @@ class Player{
         ],null,'CORVAN','#d0a8e0');
       }
 
-      // Salt expositions (geology teaching)
       if(level.expositions){
         for(const ex of level.expositions){
           if(!ex.examined&&this.near({x:ex.x-28,y:ex.y-28,w:56,h:56})){
@@ -948,7 +866,6 @@ class Player{
         }
       }
 
-      // Salt wall mining
       if(level.saltWalls&&!G.miningWall){
         for(const w of level.saltWalls){
           if(w.done)continue;
@@ -958,7 +875,6 @@ class Player{
             if(this.activeTools.has('lampada_de_sal')){
               notify('🕯️ Lâmpada detectou umidade! Evite este trecho.');
             } else {
-              // Collapse!
               sfx('colapso');shake(10,30);
               this._hurt(1,level,'colapso');
               burst(w.x+22,w.y,'#808090',14,3);
@@ -967,13 +883,11 @@ class Player{
             }
             break;
           }
-          // Enter angle selection mode
           G.miningWall=w;G.angleChoice=null;G.dialog=true;
           break;
         }
       }
 
-      // Insígnia da Guilda
       if(level.insigniaObj&&!level.insigniaObj.done&&this.near({x:level.insigniaObj.x-40,y:level.insigniaObj.y-40,w:80,h:40})){
         level.insigniaObj.done=true;this.items.push('insignia_guilda');this.score+=80;sfx('unlock');
         burst(level.insigniaObj.x,level.insigniaObj.y,'#c0b0e0',18,3);
@@ -998,7 +912,6 @@ class Player{
 
   _resolveAngle(wall,angle,level){
     if(angle===wall.correctAngle){
-      // Correct! Collect halita
       wall.done=true;sfx('halita');
       burst(wall.x+22,wall.y+32,'#f0e8d0',12,3);
       const type='halita_'+wall.cleavage;
@@ -1013,7 +926,6 @@ class Player{
       const cnt=level.saltWalls.filter(w=>w.done&&!w.humid).length;
       notify(`🧊 ${ITEM_DEFS[type]?.nome} coletada! (${cnt}/3)`);
     } else {
-      // Wrong angle
       sfx('gipso');shake(4,12);
       burst(wall.x+22,wall.y+20,'#d0c8b8',6,1.5);
       wall.cracked=true;
@@ -1052,7 +964,6 @@ class Player{
   }
 }
 
-// ─── DRAW UTILITIES ──────────────────────────────────────────────────────────
 function drawBg(bgKey){
   const img=IMG[bgKey];
   if(img&&img.complete&&img.naturalWidth>0){
@@ -1068,7 +979,6 @@ function drawBg(bgKey){
   ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(0,0,W,H);
 }
 
-// Snow particles for exterior
 let snowP=[];
 function initSnow(){snowP=[];for(let i=0;i<60;i++)snowP.push({x:Math.random()*W,y:Math.random()*H,vy:0.4+Math.random()*0.8,vx:(Math.random()-.5)*0.3,r:1+Math.random()*2});}
 initSnow();
@@ -1081,7 +991,6 @@ function drawSnow(){
   }
 }
 
-// Crystal sparkle particles in underground
 let crystalP=[];
 function initCrystalP(){crystalP=[];for(let i=0;i<50;i++)crystalP.push({wx:Math.random()*3000+100,y:100+Math.random()*400,a:Math.random(),t:Math.random()*Math.PI*2});}
 initCrystalP();
@@ -1094,16 +1003,13 @@ function drawCrystalSparkle(){
   }
 }
 
-// Vignette/lamp light effect for underground levels
 function drawLampLight(player,lampOn){
   if(!lampOn){
-    // Dark underground vignette
     const px=player.x-cam.x+16,py=player.y-cam.y+34;
     const vg=ctx.createRadialGradient(px,py,80,px,py,500);
     vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(0.6,'rgba(0,0,0,0.45)');vg.addColorStop(1,'rgba(0,0,0,0.75)');
     ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   } else {
-    // Warm lamp glow
     const px=player.x-cam.x+16,py=player.y-cam.y+34;
     const lg=ctx.createRadialGradient(px,py,30,px,py,280);
     lg.addColorStop(0,'rgba(255,180,80,0.18)');lg.addColorStop(0.5,'rgba(255,120,40,0.06)');lg.addColorStop(1,'rgba(0,0,0,0)');
@@ -1114,45 +1020,35 @@ function drawLampLight(player,lampOn){
   }
 }
 
-// Mine entrance drawing
 function drawMineEntrance(worldX,floorY){
   const sx=worldX-cam.x,sy=floorY-cam.y;
   if(sx<-200||sx>W+200)return;
-  // Wooden frame around shaft
   ctx.fillStyle='#4a3010';ctx.fillRect(sx-30,sy-80,10,80);ctx.fillRect(sx+20,sy-80,10,80);
   ctx.fillStyle='#5a3818';ctx.fillRect(sx-38,sy-84,76,14);
-  // Shaft opening
   ctx.fillStyle='#050308';ctx.fillRect(sx-20,sy-70,40,72);
-  // Shadows in shaft
   const sg=ctx.createLinearGradient(sx-20,sy-70,sx+20,sy-70);
   sg.addColorStop(0,'rgba(0,0,0,0.6)');sg.addColorStop(0.3,'rgba(0,0,0,0)');sg.addColorStop(0.7,'rgba(0,0,0,0)');sg.addColorStop(1,'rgba(0,0,0,0.6)');
   ctx.fillStyle=sg;ctx.fillRect(sx-20,sy-70,40,72);
-  // Wooden beams inside
   for(let i=0;i<3;i++){ctx.fillStyle='#4a3010';ctx.fillRect(sx-22,sy-60+i*22,44,4);}
   ctx.font='bold 12px "Courier New"';ctx.fillStyle='#c8a060';
   ctx.textAlign='center';ctx.fillText('↓ Wieliczka ↓',sx,sy-92);ctx.textAlign='left';
 }
 
-// Cathedral visual for Level 4
 function drawCathedralDetail(floorY){
-  // Hanging crystal chandelier
   const cx=W/2+cam.x*0.3;
   const cy=80;
   ctx.fillStyle='rgba(240,220,200,0.4)';ctx.fillRect(cx-2,cy-20,4,40);
   const cglow=ctx.createRadialGradient(cx,cy+40,10,cx,cy+40,80);
   cglow.addColorStop(0,'rgba(240,210,180,0.3)');cglow.addColorStop(1,'rgba(240,210,180,0)');
   ctx.fillStyle=cglow;ctx.fillRect(cx-80,cy,160,120);
-  // Crystal arms
   for(let i=0;i<8;i++){
     const a=i/8*Math.PI*2,r=40;
     const ex=cx+Math.cos(a)*r,ey=cy+40+Math.sin(a)*20;
     ctx.strokeStyle='rgba(220,200,180,0.5)';ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(cx,cy+40);ctx.lineTo(ex,ey);ctx.stroke();
-    // Crystal pendant
     ctx.fillStyle='rgba(240,220,210,0.8)';
     ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-4,ey+12);ctx.lineTo(ex+4,ey+12);ctx.closePath();ctx.fill();
   }
-  // Underground lake reflection
   const ly=floorY-cam.y+20;
   if(ly>0&&ly<H){
     const lg=ctx.createLinearGradient(0,ly,0,ly+60);
@@ -1165,7 +1061,6 @@ function drawCathedralDetail(floorY){
   }
 }
 
-// ─── HUD ──────────────────────────────────────────────────────────────────────
 function drawHUD(player,level){
   ctx.fillStyle='rgba(6,4,10,0.85)';ctx.fillRect(0,0,W,38);
   ctx.fillStyle='rgba(160,120,200,0.2)';ctx.fillRect(0,36,W,2);
@@ -1181,7 +1076,6 @@ function drawHUD(player,level){
   ctx.fillStyle='#d0a8e0';ctx.font='bold 20px "Courier New"';
   ctx.textAlign='right';ctx.fillText('🧊 '+player.score,W-14,26);ctx.textAlign='left';
 
-  // Mini tool panel
   const PX=12,PY=46,PW=190,PH_BASE=52;
   const TOOL_DEFS=[{id:'talhadeira',icon:'🪓',nome:'Talhadeira'},{id:'corda_de_poco',icon:'🪢',nome:'Corda'},{id:'lampada_de_sal',icon:'🕯️',nome:'Lâmpada'}];
   const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
@@ -1215,7 +1109,6 @@ function drawHUD(player,level){
     });
   }
 
-  // Halita counter (Level 3)
   if(level.id===3){
     const halitas=['halita_cubica','halita_tabular','halita_prismatica'].map(k=>player.items.includes(k)?1:0);
     const hasInsignia=player.items.includes('insignia_guilda');
@@ -1239,7 +1132,6 @@ function drawHUD(player,level){
   ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
 }
 
-// ─── TITLE SCREEN ─────────────────────────────────────────────────────────────
 function drawTitle(){
   drawBg('bg01');
   ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,H);
@@ -1256,7 +1148,6 @@ function drawTitle(){
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
     ctx.drawImage(IMG.card31,cardX,cardY,cs,cs);
   } else {
-    // Draw decorative salt crystal instead of card
     ctx.save();ctx.translate(W/2,310);ctx.scale(3,3);drawHalitaItem(0,0,Date.now()/1000,'prismatica');ctx.restore();
   }
   ctx.fillStyle=`rgba(200,180,240,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
@@ -1267,7 +1158,6 @@ function drawTitle(){
   ctx.textAlign='left';
 }
 
-// ─── DEATH SCREEN ─────────────────────────────────────────────────────────────
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
   const cause=G.player?.deathCause||'queda';
@@ -1284,10 +1174,8 @@ function drawDeath(){
   ctx.textAlign='left';
 }
 
-// ─── COMPLETE SCREEN ──────────────────────────────────────────────────────────
 function drawComplete(){
   const gr=ctx.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#060410');gr.addColorStop(1,'#100818');ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
-  // Crystal sparkle background
   drawCrystalSparkle();
   const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);rg.addColorStop(0,'rgba(180,140,220,.18)');rg.addColorStop(1,'rgba(180,140,220,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#d0a8e0';ctx.shadowBlur=40;
@@ -1303,9 +1191,7 @@ function drawComplete(){
   ctx.fillText('✦ Fase 3.2 desbloqueada!   [M] Menu Principal',W/2,458);ctx.textAlign='left';
 }
 
-// ═══ LEVEL BUILDERS ══════════════════════════════════════════════════════════
 
-// ─── LEVEL 1 — Cena 1: Entrada de Wieliczka ───────────────────────────────────
 function buildL1(){
   const FL=570,WW=3200,WH=900;
   const plats=[
@@ -1366,15 +1252,11 @@ function buildL1(){
     },
     draw(player){
       drawSnow();
-      // Sky horizon
       const hg=ctx.createLinearGradient(0,0,0,200);hg.addColorStop(0,'rgba(80,100,140,0.35)');hg.addColorStop(1,'rgba(80,100,140,0)');
       ctx.fillStyle=hg;ctx.fillRect(0,0,W,200);
-      // Distant Kraków silhouette
       ctx.fillStyle='rgba(40,50,70,0.5)';
       for(let i=0;i<12;i++){const bx=i*110-cam.x*0.05-40,bh=30+Math.sin(i*2.1)*15;ctx.fillRect(bx,H/2-bh,18,bh);}
-      // Mine entrance
       drawMineEntrance(3080,FL);
-      // Bison NPC
       if(this.bison){
         const gx=this.bison.x-cam.x,gy=this.bison.y-cam.y;
         if(gx>-200&&gx<W+200){
@@ -1398,14 +1280,12 @@ function buildL1(){
   };
 }
 
-// ─── LEVEL 2 — Cena 2: As Galerias de Cristal ─────────────────────────────────
 function buildL2(){
   const FL=580,WW=2800,WH=900;
   const plats=[
     solid(0,FL,300,WH-FL),solid(380,FL,200,WH-FL),solid(660,FL,200,WH-FL),
     solid(940,FL,220,WH-FL),solid(1220,FL,200,WH-FL),solid(1500,FL,220,WH-FL),
     solid(1780,FL,200,WH-FL),solid(2060,FL,200,WH-FL),solid(2340,FL,520,WH-FL),
-    // Upper platforms
     solid(180,FL-200,130,18),solid(420,FL-250,120,18),solid(700,FL-200,120,18),
     solid(1000,FL-240,120,18),solid(1280,FL-200,130,18),solid(1560,FL-250,110,18),
     solid(1840,FL-200,120,18),
@@ -1414,9 +1294,8 @@ function buildL2(){
     movH(1600,FL-120,100,1600,1760,1.9),
     spike(860,FL-18,60),spike(1700,FL-18,50),
     trap(1180,FL-60,100),
-    // Lower rope section
-    solid(1980,FL+80,200,WH-FL-80),// step down
-    solid(2160,FL+160,200,WH-FL-160),// another step
+    solid(1980,FL+80,200,WH-FL-80),
+    solid(2160,FL+160,200,WH-FL-160),
   ];
   const expositions=[
     new SaltExposition(380,FL-260,'halita'),
@@ -1454,11 +1333,9 @@ function buildL2(){
       for(const ex of this.expositions)ex.tick();
     },
     draw(player){
-      // Underground crystals on ceiling
       const lampOn=player.activeTools.has('lampada_de_sal');
       drawLampLight(player,lampOn);
       drawCrystalSparkle();
-      // Ceiling crystals
       ctx.fillStyle='rgba(230,218,202,0.25)';
       for(let i=0;i<20;i++){
         const cx=(i*140+70)-cam.x,cy=50+Math.sin(i*1.7)*30;
@@ -1471,14 +1348,12 @@ function buildL2(){
   };
 }
 
-// ─── LEVEL 3 — Cena 3: A Câmara de Coleta ────────────────────────────────────
 function buildL3(){
   const FL=580,WW=2800,WH=900;
   const plats=[
     solid(0,FL,280,WH-FL),solid(360,FL,200,WH-FL),solid(640,FL,200,WH-FL),
     solid(920,FL,220,WH-FL),solid(1200,FL,200,WH-FL),solid(1480,FL,220,WH-FL),
     solid(1760,FL,200,WH-FL),solid(2040,FL,240,WH-FL),solid(2320,FL,520,WH-FL),
-    // Upper ledges
     solid(160,FL-200,130,18),solid(400,FL-250,120,18),solid(680,FL-200,120,18),
     solid(980,FL-240,120,18),solid(1260,FL-200,130,18),solid(1540,FL-250,110,18),
     solid(1820,FL-200,120,18),solid(2100,FL-240,130,18),
@@ -1489,13 +1364,12 @@ function buildL3(){
     spike(2100,FL-18,60),
     trap(940,FL-50,100),
   ];
-  // Salt walls: 3 dry (one each type) + 2 humid
   const saltWalls=[
     new SaltWall(440,FL-120,'cubica',false),
     new SaltWall(900,FL-160,'tabular',false),
     new SaltWall(1340,FL-120,'prismatica',false),
-    new SaltWall(680,FL-110,'cubica',true),// humid zone
-    new SaltWall(1160,FL-130,'tabular',true),// humid zone
+    new SaltWall(680,FL-110,'cubica',true),
+    new SaltWall(1160,FL-130,'tabular',true),
   ];
   const insigniaObj={x:2200,y:FL-80,done:false};
   const triggers=[
@@ -1539,7 +1413,6 @@ function buildL3(){
       const lampOn=player.activeTools.has('lampada_de_sal');
       drawLampLight(player,lampOn);
       drawCrystalSparkle();
-      // Ceiling crystal formations
       ctx.fillStyle='rgba(235,220,208,0.28)';
       for(let i=0;i<25;i++){
         const cx=(i*112+56)-cam.x,cy=40+Math.sin(i*2.3)*40;
@@ -1547,7 +1420,6 @@ function buildL3(){
         const ch=14+Math.sin(i*1.1)*8;
         ctx.beginPath();ctx.moveTo(cx-4,cy);ctx.lineTo(cx,cy+ch);ctx.lineTo(cx+4,cy);ctx.closePath();ctx.fill();
       }
-      // Insígnia chamber entrance hint
       if(this.insigniaObj&&!this.insigniaObj.done){
         const ix=this.insigniaObj.x-cam.x,iy=this.insigniaObj.y-cam.y;
         if(ix>-60&&ix<W+60){
@@ -1568,7 +1440,6 @@ function buildL3(){
   };
 }
 
-// ─── LEVEL 4 — Cena 4: A Câmara-Catedral ─────────────────────────────────────
 function buildL4(){
   const FL=580,WW=1600,WH=900;
   const plats=[
@@ -1627,23 +1498,18 @@ function buildL4(){
     },
     draw(player){
       const lampOn=player.activeTools.has('lampada_de_sal');
-      // In the cathedral, partial lamp light even without lamp (ambient crystal glow)
       drawLampLight(player,true);
       drawCrystalSparkle();
-      // Cathedral details
       drawCathedralDetail(FL);
-      // Salt reliefs on walls (angel sculptures)
       ctx.fillStyle='rgba(238,228,215,0.25)';
       for(let i=0;i<4;i++){
         const rx=160+i*340-cam.x,ry=FL-cam.y-60;
         if(rx<-80||rx>W+80)continue;
-        // Simple angel silhouette
         ctx.beginPath();ctx.arc(rx,ry-40,16,0,Math.PI*2);ctx.fill();
         ctx.fillRect(rx-14,ry-26,28,30);
         ctx.beginPath();ctx.ellipse(rx-24,ry-36,14,8,0.5,0,Math.PI);ctx.fill();
         ctx.beginPath();ctx.ellipse(rx+24,ry-36,14,8,-0.5,0,Math.PI);ctx.fill();
       }
-      // Final altar golden pillar
       const fx=1420-cam.x,fy=FL-cam.y;
       ctx.fillStyle='#6a4818';ctx.fillRect(fx,fy-180,6,180);
       const flagWave=Math.sin(Date.now()/300)*4;
@@ -1656,7 +1522,6 @@ function buildL4(){
       const mg=ctx.createRadialGradient(fx+30,fy-90,5,fx+30,fy-90,70);
       mg.addColorStop(0,'rgba(180,140,220,0.22)');mg.addColorStop(1,'rgba(180,140,220,0)');
       ctx.fillStyle=mg;ctx.fillRect(fx-30,fy-160,120,160);
-      // Celebration
       if(this.celebState.active){
         const t=this.celebState.t;
         const px2=player.x-cam.x+20,py2=player.y-cam.y;
@@ -1677,7 +1542,6 @@ function buildL4(){
   };
 }
 
-// ═══ GAME CONTROLLER ═════════════════════════════════════════════════════════
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title',lvIdx:0,level:null,player:null,
@@ -1690,7 +1554,6 @@ const G={
     this.player=new Player(this.level.startX,this.level.startY);
     this.miningWall=null;this.angleChoice=null;
     if(idx===0){
-      // Phase 3.1 starts fresh
       this.player.items=[];
       this.player.activeTools=new Set();
     } else {
@@ -1732,7 +1595,6 @@ const G={
     drawHUD(this.player,this.level);
     drawPopup();BUBBLE.draw(this.player);drawNotif();
     INV.draw(this.player);
-    // Angle choice overlay on top of everything
     if(this.miningWall)drawAngleChoice(this.miningWall);
     ctx.restore();
   }
