@@ -58,7 +58,7 @@ IMG.card21=null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -123,13 +123,22 @@ const INV={
     const cat=this.TABS[this.tab].id;
     let saved={};
     try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
-    return Object.entries(ITEM_DEFS).filter(([id,def])=>{
+    // Mescla global + local sem duplicar journalIds (local tem prioridade)
+    const _seenJids=new Set(Object.values(ITEM_DEFS).map(d=>d.journalId||'').filter(Boolean));
+    const _FINAL={...ITEM_DEFS};
+    for(const [id,def] of Object.entries(window.ALL_ITEM_DEFS||{})){
+      if(id in ITEM_DEFS)continue;
+      const jid=def.journalId||id;
+      if(_seenJids.has(jid))continue;
+      _seenJids.add(jid);_FINAL[id]=def;
+    }
+    return Object.entries(_FINAL).filter(([id,def])=>{
       if(def.cat!==cat)return false;
       return player.items.includes(id)||player.items.includes(id+'_ok')||player.items.includes(id+'_col')||saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
-  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open;},
-  close(){this.open=false;G.dialog=false;},
+  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
+  close(){this.open=false;G.dialog=BUBBLE.active;},
   isUpKey(){return jp['ArrowUp']||jp['KeyW'];},
   isDownKey(){return jp['ArrowDown']||jp['KeyS'];},
   isLeftKey(){return jp['ArrowLeft']||jp['KeyA'];},
@@ -296,58 +305,26 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
   const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
   const lb=0.7+Math.sin(frame*0.4)*0.3;
-  const showPickaxe   = activeTool==='picareta';
-  const showBateia    = activeTool==='bateia';
-  const showPedra     = activeTool==='pedra_de_toque';
-  // Hat
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
-  // Hat brim decorative — miners' hat adapted (no feather, simple wide brim)
   r(5,3,22,2,'#5a3a10');
   r(13,0,6,3,'#c89820');r(14,0,4,2,'#ffe060');
-  // Face
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Shirt (red — same as Phase 1.1)
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
-  // Belt
   r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
-  // Pants (brown)
   r(9,30,14,12,'#6a4820');r(15,36,2,6,'#5a3810');
-  // Left arm
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
-  // Left hand tool
-  if(showPickaxe){
-    const wb=Math.sin(frame*0.2)*1.5;
-    r(0,24+wb,6,1,'#7a4818');r(0,25+wb,1,7,'#7a4818');
-    r(0,22+wb,6,3,'#888888');r(4,20+wb,2,3,'#aaaaaa');
-  } else if(showPedra){
-    // Pedra de toque na mão esquerda — pequena pedra escura
-    r(1,25,5,4,'#302820');r(0,24,7,2,'#443830');
-    ctx.fillStyle='rgba(220,180,40,0.6)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(1*S,26*S);ctx.lineTo(6*S,28*S);ctx.stroke();
-  }
-  // Right arm
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
-  // Right hand tool
-  if(showBateia){
-    // Bateia na mão direita — pan redonda
-    ctx.fillStyle='#7a5a30';
-    ctx.beginPath();ctx.ellipse(29*S,34*S,10*S,5*S,0.2,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#5a4020';
-    ctx.beginPath();ctx.ellipse(29*S,33*S,7*S,3*S,0.2,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='rgba(160,210,230,0.35)';
-    ctx.beginPath();ctx.ellipse(28*S,33*S,4*S,2*S,0.2,0,Math.PI*2);ctx.fill();
-  }
-  // Boots
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
-  // Hat glow
   ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
-  ctx.globalAlpha=1;ctx.restore();
+  ctx.globalAlpha=1;
+  _drawCorvanTools(activeTool,S,frame,lb);
+  ctx.restore();
 }
 
 // ─── ITEM DRAW FUNCTIONS ──────────────────────────────────────────────────────
@@ -418,16 +395,42 @@ function drawPirita(cx,cy,bobT=0){
 
 function drawPedraDeToque(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,0,0,0,0,18);
-  glow.addColorStop(0,'rgba(80,60,40,0.3)');glow.addColorStop(1,'rgba(60,40,20,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#282018';
-  ctx.beginPath();ctx.moveTo(-14,-5);ctx.lineTo(14,-8);ctx.lineTo(16,5);ctx.lineTo(-12,7);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#3c3028';
-  ctx.beginPath();ctx.moveTo(-12,-3);ctx.lineTo(12,-6);ctx.lineTo(10,-1);ctx.lineTo(-10,-1);ctx.closePath();ctx.fill();
-  // Gold streak on stone
-  ctx.strokeStyle='rgba(220,185,50,0.75)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(-7,1);ctx.lineTo(7,3);ctx.stroke();
+  // Glow externo — aura dourada pulsante
+  const pulse=0.18+Math.abs(Math.sin(bobT*0.9))*0.18;
+  const glow=ctx.createRadialGradient(0,0,0,0,0,28);
+  glow.addColorStop(0,`rgba(200,160,30,${pulse})`);
+  glow.addColorStop(1,'rgba(160,120,10,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fill();
+  // Sombra base
+  ctx.fillStyle='rgba(0,0,0,0.25)';
+  ctx.beginPath();ctx.ellipse(0,10,16,5,0,0,Math.PI*2);ctx.fill();
+  // Corpo da pedra — forma irregular escura (basalto negro)
+  ctx.fillStyle='#18140c';
+  ctx.beginPath();
+  ctx.moveTo(-15,-8);ctx.lineTo(-8,-14);ctx.lineTo(4,-16);ctx.lineTo(15,-10);
+  ctx.lineTo(17,3);ctx.lineTo(10,10);ctx.lineTo(-6,11);ctx.lineTo(-16,4);
+  ctx.closePath();ctx.fill();
+  // Face superior com textura granulada
+  ctx.fillStyle='#2a2418';
+  ctx.beginPath();
+  ctx.moveTo(-13,-7);ctx.lineTo(-6,-12);ctx.lineTo(4,-14);ctx.lineTo(13,-9);
+  ctx.lineTo(14,1);ctx.lineTo(8,7);ctx.lineTo(-5,8);ctx.lineTo(-13,3);
+  ctx.closePath();ctx.fill();
+  // Reflexo mineral na superfície
+  ctx.fillStyle='rgba(80,70,55,0.6)';
+  ctx.beginPath();ctx.ellipse(-4,-5,5,3,-0.4,0,Math.PI*2);ctx.fill();
+  // Riscos de teste — traço dourado (ouro puro) já feito
+  ctx.strokeStyle='rgba(225,185,40,0.95)';ctx.lineWidth=2.2;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(8,2);ctx.stroke();
+  // Segundo traço — resultado prateado (prata)
+  ctx.strokeStyle='rgba(180,190,210,0.8)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(-7,4);ctx.lineTo(5,5);ctx.stroke();
+  // Micro-brilhos na superfície
+  const sa=0.4+Math.abs(Math.sin(bobT*1.3))*0.5;
+  ctx.fillStyle=`rgba(255,230,100,${sa})`;
+  ctx.beginPath();ctx.arc(-5,-3,1.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=`rgba(255,230,100,${sa*0.6})`;
+  ctx.beginPath();ctx.arc(7,-1,1,0,Math.PI*2);ctx.fill();
   ctx.restore();
 }
 
@@ -465,37 +468,144 @@ function drawQuartzoItem(cx,cy,bobT=0){
 // ─── GRIZZLY BEAR NPC ─────────────────────────────────────────────────────────
 function drawGrizzly(cx,cy,frame=0){
   ctx.save();ctx.translate(cx,cy);
-  const bob=Math.sin(frame)*2;
-  // Body hump (characteristic of grizzly)
-  ctx.fillStyle='#5a4838';ctx.fillRect(-26,-24,52,42);
-  ctx.fillStyle='#6a5848';ctx.fillRect(-22,-30,44,12);// shoulder hump
-  // Legs
-  ctx.fillStyle='#4a3828';
-  ctx.fillRect(-24,14,16,26);ctx.fillRect(-6,14,16,26);
-  ctx.fillRect(6,14,16,26);ctx.fillRect(18,14,16,26);
-  // Head
-  ctx.fillStyle='#6a5848';ctx.fillRect(-20,-56+bob,40,32);
-  // Snout
-  ctx.fillStyle='#7a6858';ctx.fillRect(-14,-44+bob,28,22);
-  // Eyes
-  ctx.fillStyle='#1a1008';
-  ctx.fillRect(-14,-50+bob,9,9);ctx.fillRect(5,-50+bob,9,9);
-  ctx.fillStyle='rgba(255,255,255,0.35)';
-  ctx.fillRect(-12,-48+bob,4,4);ctx.fillRect(7,-48+bob,4,4);
-  // Ears
-  ctx.fillStyle='#5a4838';ctx.fillRect(-24,-62+bob,16,16);ctx.fillRect(8,-62+bob,16,16);
-  ctx.fillStyle='#7a6060';ctx.fillRect(-21,-59+bob,10,10);ctx.fillRect(11,-59+bob,10,10);
-  // Nose
-  ctx.fillStyle='#1a1008';ctx.fillRect(-8,-34+bob,16,10);
-  ctx.fillStyle='#2a2018';ctx.beginPath();ctx.ellipse(0,-29+bob,6,4,0,0,Math.PI*2);ctx.fill();
-  // Fur texture lines
-  ctx.strokeStyle='rgba(40,30,20,0.3)';ctx.lineWidth=1.5;
-  for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-22+i*9,-22);ctx.lineTo(-20+i*9,12);ctx.stroke();}
-  // California star badge (fun detail — CA flag reference)
+  const bob=Math.sin(frame*0.7)*2.5;
+  const S=1; // escala base
+
+  // Sombra no chão
+  ctx.fillStyle='rgba(0,0,0,0.22)';
+  ctx.beginPath();ctx.ellipse(0,22,34,8,0,0,Math.PI*2);ctx.fill();
+
+  // === PATAS TRASEIRAS ===
+  ctx.fillStyle='#3e2e1c';
+  ctx.beginPath();ctx.ellipse(-16,20,9,12,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(16,20,9,12,0,0,Math.PI*2);ctx.fill();
+  // garras traseiras
+  ctx.fillStyle='#1a120a';
+  for(let g=-1;g<=1;g++){
+    ctx.beginPath();ctx.ellipse(-16+g*5,30,2.5,3.5,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(16+g*5,30,2.5,3.5,0,0,Math.PI*2);ctx.fill();
+  }
+
+  // === CORPO PRINCIPAL ===
+  // camada de pelo mais escura (fundo)
+  ctx.fillStyle='#3e2e1c';
+  ctx.beginPath();ctx.ellipse(0,-2,32,28,0,0,Math.PI*2);ctx.fill();
+  // pelo médio
+  ctx.fillStyle='#5a4230';
+  ctx.beginPath();ctx.ellipse(0,-4,28,24,0,0,Math.PI*2);ctx.fill();
+  // destaque dorsal (pelo mais claro no topo — típico do grizzly)
+  ctx.fillStyle='#7a6248';
+  ctx.beginPath();ctx.ellipse(0,-14,22,12,0,0,Math.PI*2);ctx.fill();
+
+  // === CORCOVA DO OMBRO (característica do grizzly) ===
+  ctx.fillStyle='#4e3824';
+  ctx.beginPath();ctx.ellipse(0,-22,26,14,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#6a5240';
+  ctx.beginPath();ctx.ellipse(0,-24,20,10,0,0,Math.PI*2);ctx.fill();
+  // pelo prateado na corcova (grizzly = "grisalho")
+  ctx.fillStyle='rgba(180,165,140,0.35)';
+  ctx.beginPath();ctx.ellipse(2,-26,14,7,-0.2,0,Math.PI*2);ctx.fill();
+
+  // === PATAS DIANTEIRAS ===
+  ctx.fillStyle='#4a3420';
+  ctx.beginPath();ctx.ellipse(-28,-4,9,14,-0.2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(28,-4,9,14,0.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#3a2818';
+  ctx.beginPath();ctx.ellipse(-29,8,8,6,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(29,8,8,6,0,0,Math.PI*2);ctx.fill();
+  // garras dianteiras
+  ctx.fillStyle='#1a120a';
+  for(let g=-1;g<=1;g++){
+    ctx.beginPath();ctx.ellipse(-29+g*5,14,2.5,4,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(29+g*5,14,2.5,4,0,0,Math.PI*2);ctx.fill();
+  }
+
+  // === TEXTURA DE PELO (linhas) ===
+  ctx.strokeStyle='rgba(30,20,10,0.22)';ctx.lineWidth=1.2;
+  for(let i=0;i<7;i++){
+    const x=-24+i*8;
+    ctx.beginPath();ctx.moveTo(x,-18);ctx.quadraticCurveTo(x+2,-2,x-1,14);ctx.stroke();
+  }
+  // Pelos laterais mais claros
+  ctx.strokeStyle='rgba(130,100,70,0.18)';ctx.lineWidth=1;
+  for(let i=0;i<4;i++){
+    ctx.beginPath();ctx.moveTo(-20+i*12,-8);ctx.lineTo(-18+i*12,6);ctx.stroke();
+  }
+
+  // === CABEÇA ===
+  // pescoço
+  ctx.fillStyle='#4e3824';
+  ctx.beginPath();ctx.ellipse(0,-34+bob,18,10,0,0,Math.PI*2);ctx.fill();
+  // cabeça principal
+  ctx.fillStyle='#5a4230';
+  ctx.beginPath();ctx.ellipse(0,-50+bob,24,20,0,0,Math.PI*2);ctx.fill();
+  // fronte mais escura
+  ctx.fillStyle='#3e2e1c';
+  ctx.beginPath();ctx.ellipse(0,-56+bob,18,10,0,0,Math.PI*2);ctx.fill();
+  // focinho protuberante
+  ctx.fillStyle='#6a5238';
+  ctx.beginPath();ctx.ellipse(0,-44+bob,16,11,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#7a6248';
+  ctx.beginPath();ctx.ellipse(0,-46+bob,12,7,0,0,Math.PI*2);ctx.fill();
+
+  // === ORELHAS ===
+  ctx.fillStyle='#4a3420';
+  ctx.beginPath();ctx.ellipse(-18,-66+bob,10,9,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(18,-66+bob,10,9,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#7a5858';
+  ctx.beginPath();ctx.ellipse(-18,-66+bob,6,5,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(18,-66+bob,6,5,0,0,Math.PI*2);ctx.fill();
+
+  // === OLHOS ===
+  ctx.fillStyle='#0a0806';
+  ctx.beginPath();ctx.ellipse(-10,-54+bob,5,5,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(10,-54+bob,5,5,0,0,Math.PI*2);ctx.fill();
+  // íris âmbar
+  ctx.fillStyle='#8a5a10';
+  ctx.beginPath();ctx.ellipse(-10,-54+bob,3,3,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(10,-54+bob,3,3,0,0,Math.PI*2);ctx.fill();
+  // pupila
+  ctx.fillStyle='#050404';
+  ctx.beginPath();ctx.ellipse(-10,-54+bob,1.5,2,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(10,-54+bob,1.5,2,0,0,Math.PI*2);ctx.fill();
+  // brilho
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.beginPath();ctx.arc(-8,-56+bob,1.5,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(12,-56+bob,1.5,0,Math.PI*2);ctx.fill();
+
+  // === NARIZ ===
+  ctx.fillStyle='#180e06';
+  ctx.beginPath();ctx.ellipse(0,-38+bob,8,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(80,50,30,0.4)';
+  ctx.beginPath();ctx.ellipse(-2,-37+bob,3,2,0,0,Math.PI*2);ctx.fill();
+
+  // === BOCA / SORRISO LEVEMENTE ABERTA ===
+  ctx.strokeStyle='#0e0806';ctx.lineWidth=2;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-7,-33+bob);ctx.quadraticCurveTo(0,-30+bob,7,-33+bob);ctx.stroke();
+
+  // === ESTRELA CALIFORNIA (referência à bandeira) ===
+  const starX=4,starY=-10+bob;
+  const glowS=ctx.createRadialGradient(starX,starY,0,starX,starY,12);
+  glowS.addColorStop(0,'rgba(220,60,20,0.3)');glowS.addColorStop(1,'rgba(220,60,20,0)');
+  ctx.fillStyle=glowS;ctx.beginPath();ctx.arc(starX,starY,12,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#c83010';
-  ctx.beginPath();const starX=-2,starY=-10+bob;
-  for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2,ao=a+Math.PI/5;ctx.lineTo(starX+Math.cos(a)*8,starY+Math.sin(a)*8);ctx.lineTo(starX+Math.cos(ao)*3,starY+Math.sin(ao)*3);}
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a=i*Math.PI*2/5-Math.PI/2,ao=a+Math.PI/5;
+    ctx.lineTo(starX+Math.cos(a)*9,starY+Math.sin(a)*9);
+    ctx.lineTo(starX+Math.cos(ao)*3.5,starY+Math.sin(ao)*3.5);
+  }
   ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,100,60,0.4)';
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a=i*Math.PI*2/5-Math.PI/2,ao=a+Math.PI/5;
+    ctx.lineTo(starX+Math.cos(a)*9,starY+Math.sin(a)*9);
+    ctx.lineTo(starX+Math.cos(ao)*3.5,starY+Math.sin(ao)*3.5);
+  }
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,140,80,0.25)';ctx.fill();
+
   ctx.restore();
 }
 
@@ -1073,8 +1183,8 @@ function drawTitle(){
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Garimpar',W/2,500);
-  ctx.fillText('[I] Diário de Bordo   [M] Menu Principal',W/2,538);
+  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Garimpar',W/2,500);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -1395,125 +1505,4 @@ function buildL4(){
       if(this.celebState.active)this.celebState.t+=0.06;
       const fim=this.triggers[0];
       if(!fim.done&&!G.dialog){
-        const ouros=player.items.filter(i=>i==='ouro_pepita').length;
-        if(player.items.includes('placa_reivindicacao')&&ouros>=3){
-          if(player.x+player.w>=fim.x&&player.x<=fim.x+fim.w+60)fim.fn(player,this);
-        }
-      }
-    },
-    draw(player){
-      drawStars();drawWind();
-      // Sunset mountain silhouettes (drawn procedurally as fallback)
-      const sy2=FL-cam.y;
-      if(sy2>50){
-        ctx.fillStyle='rgba(60,100,160,0.2)';ctx.fillRect(0,sy2-14,W,16);
-      }
-      // Marco final dourado
-      const fx=1240-cam.x,fy=FL-cam.y;
-      ctx.fillStyle='#7a5020';ctx.fillRect(fx,fy-160,5,160);
-      const flagWave=Math.sin(Date.now()/300)*4;
-      ctx.fillStyle='#c8a020';
-      ctx.beginPath();ctx.moveTo(fx+5,fy-158);ctx.lineTo(fx+55,fy-145+flagWave);ctx.lineTo(fx+5,fy-128);ctx.closePath();ctx.fill();
-      ctx.strokeStyle='#e0c040';ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.moveTo(fx+5,fy-158);ctx.lineTo(fx+55,fy-145+flagWave);ctx.lineTo(fx+5,fy-128);ctx.stroke();
-      ctx.save();ctx.translate(fx+28,fy-143+flagWave*0.5);ctx.rotate(flagWave*0.01);
-      ctx.font='bold 10px "Courier New"';ctx.fillStyle='#3a1808';
-      ctx.textAlign='center';ctx.fillText('FIM',0,4);ctx.textAlign='left';ctx.restore();
-      const mg=ctx.createRadialGradient(fx+30,fy-80,5,fx+30,fy-80,60);
-      mg.addColorStop(0,'rgba(200,160,40,0.18)');mg.addColorStop(1,'rgba(200,160,40,0)');
-      ctx.fillStyle=mg;ctx.fillRect(fx-30,fy-140,120,160);
-      // Celebração
-      if(this.celebState.active&&player.items.includes('placa_reivindicacao')){
-        const t=this.celebState.t;
-        const px2=player.x-cam.x+20,py2=player.y-cam.y;
-        const tg=ctx.createRadialGradient(px2,py2-70,0,px2,py2-70,70);
-        tg.addColorStop(0,`rgba(220,185,80,${0.3+Math.sin(t*3)*0.15})`);tg.addColorStop(1,'rgba(220,185,80,0)');
-        ctx.fillStyle=tg;ctx.fillRect(px2-70,py2-140,140,140);
-        ctx.save();ctx.translate(px2,py2-65+Math.sin(t*2)*10);ctx.rotate(Math.sin(t*1.5)*0.25);ctx.scale(2.5,2.5);drawPlaca(0,0,t);ctx.restore();
-        for(let i=0;i<8;i++){
-          const a=t*0.9+i*(Math.PI*2/8),sr=40+Math.sin(t*2+i)*8;
-          const s2x=px2+Math.cos(a)*sr,s2y=py2-65+Math.sin(a)*sr;
-          const sa=0.5+Math.abs(Math.sin(t*2.5+i))*0.5;
-          ctx.fillStyle=`rgba(200,160,40,${sa})`;ctx.font='13px serif';ctx.textAlign='center';ctx.fillText('◎',s2x,s2y);ctx.textAlign='left';
-        }
-      }
-      for(const c of this.cols)c.draw(player.x,player.y);
-      for(const t of this.triggers)t.draw(player.x,player.y);
-    }
-  };
-}
-
-// ═══ GAME CONTROLLER ═════════════════════════════════════════════════════════
-const LEVELS=[buildL1,buildL2,buildL3,buildL4];
-const G={
-  state:'title',lvIdx:0,level:null,player:null,
-  dialog:false,deaths:0,timeOnLevel:0,_storedItems:[],_storedScore:0,_storedTools:[],
-  load(idx){
-    this.lvIdx=idx;particles=[];
-    tileTheme=TILE_THEMES[idx+1]||TILE_THEMES[1];
-    this.level=LEVELS[idx]();cam.x=0;cam.y=0;
-    this.player=new Player(this.level.startX,this.level.startY);
-    if(idx===0){
-      // Phase 2.1 starts with bateia and picareta from Phase 1
-      this.player.items=['bateia','picareta'];
-      this.player.activeTools=new Set(['bateia']);
-    } else {
-      this.player.items=[...this._storedItems];
-      this.player.score=this._storedScore;
-      this.player.activeTools=new Set(this._storedTools||[]);
-    }
-    this.dialog=false;this.state='playing';this.timeOnLevel=0;
-    BUBBLE.active=false;popup.active=false;
-    for(const k in jp)delete jp[k];
-    setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},1200);
-  },
-  nextLevel(){
-    this._storedItems=[...this.player.items];
-    this._storedScore=this.player.score;
-    this._storedTools=[...this.player.activeTools];
-    if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);
-    else{BUBBLE.active=false;this.dialog=false;this.state='complete';}
-  },
-  update(){
-    if(this.state!=='playing')return;this.timeOnLevel++;
-    checkDlg();updateCam(this.player.x,this.level.W);
-    this.level.update(this.player);this.player.update(this.level);
-    tickParticles();tickNotif();tickPopup();
-    if(this.player.dead){this.deaths++;this.state='dead';}
-  },
-  draw(){
-    ctx.clearRect(0,0,W,H);
-    if(this.state==='title'){drawTitle();return;}
-    if(this.state==='complete'){drawComplete();return;}
-    drawBg(this.level.bg);
-    for(const p of this.level.plats)drawPlatform(p);
-    this.level.draw(this.player);
-    drawParticles();
-    this.player.draw();
-    if(this.state==='dead'){drawDeath();return;}
-    drawHUD(this.player,this.level);
-    drawPopup();BUBBLE.draw(this.player);drawNotif();
-    INV.draw(this.player);
-  }
-};
-
-function startGame(){G.load(0);G.state='title';loop();}
-function loop(){
-  requestAnimationFrame(loop);
-  if(G.state==='title'&&(jp['Enter']||jp['Space']))G.load(0);
-  if(G.state==='dead'&&jp['KeyR'])G.load(G.lvIdx);
-  if(G.state==='complete'&&jp['Enter']){
-    unlockPhase('2.2');
-    G.deaths=0;G._storedItems=[];G._storedScore=0;G._storedTools=[];
-    window.location.href='../../MenuPrincipal/index.html?unlocked=2.2';
-  }
-  G.update();G.draw();clearJP();
-}
-
-if(!gameReady){(function loadLoop(){
-  if(gameReady)return;requestAnimationFrame(loadLoop);
-  ctx.fillStyle='#080c04';ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#e0c040';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
-  ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
-  ctx.textAlign='left';
-})();}
+        const ouros=player.items.filter(i=>i==='ouro_pepita')

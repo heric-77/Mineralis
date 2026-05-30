@@ -23,7 +23,7 @@ const IMG={};let assetsLoaded=0,totalAssets=5,gameReady=false;
 ['bateia','calabaca','peixe','bastao','passaro'].forEach((k,i)=>{const src=['Assets/Item_BateiaMadeira.svg','Assets/Item_Calabaca.svg','Assets/Item_PeixeAguia.svg','Assets/Item_BastaoSombra.svg','Assets/Item_PassaroEsteatita.svg'][i];const im=new Image();im.onload=()=>IMG[k]=im;im.onerror=()=>IMG[k]=null;im.src=src;});
 
 const keys={},jp={};
-addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){INV.toggle(G.player);}if(e.code==='Escape')INV.close();if(e.code==='KeyM')location.href='../../MenuPrincipal/index.html';});
+addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){INV.toggle(G.player);}if(e.code==='Escape')INV.close();if(e.code==='KeyM')location.href='../../MenuPrincipal/index.html';});
 addEventListener('keyup',e=>delete keys[e.code]);
 const TOUCH={l:false,r:false,j:false,e:false};function bindT(id,k){const el=document.getElementById(id);if(!el)return;el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});el.addEventListener('touchend',ev=>{ev.preventDefault();TOUCH[k]=false;},{passive:false});}
 bindT('tb-l','l');bindT('tb-r','r');bindT('tb-j','j');bindT('tb-e','e');
@@ -63,12 +63,64 @@ Na bateia, fica em suspensão em vez de afundar.`},
 Representa ancestrais e mensageiros espirituais.
 Sua imagem aparece na bandeira nacional do Zimbábue.`}
 };
-const INV={open:false,tab:0,cursor:0,TABS:[{id:'ferramenta',label:'🔧 Ferramentas'},{id:'minerio',label:'⛏ Minérios'},{id:'artefato',label:'🏺 Artefatos'}],items(player){const cat=this.TABS[this.tab].id;return Object.entries(ITEM_DEFS).filter(([id,d])=>d.cat===cat&&player.items.includes(id)).map(([id,d])=>({id,...d}));},toggle(p){this.open=!this.open;G.dialog=this.open;if(this.open)this.cursor=0;},close(){this.open=false;G.dialog=false;},navigate(p){if(!this.open)return;const its=this.items(p);if(jp.ArrowLeft||jp.KeyA){this.tab=(this.tab+2)%3;this.cursor=0;}if(jp.ArrowRight||jp.KeyD){this.tab=(this.tab+1)%3;this.cursor=0;}if(jp.ArrowUp||jp.KeyW)this.cursor=Math.max(0,this.cursor-1);if(jp.ArrowDown||jp.KeyS)this.cursor=Math.min(Math.max(0,its.length-1),this.cursor+1);if(isE()&&its.length&&its[this.cursor].tool){const id=its[this.cursor].id;p.activeTool=p.activeTool===id?null:id;sfx('item');}},draw(p){if(!this.open)return;ctx.fillStyle='rgba(0,0,0,.68)';ctx.fillRect(0,0,W,H);const PX=250,PY=110,PW=780,PH=500;ctx.fillStyle='rgba(8,6,2,.97)';roundRect(PX,PY,PW,PH,16);ctx.fill();ctx.strokeStyle=UI_BORDER;ctx.lineWidth=2;roundRect(PX,PY,PW,PH,16);ctx.stroke();ctx.fillStyle=UI_ACCENT;ctx.font='bold 18px Courier New';ctx.textAlign='center';ctx.fillText('📔 DIÁRIO DE BORDO',W/2,PY+34);const tw=PW/3;this.TABS.forEach((t,i)=>{ctx.fillStyle=i===this.tab?'rgba(216,179,74,.22)':'rgba(0,0,0,.25)';ctx.fillRect(PX+i*tw+6,PY+52,tw-12,34);ctx.fillStyle=i===this.tab?UI_ACCENT:'#786b44';ctx.font='bold 13px Courier New';ctx.fillText(t.label,PX+i*tw+tw/2,PY+74);});const its=this.items(p);ctx.textAlign='left';if(!its.length){ctx.fillStyle='#887b58';ctx.font='16px Courier New';ctx.textAlign='center';ctx.fillText('Nenhum item coletado nesta aba.',W/2,PY+285);return;}its.forEach((it,i)=>{const y=PY+115+i*52;ctx.fillStyle=i===this.cursor?'rgba(216,179,74,.18)':'transparent';roundRect(PX+22,y-26,260,42,7);ctx.fill();ctx.font='24px serif';ctx.fillText(it.icon,PX+36,y);ctx.font='bold 14px Courier New';ctx.fillStyle=p.activeTool===it.id?'#e9c45c':(i===this.cursor?'#d8c891':'#aaa');ctx.fillText(it.nome+(p.activeTool===it.id?'  EQUIPADO':''),PX+72,y-3);});const sel=its[this.cursor];ctx.fillStyle='rgba(216,179,74,.08)';roundRect(PX+320,PY+118,430,310,10);ctx.fill();ctx.font='52px serif';ctx.textAlign='center';ctx.fillText(sel.icon,PX+535,PY+190);ctx.fillStyle=UI_ACCENT;ctx.font='bold 16px Courier New';ctx.fillText(sel.nome,PX+535,PY+220);ctx.fillStyle='#d8c891';ctx.font='14px Courier New';sel.desc.split('\\n').forEach((l,i)=>ctx.fillText(l,PX+535,PY+260+i*24));ctx.fillStyle='#8c7c50';ctx.font='12px Courier New';ctx.fillText('[I]/ESC fechar   ← → abas   ↑ ↓ itens   E equipar ferramenta',W/2,PY+465);ctx.textAlign='left';}}
+const INV={open:false,tab:0,cursor:0,TABS:[{id:'ferramenta',label:'🔧 Ferramentas'},{id:'minerio',label:'⛏ Minérios'},{id:'artefato',label:'🏺 Artefatos'}],items(player){const cat=this.TABS[this.tab].id;const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
+    return Object.entries(_ALL_DEFS).filter(([id,d])=>d.cat===cat&&player.items.includes(id)).map(([id,d])=>({id,...d}));},toggle(p){this.open=!this.open;G.dialog=this.open||BUBBLE.active;if(this.open)this.cursor=0;},close(){this.open=false;G.dialog=BUBBLE.active;},navigate(p){if(!this.open)return;const its=this.items(p);if(jp.ArrowLeft||jp.KeyA){this.tab=(this.tab+2)%3;this.cursor=0;}if(jp.ArrowRight||jp.KeyD){this.tab=(this.tab+1)%3;this.cursor=0;}if(jp.ArrowUp||jp.KeyW)this.cursor=Math.max(0,this.cursor-1);if(jp.ArrowDown||jp.KeyS)this.cursor=Math.min(Math.max(0,its.length-1),this.cursor+1);if(isE()&&its.length&&its[this.cursor].tool){const id=its[this.cursor].id;p.activeTool=p.activeTool===id?null:id;sfx('item');}},draw(p){if(!this.open)return;ctx.fillStyle='rgba(0,0,0,.68)';ctx.fillRect(0,0,W,H);const PX=250,PY=110,PW=780,PH=500;ctx.fillStyle='rgba(8,6,2,.97)';roundRect(PX,PY,PW,PH,16);ctx.fill();ctx.strokeStyle=UI_BORDER;ctx.lineWidth=2;roundRect(PX,PY,PW,PH,16);ctx.stroke();ctx.fillStyle=UI_ACCENT;ctx.font='bold 18px Courier New';ctx.textAlign='center';ctx.fillText('📔 DIÁRIO DE BORDO',W/2,PY+34);const tw=PW/3;this.TABS.forEach((t,i)=>{ctx.fillStyle=i===this.tab?'rgba(216,179,74,.22)':'rgba(0,0,0,.25)';ctx.fillRect(PX+i*tw+6,PY+52,tw-12,34);ctx.fillStyle=i===this.tab?UI_ACCENT:'#786b44';ctx.font='bold 13px Courier New';ctx.fillText(t.label,PX+i*tw+tw/2,PY+74);});const its=this.items(p);ctx.textAlign='left';if(!its.length){ctx.fillStyle='#887b58';ctx.font='16px Courier New';ctx.textAlign='center';ctx.fillText('Nenhum item coletado nesta aba.',W/2,PY+285);return;}its.forEach((it,i)=>{const y=PY+115+i*52;ctx.fillStyle=i===this.cursor?'rgba(216,179,74,.18)':'transparent';roundRect(PX+22,y-26,260,42,7);ctx.fill();ctx.font='24px serif';ctx.fillText(it.icon,PX+36,y);ctx.font='bold 14px Courier New';ctx.fillStyle=p.activeTool===it.id?'#e9c45c':(i===this.cursor?'#d8c891':'#aaa');ctx.fillText(it.nome+(p.activeTool===it.id?'  EQUIPADO':''),PX+72,y-3);});const sel=its[this.cursor];ctx.fillStyle='rgba(216,179,74,.08)';roundRect(PX+320,PY+118,430,310,10);ctx.fill();ctx.font='52px serif';ctx.textAlign='center';ctx.fillText(sel.icon,PX+535,PY+190);ctx.fillStyle=UI_ACCENT;ctx.font='bold 16px Courier New';ctx.fillText(sel.nome,PX+535,PY+220);ctx.fillStyle='#d8c891';ctx.font='14px Courier New';sel.desc.split('\\n').forEach((l,i)=>ctx.fillText(l,PX+535,PY+260+i*24));ctx.fillStyle='#8c7c50';ctx.font='12px Courier New';ctx.fillText('[I]/ESC fechar   ← → abas   ↑ ↓ itens   E equipar ferramenta',W/2,PY+465);ctx.textAlign='left';}}
 
 let popup={active:false,title:'',lines:[],color:UI_ACCENT,t:0};function showPopup(title,lines,color=UI_ACCENT,time=5200){popup={active:true,title,lines,color,t:time/16};}function tickPopup(){if(popup.t>0)popup.t--;else popup.active=false;}function drawPopup(){if(!popup.active)return;const PW=470,PH=90+popup.lines.length*22,PX=W-PW-28,PY=105;ctx.fillStyle='rgba(6,5,2,.93)';roundRect(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle=popup.color;ctx.lineWidth=2;roundRect(PX,PY,PW,PH,12);ctx.stroke();ctx.fillStyle=popup.color;ctx.font='bold 17px Courier New';ctx.textAlign='center';ctx.fillText(popup.title,PX+PW/2,PY+30);ctx.fillStyle='#e3d59a';ctx.font='13px Courier New';popup.lines.forEach((l,i)=>ctx.fillText(l,PX+PW/2,PY+60+i*22));ctx.textAlign='left';}
 function wrapText(text,maxW){ctx.font='15px Courier New';let out=[];for(const par of text.split('\n')){let line='';for(const w of par.split(' ')){const test=line?line+' '+w:w;if(ctx.measureText(test).width>maxW&&line){out.push(line);line=w;}else line=test;}if(line)out.push(line);}return out;}
-const BUBBLE={active:false,queue:[],lines:[],cb:null,show(msgs,cb){this.queue=[...msgs];this.cb=cb;this.active=true;G.dialog=true;this.next();},next(){if(!this.queue.length){this.active=false;G.dialog=false;const f=this.cb;this.cb=null;if(f)f();return;}this.lines=wrapText(this.queue.shift(),560);},draw(player){if(!this.active)return;const bx=Math.max(18,Math.min(player.x-cam.x-240,W-670)),by=Math.max(48,player.y-cam.y-165);ctx.fillStyle='rgba(8,5,1,.96)';roundRect(bx,by,650,130,14);ctx.fill();ctx.strokeStyle=UI_ACCENT;ctx.lineWidth=2;roundRect(bx,by,650,130,14);ctx.stroke();drawCorvan(bx+22,by+40,1.15,false,Date.now()/260);ctx.fillStyle=UI_ACCENT;ctx.font='bold 14px Courier New';ctx.fillText('CORVAN',bx+112,by+30);ctx.fillStyle='#e8dba5';ctx.font='15px Courier New';this.lines.forEach((l,i)=>ctx.fillText(l,bx+112,by+56+i*23));ctx.fillStyle='#8f7f4a';ctx.font='12px Courier New';ctx.textAlign='right';ctx.fillText('[E] continuar',bx+632,by+112);ctx.textAlign='left';}}
-function showDialog(msgs,cb){BUBBLE.show(msgs,cb);}function checkDlg(){if(BUBBLE.active&&isE())BUBBLE.next();}
+const BUBBLE={
+  active:false,queue:[],lines:[],cb:null,faceFrame:0,
+  show(msgs,cb){this.queue=[...msgs];this.cb=cb;this.active=true;G.dialog=true;this.faceFrame=0;this._next();},
+  _next(){if(!this.queue.length){this.active=false;G.dialog=false;const f=this.cb;this.cb=null;if(f)f();return;}this.lines=wrapText(this.queue.shift(),480);},
+  advance(){if(this.active)this._next();},
+  draw(player){
+    if(!this.active)return;
+    this.faceFrame+=0.03;
+    ctx.font='15px "Courier New"';
+    const faceW=60,faceH=76,facePad=12,lineH=24,pad=20,textW=480;
+    const bubW=facePad+faceW+facePad+textW+pad;
+    const bubH=Math.max(faceH+pad*2,this.lines.length*lineH+70)+pad;
+    const pcx=player.x-cam.x+player.w/2,pcy=player.y-cam.y;
+    const bx=Math.max(10,Math.min(pcx-bubW/2,W-bubW-10)),by=Math.max(10,pcy-bubH-32);
+    // Fundo + sombra
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=14;
+    ctx.fillStyle='rgba(8,6,1,0.96)';roundRect(bx,by,bubW,bubH,14);ctx.fill();
+    ctx.shadowBlur=0;
+    // Borda dupla dourada
+    ctx.strokeStyle=UI_ACCENT;ctx.lineWidth=2.5;roundRect(bx,by,bubW,bubH,14);ctx.stroke();
+    ctx.strokeStyle='rgba(216,179,74,0.2)';ctx.lineWidth=1;roundRect(bx+4,by+4,bubW-8,bubH-8,10);ctx.stroke();
+    // Cauda apontando para o player
+    const tbx=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
+    const tty=by+bubH,tipy=Math.min(pcy,tty+38);
+    ctx.fillStyle='rgba(8,6,1,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=UI_ACCENT;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(pcx,tipy);ctx.lineTo(tbx+14,tty);ctx.stroke();
+    // Face box
+    const fx=bx+facePad,fy=by+pad;
+    ctx.fillStyle='rgba(20,14,4,0.85)';roundRect(fx,fy,faceW,faceH,6);ctx.fill();
+    ctx.strokeStyle='rgba(216,179,74,0.45)';ctx.lineWidth=1.5;roundRect(fx,fy,faceW,faceH,6);ctx.stroke();
+    // Corvan dentro da face box
+    const faceScale=faceW/18*0.82,sprX=fx+faceW/2-16*faceScale,sprY=fy+4;
+    ctx.save();ctx.beginPath();roundRect(fx+1,fy+1,faceW-2,faceH-2,5);ctx.clip();
+    drawCorvan(sprX,sprY,faceScale,false,this.faceFrame*4,null);
+    const open=Math.abs(Math.sin(this.faceFrame*4))*1.8*faceScale;
+    if(open>0.5){ctx.fillStyle='#2a0e06';ctx.fillRect(sprX+12*faceScale,sprY+13*faceScale,8*faceScale,open);}
+    ctx.restore();
+    // Nome do falante
+    const tx=fx+faceW+facePad;
+    ctx.font='bold 12px "Courier New"';ctx.fillStyle=UI_ACCENT;ctx.fillText('CORVAN',tx,by+pad+14);
+    // Separador
+    ctx.fillStyle='rgba(216,179,74,0.35)';ctx.fillRect(tx,by+pad+20,textW,1);
+    // Texto
+    ctx.font='15px "Courier New"';ctx.fillStyle='#f0e8c0';
+    this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+40+i*lineH));
+    // Hint [E] Continuar pulsante
+    const pulse=0.5+Math.sin(Date.now()/400)*0.5;
+    ctx.fillStyle=`rgba(216,179,74,${pulse})`;ctx.font='12px "Courier New"';
+    ctx.textAlign='right';ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-10);ctx.textAlign='left';
+  }
+};
+function showDialog(msgs,cb){BUBBLE.show(msgs,cb);}
+function checkDlg(){if(BUBBLE.active&&isE())BUBBLE.advance();}
 
 
 function drawBateia(x,y,S=1,t=0){ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(t)*.04);ctx.fillStyle='#7b4c22';ctx.beginPath();ctx.ellipse(0,4*S,26*S,12*S,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a66a2b';ctx.beginPath();ctx.ellipse(0,0,25*S,10*S,0,0,Math.PI);ctx.fill();ctx.strokeStyle='#4d2c12';ctx.lineWidth=2*S;ctx.beginPath();ctx.ellipse(0,1*S,27*S,13*S,0,0,Math.PI*2);ctx.stroke();for(let i=-14;i<=14;i+=7){ctx.strokeStyle='rgba(235,190,100,.45)';ctx.beginPath();ctx.moveTo(i*S,-4*S);ctx.lineTo(i*.6*S,11*S);ctx.stroke();}ctx.restore();}
@@ -77,9 +129,66 @@ function drawBastao(x,y,S=1,t=0){ctx.save();ctx.translate(x,y);ctx.rotate(-.25+M
 function drawOuro(x,y,S=1,t=0){ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(t)*.08);ctx.fillStyle='#d8b34a';ctx.beginPath();ctx.moveTo(-13*S,-2*S);ctx.lineTo(-5*S,-12*S);ctx.lineTo(9*S,-9*S);ctx.lineTo(15*S,2*S);ctx.lineTo(6*S,12*S);ctx.lineTo(-11*S,9*S);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,245,180,.55)';ctx.beginPath();ctx.arc(-3*S,-4*S,4*S,0,Math.PI*2);ctx.fill();ctx.restore();}
 function drawMica(x,y,S=1,t=0){ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(t)*.18);ctx.fillStyle='rgba(238,218,126,.72)';for(let i=0;i<4;i++){ctx.save();ctx.rotate(i*.55);ctx.fillRect(-13*S,-2*S,26*S,4*S);ctx.restore();}ctx.strokeStyle='rgba(255,255,220,.6)';ctx.strokeRect(-12*S,-5*S,24*S,10*S);ctx.restore();}
 function drawPassaro(x,y,S=1,t=0){ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(t)*.04);ctx.fillStyle='#9aa08a';ctx.beginPath();ctx.ellipse(0,0,18*S,25*S,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#70785f';ctx.beginPath();ctx.moveTo(0,-25*S);ctx.lineTo(18*S,-38*S);ctx.lineTo(15*S,-16*S);ctx.closePath();ctx.fill();ctx.fillStyle='#c9c0a0';ctx.beginPath();ctx.arc(6*S,-15*S,3*S,0,Math.PI*2);ctx.fill();ctx.fillStyle='#6c705c';ctx.fillRect(-16*S,19*S,32*S,8*S);ctx.restore();}
-function drawPeixeAguia(x,y,t=0){ctx.save();ctx.translate(x,y+Math.sin(t)*3);ctx.fillStyle='#3a2417';ctx.beginPath();ctx.ellipse(0,0,25,15,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f5f1d0';ctx.beginPath();ctx.ellipse(21,-9,12,10,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#d8b34a';ctx.beginPath();ctx.moveTo(32,-9);ctx.lineTo(49,-5);ctx.lineTo(32,-1);ctx.closePath();ctx.fill();ctx.fillStyle='#4b2b15';ctx.beginPath();ctx.moveTo(-18,-4);ctx.lineTo(-50,-26);ctx.lineTo(-33,6);ctx.closePath();ctx.fill();ctx.fillStyle='#111';ctx.beginPath();ctx.arc(25,-11,2,0,Math.PI*2);ctx.fill();ctx.restore();}
+function drawPeixeAguia(x,y,t=0){
+  ctx.save();ctx.translate(x,y+Math.sin(t)*4);
+  // Corpo marrom-escuro
+  ctx.fillStyle='#3a2417';ctx.beginPath();ctx.ellipse(0,0,26,14,0,0,Math.PI*2);ctx.fill();
+  // Cabeça branca
+  ctx.fillStyle='#f5f1d0';ctx.beginPath();ctx.ellipse(21,-9,12,10,0,0,Math.PI*2);ctx.fill();
+  // Bico dourado
+  ctx.fillStyle='#d8b34a';ctx.beginPath();ctx.moveTo(32,-9);ctx.lineTo(49,-5);ctx.lineTo(32,-1);ctx.closePath();ctx.fill();
+  // Asa esquerda — bate com sin(t)
+  const wingUp=Math.sin(t*2.2)*18;
+  ctx.fillStyle='#4b2b15';
+  ctx.beginPath();ctx.moveTo(-10,0);ctx.lineTo(-44,-20+wingUp);ctx.lineTo(-38,8);ctx.closePath();ctx.fill();
+  // Asa direita — bate oposta
+  ctx.fillStyle='#5a3820';
+  ctx.beginPath();ctx.moveTo(8,-4);ctx.lineTo(38,-22-wingUp*0.6);ctx.lineTo(30,4);ctx.closePath();ctx.fill();
+  // Reflexo asa
+  ctx.fillStyle='rgba(100,70,40,0.4)';
+  ctx.beginPath();ctx.moveTo(-10,0);ctx.lineTo(-44,-20+wingUp);ctx.lineTo(-30,-12+wingUp*0.5);ctx.closePath();ctx.fill();
+  // Olho
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(25,-11,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(24.5,-11.5,1,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
 
-function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){const S=scale;ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);const r=(x,y,w,h,f,a=1)=>{ctx.fillStyle=f;ctx.globalAlpha=a;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};const showBateia=activeTool==='bateia_madeira',showCalabaca=activeTool==='calabaca_agua',showBastao=activeTool==='bastao_sombra';r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');r(5,3,22,2,'#5a3a10');r(13,0,6,3,'#c89820');r(9,5,14,9,'#c88050');r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');r(12,13,8,1,'#7a3820');r(8,16,16,13,'#b82010');r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');r(9,30,14,12,'#6a4820');r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');if(showBateia){ctx.save();ctx.translate(0*S,31*S);drawBateia(0,0,S*.40,frame);ctx.restore();}if(showCalabaca){ctx.save();ctx.translate(2*S,31*S);drawCalabaca(0,0,S*.38,frame);ctx.restore();}r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');if(showBastao){ctx.save();ctx.translate(30*S,25*S);drawBastao(0,0,S*.55,frame);ctx.restore();}r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');ctx.fillStyle='#ffe060';ctx.globalAlpha=.18+.12*Math.sin(frame*.4);ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.restore();}
+function _drawCorvanTools(activeTool,S,frame){
+  if(activeTool==='bateia_madeira'){
+    const wb=Math.sin(frame*0.15)*1.5;
+    ctx.fillStyle='#7b4c22';ctx.beginPath();ctx.ellipse(2*S,(31+wb)*S,10*S,5*S,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#4d2c12';ctx.lineWidth=S;ctx.beginPath();ctx.ellipse(2*S,(31+wb)*S,11*S,6*S,0,0,Math.PI*2);ctx.stroke();
+  } else if(activeTool==='calabaca_agua'){
+    ctx.fillStyle='#b5752b';ctx.beginPath();ctx.ellipse(27*S,28*S,5*S,8*S,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#d99a45';ctx.beginPath();ctx.ellipse(27*S,20*S,3*S,3*S,0,0,Math.PI*2);ctx.fill();
+  } else if(activeTool==='bastao_sombra'){
+    const wb=Math.sin(frame*0.2)*1;
+    ctx.fillStyle='#6b3e18';ctx.fillRect(26*S,(16+wb)*S,2*S,20*S);
+    ctx.fillStyle='#e7c765';ctx.beginPath();ctx.arc(27*S,(14+wb)*S,3*S,0,Math.PI*2);ctx.fill();
+  }
+}
+
+function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
+  const S=scale;ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
+  const r=(x,y,w,h,f,a=1)=>{ctx.fillStyle=f;ctx.globalAlpha=a;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
+  const lb=0.7+Math.sin(frame*0.4)*0.3;
+  r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');r(5,3,22,2,'#5a3a10');r(13,0,6,3,'#c89820');
+  r(14,0,4,2,'#ffe060');
+  r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
+  r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
+  r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');r(13,14,6,2,'#c88050');
+  r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
+  r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
+  r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
+  r(9,30,14,12,'#6a4820');r(15,36,2,6,'#4a3020');
+  r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
+  r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
+  r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
+  ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  _drawCorvanTools(activeTool,S,frame);
+  ctx.restore();
+}
 
 
 class Col{constructor(x,y,type){this.x=x;this.y=y;this.w=34;this.h=34;this.type=type;this.done=false;this.t=Math.random()*6;}tick(){this.t+=.06;}draw(px,py){if(this.done)return;const sx=this.x-cam.x,sy=this.y-cam.y;if(sx<-80||sx>W+80)return;ctx.save();ctx.translate(sx+17,sy+17+Math.sin(this.t)*4);const draw={bateia_madeira:()=>drawBateia(0,0,.75,this.t),calabaca_agua:()=>drawCalabaca(0,0,.75,this.t),bastao_sombra:()=>drawBastao(0,0,.75,this.t),quartzo_aurifero:()=>drawMica(0,0,.8,this.t),passaro_esteatita:()=>drawPassaro(0,0,.7,this.t)}[this.type];if(draw)draw();ctx.restore();const near=px!==undefined&&Math.hypot(px+18-(this.x+17),py+38-(this.y+17))<95;if(near){ctx.fillStyle='rgba(0,0,0,.82)';ctx.font='bold 12px Courier New';const txt='[E] Pegar '+(ITEM_DEFS[this.type]?.nome||this.type);const tw=ctx.measureText(txt).width+18;roundRect(sx+17-tw/2,sy-36,tw,22,5);ctx.fill();ctx.strokeStyle=UI_ACCENT;ctx.stroke();ctx.fillStyle=UI_ACCENT;ctx.textAlign='center';ctx.fillText(txt,sx+17,sy-21);ctx.textAlign='left';}}}
@@ -120,8 +229,11 @@ update(level){
   if(level.currents){
     for(const b of level.currents){
       if(this.overlaps(b)&&!b.safe){
-        this.vx*=.55;this.vy+=.12;
-        if(this.y+this.h>b.y+18){this._hurt(1,level,'corrente');notify('Corrente forte! Use a Calabaça de Água para controlar o fluxo.');}
+        // Corrente desacelera mas não machuca — só notifica para usar a Calabaça
+        this.vx*=.60;
+        if(!this._currentNotified){this._currentNotified=true;notify('Corrente forte! Equipe a Calabaça [I] e use [E] aqui para controlar o fluxo.');setTimeout(()=>this._currentNotified=false,3000);}
+      } else if(b.safe){
+        this._currentNotified=false;
       }
     }
   }
@@ -234,15 +346,110 @@ draw(){drawCorvan(this.x-cam.x,this.y-cam.y,1.45,this.facing<0,Date.now()/220,th
 
 
 function drawBg(k){const im=IMG[k];if(im)ctx.drawImage(im,0,0,W,H);else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#25321d');g.addColorStop(1,'#0f1308');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}ctx.fillStyle='rgba(0,0,0,.16)';ctx.fillRect(0,0,W,H);}function goldSparkles(){for(let i=0;i<36;i++){const x=(i*173+Date.now()/45)%W,y=390+(i*41)%230;ctx.fillStyle=`rgba(226,190,80,${.07+Math.sin(Date.now()/620+i)*.06})`;ctx.fillRect(x,y,2,2);}}
-function drawHUD(p,l){ctx.fillStyle='rgba(7,6,2,.86)';ctx.fillRect(0,0,W,38);ctx.fillStyle='rgba(216,179,74,.22)';ctx.fillRect(0,36,W,2);for(let i=0;i<p.maxHp;i++){ctx.fillStyle=i<p.hp?'#cf5730':'#334';ctx.beginPath();const x=16+i*28,y=9;ctx.arc(x+5,y+6,5,Math.PI,0);ctx.arc(x+15,y+6,5,Math.PI,0);ctx.lineTo(x+20,y+6);ctx.bezierCurveTo(x+20,y+16,x+10,y+19,x+10,y+19);ctx.bezierCurveTo(x+10,y+19,x,y+16,x,y+6);ctx.closePath();ctx.fill();}ctx.fillStyle='#c8c0a0';ctx.font='20px Courier New';ctx.textAlign='center';ctx.fillText(l.title,W/2,25);ctx.fillStyle=UI_ACCENT;ctx.font='bold 20px Courier New';ctx.textAlign='right';ctx.fillText('◈ '+p.score,W-14,26);ctx.textAlign='left';ctx.fillStyle='rgba(7,6,2,.88)';roundRect(12,48,245,68,7);ctx.fill();ctx.strokeStyle=UI_BORDER_DARK;ctx.stroke();ctx.fillStyle=UI_MUTED;ctx.font='bold 11px Courier New';ctx.fillText('📔 DIÁRIO DE BORDO [I]',24,70);ctx.fillStyle='#d8c891';ctx.font='12px Courier New';ctx.fillText('Ferramenta: '+(p.activeTool?ITEM_DEFS[p.activeTool].icon+' '+ITEM_DEFS[p.activeTool].nome:'nenhuma'),24,96);if(l.id===3){const count=p.items.filter(x=>x==='ouro_aluvial').length;ctx.fillStyle='rgba(7,6,2,.88)';roundRect(W/2+200,48,260,68,7);ctx.fill();ctx.strokeStyle=UI_BORDER_DARK;ctx.stroke();ctx.fillStyle=UI_ACCENT;ctx.font='bold 11px Courier New';ctx.textAlign='center';ctx.fillText('GARIMPAGEM SHONA',W/2+330,66);ctx.fillStyle='#d8c891';ctx.font='14px Courier New';ctx.fillText(`Ouro: ${count}/3    ${p.items.includes('passaro_esteatita')?'🐦':'□'}`,W/2+330,95);ctx.textAlign='left';}ctx.fillStyle='#c8c0a0';ctx.font='17px Courier New';ctx.textAlign='center';ctx.fillText(typeof l.hint==='function'?l.hint(p):l.hint,W/2,H-12);ctx.textAlign='left';}
-function drawTitle(){drawBg('bg01');ctx.fillStyle='rgba(0,0,0,.58)';ctx.fillRect(0,0,W,H);goldSparkles();ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=35;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('O Ouro que a Pedra Guardou',W/2,138);ctx.shadowBlur=0;ctx.fillStyle='#c8c0a0';ctx.font='18px Courier New';ctx.fillText('Fase 4.2 - Ouro do Grande Zimbabué · Zimbábue, século XIII',W/2,190);if(IMG.card42)ctx.drawImage(IMG.card42,W/2-85,230,170,170);ctx.fillStyle=`rgba(216,179,74,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='18px Courier New';ctx.fillText('▶ Pressione ENTER para começar ◀',W/2,455);ctx.fillStyle='#bdb38c';ctx.font='16px Courier New';ctx.fillText('← → mover   ↑/Espaço pular   E interagir/garimpar/coletar',W/2,498);ctx.fillText('[I] Diário de Bordo   [M] Menu Principal',W/2,528);ctx.textAlign='left';}
+function drawHUD(p,l){
+  // Corações de vida — forma padrão 1-1
+  for(let i=0;i<p.maxHp;i++){
+    ctx.fillStyle=i<p.hp?'#e02020':'#333';
+    ctx.beginPath();const hx=16+i*28,hy=10;
+    ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
+    ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
+    ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
+  }
+  // Barra escura + título centralizado
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,34);
+  ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=6;
+  ctx.fillStyle='#e8e0d0';ctx.font='20px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(l.title,W/2,24);ctx.textAlign='left';ctx.shadowBlur=0;
+  // Score / ouro — canto direito
+  ctx.fillStyle='#e8e0d0';ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText('◈ '+p.score,W-14,26);ctx.textAlign='left';
+
+  // Painel Diário de Bordo — padrão 1-1
+  const TOOL_DEFS=[
+    {id:'bateia_madeira',  icon:'🥣',nome:'Bateia'},
+    {id:'calabaca_agua',   icon:'💧',nome:'Calabaça'},
+    {id:'bastao_sombra',   icon:'☀️',nome:'Bastão Sombra'},
+  ];
+  // Mapa de nomes curtos para o painel (evita overflow)
+  const NOME_CURTO={bateia_madeira:'Bateia',calabaca_agua:'Calabaça',bastao_sombra:'Bastão'};
+  const tools=TOOL_DEFS.filter(t=>p.items.includes(t.id));
+  const PX=12,PY=46,PW=178,PH_BASE=52;
+  const PH=PH_BASE+(tools.length>0?6+tools.length*22:0);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(8,6,1,0.88)';roundRect(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=UI_BORDER;ctx.lineWidth=1.5;roundRect(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.strokeStyle='rgba(216,179,74,0.25)';ctx.lineWidth=1;roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
+  ctx.restore();
+  const midX=PX+PW/2;
+  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle=UI_MUTED;ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle=UI_MUTED;ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(216,179,74,0.2)';roundRect(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle=UI_MUTED;ctx.lineWidth=1;roundRect(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle=UI_ACCENT;
+  ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+  ctx.fillStyle='rgba(216,179,74,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
+  // Ferramenta ativa
+  const atY=PY+44;ctx.textAlign='center';
+  if(p.activeTool&&ITEM_DEFS[p.activeTool]){
+    const def=ITEM_DEFS[p.activeTool];
+    const nomeExib=NOME_CURTO[p.activeTool]||def.nome;
+    ctx.fillStyle='rgba(216,179,74,0.1)';roundRect(PX+6,atY-14,PW-12,20,3);ctx.fill();
+    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';
+    ctx.fillText(def.icon+' '+nomeExib,midX,atY+1);
+  } else {
+    ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8d8';ctx.fillText('Não Equipado',midX,atY);
+  }
+  ctx.textAlign='left';
+  // Ferramentas coletadas
+  if(tools.length>0){
+    ctx.fillStyle='rgba(216,179,74,0.3)';ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
+    tools.forEach((t,i)=>{
+      const ty=PY+PH_BASE+8+i*22,equipped=p.activeTool===t.id;
+      ctx.textAlign='center';
+      ctx.font='11px serif';ctx.fillStyle=equipped?'#f0c040':'#a08040';
+      ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
+      ctx.textAlign='left';
+    });
+  }
+
+  // Hint rodapé com fundo
+  const hintTxt=typeof l.hint==='function'?l.hint(p):l.hint;
+  ctx.fillStyle='rgba(0,0,0,0.60)';ctx.fillRect(0,H-32,W,32);
+  ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
+  ctx.fillStyle='#f0e8c0';ctx.font='17px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(hintTxt,W/2,H-10);
+  ctx.textAlign='left';ctx.shadowBlur=0;
+}
+function drawTitle(){drawBg('bg01');ctx.fillStyle='rgba(0,0,0,.58)';ctx.fillRect(0,0,W,H);goldSparkles();ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=35;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('O Ouro que a Pedra Guardou',W/2,138);ctx.shadowBlur=0;ctx.fillStyle='#c8c0a0';ctx.font='18px Courier New';ctx.fillText('Fase 4.2 - Ouro do Grande Zimbabué · Zimbábue, século XIII',W/2,190);if(IMG.card42)ctx.drawImage(IMG.card42,W/2-85,230,170,170);ctx.fillStyle=`rgba(216,179,74,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='18px Courier New';ctx.fillText('▶ Pressione ENTER para começar ◀',W/2,455);ctx.fillStyle='#bdb38c';ctx.font='16px Courier New';ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,498);ctx.fillText('[M] Menu Principal',W/2,550);ctx.textAlign='left';}
 function drawDeath(){ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,H);const msgs={corrente:'A CORRENTE TE LEVOU!',queda:'VOCÊ CAIU!',rocha:'TERRENO PERIGOSO!'};ctx.textAlign='center';ctx.fillStyle='#e05a38';ctx.font='bold 48px Courier New';ctx.fillText(msgs[G.player.deathCause]||'VOCÊ CAIU!',W/2,H/2-40);ctx.fillStyle='#d8b34a';ctx.font='19px Courier New';ctx.fillText('Pressione R para tentar novamente',W/2,H/2+36);ctx.fillStyle='#999';ctx.font='15px Courier New';ctx.fillText('[M] Menu Principal',W/2,H/2+70);ctx.textAlign='left';}
 function drawComplete(){drawBg('bg04');ctx.fillStyle='rgba(0,0,0,.62)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=38;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('✦ FASE 4.2 CONCLUÍDA ✦',W/2,118);ctx.shadowBlur=0;drawCorvan(W/2-180,210,2.4,false,Date.now()/260,'bastao_sombra');ctx.save();ctx.translate(W/2+90,285);ctx.scale(2.3,2.3);drawPassaro(0,0,1,Date.now()/700);ctx.restore();ctx.fillStyle='#e8dba5';ctx.font='17px Courier New';ctx.fillText('O ouro revelou o comércio e a memória do Grande Zimbabué.',W/2,190);const lines=['🥣 Bateia de Madeira - garimpo Shona sem ferramentas metálicas','🟡 Ouro Aluvial - pepitas densas que afundam na bateia','✧ Mica Dourada - brilho enganoso, leve e flexível','🐦 Pássaro de Esteatita - ancestralidade, símbolo e resistência'];ctx.fillStyle='#d8c891';ctx.font='14px Courier New';lines.forEach((l,i)=>ctx.fillText(l,W/2,250+i*29));ctx.fillStyle='#c8c0a0';ctx.font='16px Courier New';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,430);ctx.fillStyle=`rgba(216,179,74,${.6+Math.sin(Date.now()/550)*.35})`;ctx.font='15px Courier New';ctx.fillText('✦ Fase 4.3 desbloqueada!   ENTER para voltar ao Menu',W/2,465);ctx.textAlign='left';}
 
-function buildL1(){const FL=590,WW=3100,WH=900;const plats=basePlats(FL,WW,WH);const cols=[new Col(210,FL-55,'bateia_madeira'),new Col(540,FL-55,'calabaca_agua')];const aguia={x:2520,y:FL-215,gifted:false};const triggers=[new Trigger(2880,FL-190,120,190,'Descer ao rio',(p,l)=>{if(!p.items.includes('bateia_madeira')){notify('Pegue a Bateia de Madeira primeiro.');return;}if(!p.items.includes('calabaca_agua')){notify('Pegue a Calabaça de Água primeiro.');return;}if(!p.items.includes('bastao_sombra')){notify('Interaja com o Peixe-Águia para receber o Bastão de Sombra.');return;}l.triggers[0].done=true;sfx('unlock');showDialog(['Século XIII. Diante de nós está o Grande Zimbabué: muralhas de granito sem argamassa e uma torre cônica que observa o planalto.','Mais de 18 mil pessoas viveram aqui. O ouro viajava do interior da África até Sofala, depois para a Índia e além.','A primeira tarefa é simples: recolher as ferramentas Shona e seguir para o rio Mutirikwe.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,title:'Grande Zimbabué - Muralhas ao Amanhecer',hint:p=>!p.items.includes('bateia_madeira')?'🥣 Pegue a Bateia de Madeira →':!p.items.includes('calabaca_agua')?'💧 Pegue a Calabaça de Água →':!p.items.includes('bastao_sombra')?'🦅 Encontre o Peixe-Águia e receba o Bastão de Sombra →':'✦ Ferramentas prontas - desça ao rio →',plats,cols,triggers,aguia,intro:['Capim dourado, kopjes de granito e muralhas curvas no amanhecer africano.','Colete a Bateia de Madeira e a Calabaça. Depois procure o Peixe-Águia sobre a rocha acima do rio.'],update(p){tickPlats(this.plats);for(const c of this.cols)c.tick();const tr=this.triggers[0];if(p.items.includes('bateia_madeira')&&p.items.includes('calabaca_agua')&&p.items.includes('bastao_sombra')&&p.x>tr.x-110&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();const cx=this.aguia.x-cam.x,cy=this.aguia.y-cam.y;if(cx>-100&&cx<W+100){drawPeixeAguia(cx,cy,Date.now()/400);if(!this.aguia.gifted){ctx.fillStyle=UI_ACCENT;ctx.font='bold 12px Courier New';ctx.textAlign='center';ctx.fillText('[E] Interagir com o Peixe-Águia',cx,cy-48);ctx.textAlign='left';}}for(const c of this.cols)c.draw(p.x,p.y);for(const t of this.triggers)t.draw(p.x,p.y);}};}
-function buildL2(){const FL=590,WW=2600,WH=900;const plats=basePlats(FL,WW,WH);const cols=[new Col(820,FL-260,'quartzo_aurifero')];const triggers=[new Trigger(2350,FL-180,120,180,'Avançar para a coleta',(p,l)=>{if(!p.items.includes('quartzo_aurifero')){notify('Colete a amostra de Quartzo Aurífero.');return;}l.triggers[0].done=true;showDialog(['Estas rochas têm mais de 2,7 bilhões de anos. Veios de quartzo branco cortam o granito antigo.','Fluidos hidrotermais depositaram ouro nessas fissuras. Depois, a água arrancou fragmentos e os concentrou no rio.','A dica de coleta: mica brilha, mas é leve. Ouro é denso e afunda.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,title:'Geologia - Granito, Quartzo e Ouro',hint:p=>!p.items.includes('quartzo_aurifero')?'◇ Examine o Quartzo Aurífero no leito do rio →':'✦ Formação compreendida - avance para garimpar →',plats,cols,triggers,intro:['Corvan desce ao rio Mutirikwe. O granito cor de mel aparece sob a água clara.','Veios de quartzo branco cortam o leito. É dali que o ouro do rio se originou.'],update(p){tickPlats(this.plats);for(const c of this.cols)c.tick();const tr=this.triggers[0];if(p.items.includes('quartzo_aurifero')&&p.x>tr.x-120&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();for(const c of this.cols)c.draw(p.x,p.y);for(const t of this.triggers)t.draw(p.x,p.y);}};}
-function buildL3(){const FL=590,WW=3400,WH=900;const plats=basePlats(FL,WW,WH);plats.push(spike(1180,FL-18,70),spike(2120,FL-18,70));const nodes=[new GoldSpot(430,FL-82,true),new GoldSpot(720,FL-82,false),new GoldSpot(1060,FL-82,true),new GoldSpot(1510,FL-82,false),new GoldSpot(1880,FL-82,true),new GoldSpot(2290,FL-82,false)];const currents=[new RiverCurrent(1240,FL-28,210,36),new RiverCurrent(2520,FL-28,230,36)];const relic={x:2920,y:FL-105,alignX:2850,done:false};const triggers=[new Trigger(3160,FL-180,120,180,'Concluir coleta',(p,l)=>{const count=p.items.filter(x=>x==='ouro_aluvial').length;if(count<3){notify('Colete 3 pepitas de Ouro Aluvial.');return;}if(!p.items.includes('passaro_esteatita')){notify('Revele o Pássaro de Esteatita com o Bastão de Sombra.');return;}l.triggers[0].done=true;showDialog(['A mica engana os olhos, mas a bateia revela o peso. O ouro fica no centro.','O Bastão de Sombra revelou a câmara da torre cônica: tecnologia, astronomia e memória reunidas.','Com o artefato e as pepitas, podemos registrar o impacto histórico desta cidade.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:3,bg:'bg03',W:WW,H:WH,startX:60,startY:FL-90,title:'Coleta - Bateia e Orientação Solar',hint:p=>{const count=p.items.filter(x=>x==='ouro_aluvial').length;if(count<3)return `🥣 Garimpe e colete Ouro Aluvial (${count}/3)`;if(!p.items.includes('passaro_esteatita'))return '☀️ Use o Bastão de Sombra na torre para revelar o Pássaro →';return '✦ Coleta completa - avance para a conclusão →';},plats,cols:[],triggers,nodes,currents,relic,intro:['Agora vem o mini-puzzle de garimpagem. Equipe a Bateia [I] e pressione [E] sobre pontos brilhantes.','O ouro afunda; a mica fica leve e suspensa. Colete 3 pepitas verdadeiras.','Depois, equipe o Bastão de Sombra e alinhe a posição dentro da torre cônica para revelar o Pássaro de Esteatita.'],update(p){tickPlats(this.plats);const tr=this.triggers[0];if(p.items.filter(x=>x==='ouro_aluvial').length>=3&&p.items.includes('passaro_esteatita')&&p.x>tr.x-130&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();for(const b of this.currents)b.draw();for(const n of this.nodes)n.draw();if(!this.relic.done){const sx=this.relic.x-cam.x,sy=this.relic.y-cam.y;ctx.save();ctx.translate(sx,sy+Math.sin(Date.now()/400)*3);ctx.scale(1.25,1.25);drawPassaro(0,0,1,Date.now()/600);ctx.restore();ctx.fillStyle=UI_ACCENT;ctx.font='bold 12px Courier New';ctx.textAlign='center';ctx.fillText('[E] Câmara Solar da Torre',sx,sy-48);ctx.textAlign='left';if(p.activeTool==='bastao_sombra'){ctx.strokeStyle='rgba(216,179,74,.75)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x+16-cam.x,p.y+10-cam.y);ctx.lineTo(sx,sy);ctx.stroke();}}for(const t of this.triggers)t.draw(p.x,p.y);}};}
-function buildL4(){const FL=590,WW=1900,WH=900;const plats=basePlats(FL,WW,WH);const triggers=[new Trigger(1680,FL-200,120,200,'Concluir Fase 4.2',(p,l)=>{if(l._done)return;l._done=true;sfx('unlock');showDialog(['Este pássaro é o Zimbábue: não apenas ouro ou pedra, mas memória esculpida para atravessar séculos.','Quando colonialistas disseram que africanos não poderiam ter construído esta cidade, as próprias muralhas responderam em silêncio.','O ouro sustentou rotas comerciais; o pássaro sustentou identidade. Algumas histórias são mais fortes que quem tenta apagá-las.'],()=>{completeCurrentPhase('4.2',G.deaths);unlockPhase('4.3');try{sessionStorage.setItem('mineralis_session','1');}catch(e){}G.state='complete';});},true)];return{id:4,bg:'bg04',W:WW,H:WH,startX:80,startY:FL-90,title:'Conclusão - Rota de Sofala e Memória Shona',hint:'✦ Suba à torre para concluir a fase →',plats,cols:[],triggers,intro:['No pôr do sol, Corvan segura o Pássaro de Esteatita no alto da torre cônica.','Uma animação mostra a rota: planalto zimbabweano, Sofala, mercadores árabes, Índia e China.'],update(p){tickPlats(this.plats);const tr=this.triggers[0];if(p.x>tr.x-120&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();for(const t of this.triggers)t.draw(p.x,p.y);const sx=1480-cam.x,sy=FL-100;ctx.save();ctx.translate(sx,sy);ctx.fillStyle='rgba(90,70,35,.55)';ctx.beginPath();ctx.moveTo(-55,100);ctx.lineTo(0,-85);ctx.lineTo(55,100);ctx.closePath();ctx.fill();ctx.strokeStyle='#d8b34a';ctx.stroke();ctx.translate(0,-20);drawPassaro(0,0,1.15,Date.now()/650);ctx.restore();}};}
+function buildL1(){const FL=590,WW=3100,WH=900;const plats=basePlats(FL,WW,WH);const cols=[new Col(210,FL-55,'bateia_madeira'),new Col(540,FL-55,'calabaca_agua')];const aguia={x:2520,y:FL-215,gifted:false,vx:0.6,patrolMin:2200,patrolMax:2850,t:0};const triggers=[new Trigger(2880,FL-190,120,190,'Descer ao rio',(p,l)=>{if(!p.items.includes('bateia_madeira')){notify('Pegue a Bateia de Madeira primeiro.');return;}if(!p.items.includes('calabaca_agua')){notify('Pegue a Calabaça de Água primeiro.');return;}if(!p.items.includes('bastao_sombra')){notify('Interaja com o Peixe-Águia para receber o Bastão de Sombra.');return;}l.triggers[0].done=true;sfx('unlock');showDialog(['Século XIII. Diante de nós está o Grande Zimbabué: muralhas de granito sem argamassa e uma torre cônica que observa o planalto.','Mais de 18 mil pessoas viveram aqui. O ouro viajava do interior da África até Sofala, depois para a Índia e além.','A primeira tarefa é simples: recolher as ferramentas Shona e seguir para o rio Mutirikwe.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,title:'Grande Zimbabué - Muralhas ao Amanhecer',hint:p=>!p.items.includes('bateia_madeira')?'🥣 Pegue a Bateia de Madeira →':!p.items.includes('calabaca_agua')?'💧 Pegue a Calabaça de Água →':!p.items.includes('bastao_sombra')?'🦅 Encontre o Peixe-Águia e receba o Bastão de Sombra →':'✦ Ferramentas prontas - desça ao rio →',plats,cols,triggers,aguia,intro:['Capim dourado, kopjes de granito e muralhas curvas no amanhecer africano.','Colete a Bateia de Madeira e a Calabaça. Depois procure o Peixe-Águia sobre a rocha acima do rio.'],update(p){
+  tickPlats(this.plats);for(const c of this.cols)c.tick();
+  // Peixe-Águia: voo de patrulha suave + ondulação vertical
+  if(!this.aguia.gifted){
+    this.aguia.t=(this.aguia.t||0)+0.018;
+    this.aguia.x+=this.aguia.vx;
+    this.aguia.y=590-215+Math.sin(this.aguia.t)*18; // ondula suavemente
+    if(this.aguia.x>this.aguia.patrolMax){this.aguia.x=this.aguia.patrolMax;this.aguia.vx=-Math.abs(this.aguia.vx);}
+    if(this.aguia.x<this.aguia.patrolMin){this.aguia.x=this.aguia.patrolMin;this.aguia.vx=Math.abs(this.aguia.vx);}
+  }
+  const tr=this.triggers[0];if(p.items.includes('bateia_madeira')&&p.items.includes('calabaca_agua')&&p.items.includes('bastao_sombra')&&p.x>tr.x-110&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();const cx=this.aguia.x-cam.x,cy=this.aguia.y-cam.y;if(cx>-100&&cx<W+100){
+  // Vira o peixe de acordo com a direção do voo
+  ctx.save();if(this.aguia.vx<0){ctx.translate(cx*2,0);ctx.scale(-1,1);}
+  drawPeixeAguia(cx,cy,this.aguia.t||Date.now()/400);
+  ctx.restore();if(!this.aguia.gifted){ctx.fillStyle=UI_ACCENT;ctx.font='bold 12px Courier New';ctx.textAlign='center';ctx.fillText('[E] Interagir com o Peixe-Águia',cx,cy-48);ctx.textAlign='left';}}for(const c of this.cols)c.draw(p.x,p.y);for(const t of this.triggers)t.draw(p.x,p.y);}};}
+function buildL2(){const FL=590,WW=2600,WH=900;const plats=basePlats(FL,WW,WH);const cols=[new Col(820,FL-65,'quartzo_aurifero')];const triggers=[new Trigger(2350,FL-180,120,180,'Avançar para a coleta',(p,l)=>{if(!p.items.includes('quartzo_aurifero')){notify('Colete a amostra de Quartzo Aurífero.');return;}l.triggers[0].done=true;showDialog(['Estas rochas têm mais de 2,7 bilhões de anos. Veios de quartzo branco cortam o granito antigo.','Fluidos hidrotermais depositaram ouro nessas fissuras. Depois, a água arrancou fragmentos e os concentrou no rio.','A dica de coleta: mica brilha, mas é leve. Ouro é denso e afunda.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:2,bg:'bg02',W:WW,H:WH,startX:60,startY:FL-90,title:'Geologia - Granito, Quartzo e Ouro',hint:p=>!p.items.includes('quartzo_aurifero')?'◇ Examine o Quartzo Aurífero no leito do rio →':'✦ Formação compreendida - avance para garimpar →',plats,cols,triggers,intro:['Corvan desce ao rio Mutirikwe. O granito cor de mel aparece sob a água clara.','Veios de quartzo branco cortam o leito. É dali que o ouro do rio se originou.'],update(p){tickPlats(this.plats);for(const c of this.cols)c.tick();const tr=this.triggers[0];if(p.items.includes('quartzo_aurifero')&&p.x>tr.x-120&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();for(const c of this.cols)c.draw(p.x,p.y);for(const t of this.triggers)t.draw(p.x,p.y);}};}
+function buildL3(){const FL=590,WW=3400,WH=900;
+  // basePlats sem os spikes que bloqueavam o caminho nas correntes
+  const plats=basePlats(FL,WW,WH).filter(p=>p.type!=='spike');
+  // Correntes mais estreitas + plataforma de apoio no meio para o player conseguir cruzar
+  const nodes=[new GoldSpot(430,FL-82,true),new GoldSpot(720,FL-82,false),new GoldSpot(1060,FL-82,true),new GoldSpot(1510,FL-82,false),new GoldSpot(1880,FL-82,true),new GoldSpot(2290,FL-82,false)];
+  const currents=[new RiverCurrent(1240,FL-28,140,36),new RiverCurrent(2540,FL-28,150,36)];const relic={x:2920,y:FL-105,alignX:2850,done:false};const triggers=[new Trigger(3160,FL-180,120,180,'Concluir coleta',(p,l)=>{const count=p.items.filter(x=>x==='ouro_aluvial').length;if(count<3){notify('Colete 3 pepitas de Ouro Aluvial.');return;}if(!p.items.includes('passaro_esteatita')){notify('Revele o Pássaro de Esteatita com o Bastão de Sombra.');return;}l.triggers[0].done=true;showDialog(['A mica engana os olhos, mas a bateia revela o peso. O ouro fica no centro.','O Bastão de Sombra revelou a câmara da torre cônica: tecnologia, astronomia e memória reunidas.','Com o artefato e as pepitas, podemos registrar o impacto histórico desta cidade.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:3,bg:'bg03',W:WW,H:WH,startX:60,startY:FL-90,title:'Coleta - Bateia e Orientação Solar',hint:p=>{const count=p.items.filter(x=>x==='ouro_aluvial').length;if(count<3)return `🥣 Garimpe e colete Ouro Aluvial (${count}/3)`;if(!p.items.includes('passaro_esteatita'))return '☀️ Use o Bastão de Sombra na torre para revelar o Pássaro →';return '✦ Coleta completa - avance para a conclusão →';},plats,cols:[],triggers,nodes,currents,relic,intro:['Agora vem o mini-puzzle de garimpagem. Equipe a Bateia [I] e pressione [E] sobre pontos brilhantes.','O ouro afunda; a mica fica leve e suspensa. Colete 3 pepitas verdadeiras.','Depois, equipe o Bastão de Sombra e alinhe a posição dentro da torre cônica para revelar o Pássaro de Esteatita.'],update(p){tickPlats(this.plats);const tr=this.triggers[0];if(p.items.filter(x=>x==='ouro_aluvial').length>=3&&p.items.includes('passaro_esteatita')&&p.x>tr.x-130&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();for(const b of this.currents)b.draw();for(const n of this.nodes)n.draw();if(!this.relic.done){const sx=this.relic.x-cam.x,sy=this.relic.y-cam.y;ctx.save();ctx.translate(sx,sy+Math.sin(Date.now()/400)*3);ctx.scale(1.25,1.25);drawPassaro(0,0,1,Date.now()/600);ctx.restore();ctx.fillStyle=UI_ACCENT;ctx.font='bold 12px Courier New';ctx.textAlign='center';ctx.fillText('[E] Câmara Solar da Torre',sx,sy-48);ctx.textAlign='left';if(p.activeTool==='bastao_sombra'){ctx.strokeStyle='rgba(216,179,74,.75)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x+16-cam.x,p.y+10-cam.y);ctx.lineTo(sx,sy);ctx.stroke();}}for(const t of this.triggers)t.draw(p.x,p.y);}};}
+function buildL4(){const FL=590,WW=1900,WH=900;const plats=basePlats(FL,WW,WH);const triggers=[new Trigger(1680,FL-200,120,200,'Concluir Fase 4.2',(p,l)=>{if(l._done)return;l._done=true;sfx('unlock');showDialog(['Este pássaro é o Zimbábue: não apenas ouro ou pedra, mas memória esculpida para atravessar séculos.','Quando colonialistas disseram que africanos não poderiam ter construído esta cidade, as próprias muralhas responderam em silêncio.','O ouro sustentou rotas comerciais; o pássaro sustentou identidade. Algumas histórias são mais fortes que quem tenta apagá-las.'],()=>{completeCurrentPhase('4.2',G.deaths);unlockPhase('4.3');try{sessionStorage.setItem('mineralis_session','1');}catch(e){}G.state='complete';});},true)];return{id:4,bg:'bg04',W:WW,H:WH,startX:80,startY:FL-90,title:'Rota de Sofala e Memória Shona',hint:'✦ Suba à torre para concluir a fase →',plats,cols:[],triggers,intro:['No pôr do sol, Corvan segura o Pássaro de Esteatita no alto da torre cônica.','Uma animação mostra a rota: planalto zimbabweano, Sofala, mercadores árabes, Índia e China.'],update(p){tickPlats(this.plats);const tr=this.triggers[0];if(p.x>tr.x-120&&!tr.done&&!G.dialog)tr.fn(p,this);},draw(p){goldSparkles();for(const t of this.triggers)t.draw(p.x,p.y);const sx=1480-cam.x,sy=FL-100;ctx.save();ctx.translate(sx,sy);ctx.fillStyle='rgba(90,70,35,.55)';ctx.beginPath();ctx.moveTo(-55,100);ctx.lineTo(0,-85);ctx.lineTo(55,100);ctx.closePath();ctx.fill();ctx.strokeStyle='#d8b34a';ctx.stroke();ctx.translate(0,-20);drawPassaro(0,0,1.15,Date.now()/650);ctx.restore();}};}
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={state:'title',lvIdx:0,level:null,player:null,dialog:false,deaths:0,_items:[],_score:0,_tool:null,load(i){this.lvIdx=i;particles=[];this.level=LEVELS[i]();cam.x=0;this.player=new Player(this.level.startX,this.level.startY);if(i>0){this.player.items=[...this._items];this.player.score=this._score;this.player.activeTool=this._tool;}else{this._items=[];this._score=0;this._tool=null;}this.dialog=false;this.state='playing';BUBBLE.active=false;popup.active=false;for(const k in jp)delete jp[k];setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro);},700);},nextLevel(){this._items=[...this.player.items];this._score=this.player.score;this._tool=this.player.activeTool;if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);else this.state='complete';},update(){if(this.state!=='playing')return;checkDlg();updateCam(this.player.x,this.level.W);this.level.update(this.player);this.player.update(this.level);tickParticles();tickNotif();tickPopup();if(this.player.dead){this.deaths++;this.state='dead';}},draw(){ctx.clearRect(0,0,W,H);if(this.state==='title'){drawTitle();return;}if(this.state==='complete'){drawComplete();return;}drawBg(this.level.bg);for(const p of this.level.plats)drawPlatform(p);this.level.draw(this.player);drawParticles();this.player.draw();if(this.state==='dead'){drawDeath();return;}drawHUD(this.player,this.level);drawPopup();BUBBLE.draw(this.player);drawNotif();INV.draw(this.player);}};

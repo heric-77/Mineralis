@@ -1,5 +1,4 @@
-﻿// ─── SAVE ────────────────────────────────────────────────────────────────────
-const SAVE_KEY='mineralis_save_v2';
+﻿const SAVE_KEY='mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
@@ -10,7 +9,6 @@ const UI_BORDER='#8a6820';
 const UI_BORDER_DARK='#6a4a18';
 const UI_MUTED='#a08030';
 
-// ─── CANVAS ──────────────────────────────────────────────────────────────────
 const W=1280,H=720;
 const wrap=document.getElementById('wrap');
 const canvas=document.getElementById('c');
@@ -28,7 +26,6 @@ function resize(){
 }
 resize();window.addEventListener('resize',resize);
 
-// ─── AUDIO ───────────────────────────────────────────────────────────────────
 let AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
 function sfx(type){
   if(!AC)return;if(AC.state==='suspended')AC.resume();
@@ -48,7 +45,6 @@ function sfx(type){
   o.start(t);o.stop(t+.8);
 }
 
-// ─── ASSETS ──────────────────────────────────────────────────────────────────
 const IMG={};
 let assetsLoaded=0,totalAssets=4,gameReady=false;
 [['bg01','Assets/cena1.svg'],['bg02','Assets/cena2.svg'],
@@ -58,7 +54,6 @@ let assetsLoaded=0,totalAssets=4,gameReady=false;
   img.onerror=()=>{IMG[key]=null;if(++assetsLoaded>=totalAssets){gameReady=true;startGame();}};
   img.src=src;
 });
-// Card do mapa e itens SVG
 IMG.card22=null;
 (function(){const ci=new Image();ci.onload=()=>{IMG.card22=ci;};ci.onerror=()=>{IMG.card22=null;};ci.src='Assets/2_2_apalaches.svg';})();
 ['canario','lampada','picareta_ind','cracha','xisto'].forEach((k,i)=>{
@@ -66,11 +61,10 @@ IMG.card22=null;
   const img=new Image();img.onload=()=>{IMG[k]=img;};img.onerror=()=>{IMG[k]=null;};img.src=src;
 });
 
-// ─── INPUT ───────────────────────────────────────────────────────────────────
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -86,7 +80,6 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){for(const k in jp)delete jp[k];}
 
-// ─── ITEM DEFS ────────────────────────────────────────────────────────────────
 const ITEM_DEFS={
   picareta_industrial:{
     cat:'ferramenta',nome:'Picareta Industrial',icon:'⛏',
@@ -127,7 +120,6 @@ const ITEM_DEFS={
   },
 };
 
-// ─── INVENTORY ────────────────────────────────────────────────────────────────
 const INV={
   open:false,tab:0,cursor:0,
   TABS:[
@@ -139,13 +131,14 @@ const INV={
     const cat=this.TABS[this.tab].id;
     let saved={};
     try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
-    return Object.entries(ITEM_DEFS).filter(([id,def])=>{
+    const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
+    return Object.entries(_ALL_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
       return player.items.includes(id)||player.items.includes(id+'_ok')||saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
-  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open;},
-  close(){this.open=false;G.dialog=false;},
+  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
+  close(){this.open=false;G.dialog=BUBBLE.active;},
   isUpKey(){return jp['ArrowUp']||jp['KeyW'];},
   isDownKey(){return jp['ArrowDown']||jp['KeyS'];},
   isLeftKey(){return jp['ArrowLeft']||jp['KeyA'];},
@@ -237,7 +230,6 @@ const INV={
   }
 };
 
-// ─── PARTICLES ────────────────────────────────────────────────────────────────
 let particles=[];
 function burst(x,y,color,n=8,spd=3.2){
   for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2+Math.random()*.5;
@@ -246,11 +238,9 @@ function burst(x,y,color,n=8,spd=3.2){
 function tickParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;if(p.life<=0)particles.splice(i,1);}}
 function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
 
-// ─── CAMERA ───────────────────────────────────────────────────────────────────
 const cam={x:0,y:0};
 function updateCam(px,worldW){cam.x+=(Math.max(0,Math.min(px-W/2+24,worldW-W))-cam.x)*0.12;}
 
-// ─── PHYSICS ──────────────────────────────────────────────────────────────────
 const GRAV=0.46,PSPD=4.5,JUMPF=-12.2,MAXFALL=16;
 
 const TILE_THEMES={
@@ -275,7 +265,6 @@ function drawPlatform(p){
   if(p.type==='spike'){
     ctx.fillStyle='#4a3828';const nc=Math.max(1,Math.floor(p.w/20));
     for(let i=0;i<nc;i++){const tx=sx+i*(p.w/nc);ctx.beginPath();ctx.moveTo(tx,sy+p.h);ctx.lineTo(tx+p.w/nc/2,sy);ctx.lineTo(tx+p.w/nc,sy+p.h);ctx.fill();}
-    // Rock spike label
     ctx.strokeStyle='rgba(120,80,40,0.5)';ctx.lineWidth=1;
     for(let i=0;i<nc;i++){const tx=sx+i*(p.w/nc);ctx.beginPath();ctx.moveTo(tx,sy+p.h);ctx.lineTo(tx+p.w/nc/2,sy);ctx.lineTo(tx+p.w/nc,sy+p.h);ctx.stroke();}
     return;
@@ -286,7 +275,6 @@ function drawPlatform(p){
     ctx.fillStyle='#4a3828';ctx.fillRect(sx,sy,p.w,p.h);
     ctx.fillStyle='#6a5040';ctx.fillRect(sx,sy,p.w,3);ctx.globalAlpha=1;return;
   }
-  // Coal/shale texture tiles
   const ts=24,cols=Math.ceil(p.w/ts),rows=Math.ceil(p.h/ts);
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
@@ -294,18 +282,15 @@ function drawPlatform(p){
       ctx.fillStyle=r===0?tileTheme.body:(r%2===0?tileTheme.dark:tileTheme.body);
       ctx.fillRect(tx,ty,tw,th);
       ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(tx+tw-1,ty,1,th);ctx.fillRect(tx,ty+th-1,tw,1);
-      // Coal glint
       if(Math.random()<0.015){ctx.fillStyle='rgba(100,120,160,0.25)';ctx.fillRect(tx+Math.random()*tw,ty+Math.random()*th,3,2);}
     }
   }
   ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,4);
-  // Sediment layering lines
   ctx.fillStyle='rgba(80,60,40,0.3)';
   for(let i=0;i<Math.floor(p.h/14);i++)ctx.fillRect(sx,sy+4+i*14,p.w,1);
   if(p.moving){ctx.fillStyle='rgba(180,140,80,0.3)';ctx.fillRect(sx,sy,p.w,4);}
 }
 
-// ─── roundRect ────────────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
   ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
@@ -313,54 +298,31 @@ function roundRect(x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
-// ─── DRAW CORVAN ──────────────────────────────────────────────────────────────
-// Reused from Fase 2.1 — kept identical for visual consistency
 function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const S=scale;
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
   const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
   const lb=0.7+Math.sin(frame*0.4)*0.3;
-  const showPickaxe=activeTool==='picareta_industrial';
-  const showLamp=activeTool==='lampada_davy';
-  // Hat
   r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
   r(5,3,22,2,'#5a3a10');
   r(13,0,6,3,'#c89820');r(14,0,4,2,'#ffe060');
-  // Face
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  // Shirt
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
-  // Belt
   r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
-  // Pants
   r(9,30,14,12,'#6a4820');r(15,36,2,6,'#5a3810');
-  // Left arm
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
-  if(showLamp){
-    ctx.save();ctx.translate(3*S,30*S);drawLampadaDavy(0,0,S*0.42);ctx.restore();
-  }
-  // Right arm
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
-  if(showPickaxe){
-    const wb=Math.sin(frame*0.2)*1.5;
-    ctx.save();ctx.translate(28*S,(24+wb)*S);ctx.rotate(0.35+Math.sin(frame*0.18)*0.12);
-    drawPicaretaIndustrial(0,0,S*0.48,frame);
-    ctx.restore();
-  }
-  // Boots
   r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
-  // Hat glow
   ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
-  if(showLamp){
-    ctx.fillStyle='#ffcc00';ctx.globalAlpha=0.18*lb;ctx.beginPath();ctx.arc(5*S,31*S,5*S,0,Math.PI*2);ctx.fill();
-  }
-  ctx.globalAlpha=1;ctx.restore();
+  ctx.globalAlpha=1;
+  _drawCorvanTools(activeTool,S,frame,lb);
+  ctx.restore();
 }
 
 function drawPicaretaIndustrial(x,y,S=1,t=0){
@@ -997,29 +959,9 @@ function drawHUD(player,level){
     });
   }
 
-  // Davy lamp HUD (separate, top right)
-  const hasDavy=player.items.includes('lampada_davy');
-  const inGas=G.level?.grisuZones?.some(gz=>gz.overlaps(player))&&hasDavy||false;
-  drawDavyHUD(hasDavy,inGas);
+  // Davy lamp HUD removido — status integrado no painel do Diário
 
-  // Carvão counter (level 3)
-  if(level.id===3){
-    const hasLig=player.items.includes('lignito');
-    const hasBet=player.items.includes('carvao_betuminoso');
-    const hasAnt=player.items.includes('antracito');
-    const hasCra=player.items.includes('cracha_breaker_boy');
-    const ox=W/2+150,oy=48;
-    ctx.fillStyle='rgba(6,3,0,0.85)';roundRect(ox,oy,200,72,6);ctx.fill();
-    ctx.strokeStyle=UI_BORDER_DARK;ctx.lineWidth=1.5;roundRect(ox,oy,200,72,6);ctx.stroke();
-    ctx.font='bold 11px "Courier New"';ctx.fillStyle=UI_ACCENT;
-    ctx.textAlign='center';ctx.fillText('COLETA DE CARVÃO',ox+100,oy+16);ctx.textAlign='left';
-    ctx.fillStyle='rgba(160,120,40,0.3)';ctx.fillRect(ox+8,oy+22,184,1);
-    const icons=[['🪨',hasLig],[' ⬛',hasBet],['💎',hasAnt],['🏷️',hasCra]];
-    icons.forEach(([ic,has],i)=>{
-      ctx.font='18px serif';ctx.fillStyle=has?'#e0a020':'#334';
-      ctx.fillText(ic,ox+16+i*44,oy+52);
-    });
-  }
+  // Coleta de carvão removida do HUD — itens já constam no Diário de Bordo
 
   const hintText=typeof level.hint==='function'?level.hint(player):level.hint;
   ctx.fillStyle='#9090a8';ctx.font='18px "Courier New"';
@@ -1046,8 +988,8 @@ function drawTitle(){
   ctx.fillStyle=`rgba(200,155,60,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='18px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,450);
   ctx.fillStyle='#a0a8b8';ctx.font='17px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,494);
-  ctx.fillText('[I] Diário de Bordo   [M] Menu Principal',W/2,530);
+  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Minerar',W/2,494);
+  ctx.fillText('[M] Menu Principal',W/2,530);
   ctx.textAlign='left';
 }
 
@@ -1264,9 +1206,11 @@ function buildL2(){
     plats,cols,triggers,coalLayers,canario:null,grisuZones:null,crachaObj:null,
     intro:[
       '"Estamos dentro da mina. As paredes exibem a história geológica completa: xisto cinza intercalado com faixas negras brilhantes de carvão."',
-      '"Há 300 milhões de anos, esta região era um pântano tropical. A vegetação soterrada virou carvão. Cada centímetro representa séculos de compressão."',
-      'Extraia amostras [E] das camadas de carvão na parede para identificar os três tipos! Equipe a Picareta Industrial no Diário [I].'
+      '"Há 300 milhões de anos — o Período Carbonífero — esta região era um pântano tropical denso de samambaias gigantes. Essa vegetação foi soterrada, comprimida e aquecida por milhões de anos."',
+      '"O resultado: Lignito → Carvão Betuminoso → Antracito. Cada camada representa um grau diferente de pressão e tempo. Quanto mais fundo, mais puro o carvão."',
+      'Extraia amostras [E] das camadas na parede para identificar os três tipos! Equipe a Picareta Industrial no Diário [I].'
     ],
+    _eduTimer:0,
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const cl of this.coalLayers)cl.tick();for(const c of this.cols)c.tick();},
     draw(player){
       drawMineSparkles();
@@ -1281,15 +1225,7 @@ function buildL2(){
         ctx.strokeStyle='rgba(80,120,180,0.2)';ctx.lineWidth=1;
         ctx.beginPath();ctx.moveTo(dx2,dy2);ctx.lineTo(dx2,dy2+18);ctx.stroke();
       }
-      // Painel educativo geológico (fixo na tela quando na esquerda)
-      const eduX=cam.x<200?16:W+100;
-      if(eduX<W){
-        ctx.fillStyle='rgba(6,3,0,0.82)';roundRect(eduX,H-190,200,180,6);ctx.fill();
-        ctx.strokeStyle='rgba(100,80,40,0.5)';ctx.lineWidth=1;roundRect(eduX,H-190,200,180,6);ctx.stroke();
-        ctx.font='bold 10px "Courier New"';ctx.fillStyle=UI_ACCENT;ctx.fillText('CARBONÍFERO',eduX+8,H-173);
-        ctx.font='9px "Courier New"';ctx.fillStyle='#a09070';
-        ['~300 milhões de anos','Pântano tropical soterrado','→ Pressão + calor','→ Carvão formado','Lignito → Betuminoso','→ Antracito'].forEach((l,i)=>ctx.fillText(l,eduX+8,H-155+i*16));
-      }
+      // Painel Carbonifero removido — info integrada nas falas do Corvan (intro)
       for(const cl of this.coalLayers)cl.draw();
       for(const c of this.cols)c.draw(player.x,player.y);
       for(const t of this.triggers)t.draw(player.x,player.y);
@@ -1457,9 +1393,9 @@ function buildL4(){
     },
     plats,cols,triggers,coalLayers:null,canario:null,grisuZones:null,crachaObj:null,celebState,
     intro:[
-      '"Saímos da mina ao entardecer. Corvan segura o Crachá de Breaker Boy Nº 247."',
+      '"Saímos da mina ao entardecer"',
       '"A vila operária ainda fuma ao fundo. Os pombos pousam nos fios de telégrafo — a modernidade construída sobre o carvão."',
-      '"Chegue ao marco final para registrar todas as descobertas e concluir a Fase 2.2!"',
+      '"Vamos até o marco final para registrar todas as nossas descobertas e concluir a Fase 2.2!"',
     ],
     update(player){
       tickMoving(this.plats);tickTrapdoors(this.plats);
@@ -1472,7 +1408,6 @@ function buildL4(){
       }
     },
     draw(player){
-      // Fios de telégrafo e pombos
       const wireY=FL-cam.y-220;
       ctx.strokeStyle='rgba(40,25,10,0.6)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(0,wireY);ctx.lineTo(W,wireY);ctx.stroke();
@@ -1593,7 +1528,8 @@ const G={
     this.player.draw();
     if(this.state==='dead'){drawDeath();return;}
     drawHUD(this.player,this.level);
-    drawPopup();BUBBLE.draw(this.player);drawNotif();
+    BUBBLE.draw(this.player);
+    drawNotif();
     INV.draw(this.player);
   }
 };
@@ -1601,11 +1537,11 @@ const G={
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
-  if(G.state==='title'&&(jp['Enter']||jp['Space']))G.load(0);
-  if(G.state==='dead'&&jp['KeyR'])G.load(G.lvIdx);
-  if(G.state==='complete'&&jp['Enter']){
-    unlockPhase('2.3');
-    G.deaths=0;G._storedItems=[];G._storedScore=0;G._storedTools=[];
+  if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
+  if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
+  if(G.state==='complete' &&jp['Enter']){
+    try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+    G.deaths=0;
     window.location.href='../../MenuPrincipal/index.html?unlocked=2.3';
   }
   G.update();G.draw();clearJP();
@@ -1613,13 +1549,10 @@ function loop(){
 
 if(!gameReady){(function loadLoop(){
   if(gameReady)return;requestAnimationFrame(loadLoop);
-  ctx.fillStyle='#060402';ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=UI_ACCENT;ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
-  ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
+  ctx.fillStyle='#0a0608';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#e0b840';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
+  ctx.fillText('Carregando...  '+assetsLoaded+'/'+totalAssets,W/2,H/2);
+  ctx.fillStyle='#888';ctx.font='14px "Courier New"';
+  ctx.fillText('Fase 2.2 - Minas de Carvao dos Apalaches',W/2,H/2+36);
   ctx.textAlign='left';
 })();}
-
-
-
-
-

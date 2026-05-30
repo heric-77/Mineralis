@@ -57,6 +57,7 @@ function _salvarFase(score, deaths){
 }
 function _voltarAoMenu(){
   _salvarFase(G.player?.score||0, G.deaths);
+  try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
   window.location.href = '../../MenuPrincipal/index.html';
 }
 
@@ -128,7 +129,7 @@ window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
   keys[e.code]=true;
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open)INV.close();
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -252,6 +253,33 @@ function drawPlatform(p){
   if(p.moving){ ctx.fillStyle='rgba(240,192,64,0.35)'; ctx.fillRect(sx,sy,p.w,4); }
 }
 
+// ── Corvan pixel-art (igual à Fase 1-1) ─────────────────────────────────────
+function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
+  const S=scale;
+  ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
+  const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
+  const lb=0.7+Math.sin(frame*0.4)*0.3;
+  r(7,3,18,2,'#3a2208');r(9,1,14,4,'#4a2e10');
+  r(13,0,6,3,'#c8a020');r(14,0,4,2,'#ffe060');
+  r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
+  r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
+  r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
+  r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
+  r(13,14,6,2,'#c88050');
+  r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
+  r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
+  r(8,28,16,2,'#2a1408');r(14,28,4,2,'#c88020');
+  r(9,30,14,12,'#383838');r(15,36,2,6,'#282828');
+  r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
+  r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
+  r(9,42,6,4,'#3a1e08');r(17,42,6,4,'#3a1e08');
+  r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
+  ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  _drawCorvanTools(activeTool,S,frame,lb);
+  ctx.restore();
+}
+
 function roundRect(x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
@@ -325,24 +353,38 @@ const INV = {
     const cat=this.TABS[this.tab].id;
     let coletados={};
     try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);coletados=j.coletados||{};}}catch(e){}
+    // Mergear itens do player atual
     for(const tipo of player.items){
       const jid=TIPO_TO_JOURNAL[tipo]||tipo;
       coletados[jid]=true;
     }
     const stoneCount=player.items.filter(i=>i==='stone').length;
+
+    // Catálogo: local ITEM_DEFS + global ALL_ITEM_DEFS (sem duplicar journalIds)
+    const _seenJids=new Set(Object.values(ITEM_DEFS).map(d=>d.journalId||'').filter(Boolean));
+    const _FINAL={...ITEM_DEFS};
+    for(const [id,def] of Object.entries(window.ALL_ITEM_DEFS||{})){
+      if(id in ITEM_DEFS)continue;
+      const jid=def.journalId||id;
+      if(_seenJids.has(jid))continue;
+      _seenJids.add(jid);_FINAL[id]=def;
+    }
+
     const out=[];
-    for(const [id,def] of Object.entries(ITEM_DEFS)){
+    for(const [id,def] of Object.entries(_FINAL)){
       if(def.cat!==cat) continue;
+      // Suporte a journalId explícito OU chave direta no coletados
+      const jid=def.journalId||id;
       if(def.multiple){
         if(stoneCount>0) out.push({id,...def,count:stoneCount});
-      } else if(coletados[id]){
+      } else if(coletados[jid]||coletados[id]){
         out.push({id,...def,count:1});
       }
     }
     return out;
   },
-  toggle(player){ this.open=!this.open; if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));} G.dialog=this.open; },
-  close(){ this.open=false; G.dialog=false; },
+  toggle(player){ this.open=!this.open; if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));} G.dialog=this.open||BUBBLE.active; },
+  close(){ this.open=false; G.dialog=BUBBLE.active; },
   navigate(player){
     if(!this.open)return false;
     if(jp['ArrowLeft']||jp['KeyA']){this.tab=(this.tab+2)%3;this.cursor=0;return true;}
@@ -467,94 +509,45 @@ const BUBBLE = {
 
   draw(player) {
     if (!this.active) return;
-    this.faceFrame += 0.08;
-
-    const FONT    = '15px "Courier New"';
-    const NAMEFNT = 'bold 12px "Courier New"';
-    ctx.font = FONT;
-    const lineH   = 22;
-    const pad     = 18;
-    const faceW   = 56;
-    const faceH   = 68;
-    const textAreaW = 480;
-
-    const bubW = faceW + pad + textAreaW + pad*2;
-    const bubH = Math.max(faceH, this.lines.length*lineH + 30) + pad*2;
-
-    const pcx = player.x - cam.x + player.w/2;
-    const pcy = player.y - cam.y;
-
-    let bx = pcx - bubW/2;
-    let by = pcy - bubH - 28;
-
-    bx = Math.max(12, Math.min(bx, W - bubW - 12));
-    if (by < 40) by = pcy + player.h + 10;
-    by = Math.max(40, Math.min(by, H - bubH - 10));
-
-    ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=12;
-    ctx.fillStyle='rgba(6,3,0,0.94)';
-    roundRect(bx,by,bubW,bubH,14); ctx.fill();
+    this.faceFrame += 0.03;
+    ctx.font='15px "Courier New"';
+    const faceW=60,faceH=76,facePad=12;
+    const lineH=24,pad=20,textW=480;
+    const bubW=facePad+faceW+facePad+textW+pad;
+    const bubH=Math.max(faceH+pad*2,this.lines.length*lineH+70)+pad;
+    const pcx=player.x-cam.x+player.w/2,pcy=player.y-cam.y;
+    let bx=Math.max(10,Math.min(pcx-bubW/2,W-bubW-10)),by=Math.max(10,pcy-bubH-32);
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=14;
+    ctx.fillStyle='rgba(8,4,0,0.96)';roundRect(bx,by,bubW,bubH,14);ctx.fill();
     ctx.shadowBlur=0;
+    ctx.strokeStyle='#e0b840';ctx.lineWidth=2.5;roundRect(bx,by,bubW,bubH,14);ctx.stroke();
+    ctx.strokeStyle='rgba(200,160,40,0.2)';ctx.lineWidth=1;roundRect(bx+4,by+4,bubW-8,bubH-8,10);ctx.stroke();
+    const tbx=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
+    const tty=by+bubH,tipy=Math.min(pcy,tty+38);
+    ctx.fillStyle='rgba(8,4,0,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#e0b840';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(pcx,tipy);ctx.lineTo(tbx+14,tty);ctx.stroke();
+    const fx=bx+facePad,fy=by+pad;
+    ctx.fillStyle='rgba(20,10,2,0.85)';roundRect(fx,fy,faceW,faceH,6);ctx.fill();
+    ctx.strokeStyle='rgba(200,160,40,0.45)';ctx.lineWidth=1.5;roundRect(fx,fy,faceW,faceH,6);ctx.stroke();
+    const faceScale=faceW/18*0.82;
+    const sprX=fx+faceW/2-16*faceScale;
+    const sprY=fy+4;
+    ctx.save();
+    ctx.beginPath();roundRect(fx+1,fy+1,faceW-2,faceH-2,5);ctx.clip();
+    drawCorvan(sprX,sprY,faceScale,false,this.faceFrame*4,null);
+    const mouthY=sprY+13*faceScale,mouthX=sprX+12*faceScale,mouthW=8*faceScale;
+    const open=Math.abs(Math.sin(this.faceFrame*4))*1.8*faceScale;
+    if(open>0.5){ctx.fillStyle='#2a0e06';ctx.fillRect(mouthX,mouthY,mouthW,open);}
+    ctx.restore();
+    const tx=fx+faceW+facePad;
+    ctx.font='bold 12px "Courier New"';ctx.fillStyle='#e0b840';ctx.fillText(this.speakerTxt,tx,by+pad+14);
+    ctx.fillStyle='rgba(200,160,40,0.35)';ctx.fillRect(tx,by+pad+20,textW,1);
+    ctx.font='15px "Courier New"';ctx.fillStyle='#f0e8c0';
+    this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+40+i*lineH));
+    const pulse=0.5+Math.sin(Date.now()/400)*0.5;
+    ctx.fillStyle=`rgba(200,160,40,${pulse})`;ctx.font='12px "Courier New"';
+    ctx.textAlign='right';ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-10);ctx.textAlign='left';
 
-    ctx.strokeStyle='#c8a020'; ctx.lineWidth=2.5;
-    roundRect(bx,by,bubW,bubH,14); ctx.stroke();
-
-    const tailBaseX = Math.max(bx+30, Math.min(pcx, bx+bubW-30));
-    const tailTopY  = by + bubH;
-    const tailTipX  = pcx;
-    const tailTipY  = Math.min(pcy, tailTopY+36);
-
-    ctx.fillStyle='rgba(6,3,0,0.94)';
-    ctx.beginPath();
-    ctx.moveTo(tailBaseX-14, tailTopY);
-    ctx.lineTo(tailBaseX+14, tailTopY);
-    ctx.lineTo(tailTipX, tailTipY);
-    ctx.closePath(); ctx.fill();
-
-    ctx.strokeStyle='#c8a020'; ctx.lineWidth=2;
-    ctx.beginPath();
-    ctx.moveTo(tailBaseX-14, tailTopY);
-    ctx.lineTo(tailTipX, tailTipY);
-    ctx.lineTo(tailBaseX+14, tailTopY);
-    ctx.stroke();
-
-    const fx = bx+pad, fy = by+pad;
-    if (SPRITES['idle']||SPRITES['talk']) {
-      const key = 'talk';
-      const spr = SPRITES[key]||SPRITES['idle']||SPRITES['walk'];
-      if (spr) {
-        const info = SPRITE_INFO[key]||SPRITE_INFO['idle']||SPRITE_INFO['walk'];
-        const fi = Math.floor(this.faceFrame)%info.n;
-        const nw = spr.width/info.n;
-        const showH = info.fh*0.55;
-        const scl = faceH/showH;
-        const dw = info.fw*scl;
-        ctx.save();
-        ctx.beginPath(); ctx.rect(fx,fy,faceW,faceH); ctx.clip();
-        ctx.drawImage(spr, fi*nw+info.ox, info.oy, info.fw, showH, fx+(faceW-dw)/2, fy, dw, faceH);
-        ctx.restore();
-      }
-    } else {
-      ctx.fillStyle='#c8845a'; ctx.fillRect(fx+8,fy+4,40,50);
-    }
-    ctx.strokeStyle='rgba(200,160,32,0.5)'; ctx.lineWidth=1.5;
-    ctx.strokeRect(fx,fy,faceW,faceH);
-
-    const tx = fx + faceW + pad;
-    ctx.font = NAMEFNT;
-    ctx.fillStyle='#f0c040';
-    ctx.fillText(this.speakerTxt, tx, by+pad+14);
-
-    ctx.font = FONT;
-    ctx.fillStyle='#f0e8c0';
-    this.lines.forEach((l,i)=>ctx.fillText(l, tx, by+pad+36+i*lineH));
-
-    const pulse = 0.55+Math.sin(Date.now()/400)*0.45;
-    ctx.fillStyle=`rgba(200,160,32,${pulse})`;
-    ctx.font='12px "Courier New"';
-    ctx.textAlign='right';
-    ctx.fillText('[E] Continuar →', bx+bubW-pad, by+bubH-8);
-    ctx.textAlign='left';
   }
 };
 
@@ -581,7 +574,7 @@ function drawNotif(){
   const nx=(W-tw)/2, ny=46;
   ctx.fillStyle='rgba(0,0,0,0.82)'; roundRect(nx,ny,tw,28,6); ctx.fill();
   ctx.strokeStyle='#f0c040'; ctx.lineWidth=1.5; roundRect(nx,ny,tw,28,6); ctx.stroke();
-  ctx.fillStyle='#f0c040'; ctx.textAlign='center'; ctx.fillText(notifText,W/2,ny+19); ctx.textAlign='left';
+  ctx.fillStyle='#e0b840'; ctx.textAlign='center'; ctx.fillText(notifText,W/2,ny+19); ctx.textAlign='left';
   ctx.restore();
 }
 
@@ -780,7 +773,7 @@ class Player{
     this.vx=0; this.vy=0; this.onG=false; this.facing=1;
     this.hp=3; this.maxHp=3; this.inv=0; this.dead=false;
     this.activeTool=null;
-    this.frame=0; this.ft=0; this.state='idle';
+    this.frame=0; this.ft=0; this.walkT=0; this.state='idle';
     this.coyote=0; this.jbuf=0; this.onMoving=null;
     this.items=[]; this.score=0;
     this.soroche=0; this.sorocheAnim=0; this.interactAnim=0;
@@ -790,6 +783,7 @@ class Player{
   near(r,d=80){return Math.abs(this.x+20-(r.x+r.w/2))<r.w/2+d&&Math.abs(this.y+40-(r.y+r.h/2))<r.h/2+d;}
 
   update(level){
+    if(INV.open){ INV.navigate(this); return; }
     if(G.dialog) return;
     if(isR()||isL()) this.soroche=Math.min(100,this.soroche+0.08);
     else             this.soroche=Math.max(0,this.soroche-0.3);
@@ -843,6 +837,7 @@ class Player{
     else if(!this.onG&&this.vy>0) this.state='fall';
     else if(Math.abs(this.vx)>0.5) this.state='run';
     else this.state='idle';
+    if(Math.abs(this.vx)>0.5) this.walkT+=0.18;
     const spd=this.state==='run'?6:this.state==='idle'?18:8;
     if(++this.ft>=spd){this.ft=0;this.frame=(this.frame+1)%6;}
   }
@@ -885,41 +880,30 @@ class Player{
 
   draw(){
     if(this.dead) return;
-    const dx=this.x-cam.x, dy=this.y-cam.y;
-    const dw=this.w*2.4, dh=this.h*1.45;
-    const ox=(dw-this.w)/2, oy=dh-this.h;
+    const S=1.5, FOOT_Y=46*S;
+    const CW=32*S;
+    const dx=this.x-cam.x+this.w/2-CW/2;
+    const dy=this.y-cam.y+this.h-FOOT_Y;
     const flip=this.facing===-1;
     const hasLant=this.items.includes('lantern');
-    let drawn=false;
-    if(this.interactAnim>0&&this.state!=='jump') drawn=drawSprite('dig',this.frame,dx-ox,dy-oy,dw,dh,flip);
-    else if(hasLant)        drawn=drawSprite('lant',this.frame,dx-ox,dy-oy,dw,dh,flip);
-    else if(this.state==='run')  drawn=drawSprite('walk',this.frame,dx-ox,dy-oy,dw,dh,flip);
-    else if(this.state==='idle') drawn=drawSprite('idle',this.frame%4,dx-ox,dy-oy,dw,dh,flip);
-    if(!drawn){
-      ctx.save();
-      if(flip){ctx.translate(dx+this.w,dy);ctx.scale(-1,1);}else ctx.translate(dx,dy);
-      ctx.fillStyle='#c8845a';ctx.fillRect(8,0,24,20);
-      ctx.fillStyle='#4a2e10';ctx.fillRect(6,-4,28,8);
-      ctx.fillStyle='#f0c040';ctx.fillRect(16,-6,8,4);
-      ctx.fillStyle='#b82010';ctx.fillRect(6,20,28,30);
-      ctx.fillStyle='#383838';ctx.fillRect(8,50,12,24);ctx.fillRect(22,50,12,24);
-      ctx.fillStyle='#c8845a';ctx.fillRect(2,22,6,18);ctx.fillRect(32,22,6,18);
-      ctx.restore();
-    }
+    const hasTupu=this.items.includes('tumi');
+    const wf=this.state==='run'?this.walkT:(this.state==='idle'?Date.now()/800:0);
+    const _tool=hasTupu?'tupu':hasLant?'lantern':this.activeTool||null;
+    ctx.save();drawCorvan(dx,dy,S,flip,wf,_tool);ctx.restore();
     if(hasLant){
-      const gx=dx+(flip?-8:this.w+4), gy=dy+this.h*0.7;
-      const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,80);
-      lg.addColorStop(0,'rgba(255,200,80,0.22)'); lg.addColorStop(1,'rgba(255,200,80,0)');
-      ctx.fillStyle=lg; ctx.fillRect(gx-80,gy-80,160,160);
+      const gx=this.x-cam.x+(flip?-12:this.w+14),gy=this.y-cam.y+this.h*0.6;
+      const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,120);
+      lg.addColorStop(0,'rgba(255,210,80,0.28)');lg.addColorStop(1,'rgba(255,210,80,0)');
+      ctx.fillStyle=lg;ctx.fillRect(gx-120,gy-120,240,240);
     }
-    if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(dx,dy,this.w,this.h);}
+    if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
     if(this.sorocheAnim>0){
       const a=this.sorocheAnim/120*0.5;
       ctx.fillStyle=`rgba(80,20,20,${a})`;ctx.fillRect(0,0,W,H);
       if(this.sorocheAnim>60){
         ctx.fillStyle=`rgba(255,80,0,${(this.sorocheAnim-60)/60*0.7})`;
         ctx.font='bold 28px "Courier New"';ctx.textAlign='center';
-        ctx.fillText('⚠ SOROCHE!',W/2,90);ctx.textAlign='left';
+        ctx.fillText('⚠ SOROCHE! [E] Coca',W/2,90);ctx.textAlign='left';
       }
     }
   }
@@ -1303,49 +1287,110 @@ function buildL4(){
 }
 
 function drawHUD(player,level){
-  ctx.fillStyle='rgba(0,0,0,0.62)';ctx.fillRect(0,0,W,38);
+  // ── Barra topo ─────────────────────────────────────────────────
+  ctx.fillStyle='rgba(8,4,0,0.82)';ctx.fillRect(0,0,W,38);
+  ctx.fillStyle='rgba(200,160,40,0.18)';ctx.fillRect(0,36,W,2);
+
+  // Corações
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#e02020':'#333';
+    ctx.fillStyle=i<player.hp?'#f0c040':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
     ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  ctx.fillStyle='rgba(240,192,64,.9)';ctx.font='13px "Courier New"';
+
+  // Título e score
+  ctx.fillStyle='#e0c880';ctx.font='20px "Courier New"';
   ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#f0c040';ctx.font='bold 15px "Courier New"';
-  ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  const tY=44;
-  ctx.fillStyle='rgba(0,0,0,0.5)';_roundRect(16,tY,140,28,4);ctx.fill();
-  ctx.strokeStyle=player.activeTool?'#f0c040':'#444';ctx.lineWidth=1.5;_roundRect(16,tY,140,28,4);ctx.stroke();
+  ctx.fillStyle='#e0b840';ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText('✦ '+player.score,W-14,26);ctx.textAlign='left';
+
+  // ── Painel "Diário de Bordo" minimizado ────────────────────────
+  const PX=12, PY=46, PW=186;
+  const TOOL_DEFS=[
+    {id:'lantern', icon:'🔦', nome:'Lanterna'},
+    {id:'stone',   icon:'💎', nome:'Pedra Constelação', count:player.items.filter(i=>i==='stone').length},
+    {id:'tumi',    icon:'✦',  nome:'Tupu de Ouro'},
+  ];
+  const tools=TOOL_DEFS.filter(t=>t.count>0||player.items.includes(t.id));
+  const PH=52+(tools.length>0?6+tools.length*22:0);
+
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(8,4,0,0.88)';
+  roundRect(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;
+  roundRect(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.strokeStyle='rgba(200,160,40,0.25)';ctx.lineWidth=1;
+  roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
+  ctx.restore();
+
+  // Label + [I]
+  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#c0a030';
+  ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#c0a030';
+  ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(200,160,40,0.2)';
+  roundRect(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle='#c0a030';ctx.lineWidth=1;
+  roundRect(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#e0b840';
+  ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+
+  // Separador
+  ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
+
+  // Ferramenta ativa
+  const midX=PX+PW/2, atY=PY+44;
+  ctx.textAlign='center';
   if(player.activeTool&&ITEM_DEFS[player.activeTool]){
     const def=ITEM_DEFS[player.activeTool];
-    ctx.font='14px serif';ctx.fillText(def.icon,24,tY+20);
-    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText(def.nome,42,tY+20);
-  } else {ctx.font='11px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',22,tY+20);}
-  ctx.fillStyle='rgba(200,160,40,0.15)';_roundRect(162,tY,46,28,4);ctx.fill();
-  ctx.strokeStyle='#8a6820';ctx.lineWidth=1.5;_roundRect(162,tY,46,28,4);ctx.stroke();
-  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#c0a030';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  let ix=W-16;const inv=[];
-  if(player.items.includes('tumi'))    inv.push('🗡 TUMI');
-  if(player.items.includes('lantern')) inv.push('🔦 LANTERNA');
-  const sc=player.items.filter(i=>i==='stone').length;
-  if(sc>0) inv.push('💎 '+sc+'/3');
-  for(const it of inv){ctx.fillStyle='#f0c040';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,tY+20);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
-  if(player.soroche>40){
-    const pct=(player.soroche-40)/60,bW=120,bX=16,bY=44;
-    ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(bX,bY,bW,12);
-    ctx.fillStyle=`hsl(${30-pct*30},100%,50%)`;ctx.fillRect(bX,bY,bW*pct,12);
-    ctx.strokeStyle='#f0a020';ctx.lineWidth=1;ctx.strokeRect(bX,bY,bW,12);
-    ctx.fillStyle='#ffb040';ctx.font='10px "Courier New"';ctx.fillText('SOROCHE',bX+2,bY+10);
+    ctx.fillStyle='rgba(200,160,40,0.1)';
+    roundRect(PX+6,atY-14,PW-12,20,3);ctx.fill();
+    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';
+    ctx.fillText(def.icon+' '+def.nome,midX,atY+1);
+  } else {
+    ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8a0';
+    ctx.fillText('Não Equipado',midX,atY);
   }
-  ctx.fillStyle='rgba(240,220,120,.72)';ctx.font='12px "Courier New"';
-  ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
-  if(G.timeOnLevel<600){
-    ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(8,H-44,400,28);
-    ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';
-    ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir   [Stomp inimigo]',14,H-25);
+  ctx.textAlign='left';
+
+  // Itens coletados no painel
+  if(tools.length>0){
+    ctx.fillStyle='rgba(200,160,40,0.3)';ctx.fillRect(PX+6,PY+52,PW-12,1);
+    tools.forEach((t,i)=>{
+      const ty=PY+52+8+i*22;
+      const equipped=player.activeTool===t.id;
+      ctx.textAlign='center';
+      ctx.font='11px serif';ctx.fillStyle=equipped?'#f0c040':'#a08040';
+      const label=t.count>1?t.icon+' '+t.nome+' ('+t.count+')':t.icon+' '+t.nome;
+      ctx.fillText(label+(equipped?' ◀':''),midX,ty+10);
+      ctx.textAlign='left';
+    });
   }
+
+  // ── Barra de Soroche (à direita do painel) ─────────────────────
+  if(player.soroche>20){
+    const pct=player.soroche/100,bW=130,bX=PX+PW+10,bY=PY+8;
+    ctx.fillStyle='rgba(8,4,0,0.82)';
+    roundRect(bX,bY,bW+8,22,4);ctx.fill();
+    ctx.strokeStyle='rgba(200,160,40,0.4)';ctx.lineWidth=1;
+    roundRect(bX,bY,bW+8,22,4);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(bX+4,bY+5,bW,12);
+    const sc=pct<0.5?`rgb(${Math.round(100+pct*2*140)},180,100)`:(pct<0.8?'#e8a020':'#cc2020');
+    ctx.fillStyle=sc;ctx.fillRect(bX+4,bY+5,bW*pct,12);
+    ctx.strokeStyle='#c0a040';ctx.lineWidth=1;ctx.strokeRect(bX+4,bY+5,bW,12);
+    ctx.font='9px "Courier New"';ctx.fillStyle='#c0a040';
+    ctx.fillText('SOROCHE',bX+6,bY+15);
+  }
+
+  // ── Hint rodapé ────────────────────────────────────────────────
+  const hintText=typeof level.hint==='function'?level.hint(player):level.hint;
+  ctx.fillStyle='#b0b0c8';ctx.font='18px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
 }
 
 function drawTitle(){
@@ -1377,7 +1422,7 @@ function drawTitle(){
 
   ctx.textAlign='center';
   ctx.shadowColor='#f0c040';ctx.shadowBlur=40;
-  ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O TESOURO DO CONDOR',W/2,155);
+  ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O Tesouro do Condor',W/2,155);
   ctx.shadowBlur=0;
   ctx.fillStyle='#c8a846';ctx.font='22px "Courier New"';ctx.fillText('Fase 1.3  —  Machu Picchu, Peru',W/2,210);
 
@@ -1394,7 +1439,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Minerar',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1495,39 +1540,29 @@ function _journalColetar(tipo){
   }catch(e){}
 }
 
-function _salvarProgresso(score,deaths){
-  const estrelas=deaths===0?4:deaths<=2?3:deaths<=5?2:1;
-  try{
-    const raw=localStorage.getItem('mineralis_save_v2');
-    const save=raw?JSON.parse(raw):{versao:1,iniciado:true,fases:{}};
-    if(!save.fases) save.fases={};
-    if(!save.fases['1.3']) save.fases['1.3']={desbloqueada:true,estrelas:0};
-    save.fases['1.3'].estrelas=Math.max(save.fases['1.3'].estrelas||0,estrelas);
-    save.fases['1.3'].desbloqueada=true;
-    localStorage.setItem('mineralis_save_v2',JSON.stringify(save));
-  }catch(e){}
+function _salvarProgresso(score, deaths){
+  _salvarFase(score, deaths);
 }
 
-function startGame(){G.load(0);G.state='title';loop();}
+function startGame(){ G.load(0); G.state='title'; loop(); }
 
 function loop(){
   requestAnimationFrame(loop);
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
-  if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
-  if(G.state==='complete' &&(jp['Enter']||jp['KeyM'])) _voltarAoMenu();
-  if(G.state==='complete' && jp['KeyM'])  _voltarAoMenu();
-  G.update();
-  G.draw();
-  clearJP();
+    if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
+  if(G.state==='complete' &&(jp['Enter']||jp['KeyM']))  _voltarAoMenu();
+  G.update(); G.draw(); clearJP();
 }
 
 if(!gameReady){
   (function loadLoop(){
     if(gameReady) return;
     requestAnimationFrame(loadLoop);
-    ctx.fillStyle='#0a0600';ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#f0c040';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
-    ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
+    ctx.fillStyle='#080600'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#e0b840'; ctx.font='bold 22px "Courier New"'; ctx.textAlign='center';
+    ctx.fillText('Carregando...  '+assetsLoaded+'/'+totalAssets,W/2,H/2);
+    ctx.fillStyle='#888'; ctx.font='14px "Courier New"';
+    ctx.fillText('Fase 1.3 — O Tesouro do Condor',W/2,H/2+36);
     ctx.textAlign='left';
   })();
 }

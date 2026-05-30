@@ -56,7 +56,7 @@ IMG.card11 = null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -136,7 +136,7 @@ const INV = {
   toggle(player) {
     this.open = !this.open;
     if (this.open) { this.cursor = Math.min(this.cursor, Math.max(0, this.tabItems(player).length-1)); }
-    G.dialog = this.open;   
+    G.dialog=this.open||BUBBLE.active;   
   },
   close() { this.open = false; G.dialog = false; },
   isUpKey()   { return jp['ArrowUp']   || jp['KeyW']; },
@@ -1666,7 +1666,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Minerar',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }

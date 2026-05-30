@@ -41,6 +41,7 @@ function journalCollect(id) {
   }
 }
 function goToMainMenu() {
+  try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
   window.location.href = '../../MenuPrincipal/index.html';
 }
 
@@ -159,7 +160,7 @@ IMG.card12 = null;
 const keys={}, jp={};
 window.addEventListener('keydown',e=>{ if(!keys[e.code])jp[e.code]=true; keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open)INV.close();
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
@@ -254,9 +255,9 @@ const INV = {
   toggle(player){
     this.open=!this.open;
     if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}
-    G.dialog=this.open;
+    G.dialog=this.open||BUBBLE.active;
   },
-  close(){this.open=false;G.dialog=false;},
+  close(){this.open=false;G.dialog=BUBBLE.active;},
   navigate(player){
     if(!this.open)return false;
     if(jp['ArrowLeft']||jp['KeyA']){this.tab=(this.tab+2)%3;this.cursor=0;return true;}
@@ -636,79 +637,46 @@ const BUBBLE={
   advance(){if(this.active)this._next();},
   draw(player){
     if(!this.active)return;
-    this.faceFrame+=0.08;
-
-    const FONT='15px "Courier New"';
-    const NAMEFNT='bold 12px "Courier New"';
-    ctx.font=FONT;
-    const lineH=22,pad=18,faceW=56,faceH=68,textAreaW=480;
-    const bubW=faceW+pad+textAreaW+pad*2;
-    const bubH=Math.max(faceH,this.lines.length*lineH+30)+pad*2;
-
-    const pcx=player.x-cam.x+player.w/2;
-    const pcy=player.y-cam.y;
-    let bx=pcx-bubW/2;
-    let by=pcy-bubH-28;
-    bx=Math.max(12,Math.min(bx,W-bubW-12));
-    if(by<40)by=pcy+player.h+10;
-    by=Math.max(40,Math.min(by,H-bubH-10));
-
-    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=12;
-    ctx.fillStyle='rgba(6,3,0,0.94)';
-    roundRect(bx,by,bubW,bubH,14);ctx.fill();
+    this.faceFrame+=0.03;
+    ctx.font='15px "Courier New"';
+    const faceW=60,faceH=76,facePad=12;
+    const lineH=24,pad=20,textW=480;
+    const bubW=facePad+faceW+facePad+textW+pad;
+    const bubH=Math.max(faceH+pad*2,this.lines.length*lineH+70)+pad;
+    const pcx=player.x-cam.x+player.w/2,pcy=player.y-cam.y;
+    let bx=Math.max(10,Math.min(pcx-bubW/2,W-bubW-10)),by=Math.max(10,pcy-bubH-32);
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=14;
+    ctx.fillStyle='rgba(8,4,0,0.96)';roundRect(bx,by,bubW,bubH,14);ctx.fill();
     ctx.shadowBlur=0;
-
-    ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2.5;
-    roundRect(bx,by,bubW,bubH,14);ctx.stroke();
-
-    const tailBaseX=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
-    const tailTopY=by+bubH;
-    const tailTipY=Math.min(pcy,tailTopY+36);
-    ctx.fillStyle='rgba(6,3,0,0.94)';
-    ctx.beginPath();
-    ctx.moveTo(tailBaseX-14,tailTopY);
-    ctx.lineTo(tailBaseX+14,tailTopY);
-    ctx.lineTo(pcx,tailTipY);
-    ctx.closePath();ctx.fill();
-    ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;
-    ctx.beginPath();
-    ctx.moveTo(tailBaseX-14,tailTopY);
-    ctx.lineTo(pcx,tailTipY);
-    ctx.lineTo(tailBaseX+14,tailTopY);
-    ctx.stroke();
-
-    const fx=bx+pad, fy=by+pad;
-    const talkSpr=SPRITES.talk||SPRITES.idle||SPRITES.walk;
-    if(talkSpr){
-      const key=SPRITES.talk?'talk':(SPRITES.idle?'idle':'walk');
-      const info=SPRITE_INFO[key];
-      const fi=Math.floor(this.faceFrame)%info.n;
-      const nw=talkSpr.width/info.n;
-      const showH=info.fh*0.55;
-      const scl=faceH/showH;
-      const dw=info.fw*scl;
-      ctx.save();
-      ctx.beginPath();ctx.rect(fx,fy,faceW,faceH);ctx.clip();
-      ctx.drawImage(talkSpr,fi*nw+info.ox,info.oy,info.fw,showH,fx+(faceW-dw)/2,fy,dw,faceH);
-      ctx.restore();
-    } else {
-      ctx.fillStyle='#c8845a';ctx.fillRect(fx+8,fy+4,40,50);
-    }
-    ctx.strokeStyle='rgba(200,160,32,0.5)';ctx.lineWidth=1.5;
-    ctx.strokeRect(fx,fy,faceW,faceH);
-
-    const tx=fx+faceW+pad;
-    ctx.font=NAMEFNT;ctx.fillStyle=this.speakerColor;
-    ctx.fillText(this.speakerTxt,tx,by+pad+14);
-
-    ctx.font=FONT;ctx.fillStyle='#f0e8c0';
-    this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+36+i*lineH));
-
-    const pulse=0.55+Math.sin(Date.now()/400)*0.45;
-    ctx.fillStyle=`rgba(200,160,32,${pulse})`;
-    ctx.font='12px "Courier New"';ctx.textAlign='right';
-    ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-8);
-    ctx.textAlign='left';
+    ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2.5;roundRect(bx,by,bubW,bubH,14);ctx.stroke();
+    ctx.strokeStyle='rgba(80,200,80,0.2)';ctx.lineWidth=1;roundRect(bx+4,by+4,bubW-8,bubH-8,10);ctx.stroke();
+    const tbx=Math.max(bx+30,Math.min(pcx,bx+bubW-30));
+    const tty=by+bubH,tipy=Math.min(pcy,tty+38);
+    ctx.fillStyle='rgba(8,4,0,0.96)';ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(tbx+14,tty);ctx.lineTo(pcx,tipy);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=this.speakerColor;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tbx-14,tty);ctx.lineTo(pcx,tipy);ctx.lineTo(tbx+14,tty);ctx.stroke();
+    const fx=bx+facePad,fy=by+pad;
+    ctx.fillStyle='rgba(20,10,2,0.85)';roundRect(fx,fy,faceW,faceH,6);ctx.fill();
+    ctx.strokeStyle='rgba(200,160,40,0.45)';ctx.lineWidth=1.5;roundRect(fx,fy,faceW,faceH,6);ctx.stroke();
+    const faceScale=faceW/18*0.82;
+    const sprX=fx+faceW/2-16*faceScale;
+    const sprY=fy+4;
+    ctx.save();
+    ctx.beginPath();roundRect(fx+1,fy+1,faceW-2,faceH-2,5);ctx.clip();
+    drawCorvan(sprX,sprY,faceScale,false,this.faceFrame*4,null);
+    const mouthY=sprY+13*faceScale;
+    const mouthX=sprX+12*faceScale;
+    const mouthW=8*faceScale;
+    const open=Math.abs(Math.sin(this.faceFrame*4))*1.8*faceScale;
+    if(open>0.5){ctx.fillStyle='#2a0e06';ctx.fillRect(mouthX,mouthY,mouthW,open);}
+    ctx.restore();
+    const tx=fx+faceW+facePad;
+    ctx.font='bold 12px "Courier New"';ctx.fillStyle=this.speakerColor;ctx.fillText(this.speakerTxt,tx,by+pad+14);
+    ctx.fillStyle='rgba(80,200,80,0.35)';ctx.fillRect(tx,by+pad+20,textW,1);
+    ctx.font='15px "Courier New"';ctx.fillStyle='#f0e8c0';
+    this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+40+i*lineH));
+    const pulse=0.5+Math.sin(Date.now()/400)*0.5;
+    ctx.fillStyle=`rgba(120,216,64,${pulse})`;ctx.font='12px "Courier New"';
+    ctx.textAlign='right';ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-10);ctx.textAlign='left';
   }
 };
 
@@ -1623,7 +1591,7 @@ function drawHUD(player,level){
   ctx.fillStyle='rgba(120,240,80,.7)';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
   if(G.timeOnLevel<600){
     ctx.fillStyle='rgba(0,22,0,0.58)';ctx.fillRect(8,H-44,430,28);
-    ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Escavar   [Stomp inimigo]',14,H-25);
+    ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Escavar   [Stomp inimigo]',14,H-25);
   }
 }
 
@@ -1771,3 +1739,4 @@ if(!gameReady){(function loadLoop(){
   ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
   ctx.textAlign='left';
 })();}
+                                                                                               

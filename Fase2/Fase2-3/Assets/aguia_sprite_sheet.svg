@@ -23,15 +23,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.99326406"
-     inkscape:cx="673.53691"
-     inkscape:cy="182.22747"
+     inkscape:zoom="3.9730562"
+     inkscape:cx="1113.7522"
+     inkscape:cy="121.06549"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="-9"
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
-     inkscape:current-layer="frame4" />
+     inkscape:current-layer="svg416" />
   <g
      id="frame1"
      inkscape:label="F1 · upstroke">
@@ -910,24 +910,6 @@
        height="8"
        fill="#1A1208"
        id="rect122" />
-    <rect
-       x="20"
-       y="20"
-       width="160"
-       height="160"
-       fill="none"
-       stroke="#1E2C40"
-       stroke-width="1"
-       rx="2"
-       id="rect123" />
-    <text
-       x="100"
-       y="198"
-       text-anchor="middle"
-       font-family="monospace"
-       font-size="11"
-       fill="#506070"
-       id="text123">F1 · upstroke</text>
   </g>
   <g
      id="frame2"
@@ -1730,24 +1712,6 @@
        height="8"
        fill="#1A1208"
        id="rect233" />
-    <rect
-       x="340"
-       y="20"
-       width="160"
-       height="160"
-       fill="none"
-       stroke="#1E2C40"
-       stroke-width="1"
-       rx="2"
-       id="rect234" />
-    <text
-       x="420"
-       y="198"
-       text-anchor="middle"
-       font-family="monospace"
-       font-size="11"
-       fill="#506070"
-       id="text234">F2 · meio subindo</text>
   </g>
   <g
      id="frame3"
@@ -2438,24 +2402,6 @@
        height="8"
        fill="#1A1208"
        id="rect328" />
-    <rect
-       x="660"
-       y="20"
-       width="160"
-       height="160"
-       fill="none"
-       stroke="#1E2C40"
-       stroke-width="1"
-       rx="2"
-       id="rect329" />
-    <text
-       x="740"
-       y="198"
-       text-anchor="middle"
-       font-family="monospace"
-       font-size="11"
-       fill="#506070"
-       id="text329">F3 · planar</text>
   </g>
   <g
      id="frame4"
@@ -3076,23 +3022,5 @@
        height="8"
        fill="#1A1208"
        id="rect415" />
-    <rect
-       x="980"
-       y="20"
-       width="160"
-       height="160"
-       fill="none"
-       stroke="#1E2C40"
-       stroke-width="1"
-       rx="2"
-       id="rect416" />
-    <text
-       x="1060"
-       y="198"
-       text-anchor="middle"
-       font-family="monospace"
-       font-size="11"
-       fill="#506070"
-       id="text416">F4 · downstroke</text>
   </g>
 </svg>

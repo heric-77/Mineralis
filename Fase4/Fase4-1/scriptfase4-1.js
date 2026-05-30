@@ -1,4 +1,4 @@
-const SAVE_KEY='mineralis_save_v4';
+const SAVE_KEY='mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
@@ -65,10 +65,11 @@ ASSET_LIST.forEach(([key,src])=>{
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='Escape'&&G.sieveMode){G.sieveMode=null;G.dialog=false;}
-  if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
+  if(e.code==='KeyM'){try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+  window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
 const TOUCH={l:false,r:false,j:false,e:false};
@@ -136,13 +137,17 @@ const INV={
     const cat=this.TABS[this.tab].id;
     let saved={};
     try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
-    return Object.entries(ITEM_DEFS).filter(([id,def])=>{
+    const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
+    return Object.entries(_ALL_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
-      return player.items.includes(id)||saved[def.journalId||id];
+      return player.items.includes(id)
+          || player.items.includes(id+'_ok')
+          || player.items.includes(id+'_col')
+          || saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
-  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open;},
-  close(){this.open=false;G.dialog=false;},
+  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
+  close(){this.open=false;G.dialog=BUBBLE.active||false;},
   isUpKey(){return jp['ArrowUp']||jp['KeyW'];},
   isDownKey(){return jp['ArrowDown']||jp['KeyS'];},
   isLeftKey(){return jp['ArrowLeft']||jp['KeyA'];},
@@ -310,72 +315,51 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   const S=scale;
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
   const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
-  const showPicareta = activeTool==='picareta_kimberlito';
-  const showPeneira  = activeTool==='peneira_classificacao';
-  const showLupa     = activeTool==='lupa_lapidario';
-  
+  const lb=0.7+Math.sin(frame*0.4)*0.3;
   r(7,3,18,2,'#2a1a08');r(9,1,14,4,'#3a2610');
   r(5,3,22,2,'#4a3010');
   r(13,0,6,3,'#c09030');r(14,0,4,2,'#ffe060');
-  
   r(9,5,14,9,'#c88050');r(10,6,12,1,'#a86030');
   r(11,8,3,2,'#1a0a04');r(18,8,3,2,'#1a0a04');
   r(12,8,1,1,'#fff');r(19,8,1,1,'#fff');
   r(14,11,4,1,'#a86030');r(12,13,8,1,'#7a3820');
   r(13,14,6,2,'#c88050');
-  
   r(8,16,16,13,'#b82010');r(15,17,2,1,'#8a1008');r(15,20,2,1,'#8a1008');r(15,23,2,1,'#8a1008');
   r(12,16,3,3,'#d03018');r(17,16,3,3,'#d03018');
-  
   r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
-  
   r(9,30,14,12,'#5a4030');r(15,36,2,6,'#4a3020');
-  
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
-  
-  if(showPicareta){
-    const wb=Math.sin(frame*0.25)*3;
-    ctx.save();ctx.translate(0*S,(22+wb)*S);ctx.rotate(-0.25+wb*0.04);
-    
-    ctx.fillStyle='#7a4a18';ctx.fillRect(-2*S,-28*S,5*S,36*S);
-    ctx.fillStyle='#9a6028';ctx.fillRect(-1*S,-26*S,3*S,32*S);
-    
-    ctx.fillStyle='#585870';ctx.fillRect(-20*S,-32*S,36*S,11*S);
-    ctx.fillStyle='#7878a0';ctx.fillRect(-20*S,-32*S,36*S,5*S);
-    
-    ctx.fillStyle='#909090';
-    ctx.beginPath();ctx.moveTo(-20*S,-28*S);ctx.lineTo(-32*S,-22*S);ctx.lineTo(-20*S,-22*S);ctx.closePath();ctx.fill();
-    
-    ctx.fillStyle='#a0a0c0';
-    ctx.beginPath();ctx.moveTo(16*S,-32*S);ctx.lineTo(30*S,-42*S);ctx.lineTo(18*S,-42*S);ctx.closePath();ctx.fill();
-    ctx.restore();
-  }
-  
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
-  
-  if(showPeneira){
-    
-    ctx.strokeStyle='#808090';ctx.lineWidth=2.5*S;
-    ctx.beginPath();ctx.arc(31*S,26*S,10*S,0,Math.PI*2);ctx.stroke();
-    ctx.strokeStyle='rgba(120,130,145,0.55)';ctx.lineWidth=0.8*S;
-    for(let i=-8;i<=8;i+=4){
-      const hl=Math.sqrt(Math.max(0,100-(i*i)));
-      ctx.beginPath();ctx.moveTo((31+i)*S,(26-hl)*S);ctx.lineTo((31+i)*S,(26+hl)*S);ctx.stroke();
-    }
-    r(28,35,6,5,'#7a4818');
-  } else if(showLupa){
-    
-    r(26,18,4,10,'#5a3010');
-    ctx.strokeStyle='#606060';ctx.lineWidth=2.5*S;
-    ctx.beginPath();ctx.arc(28*S,14*S,8*S,0,Math.PI*2);ctx.stroke();
-    ctx.fillStyle='rgba(180,225,255,0.22)';
-    ctx.beginPath();ctx.arc(28*S,14*S,8*S,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,0.55)';
-    ctx.beginPath();ctx.arc(25*S,11*S,2*S,0,Math.PI*2);ctx.fill();
-  }
-  
   r(9,42,6,4,'#3a1c08');r(17,42,6,4,'#3a1c08');
   r(8,44,8,2,'#2a1008');r(16,44,8,2,'#2a1008');
+  ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  // Ferramentas inline — fase 4
+  if(activeTool==='picareta_kimberlito'){
+    // Picareta na mão esquerda — cabo + cabeça metálica
+    const wb=Math.sin(frame*0.2)*1.5;
+    r(0,24+wb,6,1,'#7a4818');r(0,25+wb,1,8,'#7a4818');
+    r(-2,22+wb,8,3,'#707080');r(1,20+wb,3,3,'#a0a0b0');
+  } else if(activeTool==='peneira_classificacao'){
+    // Peneira na mão esquerda — aro circular
+    ctx.strokeStyle='#909090';ctx.lineWidth=2*S;
+    ctx.beginPath();ctx.arc(3*S,30*S,7*S,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(140,150,165,0.55)';ctx.lineWidth=1*S;
+    for(let i=-4;i<=4;i+=2){
+      ctx.beginPath();ctx.moveTo((3+i)*S,23*S);ctx.lineTo((3+i)*S,37*S);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(-4*S,(30+i)*S);ctx.lineTo(10*S,(30+i)*S);ctx.stroke();
+    }
+    r(1,36,4,5,'#7a4818');
+  } else if(activeTool==='lupa_lapidario'){
+    // Lupa na mão direita — aro + cabo
+    r(26,31,1,3,'#888888');
+    ctx.strokeStyle='#808080';ctx.lineWidth=2.5*S;
+    ctx.beginPath();ctx.arc(27*S,26*S,5*S,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(180,225,255,0.22)';
+    ctx.beginPath();ctx.arc(27*S,26*S,5*S,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.55)';
+    ctx.beginPath();ctx.arc(25*S,24*S,1.5*S,0,Math.PI*2);ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -422,86 +406,116 @@ function drawMeerkat(cx,cy,frame=0){
 
 function drawPicaretaItem(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,0,0,0,0,26);
-  glow.addColorStop(0,'rgba(200,160,100,0.3)');glow.addColorStop(1,'rgba(200,160,100,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,26,0,Math.PI*2);ctx.fill();
-  
-  ctx.save();ctx.rotate(-0.28);
-  ctx.fillStyle='#7a4a18';ctx.fillRect(-3,-30,6,44);
-  ctx.fillStyle='#9a6028';ctx.fillRect(-2,-28,4,40);
-  ctx.restore();
-  
-  ctx.save();ctx.rotate(-0.28);
-  ctx.fillStyle='#585870';ctx.fillRect(-22,-34,40,12);
-  ctx.fillStyle='#8080a0';ctx.fillRect(-22,-34,40,5);
-  
-  ctx.fillStyle='#909090';ctx.beginPath();ctx.moveTo(-22,-30);ctx.lineTo(-36,-22);ctx.lineTo(-22,-22);ctx.closePath();ctx.fill();
-  
-  ctx.fillStyle='#a0a0c0';ctx.beginPath();ctx.moveTo(18,-34);ctx.lineTo(32,-46);ctx.lineTo(20,-46);ctx.closePath();ctx.fill();
-  ctx.restore();
+  // Halo
+  const glow=ctx.createRadialGradient(0,0,2,0,0,28);
+  glow.addColorStop(0,'rgba(200,160,100,0.28)');glow.addColorStop(1,'rgba(200,160,100,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fill();
+  // SVG 80×80 → escala 0.6, centralizado (offset = -40*0.6 = -24)
+  const S=0.6,O=-24;
+  const r=(x,y,w,h,c,a)=>{if(a!==undefined)ctx.globalAlpha=a;ctx.fillStyle=c;ctx.fillRect(x*S+O,y*S+O,w*S,h*S);ctx.globalAlpha=1;};
+  // Cabo diagonal (madeira escura → clara)
+  r(8,60,6,6,'#7A5228');r(12,56,6,6,'#7A5228');r(16,52,6,6,'#7A5228');
+  r(20,48,6,6,'#8A6030');r(24,44,6,6,'#8A6030');r(28,40,6,6,'#8A6030');
+  r(32,36,6,6,'#9A6A38');r(36,32,6,6,'#9A6A38');
+  // Reflexo do cabo
+  r(9,61,2,4,'#9A7048');r(13,57,2,4,'#9A7048');r(17,53,2,4,'#9A7048');
+  r(21,49,2,4,'#AE8050');r(25,45,2,4,'#AE8050');r(29,41,2,4,'#AE8050');
+  r(33,37,2,4,'#BF9060');r(37,33,2,4,'#BF9060');
+  // Colar/soquete
+  r(38,28,10,10,'#484840');r(39,29,8,8,'#545448');r(40,30,2,4,'#686860');
+  // Espigão esquerdo (ponta curva)
+  r(18,26,22,6,'#686858');r(20,24,18,4,'#787868');r(22,22,14,4,'#888878');
+  r(12,26,8,4,'#909080');r(8,27,6,2,'#A0A090');r(4,28,4,1,'#C0C0B0');
+  r(12,26,6,2,'#D0D0C0');r(8,27,4,1,'#E0E0D0');
+  // Espigão direito (talhadeira plana)
+  r(46,26,22,6,'#686858');r(50,24,18,4,'#787868');r(54,22,14,4,'#888878');
+  r(64,22,10,8,'#909080');r(72,22,4,8,'#B0B0A0');r(72,22,4,2,'#D0D0C0');
+  // Fragmento de kimberlito na base
+  r(10,62,10,8,'#303850');r(12,60,8,4,'#383E58');
+  r(14,64,2,2,'#B0CCEE');r(15,63,1,1,'#FFFFFF');
+  // Brilho animado
   const sa=Math.abs(Math.sin(Date.now()/500));
-  ctx.strokeStyle=`rgba(200,160,80,${sa*0.7})`;ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(10,-24);ctx.lineTo(14,-32);ctx.stroke();
+  ctx.strokeStyle=`rgba(200,180,80,${sa*0.7})`;ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(6*S+O,27*S+O);ctx.lineTo(2*S+O,23*S+O);ctx.stroke();
   ctx.restore();
 }
 
 function drawPeneiraItem(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,0,0,0,0,22);
-  glow.addColorStop(0,'rgba(160,190,210,0.3)');glow.addColorStop(1,'rgba(160,190,210,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
-  
-  ctx.strokeStyle='#808090';ctx.lineWidth=4;
-  ctx.beginPath();ctx.arc(0,0,15,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='#b0b0c0';ctx.lineWidth=2;
-  ctx.beginPath();ctx.arc(0,0,15,0,Math.PI*2);ctx.stroke();
-  
-  ctx.strokeStyle='rgba(140,150,165,0.65)';ctx.lineWidth=1;
-  for(let i=-12;i<=12;i+=4){
-    const hl=Math.sqrt(Math.max(0,225-i*i));
-    ctx.beginPath();ctx.moveTo(i,-hl);ctx.lineTo(i,hl);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(-hl,i);ctx.lineTo(hl,i);ctx.stroke();
-  }
-  
-  ctx.fillStyle='#7a4818';ctx.fillRect(-3,13,6,14);
-  ctx.fillStyle='#9a6028';ctx.fillRect(-2,14,4,12);
-  
+  // Halo azul-aço
+  const glow=ctx.createRadialGradient(0,0,2,0,0,28);
+  glow.addColorStop(0,'rgba(160,190,210,0.25)');glow.addColorStop(1,'rgba(160,190,210,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fill();
+  const S=0.6,O=-24;
+  const r=(x,y,w,h,c,a)=>{if(a!==undefined)ctx.globalAlpha=a;ctx.fillStyle=c;ctx.fillRect(x*S+O,y*S+O,w*S,h*S);ctx.globalAlpha=1;};
+  // Aro superior (aço galvanizado)
+  r(14,14,52,6,'#909080');r(10,18,60,4,'#909080');r(8,20,64,4,'#909080');
+  r(14,14,52,2,'#B0B0A0'); // reflexo superior
+  // Aro inferior
+  r(14,44,52,6,'#707068');r(10,40,60,6,'#808070');r(8,38,64,4,'#888878');
+  // Paredes laterais
+  r(8,20,6,22,'#888878');r(8,20,4,22,'#909080');
+  r(66,20,6,22,'#707068');r(68,20,4,22,'#787870');
+  // Malha interna (fundo + grade)
+  r(12,20,56,22,'#484838');
+  // Fios horizontais
+  for(const fy of [22,25,28,31,34,37,40]) r(12,fy,56,1,'#606050');
+  // Fios verticais
+  for(const fx of [14,18,22,26,30,34,38,42,46,50,54,58,62,66]) r(fx,20,1,22,'#606050');
+  // Pedregulhos grandes
+  r(16,24,6,4,'#B08840');r(17,23,4,5,'#C09A50');
+  r(24,26,8,4,'#A07830');r(25,25,6,5,'#B08840');
+  r(36,23,6,4,'#B08840');r(46,25,8,4,'#A07830');
+  r(56,24,6,4,'#B08840');
+  // Pedregulhos médios
+  r(20,32,4,4,'#9A7228');r(30,30,4,4,'#AA8030');r(44,32,4,4,'#9A7228');
+  // Diamante na malha (brilho especial)
+  r(34,34,6,4,'#C0DCFF');r(35,33,4,5,'#D0ECFF');r(36,33,2,2,'#FFFFFF');
   const ta=Math.abs(Math.sin(Date.now()/450));
-  ctx.fillStyle=`rgba(200,230,255,${ta*0.8})`;
-  ctx.beginPath();ctx.arc(-5,-3,2,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(7,5,1.5,0,Math.PI*2);ctx.fill();
+  r(37,31,1,5,'#E8F4FF',ta*0.9);r(34,34,7,1,'#E8F4FF',ta*0.9);
+  // Cabos laterais (madeira)
+  r(4,26,6,10,'#7A5228');r(5,27,4,8,'#8A6030');r(5,28,2,6,'#9A7038');
+  r(70,26,6,10,'#7A5228');r(71,27,4,8,'#8A6030');r(73,28,2,6,'#9A7038');
   ctx.restore();
 }
 
 function drawLupaItem(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
-  const glow=ctx.createRadialGradient(0,-2,0,0,-2,24);
-  glow.addColorStop(0,'rgba(200,240,255,0.35)');glow.addColorStop(1,'rgba(200,240,255,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,-2,24,0,Math.PI*2);ctx.fill();
-  
-  ctx.save();ctx.rotate(0.5);
-  ctx.fillStyle='#5a3010';ctx.fillRect(-3,10,6,18);
-  ctx.fillStyle='#7a4820';ctx.fillRect(-2,11,4,16);
-  ctx.restore();
-  
-  ctx.strokeStyle='#707070';ctx.lineWidth=3.5;
-  ctx.beginPath();ctx.arc(0,-2,13,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='#a0a0a0';ctx.lineWidth=2;
-  ctx.beginPath();ctx.arc(0,-2,13,0,Math.PI*2);ctx.stroke();
-  
-  ctx.fillStyle='rgba(180,225,255,0.28)';
-  ctx.beginPath();ctx.arc(0,-2,13,0,Math.PI*2);ctx.fill();
-  
-  ctx.fillStyle='rgba(255,255,255,0.6)';
-  ctx.beginPath();ctx.arc(-5,-7,3.5,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.3)';
-  ctx.beginPath();ctx.arc(-3,-5,2,0,Math.PI*2);ctx.fill();
-  
-  ctx.fillStyle='rgba(50,90,140,0.75)';ctx.font='bold 8px "Courier New"';
-  ctx.textAlign='center';ctx.fillText('10x',0,0);ctx.textAlign='left';
+  // Halo azul-claro
+  const glow=ctx.createRadialGradient(-2,-4,2,-2,-4,28);
+  glow.addColorStop(0,'rgba(180,230,255,0.3)');glow.addColorStop(1,'rgba(180,230,255,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(-2,-4,28,0,Math.PI*2);ctx.fill();
+  const S=0.6,O=-24;
+  const r=(x,y,w,h,c,a)=>{if(a!==undefined)ctx.globalAlpha=a;ctx.fillStyle=c;ctx.fillRect(x*S+O,y*S+O,w*S,h*S);ctx.globalAlpha=1;};
+  // Cabo de latão (handle)
+  r(54,46,6,26,'#B8881A');r(55,46,4,26,'#D4A028');r(55,47,2,24,'#E0B040');
+  r(54,50,6,2,'#A07818');r(54,56,6,2,'#A07818');r(54,62,6,2,'#A07818');r(54,68,6,2,'#A07818');
+  r(53,70,8,4,'#8A6010');r(54,71,6,2,'#C09020');
+  // Aro externo de latão (pixel-círculo)
+  r(18,10,36,36,'#B8881A');r(16,14,40,28,'#B8881A');r(14,18,44,20,'#B8881A');
+  r(20,8,32,4,'#B8881A');r(20,46,32,4,'#B8881A');
+  // Reflexos do aro
+  r(18,10,36,2,'#D4A028');r(16,14,2,28,'#D4A028');
+  r(54,14,2,28,'#9A7010');r(18,44,36,2,'#9A7010');
+  // Aro interno (mais escuro)
+  r(22,14,28,28,'#7A5808');r(20,16,32,24,'#7A5808');
+  r(24,12,24,4,'#7A5808');r(24,40,24,4,'#7A5808');
+  // Lente (vidro azul)
+  r(24,16,24,24,'#7AAED8');r(22,18,28,20,'#7AAED8');
+  r(26,14,20,4,'#7AAED8');r(26,38,20,4,'#6898C8');
+  // Reflexo interno da lente
+  r(24,16,12,12,'#90C0E8');r(22,18,10,8,'#A8D0F0');
+  r(24,16,6,4,'#C8E8FF');r(24,16,2,2,'#FFFFFF');
+  r(36,30,12,8,'#5888B8');r(38,36,12,6,'#4878A8');
+  r(26,14,20,2,'#D0E8FF');r(22,18,2,6,'#C0D8F0');
+  // Diamante ampliado na lente
   const sa=Math.abs(Math.sin(Date.now()/500));
-  ctx.strokeStyle=`rgba(200,240,255,${sa*0.7})`;ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(9,-14);ctx.lineTo(13,-20);ctx.stroke();
+  r(32,22,8,8,'#E0F2FF',sa*0.6);r(35,25,2,2,'#FFFFFF',sa*0.9);
+  // Dobradiça
+  r(52,26,4,6,'#C09020');r(53,25,2,8,'#D4A830');
+  // Diamante na base (sendo examinado)
+  r(40,60,10,8,'#C0D8F0');r(38,62,14,6,'#D0E8FF');r(42,58,6,4,'#B0C8E0');
+  r(40,60,4,2,'#E8F4FF');r(42,58,2,2,'#FFFFFF');
   ctx.restore();
 }
 
@@ -722,10 +736,11 @@ class Col{
     const TOOL_TYPES=['picareta_kimberlito','peneira_classificacao','lupa_lapidario'];
     const isTool=TOOL_TYPES.includes(this.type);
     if(isTool){
-      const a=0.3+Math.abs(Math.sin(this.t*0.8))*0.5;
-      const glow=ctx.createRadialGradient(sx+17,sy+17,4,sx+17,sy+17,32);
-      glow.addColorStop(0,`rgba(220,190,130,${a})`);glow.addColorStop(1,'rgba(200,170,110,0)');
-      ctx.fillStyle=glow;ctx.fillRect(sx-15,sy-15,64,64);
+      // Halo circular — sem retângulo de fundo
+      const a=0.25+Math.abs(Math.sin(this.t*0.8))*0.35;
+      const glow=ctx.createRadialGradient(sx+17,sy+17,4,sx+17,sy+17,36);
+      glow.addColorStop(0,`rgba(220,190,130,${a})`);glow.addColorStop(1,'rgba(220,190,130,0)');
+      ctx.fillStyle=glow;ctx.beginPath();ctx.arc(sx+17,sy+17,36,0,Math.PI*2);ctx.fill();
     }
     ctx.save();ctx.translate(sx+this.w/2,sy+this.h/2);
     if(this.type==='picareta_kimberlito')      drawPicaretaItem(0,0,this.t);
@@ -824,7 +839,7 @@ const BUBBLE={
   }
 };
 function showDialog(msgs,cb,speaker='CORVAN',color='#d0a8e0'){BUBBLE.show(msgs,cb,speaker,color);}
-function checkDlg(){if(G.dialog&&!INV.open&&!G.sieveMode&&isE())BUBBLE.advance();}
+function checkDlg(){if(G.dialog&&!INV.open&&isE())BUBBLE.advance();}
 
 let popup={active:false,timer:0,title:'',lines:[],color:'#90d8ff'};
 function showPopup(title,lines,color,ms=6500){popup={active:true,timer:ms,title,lines,color};}
@@ -941,7 +956,9 @@ class Player{
   near(r,d=80){return Math.abs(this.x+20-(r.x+r.w/2))<r.w/2+d&&Math.abs(this.y+40-(r.y+r.h/2))<r.h/2+d;}
 
   update(level){
-    
+    // Prioridade: INV → Sieve → Dialog → Movimento
+    if(INV.open){INV.navigate(this);return;}
+
     if(G.sieveMode){
       const sieve=G.sieveMode;
       const active=sieve.slots.filter(s=>!s.consumed);
@@ -984,10 +1001,12 @@ class Player{
             notify('⬜ Este é quartzo — belo, mas não é o que procuro.');
             if(wrongPickups>=2&&!lupaHintShown){
               lupaHintShown=true;
+              const sv=G.sieveMode;
+              G.sieveMode=null; // pausa o sieve durante o diálogo
               setTimeout(()=>showDialog([
                 '"Use a lupa antes de guardar qualquer cristal. O quartzo engana — é transparente, brilha, tem faces cristalinas. Mas olhe o ângulo das faces com a lupa: o diamante sempre mostrará ângulos de 120°, a geometria perfeita do carbono. O quartzo tem faces de 60°."',
                 '"A diferença entre riqueza e engano está no detalhe que você não vê a olho nu. Equipe a Lupa de Lapidário no Diário [I] e tente novamente."',
-              ],null),400);
+              ],()=>{if(sv&&!sv.wall.done)G.sieveMode=sv;}),400);
             }
             
             const remaining=sieve.slots.filter(s=>!s.consumed);
@@ -1009,7 +1028,6 @@ class Player{
       return;
     }
 
-    if(INV.open){INV.navigate(this);return;}
     if(G.dialog)return;
 
     if(isL()){this.vx=-PSPD;this.facing=-1;}
@@ -1034,7 +1052,7 @@ class Player{
 
     if(isE()){
       
-      const TOOL_TYPES=['picareta_kimberlito','peneira_classificacao'];
+      const TOOL_TYPES=['picareta_kimberlito','peneira_classificacao','contrato_trabalho'];
       for(const c of level.cols||[]){
         if(c.done||!TOOL_TYPES.includes(c.type))continue;
         if(!this.near({x:c.x,y:c.y,w:c.w,h:c.h},90))continue;
@@ -1049,6 +1067,15 @@ class Player{
           burst(c.x+17,c.y+17,'#a0b8c0',10);journalCollect('peneira_classificacao');
           showPopup('🪣 PENEIRA DE CLASSIFICAÇÃO',['Malha de aço para separar cristais por tamanho','Fragmentos pequenos caem, cristais maiores ficam','Primeiro estágio da identificação','Depois use a Lupa de Lapidário!'],'#90b8d0');
           notify('✦ Peneira coletada! Busque o Suricato →');
+        } else if(c.type==='contrato_trabalho'){
+          this.items.push('contrato_trabalho');this.score+=80;sfx('unlock');
+          burst(c.x+17,c.y+17,'#c0a0e0',14,3);journalCollect('contrato_trabalho');
+          showDialog([
+            '"Este contrato diz que o trabalho vale nada sem o documento que comprova que você concordou. Mas quem assinou com o dedo não sabia o que estava assinando."',
+            '"O contrato de trabalho migratório da De Beers: o trabalhador africano concordava em viver confinado no compound por 3 a 6 meses, sem direito de sair, vender ou possuir diamantes, sujeito a revista corporal diária."',
+            '"O sistema de compound foi uma das primeiras formas industriais de segregação racial sistemática. O apartheid formal só viria em 1948. Mas começou aqui, nas minas de diamante, em 1871."',
+          ],null,'CORVAN','#d0a8e0');
+          notify('📜 Contrato De Beers encontrado!');
         }
         break;
       }
@@ -1056,13 +1083,22 @@ class Player{
       if(level.meerkat&&!level.meerkat.gifted&&this.near({x:level.meerkat.x-60,y:level.meerkat.y-80,w:120,h:80})){
         level.meerkat.gifted=true;sfx('meerkat');
         for(let i=0;i<16;i++)burst(level.meerkat.x,level.meerkat.y-30,'#e8c860',1,2+Math.random()*2);
-        this.items.push('lupa_lapidario');journalCollect('lupa_lapidario');
-        showDialog([
-          '"O Suricato! Suricata suricatta — o animal de visão mais aguçada da savana. Em pé nas patas traseiras, escaneia o horizonte por predadores a 800 metros de distância. É a sentinela perfeita do Karoo."',
-          '"Ele me deixou a Lupa de Lapidário de 10 aumentos — o instrumento que lapidários e gemologistas usam para examinar a clareza, as inclusões e as faces cristalinas de gemas brutas."',
-          '"No século XIX, a primeira coisa que um comprador fazia ao receber um diamante bruto era examiná-lo com a lupa. O suricato, com sua postura de sentinela e visão aguçada, é a metáfora perfeita desse ato de escrutínio."',
-        ],()=>{notify('✦ Lupa coletada! Equipe-a no Diário [I] e desça na mina →');},'CORVAN','#d0a8e0');
-        showPopup('🔍 LUPA DE LAPIDÁRIO (10x)',['Instrumento essencial de gemologistas','Diamante: faces de 120° (estrutura cúbica)','Quartzo: faces de 60° (prisma hexagonal)','A diferença está no ângulo que você não vê a olho nu'],'#c0e0f0');
+        if(level.meerkat.isGuide){
+          // Cena 4: diálogo do portão do Compound
+          showDialog([
+            '"O Suricato para diante do portão do Compound De Beers e te olha. Lá dentro, trabalhadores africanos viviam confinados por meses, sem direito de sair."',
+            '"Esta cerca não é decoração — é a arquitetura do controle. O compound foi o laboratório do apartheid antes do apartheid ter nome. Entre e veja o que a De Beers construiu."',
+          ],()=>{notify('✦ Entre no Compound para completar a fase!');},'CORVAN','#d0a8e0');
+        } else {
+          // Cena 1: suricato dá a lupa
+          this.items.push('lupa_lapidario');journalCollect('lupa_lapidario');
+          showDialog([
+            '"O Suricato! Suricata suricatta — o animal de visão mais aguçada da savana. Em pé nas patas traseiras, escaneia o horizonte por predadores a 800 metros de distância. É a sentinela perfeita do Karoo."',
+            '"Ele me deixou a Lupa de Lapidário de 10 aumentos — o instrumento que lapidários e gemologistas usam para examinar a clareza, as inclusões e as faces cristalinas de gemas brutas."',
+            '"No século XIX, a primeira coisa que um comprador fazia ao receber um diamante bruto era examiná-lo com a lupa. O suricato, com sua postura de sentinela e visão aguçada, é a metáfora perfeita desse ato de escrutínio."',
+          ],()=>{notify('✦ Lupa coletada! Equipe-a no Diário [I] e desça na mina →');},'CORVAN','#d0a8e0');
+          showPopup('🔍 LUPA DE LAPIDÁRIO (10x)',['Instrumento essencial de gemologistas','Diamante: faces de 120° (estrutura cúbica)','Quartzo: faces de 60° (prisma hexagonal)','A diferença está no ângulo que você não vê a olho nu'],'#c0e0f0');
+        }
       }
 
       if(level.expositions){
@@ -1089,8 +1125,8 @@ class Player{
         }
       }
 
-      if(level.kimberliteWalls&&!G.sieveMode){
-        for(const w of level.kimberliteWalls){
+      if(level.walls&&!G.sieveMode){
+        for(const w of level.walls){
           if(w.done)continue;
           if(!this.near({x:w.x,y:w.y,w:w.w,h:w.h},70))continue;
           if(w.state==='intact'){
@@ -1236,62 +1272,108 @@ function drawSvgItem(key,cx,cy,size=48,bobT=0){
 
 function drawHUD(player,level){
   if(!player)return;
-  
-  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(14,14,130,22);
-  ctx.strokeStyle='rgba(180,140,220,0.4)';ctx.lineWidth=1.5;ctx.strokeRect(14,14,130,22);
+
+  // ── Corações de vida — forma de coração (padrão 1-1) ──────────
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#e04040':'rgba(60,40,40,0.6)';
-    ctx.fillRect(18+i*40,18,36,14);
-    ctx.strokeStyle='rgba(0,0,0,0.5)';ctx.lineWidth=1;ctx.strokeRect(18+i*40,18,36,14);
-    ctx.fillStyle='#fff';ctx.font='10px "Courier New"';ctx.textAlign='center';
-    ctx.fillText(i<player.hp?'♥':'♡',18+i*40+18,29);
-  }ctx.textAlign='left';
+    ctx.fillStyle=i<player.hp?'#e02020':'#333';
+    ctx.beginPath();const hx=16+i*28,hy=10;
+    ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
+    ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
+    ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
+  }
 
+  // ── Barra escura no topo + título centralizado ─────────────────
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,34);
+  const levelTitles=['A Porta do Big Hole','O Interior do Kimberlito','A Câmara de Coleta','O Entardecer'];
+  const levelNum=(G.currentLevel?G.currentLevel.num:1)-1;
+  const levelTitle=levelTitles[levelNum]||'';
+  ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=6;
+  ctx.fillStyle='#e8e0d0';ctx.font='20px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(levelTitle,W/2,24);ctx.textAlign='left';
+  ctx.shadowBlur=0;
+
+  // ── Diamantes — canto direito (padrão score) ───────────────────
   const diamonds=player.items.filter(id=>id.startsWith('diamante_')).length;
-  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(14,42,130,22);
-  ctx.strokeStyle='rgba(80,200,240,0.4)';ctx.lineWidth=1.5;ctx.strokeRect(14,42,130,22);
-  ctx.font='bold 12px "Courier New"';ctx.fillStyle='#90d8ff';
-  ctx.fillText(`💎 Diamantes: ${diamonds}/3`,20,57);
+  ctx.fillStyle='#e8e0d0';ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText('💎 '+diamonds+'/3',W-14,26);ctx.textAlign='left';
 
-  if(player.items.includes('contrato_trabalho')){
-    ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(14,70,130,22);
-    ctx.strokeStyle='rgba(180,120,200,0.4)';ctx.lineWidth=1.5;ctx.strokeRect(14,70,130,22);
-    ctx.font='12px "Courier New"';ctx.fillStyle='#d0a8e0';
-    ctx.fillText('📜 Contrato ✔',20,85);
+  // ── Painel Diário de Bordo — padrão 1-1 ───────────────────────
+  const TOOL_DEFS=[
+    {id:'picareta_kimberlito', icon:'⛏️', nome:'Picareta'},
+    {id:'peneira_classificacao',icon:'🪣', nome:'Peneira'},
+    {id:'lupa_lapidario',      icon:'🔍', nome:'Lupa 10x'},
+    {id:'contrato_trabalho',   icon:'📜', nome:'Contrato'},
+  ];
+  const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
+  const PX=12,PY=46,PW=178,PH_BASE=52;
+  const PH=PH_BASE+(tools.length>0?6+tools.length*22:0);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(8,4,0,0.88)';roundRect(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#7a5898';ctx.lineWidth=1.5;roundRect(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.strokeStyle='rgba(180,140,220,0.25)';ctx.lineWidth=1;roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
+  ctx.restore();
+  const midX=PX+PW/2;
+  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#c0a0d0';ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#c0a0d0';ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(180,140,220,0.2)';roundRect(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle='#c0a0d0';ctx.lineWidth=1;roundRect(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#d0a8e0';
+  ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+  ctx.fillStyle='rgba(180,140,220,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
+  // Ferramenta ativa
+  const activeTool=player.activeTools&&player.activeTools.size>0?[...player.activeTools][0]:null;
+  const atY=PY+44;ctx.textAlign='center';
+  if(activeTool&&ITEM_DEFS[activeTool]){
+    const def=ITEM_DEFS[activeTool];
+    ctx.fillStyle='rgba(180,140,220,0.1)';roundRect(PX+6,atY-14,PW-12,20,3);ctx.fill();
+    ctx.font='11px "Courier New"';ctx.fillStyle='#f0d0ff';
+    ctx.fillText(def.icon+' '+def.nome,midX,atY+1);
+  } else {
+    ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8d8';ctx.fillText('Não Equipado',midX,atY);
   }
-
-  if(player.activeTools.size>0){
-    const tool=[...player.activeTools][0];
-    const icons={picareta_kimberlito:'⛏️',peneira_classificacao:'🪣',lupa_lapidario:'🔍'};
-    ctx.fillStyle='rgba(0,0,0,0.55)';roundRect(W-68,14,54,24,5);ctx.fill();
-    ctx.strokeStyle='rgba(200,180,240,0.4)';ctx.lineWidth=1.5;roundRect(W-68,14,54,24,5);ctx.stroke();
-    ctx.font='13px "Courier New"';ctx.fillStyle='#d0a8e0';
-    ctx.textAlign='center';ctx.fillText((icons[tool]||'?')+' Eqp',W-41,30);ctx.textAlign='left';
-  }
-
-  const labels=['Borda do Big Hole','Interior do Kimberlito','Câmara de Coleta','O Entardecer'];
-  ctx.font='11px "Courier New"';ctx.fillStyle='rgba(200,180,220,0.6)';
-  ctx.textAlign='center';ctx.fillText(`Cena ${G.level}: ${labels[(G.level-1)%4]||''}`,W/2,H-10);
   ctx.textAlign='left';
-
-  if(G.hintTimer>0){
-    G.hintTimer--;
-    ctx.save();ctx.globalAlpha=Math.min(1,G.hintTimer/60)*0.7;
-    ctx.font='11px "Courier New"';ctx.fillStyle='#c0b0d0';
-    ctx.textAlign='center';
-    ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir   I Diário   M Menu',W/2,H-28);
-    ctx.restore();
+  // Ferramentas coletadas
+  if(tools.length>0){
+    ctx.fillStyle='rgba(180,140,220,0.3)';ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
+    tools.forEach((t,i)=>{
+      const ty=PY+PH_BASE+8+i*22;
+      const equipped=activeTool===t.id;
+      ctx.textAlign='center';
+      ctx.font='11px serif';ctx.fillStyle=equipped?'#f0d0ff':'#a080c0';
+      ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
+      ctx.textAlign='left';
+    });
   }
-  ctx.textAlign='left';
+
+  // ── Hint rodapé — fundo escuro + texto legível ─────────────────
+  const hints=['Encontre a Picareta, a Peneira e a Lupa. Minere o kimberlito!',
+               'Use a Lupa para distinguir diamante de quartzo!',
+               'Peneira primeiro, depois examine com a Lupa.',
+               'Siga o suricato até o altar. [E] para completar.'];
+  const hint=hints[levelNum]||'';
+  ctx.fillStyle='rgba(0,0,0,0.60)';ctx.fillRect(0,H-32,W,32);
+  ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
+  ctx.fillStyle='#f0e8c0';ctx.font='17px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(hint,W/2,H-10);
+  ctx.textAlign='left';ctx.shadowBlur=0;
 }
 
 function drawTitle(){
-  
   drawBg(1,3200,720);
-  
   ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,H);
-  
   spawnDust(1);tickDust();drawDust();
+  // Estrelas — padrão fase 1
+  ctx.save();
+  for(let i=0;i<80;i++){
+    const sx=((i*137+11)%W),sy=((i*97+7)%(H*0.65));
+    const sa=0.2+Math.abs(Math.sin(Date.now()/1200+i))*0.6;
+    ctx.fillStyle=`rgba(255,240,200,${sa})`;
+    ctx.beginPath();ctx.arc(sx,sy,0.8+Math.abs(Math.sin(i*0.7))*1.2,0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
   ctx.textAlign='center';
   
   ctx.shadowColor='#e0a030';ctx.shadowBlur=44;
@@ -1322,55 +1404,83 @@ function drawTitle(){
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,458);
   
   ctx.fillStyle='#b0a8c8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,500);
-  ctx.fillText('← → Navegar Peneira   [I] Diário   [M] Menu Principal',W/2,536);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
+  ctx.fillText('[M] Menu Principal',W/2,536);
   ctx.textAlign='left';
 }
 
 function drawDeath(player){
   ctx.fillStyle='rgba(0,0,0,0.78)';ctx.fillRect(0,0,W,H);
   const cause=player?player.deathCause||'queda':'queda';
-  const msgs={queda:'Caiu no Big Hole...',espinho:'Atingido por espinhos!'};
-  ctx.fillStyle='#e04040';ctx.font='bold 38px "Courier New"';
-  ctx.textAlign='center';ctx.fillText('CORVAN CAIU!',W/2,H/2-60);
-  ctx.font='20px "Courier New"';ctx.fillStyle='#d09090';
-  ctx.fillText(msgs[cause]||'Foi derrotado.',W/2,H/2-20);
-  ctx.font='15px "Courier New"';ctx.fillStyle='#b07070';
-  ctx.fillText('No Big Hole, um segundo de descuido custava tudo.',W/2,H/2+20);
-  const pulse=0.65+Math.sin(Date.now()/500)*0.35;
-  ctx.globalAlpha=pulse;ctx.fillStyle='#d0a8e0';ctx.font='bold 18px "Courier New"';
-  ctx.fillText('[E] Tentar novamente',W/2,H/2+74);
-  ctx.globalAlpha=1;ctx.textAlign='left';
+  const msg=cause==='espinho'?'QUE ESPINHO!':'CORVAN CAIU!';
+  const sub=cause==='espinho'?'Cuidado com os espinhos nas paredes da mina!':'Uma queda fatal no Big Hole.';
+  ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
+  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
+  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
+  ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
+  ctx.fillText(`Mortes: ${G.deaths||1}`,W/2,H/2+168);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.textAlign='left';
 }
 
 function drawComplete(player){
+  // Fundo gradiente entardecer
   const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#e86820');g.addColorStop(0.5,'#801800');g.addColorStop(1,'#1a0808');
+  g.addColorStop(0,'#e86820');g.addColorStop(0.45,'#801800');g.addColorStop(1,'#1a0808');
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  
-  ctx.fillStyle='rgba(255,140,0,0.15)';ctx.beginPath();ctx.arc(W/2,H*0.42,280,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#f0d060';ctx.font='bold 38px "Courier New"';
-  ctx.textAlign='center';ctx.fillText('O Entardecer de Kimberley',W/2,H*0.28);
-  ctx.font='18px "Courier New"';ctx.fillStyle='#e8c090';
-  ctx.fillText('Fase 4.1 — Diamantes de Kimberley concluída',W/2,H*0.36);
-  
+  // Brilho central
+  const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,420);
+  rg.addColorStop(0,'rgba(240,160,40,.14)');rg.addColorStop(1,'rgba(240,160,40,0)');
+  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  // Estrelas no céu
+  ctx.save();
+  for(let i=0;i<60;i++){
+    const sx=((i*137+11)%W),sy=((i*97+7)%(H*0.55));
+    const sa=0.3+Math.abs(Math.sin(Date.now()/1000+i))*0.6;
+    ctx.fillStyle=`rgba(255,240,200,${sa})`;
+    ctx.beginPath();ctx.arc(sx,sy,1+Math.abs(Math.sin(i))*1.2,0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.textAlign='center';
+  ctx.shadowColor='#e0a030';ctx.shadowBlur=40;
+  ctx.fillStyle='#f0d060';ctx.font='bold 42px "Courier New"';
+  ctx.fillText('✦  FASE 4.1 CONCLUÍDA  ✦',W/2,118);
+  ctx.shadowBlur=0;
+
+  // Corvan + diamante
+  drawCorvan(W/2-160,200,4,false,Date.now()/300,'lupa_lapidario');
+  ctx.save();ctx.translate(W/2+80,270);ctx.scale(2.8,2.8);
+  drawDiamanteBruto(0,0,Date.now()/1000,'grande');
+  ctx.restore();
+
+  ctx.fillStyle='#e8d8b0';ctx.font='17px "Courier New"';
+  ctx.fillText('O Palácio Subterrâneo revelou seus segredos!',W/2,196);
+
   const score=player?player.score:0;
-  ctx.fillStyle='rgba(0,0,0,0.45)';roundRect(W/2-200,H*0.43,400,120,12);ctx.fill();
-  ctx.strokeStyle='rgba(200,150,60,0.5)';ctx.lineWidth=1.5;roundRect(W/2-200,H*0.43,400,120,12);ctx.stroke();
-  ctx.font='bold 20px "Courier New"';ctx.fillStyle='#f0d070';
-  ctx.fillText(`Pontuação Final: ${score} pts`,W/2,H*0.43+36);
-  ctx.font='14px "Courier New"';ctx.fillStyle='#d0b870';
   const diamonds=player?player.items.filter(id=>id.startsWith('diamante_')).length:0;
-  ctx.fillText(`💎 Diamantes coletados: ${diamonds}/3`,W/2,H*0.43+62);
   const hasContrato=player&&player.items.includes('contrato_trabalho');
-  ctx.fillStyle=hasContrato?'#d0a8e0':'#666';
-  ctx.fillText(hasContrato?'📜 Contrato De Beers: encontrado':'📜 Contrato De Beers: não encontrado',W/2,H*0.43+86);
-  ctx.font='13px "Courier New"';ctx.fillStyle='rgba(200,160,80,0.8)';
-  ctx.fillText('A De Beers controlava 90% da produção mundial até 2000.',W/2,H*0.43+110);
-  const pulse=0.65+Math.sin(Date.now()/500)*0.35;
-  ctx.globalAlpha=pulse;ctx.fillStyle='#d0a8e0';ctx.font='bold 18px "Courier New"';
-  ctx.fillText('[E] Próxima Região',W/2,H*0.82);
-  ctx.globalAlpha=1;ctx.textAlign='left';
+
+  const lines=[
+    `✦  Picareta de Kimberlito — ferramenta do Big Hole`,
+    `✦  Peneira de Classificação — 1º estágio gemológico`,
+    `✦  Lupa de Lapidário (10x) — olho do gemologista`,
+    `✦  Diamantes coletados: ${diamonds}/3`,
+    hasContrato?'✦  Contrato De Beers — precursor do apartheid':'✦  Contrato De Beers — não encontrado',
+  ];
+  ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';
+  lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
+
+  ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';
+  ctx.fillText(`Pontuação: 💎 ${score}   Diamantes: ${diamonds}/3`,W/2,430);
+
+  const pulse=0.65+Math.sin(Date.now()/550)*0.4;
+  ctx.fillStyle=`rgba(210,180,240,${pulse})`;ctx.font='15px "Courier New"';
+  ctx.fillText('✦ Fase 4.2 desbloqueada!   [E] Menu Principal',W/2,466);
+  ctx.textAlign='left';
 }
 
 function buildL1(){
@@ -1406,7 +1516,7 @@ function buildL1(){
   
   triggers.push(new Trigger(LW-60,GROUND-120,60,120,'Descer na Mina',()=>{G.loadLevel(2);}));
 
-  const meerkat={x:2840,y:GROUND-60,gifted:false};
+  const meerkat={x:2840,y:GROUND-4,gifted:false}; // pés no chão
 
   const startDlg=new Trigger(200,0,100,720,'',()=>{},true);
   startDlg.done=false;
@@ -1476,7 +1586,7 @@ function buildL3(){
 }
 
 function buildL4(){
-  
+
   const LW=2400,LH=720;
   const FLOOR=560;
   const plats=[];
@@ -1487,11 +1597,15 @@ function buildL4(){
   plats.push({x:1200,y:FLOOR-100,w:80,h:20,type:'plat'});
   plats.push({x:1600,y:FLOOR-70,w:100,h:20,type:'plat'});
   plats.push({x:1900,y:FLOOR-60,w:140,h:60,type:'plat'});
-  
+
   const triggers=[];
   triggers.push(new Trigger(LW-120,FLOOR-160,120,160,'Entrar no Compound',()=>{G.state='complete';}));
   const cols=[];
-  return {num:4,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols,triggers};
+
+  // Suricato guia — começa perto do Corvan e caminha até o portão do Compound
+  const meerkat={x:200,y:FLOOR-4,gifted:false,isGuide:true};
+
+  return {num:4,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols,triggers,meerkat};
 }
 
 const G={
@@ -1502,6 +1616,7 @@ const G={
   dialog:false,
   sieveMode:null,
   hintTimer:240,
+  deaths:0,
 
   loadLevel(n){
     this.level=n;
@@ -1559,13 +1674,14 @@ const G={
     popup.active=false;notifAlpha=0;
     BUBBLE.active=false;BUBBLE.queue=[];BUBBLE.cb=null;
     INV.open=false;INV.cursor=0;INV.tab=0;
+    this.sieveMode=null;
     this.loadLevel(1);
   },
 
   advance(){
-    
-    unlockPhase('4_2');
-    window.location.href='../../MenuPrincipal/index.html';
+    unlockPhase('4.2');
+    try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+    window.location.href='../../MenuPrincipal/index.html?unlocked=4.2';
   },
 };
 
@@ -1609,7 +1725,7 @@ function loop(){
     else{ctx.fillStyle='#0e0810';ctx.fillRect(0,0,W,H);}
     drawDeath(G.player);
     ctx.restore();
-    if(jp['KeyR']||jp['Enter']||jp['KeyE']){G.restart();}
+    if(jp['KeyR']||jp['Enter']||jp['KeyE']){G.deaths=(G.deaths||0)+1;G.restart();}
     clearJP();return;
   }
 
@@ -1648,52 +1764,40 @@ function loop(){
 
   if(lv.cols){
     for(const c of lv.cols){
-      if(c.done)continue;
-      const sx=c.x-cam.x,sy=c.y-cam.y;
-      const svgMap={picareta_kimberlito:'ipicareta',peneira_classificacao:'ipeneira',
-                    lupa_lapidario:'ilupa',contrato_trabalho:'icontrato'};
-      const svgKey=svgMap[c.type];
-      if(svgKey&&IMG[svgKey]){
-        drawSvgItem(svgKey,sx+17,sy+17,44,c.t);
-        if(player){
-          const dist=Math.hypot(player.x+13-(c.x+17),player.y+34-(c.y+17));
-          if(dist<120){
-            const labels={picareta_kimberlito:'⛏️ Picareta de Kimberlito',peneira_classificacao:'🪣 Peneira de Classificação',
-                          lupa_lapidario:'🔍 Lupa de Lapidário',contrato_trabalho:'📜 Contrato De Beers'};
-            const txt=`[E] Pegar ${labels[c.type]||c.type}`;
-            ctx.font='bold 13px "Courier New"';
-            const tw=ctx.measureText(txt).width+20;
-            const bx=sx+17-tw/2,by=sy-42;
-            ctx.fillStyle='rgba(6,4,10,0.88)';roundRect(bx,by,tw,24,5);ctx.fill();
-            ctx.strokeStyle='rgba(200,180,240,0.9)';ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
-            ctx.fillStyle='#e0d0f0';ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
-          }
-        }
-      } else {
-        c.draw(player?player.x:0,player?player.y:0);
-      }
+      // Sempre usar canvas nativo — nunca SVG como imagem plana
+      c.draw(player?player.x:0,player?player.y:0);
     }
   }
 
   if(lv.meerkat){
     const m=lv.meerkat;
+    // Suricato guia (cena 4): move-se à frente do jogador em direção ao portão
+    if(m.isGuide&&player&&!m.gifted){
+      const targetX=Math.min(lv.W-200, player.x+420);
+      m.x+=(targetX-m.x)*0.025;
+    }
     const mx=m.x-cam.x,my=m.y-cam.y;
     if(!m.gifted){
-      if(IMG.isuricato){
-        const bob=Math.sin(Date.now()/400)*4;
-        ctx.save();
-        const gl=ctx.createRadialGradient(mx,my+bob,4,mx,my+bob,44);
-        gl.addColorStop(0,'rgba(240,200,80,0.3)');gl.addColorStop(1,'rgba(240,200,80,0)');
-        ctx.fillStyle=gl;ctx.beginPath();ctx.arc(mx,my+bob,44,0,Math.PI*2);ctx.fill();
-        ctx.drawImage(IMG.isuricato,mx-28,my-56+bob,56,56);
-        ctx.restore();
-      } else {
-        drawMeerkat(mx,my,false,Date.now()/1000);
-      }
+      // Suricato desenhado em canvas nativo (nunca como imagem SVG plana)
+      const frame=Date.now()/1000;
+      // Halo dourado
+      ctx.save();
+      const gl=ctx.createRadialGradient(mx,my,4,mx,my,50);
+      gl.addColorStop(0,'rgba(240,200,80,0.25)');gl.addColorStop(1,'rgba(240,200,80,0)');
+      ctx.fillStyle=gl;ctx.beginPath();ctx.arc(mx,my,50,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      // Personagem canvas
+      drawMeerkat(mx,my,frame);
       if(player&&Math.abs(player.x+13-m.x)<150){
         const ha=0.7+Math.sin(Date.now()/350)*0.3;
-        ctx.fillStyle=`rgba(240,200,80,${ha})`;ctx.font='bold 12px "Courier New"';
-        ctx.textAlign='center';ctx.fillText('[E] Cumprimentar Suricato',mx,my-70);ctx.textAlign='left';
+        ctx.font='bold 13px "Courier New"';
+        const txt='[E] Cumprimentar Suricato';
+        const tw=ctx.measureText(txt).width+20;
+        const bx=mx-tw/2,by=my-85;
+        ctx.fillStyle=`rgba(6,4,10,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
+        ctx.strokeStyle=`rgba(240,200,80,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
+        ctx.fillStyle=`rgba(240,200,80,${ha})`;
+        ctx.textAlign='center';ctx.fillText(txt,mx,by+16);ctx.textAlign='left';
       }
     }
   }

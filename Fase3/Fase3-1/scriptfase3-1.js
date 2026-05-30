@@ -54,7 +54,7 @@ IMG.card31=null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='Escape'&&G.miningWall){G.miningWall=null;G.angleChoice=null;G.dialog=false;}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
@@ -128,13 +128,14 @@ const INV={
     const cat=this.TABS[this.tab].id;
     let saved={};
     try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
-    return Object.entries(ITEM_DEFS).filter(([id,def])=>{
+    const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
+    return Object.entries(_ALL_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
       return player.items.includes(id)||saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
-  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open;},
-  close(){this.open=false;G.dialog=false;},
+  toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
+  close(){this.open=false;G.dialog=BUBBLE.active;},
   isUpKey(){return jp['ArrowUp']||jp['KeyW'];},
   isDownKey(){return jp['ArrowDown']||jp['KeyS'];},
   isLeftKey(){return jp['ArrowLeft']||jp['KeyA'];},
@@ -304,9 +305,6 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   ctx.save();ctx.translate(cx,cy);if(flipX)ctx.scale(-1,1);
   const r=(x,y,w,h,fill,op)=>{ctx.fillStyle=fill;ctx.globalAlpha=op!==undefined?op:1;ctx.fillRect(x*S,y*S,w*S,h*S);ctx.globalAlpha=1;};
   const lb=0.7+Math.sin(frame*0.4)*0.3;
-  const showTalhadeira = activeTool==='talhadeira';
-  const showCorda      = activeTool==='corda_de_poco';
-  const showLampada    = activeTool==='lampada_de_sal';
   r(7,3,18,2,'#2a1a08');r(9,1,14,4,'#3a2610');
   r(5,3,22,2,'#4a3010');
   r(13,0,6,3,'#b08030');r(14,0,4,2,'#ffe060');
@@ -320,30 +318,12 @@ function drawCorvan(cx,cy,scale=1,flipX=false,frame=0,activeTool=null){
   r(8,28,16,2,'#5a3010');r(14,28,4,2,'#c88020');
   r(9,30,14,12,'#5a4030');r(15,36,2,6,'#4a3020');
   r(3,16,5,12,'#b82010');r(3,28,5,3,'#a86030');
-  if(showTalhadeira){
-    const wb=Math.sin(frame*0.25)*2;
-    r(0,24+wb,5,1,'#8a5818');r(0,25+wb,1,10,'#8a5818'); 
-    r(-2,22+wb,7,4,'#909090');r(-3,20+wb,2,4,'#b0b0b0'); 
-    ctx.fillStyle='rgba(200,200,255,0.4)';ctx.fillRect(-3*S,(20+wb)*S,2*S,2*S);
-  }
   r(24,16,5,12,'#b82010');r(24,28,5,3,'#a86030');
-  if(showCorda){
-    ctx.strokeStyle='#b08850';ctx.lineWidth=3*S;
-    ctx.beginPath();ctx.arc(30*S,30*S,7*S,0,Math.PI*1.6);ctx.stroke();
-    ctx.beginPath();ctx.arc(30*S,30*S,4*S,0.3,Math.PI*1.8);ctx.stroke();
-    ctx.fillStyle='#907040';ctx.fillRect(28*S,26*S,4*S,4*S);
-  }
-  if(showLampada){
-    const lg=lb*0.6;
-    ctx.fillStyle=`rgba(255,160,80,${lg})`;ctx.beginPath();ctx.arc(31*S,28*S,9*S,0,Math.PI*2);ctx.fill();
-    r(26,24,9,8,'#e8b090');r(27,24,7,3,'#f0c8a0');
-    r(29,32,3,2,'#c09070');
-    ctx.fillStyle=`rgba(255,200,80,${lb})`;ctx.beginPath();ctx.arc(30*S,31*S,2*S,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=`rgba(255,240,120,${lb*0.7})`;ctx.beginPath();ctx.ellipse(30*S,29*S,1*S,3*S,0,0,Math.PI*2);ctx.fill();
-  }
   r(9,42,6,4,'#2a1408');r(17,42,6,4,'#2a1408');
   r(8,44,8,2,'#1a0808');r(16,44,8,2,'#1a0808');
-  if(showLampada){ctx.fillStyle='#ffe060';ctx.globalAlpha=0.2*lb;ctx.beginPath();ctx.arc(16*S,1*S,5*S,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+  ctx.fillStyle='#ffe060';ctx.globalAlpha=0.25*lb;ctx.beginPath();ctx.arc(16*S,1*S,4*S,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  _drawCorvanTools(activeTool,S,frame,lb);
   ctx.restore();
 }
 
@@ -1154,7 +1134,7 @@ function drawTitle(){
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
   ctx.fillStyle='#b0a8c8';ctx.font='18px "Courier New"';
   ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,502);
-  ctx.fillText('← ▲ → Escolher ângulo   [I] Diário   [M] Menu Principal',W/2,538);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -1213,7 +1193,7 @@ function buildL1(){
     new Col(700,FL-50,'talhadeira'),
     new Col(1500,FL-50,'corda_de_poco'),
   ];
-  const bison={x:2960,y:FL-60,gifted:false};
+  const bison={x:2960,y:FL-38,gifted:false};
   const triggers=[
     new Trigger(3060,FL-200,100,200,'Descer na Mina',(player,level)=>{
       if(!player.items.includes('corda_de_poco')){notify('Encontre a Corda de Poço antes de descer!');return;}
