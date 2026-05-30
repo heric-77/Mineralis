@@ -1,0 +1,75 @@
+ações gerais:
+
+pegue a capa da fase 1-1 e ajuste todas as demais capas das fases com base nas posições da fase 1-1
+ajustar o tamanho de cada frase (padrão da fase 1-1), posição na tela (padrão da fase 1-1), posição do card (padrão da fase 1-1)
+
+ajuste em todas as capa a frase: 
+mudar de ← → Mover   ↑ Espaço Pular   E Interagir/Minerar para 
+← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo
+
+
+
+
+
+
+
+revisar integração e link com menu principal de todas as fases
+
+rever novamente o carregamento das ferramentas, minerios e artefatos subfase a subfase dentro do diário de bordo, conforme os roteiros
+
+criar música de fundo para cada subfase, conforme sua região
+
+em todas as fases, quando o Corvan "perde vida" a mensagem precisa fazer sentido com o que ocorreu para ele ter que reiniciar a fase
+
+
+
+
+
+
+
+3-2
+cena 02 - frase da interação atrás do Corvan
+cena 03 - corvan do balão não segue padrão da fase 1-1
+cena 03 - frase do balão fica fora no inicio
+cena 03 - os pontos de subida se misturam demais com o fundo
+cena 03 - lama profunda - dificuldade alta de passar, por não ter estagios de subidas, ou seja, NÃO DA PRA PASSAR e FINALIZAR
+
+
+3-3
+em todas as cenas, corvan fica "tremendo" quando parado
+cena 02 - ajustar as mensagens, alguns balões e informações ficam fora do quadrado
+cena 03 - quando o vapor aumenta e ele precisa usar o deslidor, Corvan retorna ao inicio, mas ele deve ficar onde está. Além disso
+ele sai mto rapido, o que não permite nem andar direito
+
+4-1
+cena 01 - incluir no rodape emojis dos itens e mencionar o suricato
+cena 01 - ao interagir com o suricato, ele não deve sumir, pois não é um item colecionavel, é apenas uma interação entre um animal daquela região
+cena 01 - mensagem de interação suricato atras
+cena 02 - mensagens fora do quadrado - aumentar a dificuldade
+cena a camera da coleta - não dá pra interagir com o contrato
+
+4-2
+não existe nada para coletar a parte, precisa dar mais jogabilidade, ter desafios - cenas 01 e 02
+cena 01 - incluir no rodape emojis dos itens
+cena 02 - 
+
+
+4-3
+cena 01 - caixas estourando - não é padrão 1-1 - SOM ruim ao interagir com dromedali
+cena 01 - machado e balança precisam estar indicados com interação
+cena 02 - examinar a estratificação precisa ter alguma ação
+cena 03 - som horrivel 
+cena 04
+
+
+
+
+
+
+
+
+
+
+
+
+
