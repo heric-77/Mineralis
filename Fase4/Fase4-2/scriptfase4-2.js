@@ -23,7 +23,7 @@ const IMG={};let assetsLoaded=0,totalAssets=5,gameReady=false;
 ['bateia','calabaca','peixe','bastao','passaro'].forEach((k,i)=>{const src=['Assets/Item_BateiaMadeira.svg','Assets/Item_Calabaca.svg','Assets/Item_PeixeAguia.svg','Assets/Item_BastaoSombra.svg','Assets/Item_PassaroEsteatita.svg'][i];const im=new Image();im.onload=()=>IMG[k]=im;im.onerror=()=>IMG[k]=null;im.src=src;});
 
 const keys={},jp={};
-addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){INV.toggle(G.player);}if(e.code==='Escape')INV.close();if(e.code==='KeyM')location.href='../../MenuPrincipal/index.html';});
+addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}if(e.code==='Escape')INV.close();if(e.code==='KeyM')location.href='../../MenuPrincipal/index.html';});
 addEventListener('keyup',e=>delete keys[e.code]);
 const TOUCH={l:false,r:false,j:false,e:false};function bindT(id,k){const el=document.getElementById(id);if(!el)return;el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});el.addEventListener('touchend',ev=>{ev.preventDefault();TOUCH[k]=false;},{passive:false});}
 bindT('tb-l','l');bindT('tb-r','r');bindT('tb-j','j');bindT('tb-e','e');
@@ -423,8 +423,19 @@ function drawHUD(p,l){
   ctx.textAlign='center';ctx.fillText(hintTxt,W/2,H-10);
   ctx.textAlign='left';ctx.shadowBlur=0;
 }
-function drawTitle(){drawBg('bg01');ctx.fillStyle='rgba(0,0,0,.58)';ctx.fillRect(0,0,W,H);goldSparkles();ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=35;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('O Ouro que a Pedra Guardou',W/2,138);ctx.shadowBlur=0;ctx.fillStyle='#c8c0a0';ctx.font='18px Courier New';ctx.fillText('Fase 4.2 - Ouro do Grande Zimbabué · Zimbábue, século XIII',W/2,190);if(IMG.card42)ctx.drawImage(IMG.card42,W/2-85,230,170,170);ctx.fillStyle=`rgba(216,179,74,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='18px Courier New';ctx.fillText('▶ Pressione ENTER para começar ◀',W/2,455);ctx.fillStyle='#bdb38c';ctx.font='16px Courier New';ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,498);ctx.fillText('[M] Menu Principal',W/2,550);ctx.textAlign='left';}
-function drawDeath(){ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,H);const msgs={corrente:'A CORRENTE TE LEVOU!',queda:'VOCÊ CAIU!',rocha:'TERRENO PERIGOSO!'};ctx.textAlign='center';ctx.fillStyle='#e05a38';ctx.font='bold 48px Courier New';ctx.fillText(msgs[G.player.deathCause]||'VOCÊ CAIU!',W/2,H/2-40);ctx.fillStyle='#d8b34a';ctx.font='19px Courier New';ctx.fillText('Pressione R para tentar novamente',W/2,H/2+36);ctx.fillStyle='#999';ctx.font='15px Courier New';ctx.fillText('[M] Menu Principal',W/2,H/2+70);ctx.textAlign='left';}
+function drawTitle(){drawBg('bg01');ctx.fillStyle='rgba(0,0,0,.58)';ctx.fillRect(0,0,W,H);goldSparkles();ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=40;ctx.fillStyle=UI_ACCENT;ctx.font='bold 46px "Courier New"';ctx.fillText('O Ouro que a Pedra Guardou',W/2,148);ctx.shadowBlur=0;ctx.fillStyle='#c8c0a0';ctx.font='19px "Courier New"';ctx.fillText('Fase 4.2 - Ouro do Grande Zimbabué · Zimbábue, século XIII',W/2,200);if(IMG.card42){const cardSize=160,cardX=W/2-80,cardY=230;const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);glow.addColorStop(0,'rgba(216,179,74,0.25)');glow.addColorStop(1,'rgba(216,179,74,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();ctx.drawImage(IMG.card42,cardX,cardY,cardSize,cardSize);}ctx.fillStyle=`rgba(216,179,74,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);ctx.fillText('[M] Menu Principal',W/2,538);ctx.textAlign='left';}
+function drawDeath(){
+  ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msgs={corrente:'A CORRENTE TE LEVOU!',queda:'CORVAN CAIU!',rocha:'TERRENO PERIGOSO!',inimigo:'O DESERTO VINGOU-SE!'};
+  const subs={corrente:'O Nilo é generoso com seus filhos — mas fatal com os descuidados!',queda:'O deserto oriental do Egito não tem misericórdia.',rocha:'As rochas do deserto são afiadíssimas. Cuidado!',inimigo:'Os guardiões das minas dos faraós não perdoam intrusos!'};
+  ctx.textAlign='center';ctx.shadowColor='#c04020';ctx.shadowBlur=28;
+  ctx.fillStyle='#e05a38';ctx.font='bold 48px Courier New';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#d8b34a';ctx.font='16px Courier New';ctx.fillText(subs[cause]||'O deserto não perdoa.',W/2,H/2-8);
+  ctx.font='19px Courier New';ctx.fillText('Pressione R para tentar novamente',W/2,H/2+40);
+  ctx.fillStyle='#999';ctx.font='15px Courier New';ctx.fillText('[M] Menu Principal',W/2,H/2+75);ctx.textAlign='left';
+}
 function drawComplete(){drawBg('bg04');ctx.fillStyle='rgba(0,0,0,.62)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=38;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('✦ FASE 4.2 CONCLUÍDA ✦',W/2,118);ctx.shadowBlur=0;drawCorvan(W/2-180,210,2.4,false,Date.now()/260,'bastao_sombra');ctx.save();ctx.translate(W/2+90,285);ctx.scale(2.3,2.3);drawPassaro(0,0,1,Date.now()/700);ctx.restore();ctx.fillStyle='#e8dba5';ctx.font='17px Courier New';ctx.fillText('O ouro revelou o comércio e a memória do Grande Zimbabué.',W/2,190);const lines=['🥣 Bateia de Madeira - garimpo Shona sem ferramentas metálicas','🟡 Ouro Aluvial - pepitas densas que afundam na bateia','✧ Mica Dourada - brilho enganoso, leve e flexível','🐦 Pássaro de Esteatita - ancestralidade, símbolo e resistência'];ctx.fillStyle='#d8c891';ctx.font='14px Courier New';lines.forEach((l,i)=>ctx.fillText(l,W/2,250+i*29));ctx.fillStyle='#c8c0a0';ctx.font='16px Courier New';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,430);ctx.fillStyle=`rgba(216,179,74,${.6+Math.sin(Date.now()/550)*.35})`;ctx.font='15px Courier New';ctx.fillText('✦ Fase 4.3 desbloqueada!   ENTER para voltar ao Menu',W/2,465);ctx.textAlign='left';}
 
 function buildL1(){const FL=590,WW=3100,WH=900;const plats=basePlats(FL,WW,WH);const cols=[new Col(210,FL-55,'bateia_madeira'),new Col(540,FL-55,'calabaca_agua')];const aguia={x:2520,y:FL-215,gifted:false,vx:0.6,patrolMin:2200,patrolMax:2850,t:0};const triggers=[new Trigger(2880,FL-190,120,190,'Descer ao rio',(p,l)=>{if(!p.items.includes('bateia_madeira')){notify('Pegue a Bateia de Madeira primeiro.');return;}if(!p.items.includes('calabaca_agua')){notify('Pegue a Calabaça de Água primeiro.');return;}if(!p.items.includes('bastao_sombra')){notify('Interaja com o Peixe-Águia para receber o Bastão de Sombra.');return;}l.triggers[0].done=true;sfx('unlock');showDialog(['Século XIII. Diante de nós está o Grande Zimbabué: muralhas de granito sem argamassa e uma torre cônica que observa o planalto.','Mais de 18 mil pessoas viveram aqui. O ouro viajava do interior da África até Sofala, depois para a Índia e além.','A primeira tarefa é simples: recolher as ferramentas Shona e seguir para o rio Mutirikwe.'],()=>setTimeout(()=>G.nextLevel(),600));},true)];return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,title:'Grande Zimbabué - Muralhas ao Amanhecer',hint:p=>!p.items.includes('bateia_madeira')?'🥣 Pegue a Bateia de Madeira →':!p.items.includes('calabaca_agua')?'💧 Pegue a Calabaça de Água →':!p.items.includes('bastao_sombra')?'🦅 Encontre o Peixe-Águia e receba o Bastão de Sombra →':'✦ Ferramentas prontas - desça ao rio →',plats,cols,triggers,aguia,intro:['Capim dourado, kopjes de granito e muralhas curvas no amanhecer africano.','Colete a Bateia de Madeira e a Calabaça. Depois procure o Peixe-Águia sobre a rocha acima do rio.'],update(p){
@@ -453,8 +464,48 @@ function buildL4(){const FL=590,WW=1900,WH=900;const plats=basePlats(FL,WW,WH);c
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={state:'title',lvIdx:0,level:null,player:null,dialog:false,deaths:0,_items:[],_score:0,_tool:null,load(i){this.lvIdx=i;particles=[];this.level=LEVELS[i]();cam.x=0;this.player=new Player(this.level.startX,this.level.startY);if(i>0){this.player.items=[...this._items];this.player.score=this._score;this.player.activeTool=this._tool;}else{this._items=[];this._score=0;this._tool=null;}this.dialog=false;this.state='playing';BUBBLE.active=false;popup.active=false;for(const k in jp)delete jp[k];setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro);},700);},nextLevel(){this._items=[...this.player.items];this._score=this.player.score;this._tool=this.player.activeTool;if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);else this.state='complete';},update(){if(this.state!=='playing')return;checkDlg();updateCam(this.player.x,this.level.W);this.level.update(this.player);this.player.update(this.level);tickParticles();tickNotif();tickPopup();if(this.player.dead){this.deaths++;this.state='dead';}},draw(){ctx.clearRect(0,0,W,H);if(this.state==='title'){drawTitle();return;}if(this.state==='complete'){drawComplete();return;}drawBg(this.level.bg);for(const p of this.level.plats)drawPlatform(p);this.level.draw(this.player);drawParticles();this.player.draw();if(this.state==='dead'){drawDeath();return;}drawHUD(this.player,this.level);drawPopup();BUBBLE.draw(this.player);drawNotif();INV.draw(this.player);}};
+// ── Música de fundo — Fase 4.2 (Zimbabué/Egito): pentatônica africana grave ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_ZIM=[146.8,174.6,196,220,261.6,293.6,349.2,392]; // pentatônica menor
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.07,start+0.09);
+    g.gain.setValueAtTime(0.07,start+dur-0.2);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,5,4,2,5,7,5,4,2,4,2,0,2,4];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_ZIM[idx%_NOTES_ZIM.length],t+i*0.45,0.52));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.45-0.3)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
 function startGame(){G.state='title';loop();}
-function loop(){requestAnimationFrame(loop);if(G.state==='title'&&(jp.Enter||jp.Space))G.load(0);if(G.state==='dead'&&jp.KeyR)G.load(G.lvIdx);if(G.state==='complete'&&jp.Enter){unlockPhase('4.3');location.href='../../MenuPrincipal/index.html?unlocked=4.3';}G.update();G.draw();clearJP();}
+function loop(){
+  requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
+  if(G.state==='title'&&(jp.Enter||jp.Space))G.load(0);
+  if(G.state==='dead'&&jp.KeyR)G.load(G.lvIdx);
+  if(G.state==='complete'&&jp.Enter){unlockPhase('4.3');location.href='../../MenuPrincipal/index.html?unlocked=4.3';}
+  G.update();G.draw();clearJP();
+}
 if(!gameReady){(function loadLoop(){if(gameReady)return;requestAnimationFrame(loadLoop);ctx.fillStyle='#050805';ctx.fillRect(0,0,W,H);ctx.fillStyle=UI_ACCENT;ctx.font='bold 24px Courier New';ctx.textAlign='center';ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);ctx.textAlign='left';})();}
 
 

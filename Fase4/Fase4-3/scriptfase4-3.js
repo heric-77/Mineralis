@@ -48,6 +48,7 @@ function sfx(type) {
 
 // ── Save ─────────────────────────────────────────────────────────
 const SAVE_KEY = 'mineralis_save_v2';
+function unlockPhase(id){try{const raw=localStorage.getItem(SAVE_KEY);const save=raw?JSON.parse(raw):{versao:1,iniciado:true,fases:{}};if(!save.fases)save.fases={};if(!save.fases[id])save.fases[id]={desbloqueada:false,estrelas:0};save.fases[id].desbloqueada=true;localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
 function _salvarFase(score, deaths){
   const estrelas = deaths===0?4:deaths<=2?3:deaths<=5?2:1;
   try{
@@ -60,8 +61,8 @@ function _salvarFase(score, deaths){
     localStorage.setItem(SAVE_KEY,JSON.stringify(save));
   }catch(e){}
 }
-function _voltarAoMenu(){ _salvarFase(G.player?.score||0,G.deaths); try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
-  window.location.href='../../MenuPrincipal/index.html'; }
+function _voltarAoMenu(){ _salvarFase(G.player?.score||0,G.deaths); unlockPhase('5.1'); try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+  window.location.href='../../MenuPrincipal/index.html?unlocked=5.1'; }
 
 // ── Assets ───────────────────────────────────────────────────────
 const IMG={};
@@ -95,7 +96,7 @@ const keys={}, jp={};
 window.addEventListener('keydown',e=>{
   if(!keys[e.code]) jp[e.code]=true; keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open) INV.close();
   if(e.code==='KeyM'){try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
   window.location.href='../../MenuPrincipal/index.html';}
@@ -210,9 +211,10 @@ function wrapText(text,maxW){ ctx.font='15px "Courier New"'; const paragraphs=te
 // ── Item Definitions ──────────────────────────────────────────────
 const ITEM_DEFS={
   // Herdados
-  picareta_basica:  { cat:'ferramenta',nome:'Picareta Básica',       icon:'⛏',fase:'1.1',desc:'Extrai minérios das paredes rochosas.\nEssencial nas minas de Potosí.' },
-  maco_pedra:       { cat:'ferramenta',nome:'Maço de Pedra',         icon:'🪨',fase:'2.3',desc:'Percussão a frio Anishinaabe.\nExtrai cobre nativo do basalto.' },
-  picareta_calcario:{ cat:'ferramenta',nome:'Picareta de Calcário',  icon:'⛏',fase:'3.3',desc:'Adaptada para rocha sedimentar.\nRevela veias de cinábrio com precisão.' },
+  picareta_basica:  { cat:'ferramenta',nome:'Picareta Básica',       icon:'⛏',fase:'1.1',journalId:'picareta_basica',desc:'Extrai minérios das paredes rochosas.\nEssencial nas minas de Potosí.' },
+  lanterna:         { cat:'ferramenta',nome:'Lanterna',              icon:'🔦',fase:'1.1',journalId:'lanterna',desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.' },
+  maco_pedra:       { cat:'ferramenta',nome:'Maço de Pedra',         icon:'🪨',fase:'2.3',journalId:'maco_pedra',desc:'Percussão a frio Anishinaabe.\nExtrai cobre nativo do basalto.' },
+  picareta_calcario:{ cat:'ferramenta',nome:'Picareta de Calcário',  icon:'⛏',fase:'3.3',journalId:'picareta_calcario_item',desc:'Adaptada para rocha sedimentar.\nRevela veias de cinábrio com precisão.' },
   // Novas
   machado_item:     { cat:'ferramenta',nome:'Machado de Pedra Tuaregue',icon:'🪓',fase:'4.3',desc:'Golpe HORIZONTAL para separar lajes de sal.\nGolpe vertical = sal virou pó.\nOs Tuaregues extraem assim há séculos.' },
   balanca_item:     { cat:'ferramenta',nome:'Balança de Bronze',     icon:'⚖️',fase:'4.3',desc:'Mercadores de Timbuktu pesavam ouro\nem pó com balanças de precisão.\nA moeda era o peso, não a forma.' },
@@ -222,8 +224,9 @@ const ITEM_DEFS={
   cinabrio:         { cat:'minerio',   nome:'Cinábrio (HgS)',        icon:'🔴',fase:'3.3',desc:'Sulfeto de mercúrio escarlate.\nUsado para amalgamar a prata de Potosí.',multiple:true },
   halita:           { cat:'minerio',   nome:'Halita Saariana (Sal)', icon:'⬜',fase:'4.3',desc:'Sal-gema de Taoudenni — 700 km no Saara.\nEm Timbuktu séc. XIV = mesmo valor em ouro.\n"Salário" vem de "salarium" — pagamento romano.',multiple:true },
   // Artefatos
-  tumi_dourado:     { cat:'artefato',  nome:'Tumi de Ouro Inca',     icon:'🥇',fase:'1.3',desc:'Faca ritual Inca de ouro e turquesa.' },
-  frasco_mercurio:  { cat:'artefato',  nome:'Frasco de Mercúrio',    icon:'⚗️',fase:'3.3',desc:'10.000 km de Almadén a Potosí.' },
+  tumi_dourado:     { cat:'artefato',  nome:'Tumi — Faca Cerimonial',icon:'🗡',fase:'1.3',journalId:'relevo_inca',desc:'Faca ritual Inca de ouro e turquesa.' },
+  gorget_cobre:     { cat:'artefato',  nome:'Gorget de Cobre',       icon:'🌐',fase:'2.3',journalId:'gorget_cobre',desc:'Ornamento Anishinaabe — rota comercial do Lago Superior à Flórida.' },
+  frasco_mercurio:  { cat:'artefato',  nome:'Frasco de Mercúrio',    icon:'⚗️',fase:'3.3',journalId:'frasco_mercurio',desc:'10.000 km de Almadén a Potosí.' },
   manuscrito_item:  { cat:'artefato',  nome:'Manuscrito de Timbuktu',icon:'📜',fase:'4.3',desc:'Manuscrito árabe sobre mineralogia, séc. XIV.\nDescreve propriedades de ouro, prata e mercúrio.\nChegou à Europa via Marrocos → Florença.\nUm dos 700.000 manuscritos da cidade.' },
 };
 const TIPO_TO_JOURNAL={ machado:'machado_item',balanca:'balanca_item',astrolabio:'astrolabio_item', halita:'halita',manuscrito:'manuscrito_item' };
@@ -234,9 +237,11 @@ const INV={
   TABS:[{id:'ferramenta',label:'🔧 Ferramentas',color:'#e0b030'},{id:'minerio',label:'⛏ Minérios',color:'#c89820'},{id:'artefato',label:'🏺 Artefatos',color:'#d0a030'}],
   tabItems(player){ const cat=this.TABS[this.tab].id; let col={};
     try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);col=j.coletados||{};}}catch(e){}
+    // Migração: código antigo usava 'mapa_potosi' para o Tupu de Prata
+    if(col['mapa_potosi']&&!col['tupu_prata']) col['tupu_prata']=true;
     for(const tipo of player.items){const jid=TIPO_TO_JOURNAL[tipo]||tipo;col[jid]=true;}
     const halN=player.items.filter(i=>i==='halita').length;
-    const out=[]; for(const [id,def] of Object.entries(ITEM_DEFS)){ if(def.cat!==cat) continue; if(def.multiple){if(halN>0)out.push({id,...def,count:halN});}else if(col[id])out.push({id,...def,count:1}); } return out; },
+    const out=[]; for(const [id,def] of Object.entries(ITEM_DEFS)){ if(def.cat!==cat) continue; if(def.multiple){if(halN>0)out.push({id,...def,count:halN});} else if(def.fase==='4.3'){if(player.items.includes(id)||col[id])out.push({id,...def,count:1});} else if(col[id])out.push({id,...def,count:1}); } return out; },
   toggle(player){ this.open=!this.open; if(this.open)this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1)); G.dialog=this.open||BUBBLE.active; },
   close(){ this.open=false;G.dialog=BUBBLE.active; },
   navigate(player){ if(!this.open)return false; if(jp['ArrowLeft']||jp['KeyA']){this.tab=(this.tab+2)%3;this.cursor=0;return true;} if(jp['ArrowRight']||jp['KeyD']){this.tab=(this.tab+1)%3;this.cursor=0;return true;} const items=this.tabItems(player); if(jp['ArrowUp']||jp['KeyW']){this.cursor=Math.max(0,this.cursor-1);return true;} if(jp['ArrowDown']||jp['KeyS']){this.cursor=Math.min(items.length-1,this.cursor+1);return true;} if(isE()&&items.length>0&&this.tab===0){const item=items[this.cursor];player.activeTool=(player.activeTool===item.id)?null:item.id;return true;} return false; },
@@ -1011,7 +1016,13 @@ function drawTitle(){
 
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
-  ctx.textAlign='center';ctx.shadowColor='#ff2020';ctx.shadowBlur=30;ctx.fillStyle='#ff5050';ctx.font='bold 56px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);ctx.shadowBlur=0;
+  const cause=G.player?.deathCause||'queda';
+  const msgs={queda:'CORVAN CAIU!',espinho:'QUE ESPINHO!',inimigo:'O SAARA É IMPLACÁVEL!',areia:'A TEMPESTADE DE AREIA TE CEGOU!'};
+  const subs={queda:'O deserto do Saara não perdoa queda alguma.',espinho:'As armadilhas das rotas de caravana são mortais!',inimigo:'O guardião da rota de sal foi mais veloz. Pule sobre eles!',areia:'O Harmattan varreu tudo. Nunca pare durante a tempestade!'};
+  ctx.textAlign='center';ctx.shadowColor='#ff2020';ctx.shadowBlur=30;
+  ctx.fillStyle='#ff5050';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#e8d090';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'O Saara é implacável.',W/2,H/2-10);
   CORVAN.draw(ctx, 'hurt', Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#e0b030';ctx.font='20px "Courier New"';ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
   ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+168);ctx.textAlign='left';
@@ -1066,13 +1077,47 @@ function _journalColetar(tipo, count){
 }
 function _salvarProgresso(score,deaths){ const estrelas=deaths===0?4:deaths<=2?3:deaths<=5?2:1;try{const raw=localStorage.getItem('mineralis_save_v2');const save=raw?JSON.parse(raw):{versao:1,iniciado:true,fases:{}};if(!save.fases)save.fases={};if(!save.fases['4.3'])save.fases['4.3']={desbloqueada:true,estrelas:0};save.fases['4.3'].estrelas=Math.max(save.fases['4.3'].estrelas||0,estrelas);save.fases['4.3'].desbloqueada=true;localStorage.setItem('mineralis_save_v2',JSON.stringify(save));}catch(e){} }
 
+// ── Música de fundo — Fase 4.3 (Timbuktu/Saara): pentatônica maior africana ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_TIM=[261.6,293.6,329.6,392,440,523.2,587.3,659.2]; // pentatônica maior
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='triangle';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.07,start+0.04);
+    g.gain.setValueAtTime(0.07,start+dur-0.1);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,6,4,6,4,2,4,6,5,4,2,4,2,0]; // ritmo animado africano
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_TIM[idx%_NOTES_TIM.length],t+i*0.32,0.36));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.32-0.2)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
 function startGame(){ G.load(0);G.state='title';loop(); }
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
   if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
   if(G.state==='complete' &&(jp['Enter']||jp['KeyM'])) _voltarAoMenu();
-  if(G.state==='complete' && jp['KeyM']) _voltarAoMenu();
   G.update();G.draw();clearJP();
 }
 
@@ -1083,7 +1128,4 @@ if(!gameReady){
     ctx.fillStyle='#080500';ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#e0b030';ctx.font='bold 22px "Courier New"';ctx.textAlign='center';
     ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
-    ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('Fase 4.3 — A Cidade Onde o Ouro Vira Conhecimento',W/2,H/2+36);
-    ctx.textAlign='left';
-  })();
-}
+    ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('Fase 4.3 

@@ -138,20 +138,39 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
       });
 
   Cards.renderizar();
-  Cards.sincronizar();
+  // Todas as fases iniciam bloqueadas conforme o HTML.
+  // O desbloqueio só ocorre via "Nova Jornada" ou ao retornar de uma fase (?unlocked=).
 
   // Efeito de desbloqueio ao voltar de uma fase concluída (?unlocked=1.2 etc.)
   const _unlockParam = new URLSearchParams(window.location.search).get('unlocked');
+
   if (_unlockParam) {
+    Cards.sincronizar(); // garante que a fase recém-desbloqueada apareça
     history.replaceState(null, '', window.location.pathname); // limpa a URL
+
+    // Flash visual no frame (igual ao Nova Jornada)
+    setTimeout(() => {
+      const el = document.createElement('div');
+      Object.assign(el.style, {
+        position:'absolute', inset:'0',
+        background:'rgba(255,210,80,.10)',
+        zIndex:'999', pointerEvents:'none',
+        animation:'menuFlash .5s forwards',
+      });
+      document.getElementById('frame').appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }, 200);
+
+    // Animação do card + som (sincronizados)
     setTimeout(() => {
       const card = document.querySelector(`.phase-card[data-phase="${_unlockParam}"]`);
       if (card) {
         card.classList.add('just-unlocked');
         card.addEventListener('animationend', () => card.classList.remove('just-unlocked'), { once: true });
       }
-      Audio.novaJornada(); // som de desbloqueio
-    }, 400);
+      // novaJornada() já lida com AudioContext suspenso via .resume().then()
+      Audio.novaJornada();
+    }, 500);
   }
 
 

@@ -42,16 +42,15 @@ function journalCollect(id) {
 }
 function goToMainMenu() {
   try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
-  window.location.href = '../../MenuPrincipal/index.html';
+  // ?unlocked=1.2 garante que Cards.sincronizar() rode ao chegar no menu,
+  // exibindo corretamente as fases desbloqueadas salvas no localStorage.
+  window.location.href = '../../MenuPrincipal/index.html?unlocked=1.2';
 }
 
 
-const JOURNAL_ITEMS = {
-  bateia:       { id:'bateia',        tipo:'ferramenta', nome:'Bateia' },
-  pa:           { id:'pa_exploradora',tipo:'ferramenta', nome:'Pá Exploradora' },
-  ouro_aluvial: { id:'ouro_aluvial',  tipo:'minerio',    nome:'Ouro Aluvial' },
-  vaso:         { id:'vaso_amazônico',tipo:'artefato',   nome:'Vaso Amazônico' },
-};
+// Fase atual — itens desta fase só aparecem no diário ao serem coletados nesta sessão.
+// Itens de fases anteriores persistem via coletados no localStorage.
+const CURRENT_PHASE = '1.2';
 
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
@@ -160,7 +159,7 @@ IMG.card12 = null;
 const keys={}, jp={};
 window.addEventListener('keydown',e=>{ if(!keys[e.code])jp[e.code]=true; keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open)INV.close();
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
@@ -195,9 +194,9 @@ const ITEM_DEFS = {
     drawHand:'left',
   },
   lanterna: {
-    cat:'ferramenta', nome:'Lanterna', icon:'🔦', journalId:null,
-    desc:'Revela itens ocultos nas sombras da selva.\nNecessária para encontrar a Urna Marajoara.',
-    phase:'1.2',
+    cat:'ferramenta', nome:'Lanterna', icon:'🔦', journalId:'lanterna',
+    desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para enxergar veios e artefatos.',
+    phase:'1.1',
     drawHand:'right',
   },
   prata: {
@@ -217,12 +216,12 @@ const ITEM_DEFS = {
   },
   ceramica_inca: {
     cat:'artefato', nome:'Cerâmica Inca', icon:'🏺', journalId:'ceramica_inca',
-    desc:'Vasilha cerimonial andina encontrada em Potosí.\nRelíquia registrada na Fase 1.1.',
-    phase:'1.1',
+    desc:'Vasilha cerimonial andina encontrada na Amazônia.\nDesbloqueada ao concluir a Fase 1.2.',
+    phase:'1.2',
   },
-  mapa_potosi: {
-    cat:'artefato', nome:'Mapa de Potosí', icon:'🗺', journalId:'mapa_potosi',
-    desc:'Fragmento de mapa colonial com rotas da mineração andina.\nObtido na Fase 1.1.',
+  tupu_prata: {
+    cat:'artefato', nome:'Tupu de Prata', icon:'✦', journalId:'tupu_prata',
+    desc:'Alfinete cerimonial inca de prata pura.\nUsado para prender mantos nos rituais andinos.',
     phase:'1.1',
   },
   urna: {
@@ -242,13 +241,24 @@ const INV = {
   tabItems(player){
     const cat=this.TABS[this.tab].id;
     const collected=saveRead().coletados || {};
+    // Migração: código antigo guardava Tupu de Prata como 'mapa_potosi'
+    if(collected['mapa_potosi'] && !collected['tupu_prata']) collected['tupu_prata']=true;
     return Object.entries(ITEM_DEFS)
       .filter(([,def])=>def.cat===cat)
-      .filter(([id,def])=>def.journalId ? collected[def.journalId] : player.items.includes(id))
+      .filter(([id,def])=>{
+        // Itens da fase atual: só aparecem se coletados nesta sessão (player.items)
+        if(def.phase===CURRENT_PHASE){
+          return player.items.includes(id)||player.items.includes(id+'_ok')||player.items.includes(id+'_col');
+        }
+        // Itens de fases anteriores: persistem via coletados no localStorage
+        const jid=def.journalId||id;
+        return !!collected[jid];
+      })
       .map(([id,def])=>({
         id,
         ...def,
-        owned: player.items.includes(id),
+        owned: player.items.includes(id) ||
+               (def.phase!==CURRENT_PHASE && def.cat==='ferramenta' && !!collected[def.journalId||id]),
         equipped: player.activeTool===id,
       }));
   },
@@ -835,7 +845,7 @@ class Col{
     }
     return this;
   }
-  draw(){
+  draw(px,py){
     if(this.done)return;
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-60||sx>W+60)return;
@@ -845,6 +855,19 @@ class Col{
     else if(this.type==='pa')      drawPa(0,0,this.t);
     else if(this.type==='urna')    drawUrna(0,8,this.t,false);
     ctx.restore();
+    // Prompt [E] para itens que exigem interação
+    if(this.type!=='gold' && px!==undefined){
+      const near=Math.abs((px+20)-(this.x+this.w/2))<80&&Math.abs((py+40)-(this.y+this.h/2))<80;
+      if(near){
+        const lbl='[E] Coletar';
+        const tw=ctx.measureText(lbl).width+16;
+        const bx=sx+this.w/2-tw/2, by=sy-36;
+        ctx.fillStyle='rgba(0,0,0,0.7)';roundRect(bx,by,tw,22,5);ctx.fill();
+        ctx.strokeStyle='#78d840';ctx.lineWidth=1.2;roundRect(bx,by,tw,22,5);ctx.stroke();
+        ctx.fillStyle='#78d840';ctx.font='bold 12px "Courier New"';
+        ctx.textAlign='center';ctx.fillText(lbl,sx+this.w/2,by+15);ctx.textAlign='left';
+      }
+    }
   }
 }
 
@@ -1020,7 +1043,7 @@ class Player{
     if(!this.inMudwater)this.mudFlash=Math.max(0,this.mudFlash-1);
 
     for(const c of level.cols){
-      const canCollect = c.type==='gold' ? this.goldNear(c) : this.overlaps(c);
+      const canCollect = c.type==='gold' ? this.goldNear(c) : (this.overlaps(c) && isE());
       if(!c.done&&canCollect){c.done=true;
         if(c.type==='gold'){
           this.score+=15;sfx('gold');burst(c.x+18,c.y+18,'#d4a017',10);
@@ -1275,7 +1298,7 @@ function buildL1(){
       ],()=>{notify('✦ Bateia e Pá registradas no Diário!');setTimeout(()=>{G.transitioning=false;G.nextLevel();},2000);});
     }),
   ];
-  return{id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
+  return{id:1,bg:'bg01',W:WW,H:WH,startX:40,startY:FL-90,
     title:'A Entrada na Selva',
     hint:'Colete a 🥌 Bateia e a Pá Exploradora ao final do caminho!',
     plats,enemies,cols,triggers,digSpots:[],panZones:[],
@@ -1291,7 +1314,7 @@ function buildL1(){
         const rx=p.x-cam.x;
         ctx.fillStyle='rgba(255,255,200,0.12)';ctx.beginPath();ctx.ellipse(rx+p.w/2,p.y-cam.y+8,p.w*.3,6,Math.sin(rt)*0.3,0,Math.PI*2);ctx.fill();
       }
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1348,7 +1371,7 @@ function buildL2(){
   ];
   const panZones=[{x:1290,done:false},{x:2070,done:false},{x:2930,done:false}];
   const triggers=[
-    new Trigger(3280,FL-260,160,260,'Avançar para Cena 3',(player,level)=>{
+    new Trigger(3280,FL-260,160,260,'Siga Explorando a Amazônia',(player,level)=>{
       if(G.transitioning)return;
       G.transitioning=true;
       level.triggers[0].done=true;
@@ -1392,7 +1415,7 @@ function buildL2(){
         }
       }
       drawPanning();
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1433,7 +1456,7 @@ function buildL3(){
     ...[100,220,450,720,980,1100,1280,1540,1800,2100,2400,2720,3000,3180].map(x=>new Col(x,FL-50,'gold')),
   ];
   const triggers=[
-    new Trigger(3360,FL-280,160,280,'Avançar para Cena 4',(player,level)=>{
+    new Trigger(3360,FL-280,160,280,'Avancer para coletar as relíquias perdidas!',(player,level)=>{
       if(G.transitioning)return;
       G.transitioning=true;
       level.triggers[0].done=true;
@@ -1443,7 +1466,7 @@ function buildL3(){
         '"A Amazônia já perdeu mais de 20% de sua cobertura original. Cada pepita de ouro ilegal carrega a destruição de hectares de floresta e rios envenenados."',
         '"Mas a floresta resiste. Em áreas protegidas, ela se recupera — e com ela, os rios voltam a ser limpos e o ouro volta a brilhar no fundo transparente."',
         '"Na margem à frente, algo me chama. Não é ouro — é cerâmica. Um vaso que sobreviveu séculos de chuva e raízes. Vamos investigar com cuidado."'
-      ],()=>{notify('✦ Siga para a Cena Final!');setTimeout(()=>{G.transitioning=false;G.nextLevel();},2000);});
+      ],()=>{notify('✦ Siga em frente!');setTimeout(()=>{G.transitioning=false;G.nextLevel();},2000);});
     }),
   ];
   return{id:3,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,murky:true,
@@ -1465,7 +1488,7 @@ function buildL3(){
           ctx.fillStyle=`rgba(200,180,0,${na})`;ctx.font='bold 11px "Courier New"';ctx.textAlign='center';
           ctx.fillText('☠ MERCÚRIO',px+p.w/2,FL-cam.y-32);ctx.textAlign='left';}
       }
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -1501,33 +1524,34 @@ function buildL4(){
     new DigSpot(2680,FL-18),
   ];
   const triggers=[
-    new Trigger(2860,FL-180,180,180,'Concluir Fase 1.2',(player,level)=>{
+    new Trigger(2860,FL-180,180,180,'Chegamos ao final dessa jornada incrível!',(player,level)=>{
       if(G.transitioning)return;
       if(!player.items.includes('urna')){notify('Colete a Urna Marajoara primeiro!');return;}
       G.transitioning=true;
       level.triggers[0].done=true;
       player.interactAnim=40;sfx('unlock');
       showDialog([
-        '"Você encontrou a Urna Funerária Marajoara. Com mais de 1.000 anos, ela prova que povos sofisticados habitavam a Amazônia muito antes da colonização europeia."',
+        '"Encontramos algumas Urnas Funerária Marajoara. Com mais de 1.000 anos, ela prova que povos sofisticados habitavam a Amazônia muito antes da colonização europeia."',
         '"A cultura Marajoara (400–1300 d.C.) criava cerâmicas elaboradas para rituais funerários com padrões que representavam o ciclo da vida e os espíritos da floresta."',
         '"Para eles, o ouro era o sol materializado. Não havia mineração destrutiva — apenas coleta cuidadosa do que a terra oferecia, em equilíbrio com a floresta."',
-        '"Você preservou essa memória. A Fase 1.2 está completa — itens registrados no Diário de Bordo. Próxima parada: Machu Picchu e o Tesouro do Condor!"'
+        '"Conseguimos preservar essa memória. Próxima parada: Machu Picchu e o Tesouro do Condor!"'
       ],()=>{
         // ── Unlock próximas fases e arquivar no save ──
         unlockPhase('1.3');
+        if(!player.items.includes('ceramica_inca')){player.items.push('ceramica_inca');journalCollect('ceramica_inca');}
         G.transitioning=false;
         G.state='complete';
       });
     }),
   ];
   return{id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
-    title:'Relíquias Perdidas e Conclusão',
+    title:'Relíquias Perdidas',
     hint:'Use [E] na Terra vermelha para Escavar e encontrara Urna Marajoara!',
     plats,enemies,cols,triggers,digSpots,panZones:[],
     intro:[
       '"No entardecer da Amazônia, o rio reflete ouro. Mas o maior tesouro está enterrado na margem — esperando há séculos para ser encontrado com cuidado."',
       '"Procure fragmentos de cerâmica avermelhada perto das raízes. Use [E] várias vezes para escavar camada por camada sem danificar o artefato."',
-      'Escave com cuidado e colete a Urna para completar a Fase 1.2!'
+      'Escave com cuidado e colete a Urna para completar essa jornada!!'
     ],
     update(player){
       tickMoving(this.plats);tickTrapdoors(this.plats);
@@ -1546,14 +1570,16 @@ function buildL4(){
         }
         ds.draw();
       }
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player.x,player.y);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
 
 // ── HUD ────────────────────────────────────────────────────────
 function drawHUD(player,level){
-  ctx.fillStyle='rgba(0,22,0,0.68)';ctx.fillRect(0,0,W,38);
+  // Barra escura primeiro — padrão 1-1
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,34);
+  // Corações (verde — cor da fase amazônia)
   for(let i=0;i<player.maxHp;i++){
     ctx.fillStyle=i<player.hp?'#20c040':'#244';
     ctx.beginPath();const hx=16+i*28,hy=10;
@@ -1561,38 +1587,86 @@ function drawHUD(player,level){
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  ctx.fillStyle='rgba(120,216,64,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#78d840';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  // Slot ferramenta ativa
-  const tY=44;
-  ctx.fillStyle='rgba(0,0,0,0.5)';roundRect(16,tY,140,28,4);ctx.fill();
-  ctx.strokeStyle=player.activeTool?'#78d840':'#444';ctx.lineWidth=1.5;roundRect(16,tY,140,28,4);ctx.stroke();
+  // Título centralizado — branco com sombra
+  ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=6;
+  ctx.fillStyle='#e8e0d0';ctx.font='20px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';ctx.shadowBlur=0;
+  // Score — canto direito
+  ctx.fillStyle='#d4a017';ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText('◈ '+player.score,W-14,26);ctx.textAlign='left';
+
+  // Painel Diário de Bordo — padrão 1-1 (borda verde da fase)
+  // Ícones pixel-art 12×12 — sutis, cabem no painel
+  const iconBateia=(x,y)=>{ ctx.fillStyle='#7a9850';ctx.fillRect(x,y+5,12,2);ctx.fillRect(x+2,y+7,8,3);ctx.fillRect(x+4,y+10,4,2); };
+  const iconPa=(x,y)=>{ ctx.fillStyle='#8a6830';ctx.fillRect(x+5,y,2,8);ctx.fillStyle='#7a9850';ctx.fillRect(x+2,y+8,8,4); };
+  const iconUrna=(x,y)=>{ ctx.fillStyle='#c8a850';ctx.fillRect(x+2,y+2,8,9);ctx.fillRect(x+4,y,4,3);ctx.fillRect(x,y+4,2,5);ctx.fillRect(x+10,y+4,2,5); };
+  const TOOL_DEFS=[
+    {id:'bateia',drawFn:iconBateia,nome:'Bateia'},
+    {id:'pa',    drawFn:iconPa,   nome:'Pá Explor.'},
+    {id:'urna',  drawFn:iconUrna, nome:'Urna'},
+  ];
+  const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
+  const PX=12,PY=46,PW=178,PH_BASE=52;
+  const PH=PH_BASE+(tools.length>0?6+tools.length*22:0);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(0,10,0,0.88)';roundRect(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#2a6818';ctx.lineWidth=1.5;roundRect(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.strokeStyle='rgba(80,200,80,0.25)';ctx.lineWidth=1;roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
+  ctx.restore();
+  const midX=PX+PW/2;
+  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#5a9830';ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#5a9830';ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(80,200,80,0.2)';roundRect(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle='#5a9830';ctx.lineWidth=1;roundRect(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#78d840';
+  ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+  ctx.fillStyle='rgba(80,200,80,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
+  // Ferramenta ativa
+  const atY=PY+44;ctx.textAlign='center';
   if(player.activeTool&&ITEM_DEFS[player.activeTool]){
-    const def=ITEM_DEFS[player.activeTool];
-    ctx.font='14px serif';ctx.fillText(def.icon,24,tY+20);
-    ctx.font='11px "Courier New"';ctx.fillStyle='#78d840';ctx.fillText(def.nome,42,tY+20);
-  } else {ctx.font='11px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',22,tY+20);}
-  ctx.fillStyle='rgba(80,200,80,0.15)';roundRect(162,tY,46,28,4);ctx.fill();
-  ctx.strokeStyle='#2a5a18';ctx.lineWidth=1.5;roundRect(162,tY,46,28,4);ctx.stroke();
-  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#5a9830';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  // Inventário lado direito
-  let ix=W-16;const inv=[];
-  if(player.items.includes('urna'))   inv.push('🏺 URNA');
-  if(player.items.includes('bateia')) inv.push('🥌 BATEIA');
-  if(player.items.includes('pa'))     inv.push('🪏 PÁ');
-  for(const it of inv){ctx.fillStyle='#78d840';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,tY+20);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
+    const activeDef=TOOL_DEFS.find(t=>t.id===player.activeTool);
+    ctx.fillStyle='rgba(80,200,80,0.1)';roundRect(PX+6,atY-14,PW-12,20,3);ctx.fill();
+    // Miniatura canvas + nome
+    if(activeDef)activeDef.drawFn(midX-34,atY-4);
+    ctx.font='11px "Courier New"';ctx.fillStyle='#a0e060';
+    ctx.fillText(ITEM_DEFS[player.activeTool].nome,midX-16,atY+2);
+  } else {
+    ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8d8';ctx.fillText('Não Equipado',midX,atY);
+  }
+  ctx.textAlign='left';
+  if(tools.length>0){
+    ctx.fillStyle='rgba(80,200,80,0.3)';ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
+    tools.forEach((t,i)=>{
+      const ty=PY+PH_BASE+8+i*22,equipped=player.activeTool===t.id;
+      // Miniatura canvas da ferramenta
+      t.drawFn(PX+22,ty+6);
+      // Nome
+      ctx.font=(equipped?'bold ':'')+'10px "Courier New"';
+      ctx.fillStyle=equipped?'#a0e060':'#608040';
+      ctx.textAlign='left';
+      ctx.fillText(t.nome+(equipped?' ◀':''),PX+38,ty+12);
+    });
+  }
+
+  // Barra de calor (mantida — mecânica da fase)
   if(player.heat>40){
     const pct=(player.heat-40)/60;
-    ctx.fillStyle='rgba(0,22,0,0.6)';ctx.fillRect(16,76,120,12);
-    ctx.fillStyle=`hsl(${90-pct*90},100%,45%)`;ctx.fillRect(16,44,120*pct,12);
-    ctx.strokeStyle='#78d840';ctx.lineWidth=1;ctx.strokeRect(16,44,120,12);
-    ctx.fillStyle='#78d840';ctx.font='10px "Courier New"';ctx.fillText('CALOR',18,54);
+    const bX=PX+PW+10,bY=PY+8;
+    ctx.fillStyle='rgba(0,0,0,0.6)';roundRect(bX,bY,130,14,3);ctx.fill();
+    ctx.fillStyle=`hsl(${90-pct*90},100%,45%)`;ctx.fillRect(bX+2,bY+2,126*pct,10);
+    ctx.strokeStyle='#78d840';ctx.lineWidth=1;roundRect(bX,bY,130,14,3);ctx.stroke();
+    ctx.font='9px "Courier New"';ctx.fillStyle='#78d840';ctx.fillText('CALOR',bX+4,bY+11);
   }
-  ctx.fillStyle='rgba(120,240,80,.7)';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
-  if(G.timeOnLevel<600){
-    ctx.fillStyle='rgba(0,22,0,0.58)';ctx.fillRect(8,H-44,430,28);
-    ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Escavar   [Stomp inimigo]',14,H-25);
-  }
+
+  // Hint rodapé com fundo escuro — padrão 1-1
+  ctx.fillStyle='rgba(0,0,0,0.60)';ctx.fillRect(0,H-32,W,32);
+  ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
+  ctx.fillStyle='#f0e8c0';ctx.font='17px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);
+  ctx.textAlign='left';ctx.shadowBlur=0;
 }
 
 // ── Screens ────────────────────────────────────────────────────
@@ -1611,13 +1685,13 @@ function drawTitle(){
   drawFireflies();
   ctx.textAlign='center';
   ctx.shadowColor='#78d840';ctx.shadowBlur=40;
-  ctx.fillStyle='#78d840';ctx.font='bold 48px "Courier New"';ctx.fillText('Jazidas de Ouro da Amazônia',W/2,148);
+  ctx.fillStyle='#78d840';ctx.font='bold 46px "Courier New"';ctx.fillText('Jazidas de Ouro da Amazônia',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,204);
+  ctx.fillStyle='#a8d860';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.2  —  Serra Pelada & Amazônia, Brasil',W/2,200);
 
   // Card centralizado entre o subtítulo e o "Pressione ENTER"
   if(IMG.card12){
-    const cardSize=160, cardX=W/2-80, cardY=236;
+    const cardSize=160, cardX=W/2-80, cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(120,216,64,0.25)');
     glow.addColorStop(1,'rgba(120,216,64,0)');
@@ -1629,20 +1703,40 @@ function drawTitle(){
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msgs={
+    queda:   'CORVAN CAIU!',
+    river:   'A CORRENTEZA TE LEVOU!',
+    inimigo: 'O INIMIGO FOI MAIS RÁPIDO!',
+    piranha: 'AS PIRANHAS TE ALCANÇARAM!',
+    rocha:   'QUE ROCHA!',
+    espinho: 'QUE ESPINHO!',
+  };
+  const subs={
+    queda:   'A selva não perdoa descuido — a queda foi fatal.',
+    river:   'A correnteza amazônica é implacável. Evite as águas rápidas!',
+    inimigo: 'Um inimigo da floresta foi mais veloz. Pule sobre eles!',
+    piranha: 'Essas águas têm dentes. Não entre nos rios sem cuidado!',
+    rocha:   'Cuidado com as rochas escorregadias da Amazônia!',
+    espinho: 'Os espinhos da selva são afiados demais!',
+  };
+  drawCorvan(W/2-48,H/2+20,3,false,Date.now()/200);
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
-  ctx.fillStyle='#ff6060';ctx.font='bold 56px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);
+  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-60);
   ctx.shadowBlur=0;
-  drawCorvan(W/2-48,H/2-20,3,false,Date.now()/200);
+  ctx.fillStyle='#a8e880';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'A selva não perdoa descuido.',W/2,H/2-28);
   ctx.fillStyle='#78d840';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);ctx.textAlign='left';
+  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.textAlign='left';
 }
 
 function drawComplete(){
@@ -1721,13 +1815,51 @@ const G={
 };
 
 // ── Loop ─────────────────────────────────────────────────────
+// ── Música de fundo — Fase 1.2 (Amazônia): escala pentatônica, melodia leve ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _PENTA_AMAZ=[261.6,293.6,329.6,392,440,523.2,587.3,659.2];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.06,start+0.06);
+    g.gain.setValueAtTime(0.06,start+dur-0.15);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,5,4,2,4,7,5,4,2,0,2,4];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_PENTA_AMAZ[idx%_PENTA_AMAZ.length],t+i*0.42,0.48));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.42-0.3)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
   if(jp['KeyM'])goToMainMenu();
   if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
   if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
-  if(G.state==='complete' &&jp['Enter'])goToMainMenu();
+  if(G.state==='complete' &&jp['Enter']){
+    try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+    window.location.href='../../MenuPrincipal/index.html?unlocked=1.3';
+  }
   G.update();G.draw();clearJP();
 }
 
@@ -1739,4 +1871,3 @@ if(!gameReady){(function loadLoop(){
   ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
   ctx.textAlign='left';
 })();}
-                                                                                               

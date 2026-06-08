@@ -222,8 +222,9 @@ body {
 }
 
 
+/* Estado pós-desbloqueio: brilho dourado persistente até o usuário interagir */
 .phase-card.just-unlocked {
-  animation: unlockZoom 1.4s cubic-bezier(.22,1,.36,1) forwards;
+  animation: unlockZoom 1.6s cubic-bezier(.22,1,.36,1) forwards;
   z-index: 25;
 }
 
@@ -233,20 +234,25 @@ body {
     box-shadow: 3px 3px 0 var(--wood-dk);
     filter: brightness(1);
   }
-  20%  {
-    transform: scale(1.22);
-    box-shadow: 0 0 0 4px var(--gold-lt), 0 0 24px 6px rgba(245,200,66,.7);
-    filter: brightness(1.4);
-  }
-  50%  {
-    transform: scale(1.18);
-    box-shadow: 0 0 0 3px var(--gold-lt), 0 0 18px 4px rgba(245,200,66,.5);
-    filter: brightness(1.25);
-  }
-  75%  {
-    transform: scale(1.10);
-    box-shadow: 0 0 0 2px var(--gold-lt), 0 0 10px 2px rgba(245,200,66,.3);
+  10%  {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px var(--gold-lt), 0 0 8px 2px rgba(245,200,66,.4);
     filter: brightness(1.1);
+  }
+  25%  {
+    transform: scale(1.26);
+    box-shadow: 0 0 0 5px var(--gold-lt), 0 0 32px 10px rgba(245,200,66,.85);
+    filter: brightness(1.55);
+  }
+  55%  {
+    transform: scale(1.20);
+    box-shadow: 0 0 0 3px var(--gold-lt), 0 0 20px 5px rgba(245,200,66,.55);
+    filter: brightness(1.28);
+  }
+  80%  {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px var(--gold-lt), 0 0 10px 2px rgba(245,200,66,.30);
+    filter: brightness(1.10);
   }
   100% {
     transform: scale(1);

@@ -54,7 +54,7 @@ IMG.card31=null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='Escape'&&G.miningWall){G.miningWall=null;G.angleChoice=null;G.dialog=false;}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
@@ -131,7 +131,9 @@ const INV={
     const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
     return Object.entries(_ALL_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
-      return player.items.includes(id)||saved[def.journalId||id];
+      // Fase atual: só mostra se coletado nesta sessão
+      if(id in ITEM_DEFS) return player.items.includes(id);
+      return !!saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
   toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
@@ -1118,11 +1120,11 @@ function drawTitle(){
   drawSnow();
   ctx.textAlign='center';
   ctx.shadowColor='#c0a0e0';ctx.shadowBlur=40;
-  ctx.fillStyle='#d0a8e0';ctx.font='bold 42px "Courier New"';ctx.fillText('O Palácio Subterrâneo',W/2,140);
+  ctx.fillStyle='#d0a8e0';ctx.font='bold 46px "Courier New"';ctx.fillText('O Palácio Subterrâneo',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#c0b0d0';ctx.font='19px "Courier New"';ctx.fillText('Fase 3.1  —  Minas de Sal de Wieliczka, Polônia',W/2,186);
+  ctx.fillStyle='#c0b0d0';ctx.font='19px "Courier New"';ctx.fillText('Fase 3.1  —  Minas de Sal de Wieliczka, Polônia',W/2,200);
   if(IMG.card31){
-    const cs=160,cardX=W/2-80,cardY=220;
+    const cs=160,cardX=W/2-80,cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(200,170,240,0.25)');glow.addColorStop(1,'rgba(200,170,240,0)');
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
@@ -1131,9 +1133,9 @@ function drawTitle(){
     ctx.save();ctx.translate(W/2,310);ctx.scale(3,3);drawHalitaItem(0,0,Date.now()/1000,'prismatica');ctx.restore();
   }
   ctx.fillStyle=`rgba(200,180,240,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
-  ctx.fillStyle='#b0a8c8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/Espaço Pular   E Interagir/Minerar',W/2,502);
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1580,9 +1582,44 @@ const G={
   }
 };
 
+// ── Música de fundo — Fase 3.1 (Rio Tinto/Espanha): modo frígio, tom sério ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_FRI=[164.8,174.6,196,220,246.9,261.6,293.6,329.6]; // E frígio
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.07,start+0.09);
+    g.gain.setValueAtTime(0.07,start+dur-0.2);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,1,3,5,4,3,1,0,2,3,5,6,5,3,2,0]; // frígio descendente
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_FRI[idx%_NOTES_FRI.length],t+i*0.48,0.56));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.48-0.35)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
   if(G.state==='title'&&(jp['Enter']||jp['Space']))G.load(0);
   if(G.state==='dead'&&jp['KeyR'])G.load(G.lvIdx);
   if(G.state==='complete'&&jp['Enter']){

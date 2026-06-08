@@ -20,7 +20,7 @@ const IMG={};let assetsLoaded=0,totalAssets=5,gameReady=false;
 ['ferrao','cesto','corvo','cristal','amuleto'].forEach((k,i)=>{const src=['Assets/3_2_ferrao_sondagem.svg','Assets/3_2_cesto_vime.svg','Assets/3_2_corvo_floresta.svg','Assets/3_2_cristal_islandia.svg','Assets/3_2_amuleto_mjolnir.svg'][i];const im=new Image();im.onload=()=>IMG[k]=im;im.onerror=()=>IMG[k]=null;im.src=src;});
 
 const keys={},jp={};
-addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){INV.toggle(G.player);}if(e.code==='Escape')INV.close();if(e.code==='KeyM')location.href='../../MenuPrincipal/index.html';});
+addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}if(e.code==='Escape')INV.close();if(e.code==='KeyM')location.href='../../MenuPrincipal/index.html';});
 addEventListener('keyup',e=>delete keys[e.code]);
 const TOUCH={l:false,r:false,j:false,e:false};function bindT(id,k){const el=document.getElementById(id);if(!el)return;el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});el.addEventListener('touchend',ev=>{ev.preventDefault();TOUCH[k]=false;},{passive:false});}
 bindT('tb-l','l');bindT('tb-r','r');bindT('tb-j','j');bindT('tb-e','e');
@@ -124,8 +124,19 @@ draw(){drawCorvan(this.x-cam.x,this.y-cam.y,1.45,this.facing<0,Date.now()/220,th
 
 function drawBg(k){const im=IMG[k];if(im)ctx.drawImage(im,0,0,W,H);else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#273026');g.addColorStop(1,'#111408');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,0,W,H);}function bogSparkles(){for(let i=0;i<32;i++){const x=(i*157+Date.now()/50)%W,y=420+(i*37)%210;ctx.fillStyle=`rgba(190,180,115,${.06+Math.sin(Date.now()/600+i)*.05})`;ctx.fillRect(x,y,2,2);}}
 function drawHUD(p,l){ctx.fillStyle='rgba(7,6,2,.86)';ctx.fillRect(0,0,W,38);ctx.fillStyle='rgba(216,179,74,.22)';ctx.fillRect(0,36,W,2);for(let i=0;i<p.maxHp;i++){ctx.fillStyle=i<p.hp?'#cf5730':'#334';ctx.beginPath();const x=16+i*28,y=9;ctx.arc(x+5,y+6,5,Math.PI,0);ctx.arc(x+15,y+6,5,Math.PI,0);ctx.lineTo(x+20,y+6);ctx.bezierCurveTo(x+20,y+16,x+10,y+19,x+10,y+19);ctx.bezierCurveTo(x+10,y+19,x,y+16,x,y+6);ctx.closePath();ctx.fill();}ctx.fillStyle='#c8c0a0';ctx.font='20px Courier New';ctx.textAlign='center';ctx.fillText(l.title,W/2,25);ctx.fillStyle=UI_ACCENT;ctx.font='bold 20px Courier New';ctx.textAlign='right';ctx.fillText('◈ '+p.score,W-14,26);ctx.textAlign='left';const _THUD=[{id:'ferrao_sondagem',icon:'🪵',nome:'Ferrão de Sondagem'},{id:'cesto_vime',icon:'🧺',nome:'Cesto de Vime'},{id:'cristal_islandia',icon:'🔷',nome:'Cristal de Islândia'},{id:'amuleto_mjolnir',icon:'🔨',nome:'Amuleto de Mjölnir'}];const _tools=_THUD.filter(t=>p.items.includes(t.id));const PX=12,PY=46,PW=204,PH=30+(_tools.length>0?_tools.length*22:18);ctx.save();ctx.fillStyle='rgba(7,6,2,.88)';roundRect(PX,PY,PW,PH,7);ctx.fill();ctx.strokeStyle=UI_BORDER_DARK;ctx.lineWidth=1.5;roundRect(PX,PY,PW,PH,7);ctx.stroke();ctx.restore();ctx.font='11px Courier New';ctx.fillStyle=UI_MUTED;ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);ctx.font='bold 10px Courier New';ctx.fillStyle=UI_MUTED;ctx.fillText('DIÁRIO DE BORDO',PX+26,PY+20);ctx.fillStyle='rgba(216,179,74,.2)';ctx.fillRect(PX+6,PY+26,PW-12,1);const _midX=PX+PW/2;if(_tools.length>0){ctx.fillStyle='rgba(216,179,74,.2)';ctx.fillRect(PX+6,PY+26,PW-12,1);_tools.forEach((t,i)=>{const _ty=PY+30+i*22;const _eq=p.activeTool===t.id;ctx.textAlign='center';ctx.font='11px Courier New';ctx.fillStyle=_eq?UI_ACCENT:'#a07040';ctx.fillText(t.icon+' '+t.nome+(_eq?' ◀':''),_midX,_ty+10);});}else{ctx.font='12px Courier New';ctx.fillStyle='#888';ctx.textAlign='center';ctx.fillText('Nenhuma ferramenta',_midX,PY+44);}ctx.textAlign='left';ctx.fillStyle='#c8c0a0';ctx.font='17px Courier New';ctx.textAlign='center';ctx.fillText(typeof l.hint==='function'?l.hint(p):l.hint,W/2,H-12);ctx.textAlign='left';}
-function drawTitle(){drawBg('bg01');ctx.fillStyle='rgba(0,0,0,.58)';ctx.fillRect(0,0,W,H);bogSparkles();ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=35;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('O Ferro que Forjou o Norte',W/2,138);ctx.shadowBlur=0;ctx.fillStyle='#c8c0a0';ctx.font='18px Courier New';ctx.fillText('Fase 3.2 — O Ferro dos Pântanos Vikings · Escandinávia, século IX',W/2,190);if(IMG.card32)ctx.drawImage(IMG.card32,W/2-85,230,170,170);ctx.fillStyle=`rgba(216,179,74,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='18px Courier New';ctx.fillText('▶ Pressione ENTER para começar ◀',W/2,455);ctx.fillStyle='#bdb38c';ctx.font='16px Courier New';ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,498);ctx.fillText('[M] Menu Principal',W/2,550);ctx.textAlign='left';}
-function drawDeath(){ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,H);const msgs={pantano:'O PÂNTANO CEDEU!',queda:'VOCÊ CAIU!',rocha:'TERRENO PERIGOSO!'};ctx.textAlign='center';ctx.fillStyle='#e05a38';ctx.font='bold 48px Courier New';ctx.fillText(msgs[G.player.deathCause]||'VOCÊ CAIU!',W/2,H/2-40);ctx.fillStyle='#d8b34a';ctx.font='19px Courier New';ctx.fillText('Pressione R para tentar novamente',W/2,H/2+36);ctx.fillStyle='#999';ctx.font='15px Courier New';ctx.fillText('[M] Menu Principal',W/2,H/2+70);ctx.textAlign='left';}
+function drawTitle(){drawBg('bg01');ctx.fillStyle='rgba(0,0,0,.58)';ctx.fillRect(0,0,W,H);bogSparkles();ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=40;ctx.fillStyle=UI_ACCENT;ctx.font='bold 46px "Courier New"';ctx.fillText('O Ferro que Forjou o Norte',W/2,148);ctx.shadowBlur=0;ctx.fillStyle='#c8c0a0';ctx.font='19px "Courier New"';ctx.fillText('Fase 3.2 — O Ferro dos Pântanos Vikings · Escandinávia, século IX',W/2,200);if(IMG.card32){const cardSize=160,cardX=W/2-80,cardY=230;const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);glow.addColorStop(0,'rgba(216,179,74,0.25)');glow.addColorStop(1,'rgba(216,179,74,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();ctx.drawImage(IMG.card32,cardX,cardY,cardSize,cardSize);}ctx.fillStyle=`rgba(216,179,74,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);ctx.fillText('[M] Menu Principal',W/2,538);ctx.textAlign='left';}
+function drawDeath(){
+  ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msgs={pantano:'O PÂNTANO CEDEU!',queda:'CORVAN CAIU!',rocha:'TERRENO PERIGOSO!',inimigo:'O GUARDIÃO TE VENCEU!'};
+  const subs={pantano:'Os pântanos da Escandinávia são traiçoeiros. Use o ferrão antes de atravessar!',queda:'As turfeiras têm buracos invisíveis — a queda foi fatal!',rocha:'O terreno gelado da Europa nórdica não perdoa.',inimigo:'Os guardiões das forjas vikingues são implacáveis!'};
+  ctx.textAlign='center';ctx.shadowColor='#c04020';ctx.shadowBlur=28;
+  ctx.fillStyle='#e05a38';ctx.font='bold 48px Courier New';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#d8b34a';ctx.font='16px Courier New';ctx.fillText(subs[cause]||'Os pântanos da Europa não perdoam.',W/2,H/2-8);
+  ctx.font='19px Courier New';ctx.fillText('Pressione R para tentar novamente',W/2,H/2+40);
+  ctx.fillStyle='#999';ctx.font='15px Courier New';ctx.fillText('[M] Menu Principal',W/2,H/2+75);ctx.textAlign='left';
+}
 function drawComplete(){drawBg('bg04');ctx.fillStyle='rgba(0,0,0,.62)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=38;ctx.fillStyle=UI_ACCENT;ctx.font='bold 42px Courier New';ctx.fillText('✦ FASE 3.2 CONCLUÍDA ✦',W/2,118);ctx.shadowBlur=0;drawCorvan(W/2-180,210,2.4,false,Date.now()/260,'ferrao_sondagem');ctx.save();ctx.translate(W/2+90,285);ctx.scale(2.5,2.5);drawAmuleto(0,0,1,Date.now()/700);ctx.restore();ctx.fillStyle='#e8dba5';ctx.font='17px Courier New';ctx.fillText('O ferro de pântano revelou a tecnologia dos Vikings.',W/2,190);const lines=['🪵 Ferrão de Sondagem — ouvir o chão antes de pisar','🔷 Cristal de Islândia — luz e orientação sob céu nublado','🟤 Limonita — ferro formado por bactérias nos pântanos','🔨 Amuleto de Mjölnir — ferro, proteção e cultura nórdica'];ctx.fillStyle='#d8c891';ctx.font='14px Courier New';lines.forEach((l,i)=>ctx.fillText(l,W/2,250+i*29));ctx.fillStyle='#c8c0a0';ctx.font='16px Courier New';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,430);ctx.fillStyle=`rgba(216,179,74,${.6+Math.sin(Date.now()/550)*.35})`;ctx.font='15px Courier New';ctx.fillText('✦ Fase 3.3 desbloqueada!   ENTER para voltar ao Menu',W/2,465);ctx.textAlign='left';}
 
 function basePlats(FL,WW,WH){return[solid(0,FL,340,WH-FL),solid(420,FL,230,WH-FL),solid(720,FL,220,WH-FL),solid(1010,FL,220,WH-FL),solid(1290,FL,240,WH-FL),solid(1590,FL,220,WH-FL),solid(1880,FL,230,WH-FL),solid(2170,FL,240,WH-FL),solid(2480,FL,WW-2480,WH-FL),solid(220,FL-170,120,18),solid(750,FL-210,120,18),solid(1320,FL-185,120,18),solid(1910,FL-220,120,18),movH(1450,FL-105,110,1450,1660,1.5),trap(980,FL-52,110)];}
@@ -142,7 +153,47 @@ function buildL4(){const FL=590,WW=1900,WH=900;const plats=basePlats(FL,WW,WH);c
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={state:'title',lvIdx:0,level:null,player:null,dialog:false,deaths:0,_items:[],_score:0,_tool:null,load(i){this.lvIdx=i;particles=[];this.level=LEVELS[i]();cam.x=0;this.player=new Player(this.level.startX,this.level.startY);if(i>0){this.player.items=[...this._items];this.player.score=this._score;this.player.activeTool=this._tool;}else{this._items=[];this._score=0;this._tool=null;}this.dialog=false;this.state='playing';BUBBLE.active=false;popup.active=false;for(const k in jp)delete jp[k];setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro);},700);},nextLevel(){this._items=[...this.player.items];this._score=this.player.score;this._tool=this.player.activeTool;if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);else this.state='complete';},update(){if(this.state!=='playing')return;checkDlg();updateCam(this.player.x,this.level.W);this.level.update(this.player);this.player.update(this.level);tickParticles();tickNotif();tickPopup();if(this.player.dead){this.deaths++;this.state='dead';}},draw(){ctx.clearRect(0,0,W,H);if(this.state==='title'){drawTitle();return;}if(this.state==='complete'){drawComplete();return;}drawBg(this.level.bg);for(const p of this.level.plats)drawPlatform(p);this.level.draw(this.player);drawParticles();this.player.draw();if(this.state==='dead'){drawDeath();return;}drawHUD(this.player,this.level);drawPopup();BUBBLE.draw(this.player);drawNotif();INV.draw(this.player);}};
+// ── Música de fundo — Fase 3.2 (Hallstatt/Vikings): mixolídio europeu medieval ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_MIX=[174.6,196,220,246.9,261.6,293.6,329.6,349.2]; // G mixolídio
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='triangle';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.06,start+0.08);
+    g.gain.setValueAtTime(0.06,start+dur-0.2);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,6,5,4,2,0,1,3,5,6,5,3,1,0];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_MIX[idx%_NOTES_MIX.length],t+i*0.52,0.6));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.52-0.35)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
 function startGame(){G.state='title';loop();}
-function loop(){requestAnimationFrame(loop);if(G.state==='title'&&(jp.Enter||jp.Space))G.load(0);if(G.state==='dead'&&jp.KeyR)G.load(G.lvIdx);if(G.state==='complete'&&jp.Enter){unlockPhase('3.3');location.href='../../MenuPrincipal/index.html?unlocked=3.3';}G.update();G.draw();clearJP();}
+function loop(){
+  requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
+  if(G.state==='title'&&(jp.Enter||jp.Space))G.load(0);
+  if(G.state==='dead'&&jp.KeyR)G.load(G.lvIdx);
+  if(G.state==='complete'&&jp.Enter){unlockPhase('3.3');location.href='../../MenuPrincipal/index.html?unlocked=3.3';}
+  G.update();G.draw();clearJP();
+}
 if(!gameReady){(function loadLoop(){if(gameReady)return;requestAnimationFrame(loadLoop);ctx.fillStyle='#050805';ctx.fillRect(0,0,W,H);ctx.fillStyle=UI_ACCENT;ctx.font='bold 24px Courier New';ctx.textAlign='center';ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);ctx.textAlign='left';})();}
 

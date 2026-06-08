@@ -42,6 +42,16 @@ function sfx(type) {
 }
 
 const SAVE_KEY = 'mineralis_save_v2';
+function unlockPhase(id){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    const save=raw?JSON.parse(raw):{versao:1,iniciado:true,fases:{}};
+    if(!save.fases)save.fases={};
+    if(!save.fases[id])save.fases[id]={desbloqueada:false,estrelas:0};
+    save.fases[id].desbloqueada=true;
+    localStorage.setItem(SAVE_KEY,JSON.stringify(save));
+  }catch(e){}
+}
 function _salvarFase(score, deaths){
   const estrelas = deaths===0?4 : deaths<=2?3 : deaths<=5?2 : 1;
   try{
@@ -58,7 +68,7 @@ function _salvarFase(score, deaths){
 function _voltarAoMenu(){
   _salvarFase(G.player?.score||0, G.deaths);
   try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
-  window.location.href = '../../MenuPrincipal/index.html';
+  window.location.href = '../../MenuPrincipal/index.html?unlocked=2.1';
 }
 
 const IMG = {}, SPRITES = {};
@@ -129,7 +139,7 @@ window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
   keys[e.code]=true;
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open)INV.close();
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -314,8 +324,9 @@ const ITEM_DEFS = {
     desc:'Escava solo aluvial amazônico.\nUsada para encontrar artefatos enterrados.' },
   bateia:           { cat:'ferramenta', nome:'Bateia',                 icon:'🥌', fase:'1.2',
     desc:'Separa ouro pesado do sedimento leve.\nUsada há 2.000 anos na Amazônia.' },
-  lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.3',
-    desc:'Ilumina a mina e revela símbolos ocultos.\nNecessária para abrir portões de pedra.' },
+  lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.1',
+    journalId:'lanterna',
+    desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.' },
   pedra_constelacao:{ cat:'ferramenta', nome:'Pedra da Constelação',  icon:'💎', fase:'1.3',
     desc:'Peça da constelação do Condor.\nColete 3 para alinhar o painel astronômico.',
     multiple:true },
@@ -330,6 +341,7 @@ const ITEM_DEFS = {
   ceramica_inca:    { cat:'artefato',  nome:'Cerâmica Inca',           icon:'🏺', fase:'1.1',
     desc:'Vasilha ritual do Império Inca.\nPadrões geométricos representando o cosmos.' },
   mapa_potosi:      { cat:'artefato',  nome:'Tupu de Prata',           icon:'✦', fase:'1.1',
+    journalId:'tupu_prata',
     desc:'Fivela ornamental da nobreza Inca.\nA prata tinha valor espiritual, não econômico.' },
   vaso_amazônico:   { cat:'artefato',  nome:'Urna Marajoara',          icon:'🫙', fase:'1.2',
     desc:'Cerâmica de 1.000 anos da Ilha de Marajó.\nEvidência de civilizações amazônicas avançadas.' },
@@ -338,7 +350,7 @@ const ITEM_DEFS = {
 };
 
 const TIPO_TO_JOURNAL = {
-  lantern:'lanterna_arqueologa', stone:'pedra_constelacao',
+  lantern:'lanterna', stone:'pedra_constelacao',
   tumi:'relevo_inca', gold:'tumi_dourado',
 };
 
@@ -353,6 +365,8 @@ const INV = {
     const cat=this.TABS[this.tab].id;
     let coletados={};
     try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);coletados=j.coletados||{};}}catch(e){}
+    // Migração: código antigo guardava Tupu de Prata como 'mapa_potosi'
+    if(coletados['mapa_potosi']&&!coletados['tupu_prata']) coletados['tupu_prata']=true;
     // Mergear itens do player atual
     for(const tipo of player.items){
       const jid=TIPO_TO_JOURNAL[tipo]||tipo;
@@ -377,7 +391,11 @@ const INV = {
       const jid=def.journalId||id;
       if(def.multiple){
         if(stoneCount>0) out.push({id,...def,count:stoneCount});
+      } else if(id in ITEM_DEFS){
+        // Fase atual (1.3): só aparece se coletado nesta sessão
+        if(player.items.includes(id)||player.items.includes(id+'_ok')||coletados[jid]) out.push({id,...def,count:1});
       } else if(coletados[jid]||coletados[id]){
+        // Fases anteriores: persiste via coletados
         out.push({id,...def,count:1});
       }
     }
@@ -1249,7 +1267,7 @@ function buildL4(){
         '"A cidade permaneceu oculta por séculos, protegida pelas nuvens e pela floresta, até ser redescoberta em 1911 por Hiram Bingham."',
         'Descobertas: ✦ Lanterna do Arqueólogo ✦ Pedras da Constelação ✦ Tumi de Ouro e Turquesa',
         '🏆 FASE 1.3 CONCLUÍDA! A sabedoria do Vale Sagrado foi preservada. Próximo destino: América do Norte!'
-      ],()=>{_salvarProgresso(G.player?.score||0,G.deaths);G.state='complete';});
+      ],()=>{_salvarProgresso(G.player?.score||0,G.deaths);unlockPhase('2.1');G.state='complete';});
     }),
   ];
 
@@ -1422,12 +1440,12 @@ function drawTitle(){
 
   ctx.textAlign='center';
   ctx.shadowColor='#f0c040';ctx.shadowBlur=40;
-  ctx.fillStyle='#f0c040';ctx.font='bold 52px "Courier New"';ctx.fillText('O Tesouro do Condor',W/2,155);
+  ctx.fillStyle='#f0c040';ctx.font='bold 46px "Courier New"';ctx.fillText('O Tesouro do Condor',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#c8a846';ctx.font='22px "Courier New"';ctx.fillText('Fase 1.3  —  Machu Picchu, Peru',W/2,210);
+  ctx.fillStyle='#c8a846';ctx.font='19px "Courier New"';ctx.fillText('Fase 1.3  —  Machu Picchu, Peru',W/2,200);
 
   if(IMG.card13){
-    const cardSize=160, cardX=W/2-80, cardY=238;
+    const cardSize=160, cardX=W/2-80, cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(240,192,64,0.25)');
     glow.addColorStop(1,'rgba(240,192,64,0)');
@@ -1439,16 +1457,30 @@ function drawTitle(){
   ctx.fillStyle=`rgba(240,192,64,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msgs={
+    queda:   'CORVAN CAIU!',
+    water:   'AS PEDRAS TE DERRUBARAM!',
+    inimigo: 'O CONDOR NÃO PERDOA!',
+    espinho: 'ARMADILHA INCA!',
+  };
+  const subs={
+    queda:   'Machu Picchu fica nas nuvens — a queda é longa!',
+    water:   'A água corre rápida nos terraços sagrados. Cuidado!',
+    inimigo: 'Os guardiões de Machu Picchu são implacáveis.',
+    espinho: 'As armadilhas do templo não perdoam os imprudentes!',
+  };
   ctx.textAlign='center';ctx.shadowColor='#ff2020';ctx.shadowBlur=30;
-  ctx.fillStyle='#ff5050';ctx.font='bold 56px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);
+  ctx.fillStyle='#ff5050';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
+  ctx.fillStyle='#f8e890';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'Machu Picchu fica nas nuvens — a queda é longa!',W/2,H/2-10);
   if(SPRITES['hurt']) drawSprite('hurt',Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#f0c040';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
@@ -1544,10 +1576,45 @@ function _salvarProgresso(score, deaths){
   _salvarFase(score, deaths);
 }
 
+// ── Música de fundo — Fase 1.3 (Machu Picchu/Inca): pentatônica, ritmo solene ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _PENTA_INCA=[196,220,261.6,293.6,349.2,392,440,523.2];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.07,start+0.1);
+    g.gain.setValueAtTime(0.07,start+dur-0.25);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,3,5,6,5,3,2,0,3,5,6,5,3,2,0];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_PENTA_INCA[idx%_PENTA_INCA.length],t+i*0.6,0.7));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.6-0.4)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
 function startGame(){ G.load(0); G.state='title'; loop(); }
 
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
     if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
   if(G.state==='complete' &&(jp['Enter']||jp['KeyM']))  _voltarAoMenu();

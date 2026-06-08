@@ -65,7 +65,7 @@ ASSET_LIST.forEach(([key,src])=>{
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='Escape'&&G.sieveMode){G.sieveMode=null;G.dialog=false;}
   if(e.code==='KeyM'){try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
@@ -140,10 +140,10 @@ const INV={
     const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
     return Object.entries(_ALL_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
-      return player.items.includes(id)
-          || player.items.includes(id+'_ok')
-          || player.items.includes(id+'_col')
-          || saved[def.journalId||id];
+      // Fase atual: só aparece se coletado nesta sessão
+      if(id in ITEM_DEFS) return player.items.includes(id)||player.items.includes(id+'_ok')||player.items.includes(id+'_col');
+      // Fase anterior: persiste via coletados
+      return !!saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
   toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
@@ -1376,15 +1376,15 @@ function drawTitle(){
   ctx.restore();
   ctx.textAlign='center';
   
-  ctx.shadowColor='#e0a030';ctx.shadowBlur=44;
-  ctx.fillStyle='#f0e8d0';ctx.font='bold 42px "Courier New"';
-  ctx.fillText('O Palácio Subterrâneo',W/2,138);
+  ctx.shadowColor='#e0a030';ctx.shadowBlur=40;
+  ctx.fillStyle='#f0e8d0';ctx.font='bold 46px "Courier New"';
+  ctx.fillText('O Palácio Subterrâneo',W/2,148);
   ctx.shadowBlur=0;
   ctx.fillStyle='#f0c060';ctx.font='19px "Courier New"';
-  ctx.fillText('Fase 4.1  —  Diamantes de Kimberley, África do Sul',W/2,184);
-  
+  ctx.fillText('Fase 4.1  —  Diamantes de Kimberley, África do Sul',W/2,200);
+
   if(IMG.card41){
-    const cs=160,cardX=W/2-80,cardY=218;
+    const cs=160,cardX=W/2-80,cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(240,190,60,0.28)');glow.addColorStop(1,'rgba(240,190,60,0)');
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
@@ -1401,19 +1401,21 @@ function drawTitle(){
   
   ctx.fillStyle=`rgba(210,180,240,${.55+Math.sin(Date.now()/550)*.4})`;
   ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,458);
-  
-  ctx.fillStyle='#b0a8c8';ctx.font='18px "Courier New"';
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
   ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
-  ctx.fillText('[M] Menu Principal',W/2,536);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
 function drawDeath(player){
   ctx.fillStyle='rgba(0,0,0,0.78)';ctx.fillRect(0,0,W,H);
   const cause=player?player.deathCause||'queda':'queda';
-  const msg=cause==='espinho'?'QUE ESPINHO!':'CORVAN CAIU!';
-  const sub=cause==='espinho'?'Cuidado com os espinhos nas paredes da mina!':'Uma queda fatal no Big Hole.';
+  const msgs={queda:'CORVAN CAIU!',espinho:'QUE ESPINHO!',inimigo:'O INIMIGO FOI MAIS RÁPIDO!',abismo:'O BIG HOLE É PROFUNDO DEMAIS!'};
+  const subs={queda:'Uma queda fatal no Big Hole — o maior buraco escavado à mão do mundo!',espinho:'Cuidado com os espinhos nas paredes da mina do Kalahari!',inimigo:'Os guardas da mina de diamantes não brincam. Pule sobre eles!',abismo:'O Big Hole tem 240 metros de profundidade. A queda foi fatal!'};
+  const msg=msgs[cause]||'CORVAN CAIU!';
+  const sub=subs[cause]||'Uma queda fatal no Big Hole.';
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
   ctx.shadowBlur=0;
@@ -1685,8 +1687,37 @@ const G={
   },
 };
 
+// ── Música de fundo — Fase 4.1 (Kalahari/Diamantes): pentatônica maior africana ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_KAL=[220,261.6,293.6,349.2,392,440,523.2,587.3]; // pentatônica maior
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='triangle';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.06,start+0.04);
+    g.gain.setValueAtTime(0.06,start+dur-0.1);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,6,4,2,4,6,5,4,2,0,2,4,2,0]; // ritmo animado
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_KAL[idx%_NOTES_KAL.length],t+i*0.35,0.38));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.35-0.25)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevBgState='';
+
 function startGame(){
-  
   G.loadLevel(1);
   G.state='title';
   cam.x=0;cam.y=0;
@@ -1695,6 +1726,11 @@ function startGame(){
 
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevBgState){
+    if(G.state==='playing'&&_prevBgState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevBgState==='playing')stopBgMusic();
+    _prevBgState=G.state;
+  }
   const {dx,dy}=getShake();
   ctx.save();ctx.translate(dx,dy);
   ctx.clearRect(-10,-10,W+20,H+20);

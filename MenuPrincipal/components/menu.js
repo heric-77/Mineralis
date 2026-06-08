@@ -36,15 +36,11 @@ const SaveManager = (() => {
 
 
   function iniciarNovaJornada() {
-    const save = {
-      versao: 1,
-      iniciado: true,
-      fases: {
-        '1.1': { desbloqueada: true,  estrelas: 0 },
-        '1.2': { desbloqueada: false, estrelas: 0 },
-        '1.3': { desbloqueada: false, estrelas: 0 },
-      }
-    };
+    const fases = {};
+    PhasesData.forEach((fase, idx) => {
+      fases[fase.id] = { desbloqueada: idx === 0, estrelas: 0 };
+    });
+    const save = { versao: 1, iniciado: true, fases, coletados: {} };
     _save(save);
     console.info('[SaveManager] Nova jornada iniciada.');
   }

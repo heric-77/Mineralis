@@ -56,7 +56,7 @@ IMG.card11 = null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -81,7 +81,7 @@ const ITEM_DEFS = {
   },
   lanterna: {
     cat:'ferramenta', nome:'Lanterna', icon:'🔦',
-    journalId:null,
+    journalId:'lanterna',
     desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.',
     drawHand:'right',
   },
@@ -103,7 +103,7 @@ const ITEM_DEFS = {
   },
   tupu: {
     cat:'artefato', nome:'Tupu de Prata', icon:'✦',
-    journalId:'mapa_potosi',
+    journalId:'tupu_prata',
     desc:'Fivela ornamental da nobreza Inca.\nA prata, para os Incas, era arte — não moeda.',
   },
 };
@@ -557,8 +557,8 @@ class Col{
     if(isTool&&playerX!==undefined){
       const dist=Math.hypot(playerX+20-(this.x+17), playerY+40-(this.y+17));
       if(dist<110){
-        const label=this.type==='picareta'?'⛏ Picareta':
-                    this.type==='lanterna'?'🔦 Lanterna':'🌿 Coca';
+        const label=this.type==='picareta'?'a ⛏ Picareta':
+                    this.type==='lanterna'?'a 🔦 Lanterna':'🌿 Coca';
         const txt=`[E] Pegar ${label}`;
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
@@ -797,7 +797,7 @@ class Player{
           showPopup('◆ ESTANHO (FRAGMENTO)',['Metal dúctil, baixo ponto de fusão','Encontrado junto à prata em Potosí','Liga + Cobre = Bronze (5.000 a.C.)','Bolívia: 2° maior reserva mundial'],'#9aaab8');}
       }
       else if(c.type==='tupu'){this.items.push('tupu');sfx('unlock');burst(c.x+17,c.y+17,'#c0c8d8',16);
-        journalCollect('mapa_potosi');this.score+=50;
+        journalCollect('tupu_prata');this.score+=50;
       }
     }
 
@@ -813,6 +813,7 @@ class Player{
           notify('✦ Picareta coletada! Equipe-a no Diário [I].');
         } else if(c.type==='lanterna'){
           this.items.push('lanterna');sfx('item');burst(c.x+17,c.y+17,'#ffe080',14);
+          journalCollect('lanterna');
           showPopup('🔦 LANTERNA ENCONTRADA',['Ilumina as paredes de pedra vulcânica','Revela o brilho metálico da prata','Sem lanterna, a mina fica às escuras','Equipe-a no Diário [I] para usar'],'#ffe080');
           notify('✦ Lanterna coletada! Equipe-a no Diário [I].');
         } else if(c.type==='coca'){
@@ -856,7 +857,7 @@ class Player{
       if(level.llama&&!level.llama.gifted&&this.near({x:level.llama.x-50,y:level.llama.y-60,w:100,h:60})){
         level.llama.gifted=true;sfx('coca');
         for(let i=0;i<12;i++)burst(level.llama.x,level.llama.y-30,'#3a9a38',1,2+Math.random()*2);
-        this.items.push('coca');journalCollect('ceramica_inca');
+        this.items.push('coca');
         showDialog([
           '"Olhe que linda Lhama! Estes animais eram sagrados para os Incas — carregavam minérios pelas montanhas a fora"',
           '"Ela me oferece Folhas de Coca. Os povos andinos as usam há mais de 4.000 anos contra o Soroche — o mal de altitude."',
@@ -866,7 +867,7 @@ class Player{
       }
       if(level.tupu&&!level.tupu.done&&this.near({x:level.tupu.x-30,y:level.tupu.y-30,w:60,h:60})){
         level.tupu.done=true;this.items.push('tupu');sfx('unlock');burst(level.tupu.x,level.tupu.y,'#c0c0d8',16);
-        journalCollect('mapa_potosi');
+        journalCollect('tupu_prata');
         showDialog([
           '"O Tupu de Prata! Uma fivela ornamental usada pela nobreza Inca para prender mantos cerimoniais."',
           '"Para os Incas, a prata representava a Lua e tinha valor espiritual — não econômico. Era o metal dos deuses, não do comércio."',
@@ -1138,21 +1139,20 @@ function buildL1(){
   return{id:1,bg:'bgcena0102',W:WW,H:WH,startX:60,startY:FL-90,underground:false,
     title:'O Início em Potosí',
     hint(player){
-      if(!player.items.includes('picareta'))       return '⛏ Encontre a Picareta na alcova de pedra →';
-      if(!player.items.includes('coca'))            return '🦙 Interaja com a Lhama para obter Folhas de Coca';
-      if(!player.items.includes('lanterna'))        return '⛏ Entre na mina e encontre a Lanterna 🔦';
+      if(!player.items.includes('picareta'))       return 'Encontre a ⛏ Picareta na Alcova de pedra →';
+      if(!player.items.includes('coca'))            return 'Interaja com a 🦙 Lhama para obter Folhas de Coca';
+      if(!player.items.includes('lanterna'))        return 'Entre na mina e encontre a Lanterna 🔦';
       return '✦ Picareta + Coca prontas — Entre na mina →';
     },
     plats,bats,cols,triggers,llama,veins:[],
     intro:[
       '"Bem-vindo ao Cerro Rico de Potosí na Bolívia, estamos há 4.090 metros de altitude e em uma das maiores jazidas de prata do mundo."',
       '"Os Incas mineravam aqui há séculos antes dos espanhóis. Onde a prata era símbolo lunar dos deuses e não do comércio."',
-      'Preciso encontrar a Picareta, interajir com a Lhama para obter as Folhas de Coca e entrar na mina!'
+      'Preciso encontrar a Picareta e interajir com a Lhama para obter as folhas de coca e entrar na mina!'
     ],
     update(player){
       tickMoving(this.plats);tickTrapdoors(this.plats);
       for(const b of this.bats)b.update(player);for(const c of this.cols)c.tick();
-      // Auto-entrada: ao chegar na entrada com os itens, dispara sem teclar E
       const ent=this.triggers[0];
       if(!ent.done && !G.dialog && player.items.includes('picareta') && player.items.includes('coca')){
         if(player.x+player.w >= ent.x && player.x <= ent.x+ent.w+80) ent.fn(player,this);
@@ -1167,7 +1167,7 @@ function buildL1(){
         const a=0.55+Math.sin(Date.now()/450)*0.45;
         ctx.fillStyle=`rgba(200,200,220,${a})`;
         ctx.font='bold 12px "Courier New"';ctx.textAlign='center';
-        ctx.fillText('⛏ alcova →',alcovaCX,ay);ctx.textAlign='left';
+        ctx.fillText('Alcova ↓',alcovaCX,ay);ctx.textAlign='left';
       }
       for(const b of this.bats)b.draw();
       for(const c of this.cols)c.draw(player.x,player.y);
@@ -1186,7 +1186,7 @@ function buildL1(){
           }
           if(!this.llama.gifted&&Math.abs(player.x-this.llama.x)<140){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
-            const t2='[E] Interaja a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
+            const t2='[E] Interaja com a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
             roundRect(lx-tw/2,ly-90,tw,24,4);ctx.fill();
             ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,ly-90,tw,24,4);ctx.stroke();
             ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,ly-73);ctx.textAlign='left';
@@ -1252,10 +1252,10 @@ function buildL2(){
   ];
   return{id:2,bg:'bgmina',W:WW,H:WH,startX:60,startY:FL-90,underground:true,
     title:'Geologia e Solo da Mina',
-    hint:'🔦 Pegue a Lanterna na entrada • ⛏ [E] nos veios brilhantes • Cuidado! Soroche aumentando.',
+    hint:'🔦 Pegue a Lanterna • [E] ⛏ nos veios brilhantes • ⚠ Cuidado! Soroche aumentando!',
     plats,bats,cols,triggers,veins,llama:null,
     intro:[
-      '"Entramos na mina. Está escuro — mas há algo brilhando na entrada. Uma lanterna abandonada!"',
+      '"Entramos na mina. Está escuro — mas há algo brilhando na entrada. É uma lanterna abandonada!"',
       '"Com a Lanterna em mãos, o caminho se ilumina. Os veios de prata nas paredes ficam visíveis."',
       'Pegue a 🔦 Lanterna, equipe-a no Diário [I] e use a ⛏ Picareta para minerar!'
     ],
@@ -1666,7 +1666,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Minerar',W/2,500);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1751,11 +1751,49 @@ const G={
   }
 };
 
-function startGame(){G.load(0);G.state='title';loop();}
+// ── Música de fundo — Fase 1 (Andes): escala pentatônica menor, flauta sine ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _PENTA_ANDES=[220,261.6,293.6,349.2,392,440,523.2,587.3];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.06,start+0.08);
+    g.gain.setValueAtTime(0.06,start+dur-0.2);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,2,4,5,4,2,0,7,5,4,2,0];
+  const DUR=7.0;
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_PENTA_ANDES[idx%_PENTA_ANDES.length],t+i*0.5,0.55));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.5-0.3)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain){_bgMusicGain.gain.setValueAtTime(_bgMusicGain.gain.value,AC.currentTime);_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
+function startGame(){G.state='title';loop();}
+canvas.addEventListener('click',()=>{if(G.state==='title')G.load(0);});
+canvas.addEventListener('touchend',e=>{e.preventDefault();if(G.state==='title')G.load(0);},{passive:false});
 function loop(){
   requestAnimationFrame(loop);
-  if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
-  if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
+  if(G.state==='title'&&(jp['Enter']||jp['Space']||jp['KeyE']))G.load(0);
+  if(G.state==='dead'     &&jp['KeyR']){stopBgMusic();G.load(G.lvIdx);}
   if(G.state==='complete' &&jp['Enter']){
     unlockPhase('1.2');
     G.deaths=0;G._storedItems=[];G._storedScore=0;

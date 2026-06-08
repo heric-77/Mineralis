@@ -260,30 +260,40 @@ const Audio = (() => {
 
   function novaJornada() {
     const c    = _getCtx();
-    const t    = c.currentTime;
-    const dest = c.destination; // SFX direto, sem passar pelo duck
+    const dest = c.destination;
 
-    _duck();
-    clearTimeout(_duckTimer);
+    function _play() {
+      const t = c.currentTime + 0.05;
+      _duck();
+      clearTimeout(_duckTimer);
 
-    const notas = [
-      { f: 261.6, s: 0.00, d: 0.18 },
-      { f: 329.6, s: 0.16, d: 0.18 },
-      { f: 392.0, s: 0.30, d: 0.18 },
-      { f: 523.3, s: 0.44, d: 0.22 },
-      { f: 659.3, s: 0.60, d: 0.35 },
-    ];
+      const notas = [
+        { f: 261.6, s: 0.00, d: 0.18 },
+        { f: 329.6, s: 0.16, d: 0.18 },
+        { f: 392.0, s: 0.30, d: 0.18 },
+        { f: 523.3, s: 0.44, d: 0.22 },
+        { f: 659.3, s: 0.60, d: 0.35 },
+      ];
 
-    notas.forEach(n => _notaHarpa(n.f, t + n.s, n.d, 0.30, dest));
-    notas.slice(2).forEach(n => _notaFlauta(n.f, t + n.s + 0.02, n.d, 0.22, dest));
+      notas.forEach(n => _notaHarpa(n.f, t + n.s, n.d, 0.30, dest));
+      notas.slice(2).forEach(n => _notaFlauta(n.f, t + n.s + 0.02, n.d, 0.22, dest));
 
-    [392.0, 493.9, 587.3, 784.0].forEach((f, i) => {
-      _notaHarpa(f, t + 0.92 + i * 0.03, 0.9, 0.22 - i * 0.03, dest);
-    });
+      [392.0, 493.9, 587.3, 784.0].forEach((f, i) => {
+        _notaHarpa(f, t + 0.92 + i * 0.03, 0.9, 0.22 - i * 0.03, dest);
+      });
 
-    _nota(1318.5, t + 1.05, 0.7, 'sine', 0.08, 0.01, 0.55, dest);
+      _nota(1318.5, t + 1.05, 0.7, 'sine', 0.08, 0.01, 0.55, dest);
+      _duckTimer = setTimeout(_unduckLongo, 1400);
+    }
 
-    _duckTimer = setTimeout(_unduckLongo, 1400);
+    // Se o AudioContext estiver suspenso (sem gesto do usuário), aguarda o
+    // resume antes de agendar as notas — assim o som toca independente do
+    // momento em que o usuário interagiu com a página.
+    if (c.state === 'suspended') {
+      c.resume().then(_play).catch(() => {});
+    } else {
+      _play();
+    }
   }
  
 function setVolMusica(valor) {         

@@ -1,28 +1,13 @@
-ações gerais:
-
-pegue a capa da fase 1-1 e ajuste todas as demais capas das fases com base nas posições da fase 1-1
-ajustar o tamanho de cada frase (padrão da fase 1-1), posição na tela (padrão da fase 1-1), posição do card (padrão da fase 1-1)
-
-ajuste em todas as capa a frase: 
-mudar de ← → Mover   ↑ Espaço Pular   E Interagir/Minerar para 
-← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo
+Ajustar
+Fase 1-1 o som não toca quando volta ao menu e desbloqueia a fase 1-2
 
 
 
-
-
-
-
-revisar integração e link com menu principal de todas as fases
-
-rever novamente o carregamento das ferramentas, minerios e artefatos subfase a subfase dentro do diário de bordo, conforme os roteiros
-
-criar música de fundo para cada subfase, conforme sua região
-
-em todas as fases, quando o Corvan "perde vida" a mensagem precisa fazer sentido com o que ocorreu para ele ter que reiniciar a fase
-
-
-
+CONFERIR
+1 - revisar o carregamento das ferramentas, minerios e artefatos subfase a subfase dentro do diário de bordo, conforme os roteiros de cada fase
+2 - criar música de fundo para cada subfase, conforme sua região e conforme instruções do roteiro
+3 - Verificar e ajustar em todas as fases, quando o Corvan "perde uma vida" e reinicia a mensagem precisa fazer sentido com o que ocorreu para ele ter que reiniciar a fase, exemplo: caiu no abismo, caiu no mar, foi pego pelo espinho, etc
+4 - revisar integração e desbloqueio das fases no menu principal, observar modo quando desbloqueia (cores, brilho, som, etc.)
 
 
 

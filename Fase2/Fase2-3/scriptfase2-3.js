@@ -54,6 +54,7 @@ function sfx(type) {
 
 // ── Save ────────────────────────────────────────────────────────
 const SAVE_KEY = 'mineralis_save_v2';
+function unlockPhase(id){try{const raw=localStorage.getItem(SAVE_KEY);const save=raw?JSON.parse(raw):{versao:1,iniciado:true,fases:{}};if(!save.fases)save.fases={};if(!save.fases[id])save.fases[id]={desbloqueada:false,estrelas:0};save.fases[id].desbloqueada=true;localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
 function _salvarFase(score, deaths){
   const estrelas = deaths===0?4 : deaths<=2?3 : deaths<=5?2 : 1;
   try{
@@ -69,8 +70,9 @@ function _salvarFase(score, deaths){
 }
 function _voltarAoMenu(){
   _salvarFase(G.player?.score||0, G.deaths);
+  unlockPhase('3.1');
   try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
-  window.location.href = '../../MenuPrincipal/index.html';
+  window.location.href = '../../MenuPrincipal/index.html?unlocked=3.1';
 }
 
 // ── Assets ──────────────────────────────────────────────────────
@@ -119,7 +121,7 @@ window.addEventListener('keydown', e => {
   if (!keys[e.code]) jp[e.code]=true;
   keys[e.code]=true;
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open)INV.close();
   if(e.code==='KeyM'){try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
   window.location.href='../../MenuPrincipal/index.html';}
@@ -270,10 +272,12 @@ const ITEM_DEFS = {
     desc:'Escava solo aluvial amazônico.\nUsada para encontrar artefatos enterrados.' },
   bateia:           { cat:'ferramenta', nome:'Bateia',                 icon:'🥌', fase:'1.2',
     desc:'Separa ouro pesado do sedimento leve.\nUsada há 2.000 anos na Amazônia.' },
-  lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.3',
-    desc:'Ilumina a mina e revela símbolos ocultos.\nNecessária para abrir portões de pedra.' },
+  lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.1',
+    journalId:'lanterna',
+    desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.' },
   // ── Fases 2.1, 2.2 (herdados de viagens anteriores) ──
-  picareta_mineira: { cat:'ferramenta', nome:'Picareta Mineira',      icon:'⛏', fase:'2.1',
+  picareta_mineira: { cat:'ferramenta', nome:'Picareta Industrial',   icon:'⛏', fase:'2.2',
+    journalId:'picareta_industrial',
     desc:'Picareta de ferro reforçado.\nUsada nas minas de carvão da América do Norte.' },
   // ── Novas ferramentas da Fase 2.3 ──
   maco_pedra:       { cat:'ferramenta', nome:'Maço de Pedra',         icon:'🪨', fase:'2.3',
@@ -295,8 +299,9 @@ const ITEM_DEFS = {
   // ── Artefatos ──
   ceramica_inca:    { cat:'artefato',  nome:'Cerâmica Inca',           icon:'🏺', fase:'1.1',
     desc:'Vasilha ritual do Império Inca.\nPadrões geométricos representando o cosmos.' },
-  tumi_dourado:     { cat:'artefato',  nome:'Tumi de Ouro',            icon:'🥇', fase:'1.3',
-    desc:'Para os Incas, o ouro era o sol materializado.\nNão era moeda — era divindade.' },
+  tumi_dourado:     { cat:'artefato',  nome:'Tumi — Faca Cerimonial',  icon:'🗡', fase:'1.3',
+    journalId:'relevo_inca',
+    desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
   gorget_cobre:     { cat:'artefato',  nome:'Gorget de Cobre',         icon:'🌐', fase:'2.3',
     desc:'Ornamento peitoral Anishinaabe polido e fino.\nComercializado da Flórida ao México por redes\nnativas que existiam 7.000 anos antes dos europeus.' },
 };
@@ -327,6 +332,8 @@ const INV = {
     const cat=this.TABS[this.tab].id;
     let coletados={};
     try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);coletados=j.coletados||{};}}catch(e){}
+    // Migração: código antigo usava 'mapa_potosi' para o Tupu de Prata
+    if(coletados['mapa_potosi']&&!coletados['tupu_prata']) coletados['tupu_prata']=true;
     // Mergear itens do player atual
     for(const tipo of player.items){
       const jid=TIPO_TO_JOURNAL[tipo]||tipo;
@@ -348,6 +355,8 @@ const INV = {
       const jid=def.journalId||id;
       if(def.multiple){
         if(cobreCount>0) out.push({id,...def,count:cobreCount});
+      } else if(id in ITEM_DEFS){
+        if(player.items.includes(id)||player.items.includes(id+'_ok')||coletados[jid]) out.push({id,...def,count:1});
       } else if(coletados[jid]||coletados[id]){
         out.push({id,...def,count:1});
       }
@@ -1528,29 +1537,33 @@ function drawTitle(){
   }
   ctx.textAlign='center';
   ctx.shadowColor='#c86020';ctx.shadowBlur=40;
-  ctx.fillStyle='#e08040';ctx.font='bold 50px "Courier New"';ctx.fillText('O Metal Que o Lago Guardou',W/2,170);
+  ctx.fillStyle='#e08040';ctx.font='bold 46px "Courier New"';ctx.fillText('O Metal Que o Lago Guardou',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#b07040';ctx.font='22px "Courier New"';ctx.fillText('Fase 2.3  —  Lago Superior, Michigan · 7.000 a.C.',W/2,218);
+  ctx.fillStyle='#b07040';ctx.font='19px "Courier New"';ctx.fillText('Fase 2.3  —  Lago Superior, Michigan · 7.000 a.C.',W/2,200);
   if(IMG.card23){
-    const cardSize=160,cardX=W/2-80,cardY=246;
+    const cardSize=160,cardX=W/2-80,cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(200,100,40,0.22)'); glow.addColorStop(1,'rgba(200,100,40,0)');
     ctx.fillStyle=glow; ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
     ctx.drawImage(IMG.card23,cardX,cardY,cardSize,cardSize);
   }
   ctx.fillStyle=`rgba(200,120,40,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Testar',W/2,504);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
+  const cause=G.player?.deathCause||'queda';
+  const msgs={queda:'CORVAN CAIU!',water:'A CORRENTEZA TE LEVOU!',espinho:'QUE ESPINHO!',inimigo:'O INIMIGO FOI MAIS RÁPIDO!'};
+  const subs={queda:'O Grande Lago não perdoa descuido — a queda foi fatal.',water:'A corrente do Lago Superior é forte demais. Evite a água agitada!',espinho:'Os espinhos das margens são afiados como cobre nativo!',inimigo:'Os guardiões do lago foram mais velozes. Pule sobre eles!'};
   ctx.textAlign='center';ctx.shadowColor='#ff2020';ctx.shadowBlur=30;
-  ctx.fillStyle='#ff5050';ctx.font='bold 56px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);
+  ctx.fillStyle='#ff5050';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
+  ctx.fillStyle='#e8c890';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'O Grande Lago não perdoa.',W/2,H/2-10);
   CORVAN.draw(ctx, 'hurt', Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#e08830';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);
@@ -1637,12 +1650,44 @@ const G={
   }
 };
 
+// ── Música de fundo — Fase 2.3 (Anishinaabe/Grande Lago): grave, ritmo de água ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_ANI=[130.8,146.8,164.8,196,220,246.9,261.6,293.6];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.07,start+0.12);
+    g.gain.setValueAtTime(0.07,start+dur-0.3);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,2,5,4,2,0,3,5,4,2,4,5,3,0];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_ANI[idx%_NOTES_ANI.length],t+i*0.55,0.65));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.55-0.4)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
 function startGame(){ G.load(0); G.state='title'; loop(); }
 
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
-  if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
-  if(G.state==='complete' &&(jp['Enter']||jp['KeyM']))  _voltarAoMenu();
-  G.update(); G.draw(); clearJP();
-}
+  if(G.state==='dead'     && jp['

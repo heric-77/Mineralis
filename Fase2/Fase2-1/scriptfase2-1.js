@@ -58,7 +58,7 @@ IMG.card21=null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -134,7 +134,9 @@ const INV={
     }
     return Object.entries(_FINAL).filter(([id,def])=>{
       if(def.cat!==cat)return false;
-      return player.items.includes(id)||player.items.includes(id+'_ok')||player.items.includes(id+'_col')||saved[def.journalId||id];
+      // Fase atual: só mostra se coletado nesta sessão; fase anterior: mostra de saved
+      if(id in ITEM_DEFS) return player.items.includes(id)||player.items.includes(id+'_ok')||player.items.includes(id+'_col');
+      return !!saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
   toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
@@ -1183,7 +1185,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(220,185,80,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   ↑/ Espaço Pular   E Interagir/Garimpar',W/2,500);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1192,12 +1194,12 @@ function drawTitle(){
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
   const cause=G.player?.deathCause||'queda';
-  const msg=cause==='rocha'?'QUE PEDRA!':'VOCÊ CAIU!';
-  const sub=cause==='rocha'?'Cuidado com as rochas afiadas!':'Você caiu no abismo.';
+  const msgs={queda:'CORVAN CAIU!',rocha:'QUE PEDRA!',inimigo:'O INIMIGO FOI MAIS RÁPIDO!',bat:'O MORCEGO TE DERRUBOU!'};
+  const subs={queda:'A Sierra Nevada não perdoa — cuidado com as bordas!',rocha:'As rochas afiadas são a lei aqui. Cuidado!',inimigo:'Os garimpeiros rivais não brincam. Pule sobre eles!',bat:'Esses morcegos são territorialistas. Pule sobre eles!'};
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
-  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
+  ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
+  ctx.fillStyle='#e8d090';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'A Sierra Nevada não perdoa.',W/2,H/2-10);
   drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
   ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
@@ -1505,4 +1507,120 @@ function buildL4(){
       if(this.celebState.active)this.celebState.t+=0.06;
       const fim=this.triggers[0];
       if(!fim.done&&!G.dialog){
-        const ouros=player.items.filter(i=>i==='ouro_pepita')
+        const ouros=player.items.filter(i=>i==='ouro_pepita')        const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+        if(ouros>=3&&player.items.includes('placa_reivindicacao'))fim.fn(player,this);
+      }
+    },
+    draw(player){
+      drawCelebration(this.celebState);
+      for(const c of this.cols)c.draw();
+      for(const t of this.triggers)t.draw(player.x,player.y);
+    }
+  };
+}
+
+// ═══ GAME CONTROLLER ═════════════════════════════════════════════════════════
+const LEVELS=[buildL1,buildL2,buildL3,buildL4];
+const G={
+  state:'title',lvIdx:0,level:null,player:null,
+  dialog:false,deaths:0,timeOnLevel:0,_storedItems:[],_storedScore:0,_storedTool:null,
+  load(idx){
+    this.lvIdx=idx;particles=[];
+    tileTheme=TILE_THEMES[idx+1]||TILE_THEMES[1];
+    this.level=LEVELS[idx]();cam.x=0;cam.y=0;
+    this.player=new Player(this.level.startX,this.level.startY);
+    if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
+    else{this._storedItems=[];this._storedScore=0;this._storedTool=null;}
+    this.dialog=false;this.state='playing';this.timeOnLevel=0;
+    BUBBLE.active=false;popup.active=false;
+    for(const k in jp)delete jp[k];
+    setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},900);
+  },
+  nextLevel(){
+    this._storedItems=[...this.player.items];
+    this._storedScore=this.player.score;
+    this._storedTool=this.player.activeTool;
+    if(this.lvIdx+1<LEVELS.length)this.load(this.lvIdx+1);
+    else{BUBBLE.active=false;this.dialog=false;this.state='complete';}
+  },
+  update(){
+    if(this.state!=='playing')return;this.timeOnLevel++;
+    checkDlg();updateCam(this.player.x,this.level.W);
+    this.level.update(this.player);this.player.update(this.level);
+    tickParticles();tickNotif();
+    if(typeof tickPopup==='function')tickPopup();
+    if(this.player.dead){this.deaths++;this.state='dead';}
+  },
+  draw(){
+    ctx.clearRect(0,0,W,H);
+    if(this.state==='title'){drawTitle();return;}
+    if(this.state==='complete'){drawComplete();return;}
+    drawBg(this.level.bg);
+    for(const p of this.level.plats)drawPlatform(p);
+    this.level.draw(this.player);
+    drawParticles();
+    this.player.draw();
+    if(this.state==='dead'){drawDeath();return;}
+    drawHUD(this.player,this.level);
+    BUBBLE.draw(this.player);
+    drawNotif();
+    if(typeof INV!=='undefined')INV.draw(this.player);
+  }
+};
+
+// ── Música de fundo — Fase 2.1 (Califórnia): notas abertas, ritmo animado ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_CAL=[220,246.9,261.6,293.6,329.6,349.2,392,440];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur,type){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||'triangle';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.06,start+0.04);
+    g.gain.setValueAtTime(0.06,start+dur-0.1);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,2,4,5,4,2,4,7,5,4,5,7,4,2,0,2];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_CAL[idx%_NOTES_CAL.length],t+i*0.38,0.42));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.38-0.25)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
+function startGame(){G.load(0);G.state='title';loop();}
+function loop(){
+  requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
+  if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
+  if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
+  if(G.state==='complete' &&(jp['Enter']||jp['KeyM'])){
+    try{sessionStorage.setItem('mineralis_session','1');}catch(e){}
+    window.location.href='../../MenuPrincipal/index.html?unlocked=2.2';
+  }
+  G.update();G.draw();clearJP();
+}
+
+if(!gameReady){(function loadLoop(){
+  if(gameReady)return;requestAnimationFrame(loadLoop);
+  ctx.fillStyle='#080604';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#e0b840';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
+  ctx.fillText('Carregando...  '+assetsLoaded+'/'+totalAssets,W/2,H/2);
+  ctx.fillStyle='#888';ctx.font='14px "Courier New"';
+  ctx.fillText('Fase 2.1 - Corrida do Ouro na Califórnia',W/2,H/2+36);
+  ctx.textAlign='left';
+})();}

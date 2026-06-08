@@ -64,7 +64,7 @@ IMG.card22=null;
 const keys={},jp={};
 window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
-  if((e.code==='KeyI'||e.code==='Tab')&&G.state==='playing'&&!BUBBLE.active){e.preventDefault();if(G.player)INV.toggle(G.player);}
+  if((e.code==="KeyI"||e.code==="Tab")&&G.state==="playing"){e.preventDefault();if(G.player&&(INV.open||!BUBBLE.active))INV.toggle(G.player);}
   if(e.code==='Escape'&&INV.open){INV.close();}
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
@@ -134,7 +134,9 @@ const INV={
     const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
     return Object.entries(_ALL_DEFS).filter(([id,def])=>{
       if(def.cat!==cat)return false;
-      return player.items.includes(id)||player.items.includes(id+'_ok')||saved[def.journalId||id];
+      // Fase atual: só mostra se coletado nesta sessão
+      if(id in ITEM_DEFS) return player.items.includes(id)||player.items.includes(id+'_ok');
+      return !!saved[def.journalId||id];
     }).map(([id,def])=>({id,...def}));
   },
   toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
@@ -974,22 +976,22 @@ function drawTitle(){
   ctx.fillStyle='rgba(0,0,0,0.58)';ctx.fillRect(0,0,W,H);
   drawMineSparkles();
   ctx.textAlign='center';
-  ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=38;
-  ctx.fillStyle=UI_ACCENT;ctx.font='bold 44px "Courier New"';ctx.fillText('A Escuridão que Moveu o Mundo',W/2,140);
+  ctx.shadowColor=UI_ACCENT;ctx.shadowBlur=40;
+  ctx.fillStyle=UI_ACCENT;ctx.font='bold 46px "Courier New"';ctx.fillText('A Escuridão que Moveu o Mundo',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#a08850';ctx.font='18px "Courier New"';ctx.fillText('Fase 2.2  —  Minas de Carvão dos Apalaches · Séc. XIX',W/2,192);
+  ctx.fillStyle='#a08850';ctx.font='19px "Courier New"';ctx.fillText('Fase 2.2  —  Minas de Carvão dos Apalaches · Séc. XIX',W/2,200);
   if(IMG.card22){
-    const cardSize=160,cardX=W/2-80,cardY=225;
+    const cardSize=160,cardX=W/2-80,cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(180,130,40,0.22)');glow.addColorStop(1,'rgba(180,130,40,0)');
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(W/2,cardY+80,130,0,Math.PI*2);ctx.fill();
     ctx.drawImage(IMG.card22,cardX,cardY,cardSize,cardSize);
   }
-  ctx.fillStyle=`rgba(200,155,60,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='18px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,450);
-  ctx.fillStyle='#a0a8b8';ctx.font='17px "Courier New"';
-  ctx.fillText('← → Mover   ↑ Espaço Pular   E Interagir/Minerar',W/2,494);
-  ctx.fillText('[M] Menu Principal',W/2,530);
+  ctx.fillStyle=`rgba(200,155,60,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+  ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
@@ -997,8 +999,8 @@ function drawTitle(){
 function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.72)';ctx.fillRect(0,0,W,H);
   const cause=G.player?.deathCause||'queda';
-  const msgs={queda:'VOCÊ CAIU!',grisu:'EXPLOSÃO DE GRISÚ!',rocha:'ROCHA INSTÁVEL!'};
-  const subs={queda:'Você caiu no abismo da galeria.',grisu:'Metano ignito — evacue ao ver a chama crescer!',rocha:'Cuidado com as estalactites.'};
+  const msgs={queda:'CORVAN CAIU!',grisu:'EXPLOSÃO DE GRISÚ!',rocha:'ROCHA INSTÁVEL!',inimigo:'O CARVÃO VINGOU-SE!'};
+  const subs={queda:'As galerias dos Apalaches são traiçoeiras — a queda é fatal!',grisu:'Metano nas minas de carvão é invisível e letal. Fuja das chamas!',rocha:'Cuidado com as estalactites e tetos instáveis!',inimigo:'O inimigo nas profundezas foi mais rápido.'};
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'VOCÊ CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
@@ -1534,9 +1536,52 @@ const G={
   }
 };
 
+// ── Música de fundo — Fase 2.2 (Apalaches/Carvão): notas graves, tambor suave ──
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_AP=[110,130.8,146.8,164.8,196,220,261.6,293.6];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.05;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur,type){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||'triangle';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.06,start+0.05);
+    g.gain.setValueAtTime(0.06,start+dur-0.15);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  function _drum(start){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';o.frequency.setValueAtTime(120,start);o.frequency.exponentialRampToValueAtTime(40,start+0.2);
+    g.gain.setValueAtTime(0.08,start);g.gain.exponentialRampToValueAtTime(0.001,start+0.25);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+0.3);
+  }
+  const SEQ=[0,2,3,5,3,2,3,5,6,5,3,2,0,2,3,0];
+  const BEAT=[0,0.75,1.5,2.25,3,3.75];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1;
+    SEQ.forEach((idx,i)=>_nota(_NOTES_AP[idx%_NOTES_AP.length],t+i*0.5,0.55));
+    BEAT.forEach(b=>_drum(t+b));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*0.5-0.3)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevState='';
+
 function startGame(){G.load(0);G.state='title';loop();}
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevState){
+    if(G.state==='playing'&&_prevState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete')&&_prevState==='playing')stopBgMusic();
+    _prevState=G.state;
+  }
   if(G.state==='title'    &&(jp['Enter']||jp['Space']))G.load(0);
   if(G.state==='dead'     &&jp['KeyR'])G.load(G.lvIdx);
   if(G.state==='complete' &&jp['Enter']){
