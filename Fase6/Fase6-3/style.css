@@ -1,11 +1,19 @@
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100vw;height:100vh;overflow:hidden;background:#000;touch-action:none;}
-#wrap{position:fixed;display:block;line-height:0;}
-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
-#dlg,#dlg-face,#dlg-body,#dlg-name,#dlg-text,#dlg-hint,#notif{display:none!important;}
-#tctrl{position:absolute;bottom:0;left:0;right:0;height:160px;pointer-events:none;display:none;z-index:15;}
-@media(pointer:coarse){#tctrl{display:block;}}
-.tb{position:absolute;width:64px;height:64px;border-radius:50%;border:2px solid rgba(180,140,80,.6);background:rgba(0,0,0,.45);color:rgba(230,190,80,.9);font-size:20px;display:flex;align-items:center;justify-content:center;pointer-events:auto;-webkit-tap-highlight-color:transparent;user-select:none;}
-#tb-l{bottom:64px;left:16px;}#tb-r{bottom:64px;left:96px;}
-#tb-j{bottom:60px;right:16px;width:72px;height:72px;}
-#tb-e{bottom:148px;right:22px;width:56px;height:56px;}
+/* ═══════════════════════════════════════════════════════════
+   MINERALIS – Fase 6.3 (FINAL) · A Última Pedra do Guardião
+   style.css  —  Te Wahi Pounamu, Nova Zelândia · Māori · Séc. XIII
+   ═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100vw; height:100vh; overflow:hidden; background:#000; touch-action:none; }
+#wrap { position:fixed; display:block; line-height:0; }
+canvas { display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
+#dlg, #dlg-face, #dlg-body, #dlg-name, #dlg-text, #dlg-hint, #notif { display:none !important; }
+#tctrl { position:absolute; bottom:0; left:0; right:0; height:160px; pointer-events:none; display:none; z-index:15; }
+@media (pointer:coarse) { #tctrl { display:block; } }
+.tb { position:absolute; width:64px; height:64px; border-radius:50%;
+  border:2px solid rgba(40,180,120,.6); background:rgba(0,0,0,.45);
+  color:rgba(120,240,180,.9); font-size:20px; display:flex; align-items:center;
+  justify-content:center; pointer-events:auto; -webkit-tap-highlight-color:transparent; user-select:none; }
+#tb-l { bottom:64px; left:16px; }
+#tb-r { bottom:64px; left:96px; }
+#tb-j { bottom:60px; right:16px; width:72px; height:72px; }
+#tb-e { bottom:148px; right:22px; width:56px; height:56px; }
