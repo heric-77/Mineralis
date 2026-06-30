@@ -1,11 +1,349 @@
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100vw;height:100vh;overflow:hidden;background:#000;touch-action:none;}
-#wrap{position:fixed;display:block;line-height:0;}
-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
-#dlg,#dlg-face,#dlg-body,#dlg-name,#dlg-text,#dlg-hint,#notif{display:none!important;}
-#tctrl{position:absolute;bottom:0;left:0;right:0;height:160px;pointer-events:none;display:none;z-index:15;}
-@media(pointer:coarse){#tctrl{display:block;}}
-.tb{position:absolute;width:64px;height:64px;border-radius:50%;border:2px solid rgba(180,140,80,.6);background:rgba(0,0,0,.45);color:rgba(230,190,80,.9);font-size:20px;display:flex;align-items:center;justify-content:center;pointer-events:auto;-webkit-tap-highlight-color:transparent;user-select:none;}
-#tb-l{bottom:64px;left:16px;}#tb-r{bottom:64px;left:96px;}
-#tb-j{bottom:60px;right:16px;width:72px;height:72px;}
-#tb-e{bottom:148px;right:22px;width:56px;height:56px;}
+/* ══════════════════════════════════════════════════════════════════
+   Mineralis — Fase 5.1: O Jade Sagrado de Mianmar
+   style.css
+   Paleta: verde-jade profundo, preto floresta, dourado-bambu
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & base ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #020a04;
+  font-family: 'Courier New', Courier, monospace;
+  color: #a0d8b0;
+  touch-action: none;
+}
+
+/* ── Tela de carregamento ─────────────────────────────────────── */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a1e0c 0%, #020804 70%, #010402 100%);
+  transition: opacity 0.5s ease;
+}
+
+#loading-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px;
+}
+
+.loading-gem {
+  font-size: 64px;
+  animation: gem-pulse 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(60, 220, 120, 0.7));
+}
+
+@keyframes gem-pulse {
+  0%, 100% { transform: scale(1);   filter: drop-shadow(0 0 18px rgba(60,220,120,0.5)); }
+  50%       { transform: scale(1.1); filter: drop-shadow(0 0 36px rgba(60,220,120,0.9)); }
+}
+
+.loading-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #c0f0d0;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(80, 220, 140, 0.6);
+}
+
+.loading-sub {
+  font-size: 14px;
+  color: #60a870;
+  letter-spacing: 2px;
+}
+
+.loading-bar-wrap {
+  width: 280px;
+  height: 6px;
+  background: rgba(40, 100, 60, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(60, 180, 90, 0.3);
+}
+
+.loading-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2a9050, #60e890, #2a9050);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  transition: width 0.15s ease;
+  animation: bar-shimmer 1.8s linear infinite;
+}
+
+@keyframes bar-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.loading-hint {
+  font-size: 12px;
+  color: #508860;
+  letter-spacing: 1px;
+  animation: blink 1.2s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── Wrapper do canvas ───────────────────────────────────────── */
+#wrap {
+  position: fixed;
+  /* posição calculada dinamicamente pelo JS via resize() */
+  background: #010402;
+  overflow: hidden;
+  /* Borda sutil estilo arcade */
+  outline: 2px solid rgba(40, 140, 70, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.8),
+    0 0 40px rgba(30, 120, 60, 0.18),
+    0 0 80px rgba(20, 80, 40, 0.1);
+}
+
+/* ── Canvas ──────────────────────────────────────────────────── */
+#c {
+  display: block;
+  /* largura/altura em CSS definidas pelo JS em resize() */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: none; /* cursor oculto — jogo de teclado/touch */
+}
+
+/* ── Controles touch ─────────────────────────────────────────── */
+#touch-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 18px 16px;
+  pointer-events: none; /* só os botões capturam eventos */
+  /* Mostrar somente em touch */
+  display: none;
+}
+
+/* Ativa somente quando é touch device */
+@media (hover: none) and (pointer: coarse) {
+  #touch-controls { display: flex; }
+  #touch-extras   { display: flex; }
+  #c              { cursor: default; }
+}
+
+/* D-pad esq/dir */
+#touch-dpad {
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+/* Ação / Pular */
+#touch-actions {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+/* Botão base */
+.touch-btn {
+  position: relative;
+  border: none;
+  border-radius: 50%;
+  background: rgba(20, 60, 30, 0.75);
+  border: 2px solid rgba(60, 180, 90, 0.5);
+  color: #a0e8b8;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(100,220,140,0.15);
+  transition: background 0.06s, transform 0.06s, box-shadow 0.06s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+.touch-btn:active,
+.touch-btn.pressed {
+  background: rgba(40, 120, 60, 0.85);
+  transform: scale(0.93);
+  box-shadow:
+    0 1px 4px rgba(0,0,0,0.7),
+    inset 0 1px 4px rgba(0,0,0,0.4),
+    0 0 12px rgba(60,200,100,0.4);
+}
+
+/* D-pad */
+.dpad-btn {
+  width: 62px;
+  height: 62px;
+}
+
+.btn-arrow {
+  font-size: 22px;
+  line-height: 1;
+  color: #80d898;
+}
+
+/* Ação */
+.action-btn {
+  width: 70px;
+  height: 70px;
+}
+
+.btn-label {
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: #a0e8b8;
+}
+
+.btn-sub {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #60a878;
+  text-transform: uppercase;
+}
+
+/* Botão E (interagir) — destaque verde */
+.btn-e {
+  background: rgba(20, 80, 40, 0.80);
+  border-color: rgba(80, 220, 120, 0.65);
+}
+
+.btn-e .btn-label { color: #80ffb0; }
+
+/* Botão J (pular) */
+.btn-j {
+  background: rgba(10, 50, 20, 0.75);
+  border-color: rgba(60, 180, 100, 0.5);
+}
+
+/* ── Botões extras flutuantes ────────────────────────────────── */
+#touch-extras {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: none; /* exibido só em touch via media query acima */
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.extra-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(10, 30, 14, 0.80);
+  border: 1.5px solid rgba(60, 160, 80, 0.45);
+  font-size: 20px;
+  color: #80d898;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  pointer-events: auto;
+}
+
+.extra-btn:active {
+  background: rgba(30, 80, 40, 0.90);
+  transform: scale(0.92);
+}
+
+/* ── Scanlines sutis (efeito retrô opcional) ─────────────────── */
+#wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.04) 3px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── Vinheta nas bordas do canvas ────────────────────────────── */
+#wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 60%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ── Scrollbar oculta (caso apareça em algum contexto) ──────── */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+/* ── Acessibilidade: foco teclado nos botões touch ──────────── */
+.touch-btn:focus-visible {
+  outline: 2px solid rgba(80, 220, 120, 0.8);
+  outline-offset: 2px;
+}
+
+/* ── Orientação: aviso para rotacionar (portrait em mobile) ─── */
+@media (max-width: 600px) and (orientation: portrait) {
+  #wrap {
+    /* Em portrait o jogo fica pequeno mas ainda funciona;
+       o aviso abaixo é apenas uma dica visual. */
+  }
+  #touch-controls {
+    height: 100px;
+    padding: 0 12px 10px;
+  }
+  .dpad-btn   { width: 54px; height: 54px; }
+  .action-btn { width: 60px; height: 60px; }
+  .btn-arrow  { font-size: 18px; }
+  .btn-label  { font-size: 18px; }
+}
+
+/* ── Landscape compacto (ex: iPhone SE landscape) ───────────── */
+@media (max-height: 420px) and (orientation: landscape) {
+  #touch-controls {
+    height: 84px;
+    padding: 0 10px 8px;
+  }
+  .dpad-btn   { width: 48px; height: 48px; }
+  .action-btn { width: 54px; height: 54px; }
+}
