@@ -2,7 +2,8 @@ const SAVE_KEY = 'mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
-function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
+const _JOURNAL_ALIAS={tupu_prata:'mapa_potosi',lanterna:'lanterna_arqueologa'};
+function journalCollect(id){id=_JOURNAL_ALIAS[id]||id;if(window.JournalStore){window.JournalStore.collect(id);return;}const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
 const W=1280,H=720;
 const wrap=document.getElementById('wrap');
@@ -61,6 +62,8 @@ window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.co
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){const el=document.getElementById(id);if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -81,7 +84,7 @@ const ITEM_DEFS = {
   },
   lanterna: {
     cat:'ferramenta', nome:'Lanterna', icon:'🔦',
-    journalId:'lanterna',
+    journalId:'lanterna_arqueologa',
     desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.',
     drawHand:'right',
   },
@@ -103,7 +106,7 @@ const ITEM_DEFS = {
   },
   tupu: {
     cat:'artefato', nome:'Tupu de Prata', icon:'✦',
-    journalId:'tupu_prata',
+    journalId:'mapa_potosi',
     desc:'Fivela ornamental da nobreza Inca.\nA prata, para os Incas, era arte — não moeda.',
   },
 };
@@ -122,7 +125,7 @@ const INV = {
     // Lê coletados do localStorage (todas as fases)
     let saved={};
     try{const s=localStorage.getItem('mineralis_save_v2');if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
-    return Object.entries(ITEM_DEFS)
+    const locais = Object.entries(ITEM_DEFS)
       .filter(([id, def]) => {
         if(def.cat !== cat) return false;
         // Verifica em player.items direto, no localStorage, ou variações de sufixo
@@ -132,6 +135,16 @@ const INV = {
             || saved[def.journalId||id];         // ex: salvo no diário global
       })
       .map(([id, def]) => ({ id, ...def }));
+    // Itens coletados em OUTRAS fases (catálogo global via JournalStore)
+    let globais = [];
+    if (window.ALL_ITEM_DEFS) {
+      const idsLocais = new Set(locais.map(it => it.journalId || it.id));
+      globais = Object.entries(window.ALL_ITEM_DEFS)
+        .filter(([id, def]) => def.cat === cat && !idsLocais.has(id))
+        .filter(([id]) => window.JournalStore ? window.JournalStore.isCollected(id) : !!saved[id])
+        .map(([id, def]) => ({ id, ...def }));
+    }
+    return locais.concat(globais);
   },
   toggle(player) {
     this.open = !this.open;
@@ -198,8 +211,12 @@ const INV = {
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
       ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52;
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H;
         const selected=(i===this.cursor);
         const equipped=player.activeTools.has(item.id);
         if(selected){
@@ -222,6 +239,16 @@ const INV = {
           ctx.fillText('CONSUMÍVEL',PX+62,iy+32);
         }
       });
+      if(scrollTop>0){
+        ctx.font='11px "Courier New"'; ctx.fillStyle='#e0b840';
+        ctx.textAlign='center'; ctx.fillText('▲ mais',PX+16+COL_W/2,CY+10);
+        ctx.textAlign='left';
+      }
+      if(scrollTop+maxRows<items.length){
+        ctx.font='11px "Courier New"'; ctx.fillStyle='#e0b840';
+        ctx.textAlign='center'; ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);
+        ctx.textAlign='left';
+      }
 
       const sel=items[this.cursor];
       if(sel){

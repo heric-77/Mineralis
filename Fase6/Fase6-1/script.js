@@ -2,7 +2,8 @@ const SAVE_KEY='mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
-function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
+const _JOURNAL_ALIAS={picareta_ponta_fina:'picareta_fina'};
+function journalCollect(id){id=_JOURNAL_ALIAS[id]||id;if(window.JournalStore){window.JournalStore.collect(id);return;}const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
 const W=1280,H=720;
 const wrap=document.getElementById('wrap');
@@ -85,6 +86,8 @@ window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.co
   window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){const el=document.getElementById(id);if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -99,7 +102,7 @@ function clearJP(){for(const k in jp)delete jp[k];}
 const ITEM_DEFS={
   picareta_ponta_fina:{
     cat:'ferramenta',nome:'Picareta de Ponta Fina',icon:'⛏️',
-    journalId:'picareta_ponta_fina',drawHand:'left',
+    journalId:'picareta_fina',drawHand:'left',
     desc:'Picareta estreita adaptada para argila — não fragmenta opalas.\nCabo de madeira de mulga, mais leve que as anteriores.\nA argila de Lightning Ridge exige precisão, não força bruta.',
   },
   roldana_poco:{
@@ -145,12 +148,23 @@ const INV={
     const cat=this.TABS[this.tab].id;
     let saved={};
     try{const s=localStorage.getItem(SAVE_KEY);if(s){const j=JSON.parse(s);saved=j.coletados||{};}}catch(e){}
-    const _ALL_DEFS=Object.assign({},window.ALL_ITEM_DEFS||{},ITEM_DEFS);
-    return Object.entries(_ALL_DEFS).filter(([id,def])=>{
-      if(def.cat!==cat)return false;
-      if(id in ITEM_DEFS) return player.items.includes(id);
-      return !!saved[def.journalId||id];
-    }).map(([id,def])=>({id,...def}));
+    // Itens desta fase: só aparecem se coletados nesta sessão (id interno do jogo)
+    const out=[];
+    const canonShown=new Set();
+    for(const [id,def] of Object.entries(ITEM_DEFS)){
+      if(def.cat!==cat) continue;
+      if(player.items.includes(id) || !!saved[def.journalId||id]){
+        out.push({id,...def});
+        canonShown.add(def.journalId||id);
+      }
+    }
+    // Itens de OUTRAS fases: via catálogo global, evitando duplicar o que já apareceu acima
+    for(const [id,def] of Object.entries(window.ALL_ITEM_DEFS||{})){
+      if(def.cat!==cat || id in ITEM_DEFS || canonShown.has(id)) continue;
+      const got = window.JournalStore ? window.JournalStore.isCollected(id) : !!saved[id];
+      if(got) out.push({id,...def});
+    }
+    return out;
   },
   toggle(player){this.open=!this.open;if(this.open){this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1));}G.dialog=this.open||BUBBLE.active;},
   close(){this.open=false;G.dialog=BUBBLE.active||false;},
@@ -203,8 +217,12 @@ const INV={
       ctx.textAlign='center';ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
         if(selected){ctx.fillStyle='rgba(180,200,120,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#d0c890';ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         ctx.font='24px serif';ctx.fillText(item.icon,PX+28,iy+22);
         ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
@@ -212,6 +230,8 @@ const INV={
         ctx.fillText(item.nome,PX+62,iy+16);
         if(equipped){ctx.fillStyle='rgba(180,200,120,0.22)';roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle='#d0c890';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
       });
+      if(scrollTop>0){ctx.font='11px "Courier New"';ctx.fillStyle='#d0c890';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+10);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.font='11px "Courier New"';ctx.fillStyle='#d0c890';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(180,200,120,0.08)';roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
@@ -989,7 +1009,7 @@ class Player{
       }
 
       if(level.churingaObj&&!level.churingaObj.done&&this.near({x:level.churingaObj.x-40,y:level.churingaObj.y-40,w:80,h:40})){
-        level.churingaObj.done=true;sfx('churinga');
+        level.churingaObj.done=true;this.churingaDevolvida=true;sfx('churinga');
         burst(level.churingaObj.x,level.churingaObj.y,'#c0a060',18,3);
 
         showDialog([
@@ -1398,7 +1418,13 @@ function buildL4(){
   plats.push({x:1600,y:FLOOR-60,w:100,h:20,type:'plat'});
   plats.push({x:1900,y:FLOOR-50,w:140,h:50,type:'plat'});
   const triggers=[];
-  triggers.push(new Trigger(LW-120,FLOOR-160,120,160,'Completar a Fase',()=>{G.state='complete';}));
+  triggers.push(new Trigger(LW-120,FLOOR-160,120,160,'Completar a Fase',(player,level)=>{
+    if(!player.items.includes('opala_vermelha')){notify('Ainda falta a Opala Negra de play vermelho — volte ao Campo de Opalas!');return;}
+    if(!player.items.includes('opala_azul')){notify('Ainda falta a Opala Negra de play azul — volte ao Campo de Opalas!');return;}
+    if(!player.items.includes('opala_verde')){notify('Ainda falta a Opala Negra de play verde — volte ao Campo de Opalas!');return;}
+    if(!player.churingaDevolvida){notify('A Churinga ainda precisa ser devolvida ao seu lugar antes de partir!');return;}
+    G.state='complete';
+  }));
   const cols=[];
   return {num:4,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols,triggers};
 }
@@ -1459,6 +1485,7 @@ const G={
     const prevItems=prev?[...prev.items]:[];
     const prevScore=prev?prev.score:0;
     const prevTools=prev?new Set(prev.activeTools):new Set();
+    const prevChuringaDevolvida=prev?!!prev.churingaDevolvida:false;
 
     if(n===1)this.currentLevel=buildL1();
     else if(n===2)this.currentLevel=buildL2();
@@ -1471,6 +1498,7 @@ const G={
     this.player.score=prevScore;
     this.player.activeTools=prevTools;
     this.player.opalaCount=prevItems.filter(id=>id.startsWith('opala_')).length;
+    this.player.churingaDevolvida=prevChuringaDevolvida;
     if(this.player.items.includes('picareta_ponta_fina'))this.player.activeTools.add('picareta_ponta_fina');
     if(this.player.items.includes('bastao_escuta'))this.player.activeTools.add('bastao_escuta');
 

@@ -122,6 +122,8 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyM') window.location.href='../../MenuPrincipal/index.html';
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){ const el=document.getElementById(id); if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -274,6 +276,7 @@ const INV={
     const out=[]; for(const [id,def] of Object.entries(ITEM_DEFS)){ if(def.cat!==cat) continue;
       if(def.multiple){ if(id==='pounamu' && pouN>0) out.push({id,...def,count:pouN}); else if(col[id]&&id!=='pounamu') out.push({id,...def,count:typeof col[id]==='number'?col[id]:1}); }
       else if(col[id]) out.push({id,...def,count:1}); }
+    if(window.ALL_ITEM_DEFS){ const idsLocais=new Set(Object.keys(ITEM_DEFS)); for(const [id,def] of Object.entries(window.ALL_ITEM_DEFS)){ if(def.cat!==cat||idsLocais.has(id))continue; const got=window.JournalStore?window.JournalStore.isCollected(id):!!col[id]; if(got)out.push({id,...def,count:1}); } }
     return out; },
   toggle(player){ this.open=!this.open; if(this.open)this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1)); G.dialog=this.open; },
   close(){ this.open=false; G.dialog=false; },
@@ -290,7 +293,12 @@ const INV={
     this.TABS.forEach((tab,i)=>{ const tx=PX+i*TAB_W,active=(i===this.tab); ctx.fillStyle=active?'rgba(40,180,100,0.18)':'rgba(0,0,0,0.3)';ctx.fillRect(tx+2,TAB_Y,TAB_W-4,34); ctx.fillStyle=active?tab.color:'#666';ctx.font=(active?'bold ':'')+'13px "Courier New"';ctx.textAlign='center';ctx.fillText(tab.label,tx+TAB_W/2,TAB_Y+22);ctx.textAlign='left'; if(active){ctx.fillStyle=tab.color;ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3);} });
     const CY=TAB_Y+40,CH=PH-(CY-PY)-50,items=this.tabItems(player),COL_W=260,DESC_X=PX+280;
     if(items.length===0){ ctx.fillStyle='#445';ctx.font='14px "Courier New"';ctx.textAlign='center';ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);ctx.textAlign='left'; }
-    else { items.forEach((item,i)=>{ const iy=CY+16+i*52,sel=(i===this.cursor),eq=(player.activeTool===item.id); if(sel){ctx.fillStyle='rgba(40,180,100,0.18)';_rr(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#40c878';ctx.lineWidth=1.5;_rr(PX+16,iy-10,COL_W,46,8);ctx.stroke();} const cnt=item.count>1?' ×'+item.count:''; ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20); ctx.font=(eq?'bold ':'')+'14px "Courier New"';ctx.fillStyle=eq?'#ffe060':(sel?'#f0e8c0':'#aaa');ctx.fillText(item.nome+cnt,PX+62,iy+14); });
+    else { const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{ const i=scrollTop+vi; const iy=CY+16+vi*ROW_H,sel=(i===this.cursor),eq=(player.activeTool===item.id); if(sel){ctx.fillStyle='rgba(40,180,100,0.18)';_rr(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#40c878';ctx.lineWidth=1.5;_rr(PX+16,iy-10,COL_W,46,8);ctx.stroke();} const cnt=item.count>1?' ×'+item.count:''; ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20); ctx.font=(eq?'bold ':'')+'14px "Courier New"';ctx.fillStyle=eq?'#ffe060':(sel?'#f0e8c0':'#aaa');ctx.fillText(item.nome+cnt,PX+62,iy+14); });
+      if(scrollTop>0){ctx.fillStyle='#40c878';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+6);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.fillStyle='#40c878';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor]; if(sel){ ctx.fillStyle='rgba(40,180,100,0.08)';_rr(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill(); ctx.font='44px serif';ctx.textAlign='center';ctx.fillText(sel.icon,DESC_X+(PW-DESC_X+PX-16)/2,CY+68); ctx.font='bold 15px "Courier New"';ctx.fillStyle='#40c878';ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+98); const catL={ferramenta:'🔧 Ferramenta',minerio:'⛏ Minério',artefato:'🏺 Artefato'}; ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.fillText(catL[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+116);ctx.textAlign='left';ctx.fillStyle='rgba(40,180,100,0.25)';ctx.fillRect(DESC_X+20,CY+124,PW-DESC_X+PX-56,1); const descLines=sel.desc.split('\n');ctx.font='13px "Courier New"';ctx.fillStyle='#f0e8c0';descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+144+i*22);});ctx.textAlign='left';
         if(sel.cat==='ferramenta'){ const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar'; ctx.fillStyle=player.activeTool===sel.id?'rgba(180,80,20,0.3)':'rgba(40,180,100,0.2)';_rr(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();ctx.strokeStyle=player.activeTool===sel.id?'#c04020':'#40c878';ctx.lineWidth=1.5;_rr(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke(); ctx.font='bold 13px "Courier New"';ctx.fillStyle=player.activeTool===sel.id?'#e06040':'#40c878';ctx.textAlign='center';ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left'; } } }
     ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(PX,PY+PH-38,PW,38);ctx.fillStyle='rgba(40,180,100,0.3)';ctx.fillRect(PX+16,PY+PH-39,PW-32,1);ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.textAlign='center';ctx.fillText('◀ ▶ Abas   ↑ ↓ Navegar   E Equipar/Desequipar   I Fechar',W/2,PY+PH-14);ctx.textAlign='left';
@@ -1383,6 +1391,7 @@ const G={
 function _journalColetar(tipo, count) {
   const id = TIPO_TO_JOURNAL[tipo] || tipo;
   if (!id) return;
+  if (window.JournalStore) window.JournalStore.collect(id, count!=null?{count}:undefined);
   try {
     const raw = localStorage.getItem('mineralis_save_v2');
     const save = raw ? JSON.parse(raw) : {versao:1,iniciado:true};

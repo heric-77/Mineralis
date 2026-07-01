@@ -32,6 +32,7 @@ function unlockPhase(id) {
   saveWrite(s);
 }
 function journalCollect(id) {
+  if (window.JournalStore) { window.JournalStore.collect(id); return; }
   const s = saveRead();
   if (!s.coletados) s.coletados = {};
   if (!s.coletados[id]) {
@@ -163,6 +164,8 @@ window.addEventListener('keydown',e=>{ if(!keys[e.code])jp[e.code]=true; keys[e.
   if(e.code==='Escape'&&INV.open)INV.close();
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){ const el=document.getElementById(id);if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -194,7 +197,7 @@ const ITEM_DEFS = {
     drawHand:'left',
   },
   lanterna: {
-    cat:'ferramenta', nome:'Lanterna', icon:'🔦', journalId:'lanterna',
+    cat:'ferramenta', nome:'Lanterna', icon:'🔦', journalId:'lanterna_arqueologa',
     desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para enxergar veios e artefatos.',
     phase:'1.1',
     drawHand:'right',
@@ -214,13 +217,8 @@ const ITEM_DEFS = {
     desc:'Depositado nos rios por erosão milenar.\nDensidade: 19,3 g/cm³ — 19× mais pesado que a água.',
     phase:'1.2',
   },
-  ceramica_inca: {
-    cat:'artefato', nome:'Cerâmica Inca', icon:'🏺', journalId:'ceramica_inca',
-    desc:'Vasilha cerimonial andina encontrada na Amazônia.\nDesbloqueada ao concluir a Fase 1.2.',
-    phase:'1.2',
-  },
   tupu_prata: {
-    cat:'artefato', nome:'Tupu de Prata', icon:'✦', journalId:'tupu_prata',
+    cat:'artefato', nome:'Tupu de Prata', icon:'✦', journalId:'mapa_potosi',
     desc:'Alfinete cerimonial inca de prata pura.\nUsado para prender mantos nos rituais andinos.',
     phase:'1.1',
   },
@@ -243,7 +241,7 @@ const INV = {
     const collected=saveRead().coletados || {};
     // Migração: código antigo guardava Tupu de Prata como 'mapa_potosi'
     if(collected['mapa_potosi'] && !collected['tupu_prata']) collected['tupu_prata']=true;
-    return Object.entries(ITEM_DEFS)
+    const locais = Object.entries(ITEM_DEFS)
       .filter(([,def])=>def.cat===cat)
       .filter(([id,def])=>{
         // Itens da fase atual: só aparecem se coletados nesta sessão (player.items)
@@ -261,6 +259,16 @@ const INV = {
                (def.phase!==CURRENT_PHASE && def.cat==='ferramenta' && !!collected[def.journalId||id]),
         equipped: player.activeTool===id,
       }));
+    // Itens coletados em OUTRAS fases (catálogo global via JournalStore)
+    let globais = [];
+    if (window.ALL_ITEM_DEFS) {
+      const idsLocais = new Set(locais.map(it => it.journalId || it.id));
+      globais = Object.entries(window.ALL_ITEM_DEFS)
+        .filter(([id, def]) => def.cat === cat && !idsLocais.has(id))
+        .filter(([id]) => window.JournalStore ? window.JournalStore.isCollected(id) : !!collected[id])
+        .map(([id, def]) => ({ id, ...def, phase:def.fase, owned:true, equipped:false }));
+    }
+    return locais.concat(globais);
   },
   toggle(player){
     this.open=!this.open;
@@ -313,8 +321,12 @@ const INV = {
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
       ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=item.equipped;
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,selected=(i===this.cursor),equipped=item.equipped;
         if(selected){
           ctx.fillStyle='rgba(80,200,80,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();
           ctx.strokeStyle='#78d840';ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();
@@ -331,6 +343,14 @@ const INV = {
           ctx.font='10px "Courier New"';ctx.fillStyle='#78d840';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);
         }
       });
+      if(scrollTop>0){
+        ctx.font='11px "Courier New"';ctx.fillStyle='#78d840';ctx.textAlign='center';
+        ctx.fillText('▲ mais',PX+16+COL_W/2,CY+10);ctx.textAlign='left';
+      }
+      if(scrollTop+maxRows<items.length){
+        ctx.font='11px "Courier New"';ctx.fillStyle='#78d840';ctx.textAlign='center';
+        ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';
+      }
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(80,200,80,0.08)';roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
@@ -1526,6 +1546,7 @@ function buildL4(){
   const triggers=[
     new Trigger(2860,FL-180,180,180,'Chegamos ao final dessa jornada incrível!',(player,level)=>{
       if(G.transitioning)return;
+      if(!player.items.includes('ouro_aluvial_ok')){notify('Garimpe o Ouro Aluvial no rio antes de seguir!');return;}
       if(!player.items.includes('urna')){notify('Colete a Urna Marajoara primeiro!');return;}
       G.transitioning=true;
       level.triggers[0].done=true;
@@ -1538,7 +1559,6 @@ function buildL4(){
       ],()=>{
         // ── Unlock próximas fases e arquivar no save ──
         unlockPhase('1.3');
-        if(!player.items.includes('ceramica_inca')){player.items.push('ceramica_inca');journalCollect('ceramica_inca');}
         G.transitioning=false;
         G.state='complete';
       });

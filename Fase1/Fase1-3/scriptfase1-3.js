@@ -144,6 +144,8 @@ window.addEventListener('keydown', e => {
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup', e => delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){ const el=document.getElementById(id); if(!el)return;
@@ -325,9 +327,9 @@ const ITEM_DEFS = {
   bateia:           { cat:'ferramenta', nome:'Bateia',                 icon:'🥌', fase:'1.2',
     desc:'Separa ouro pesado do sedimento leve.\nUsada há 2.000 anos na Amazônia.' },
   lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.1',
-    journalId:'lanterna',
+    journalId:'lanterna_arqueologa',
     desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.' },
-  pedra_constelacao:{ cat:'ferramenta', nome:'Pedra da Constelação',  icon:'💎', fase:'1.3',
+  pedra_constelacao:{ cat:'artefato', nome:'Pedra da Constelação',  icon:'💎', fase:'1.3',
     desc:'Peça da constelação do Condor.\nColete 3 para alinhar o painel astronômico.',
     multiple:true },
   prata:            { cat:'minerio',   nome:'Prata',                   icon:'◆', fase:'1.1',
@@ -338,20 +340,19 @@ const ITEM_DEFS = {
     desc:'Depositado nos rios por erosão milenar.\n19× mais pesado que a água.' },
   tumi_dourado:     { cat:'minerio',   nome:'Ouro Inca',               icon:'🥇', fase:'1.3',
     desc:'Para os Incas, o ouro era o sol materializado.\nNão era moeda — era divindade.' },
-  ceramica_inca:    { cat:'artefato',  nome:'Cerâmica Inca',           icon:'🏺', fase:'1.1',
-    desc:'Vasilha ritual do Império Inca.\nPadrões geométricos representando o cosmos.' },
   mapa_potosi:      { cat:'artefato',  nome:'Tupu de Prata',           icon:'✦', fase:'1.1',
-    journalId:'tupu_prata',
+    journalId:'mapa_potosi',
     desc:'Fivela ornamental da nobreza Inca.\nA prata tinha valor espiritual, não econômico.' },
   vaso_amazônico:   { cat:'artefato',  nome:'Urna Marajoara',          icon:'🫙', fase:'1.2',
     desc:'Cerâmica de 1.000 anos da Ilha de Marajó.\nEvidência de civilizações amazônicas avançadas.' },
   relevo_inca:      { cat:'artefato',  nome:'Tumi — Faca Cerimonial',  icon:'🗡', fase:'1.3',
+    journalId:'tumi_dourado',
     desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
 };
 
 const TIPO_TO_JOURNAL = {
-  lantern:'lanterna', stone:'pedra_constelacao',
-  tumi:'relevo_inca', gold:'tumi_dourado',
+  lantern:'lanterna_arqueologa', stone:'pedra_constelacao',
+  tumi:'tumi_dourado', gold:'tumi_dourado',
 };
 
 const INV = {
@@ -447,8 +448,12 @@ const INV = {
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
       ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
         if(selected){ctx.fillStyle='rgba(200,160,40,0.18)';_roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#f0c040';ctx.lineWidth=1.5;_roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         const cnt=item.count>1?' ×'+item.count:'';
         ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20);
@@ -457,6 +462,8 @@ const INV = {
         ctx.fillText(item.nome+cnt,PX+62,iy+14);
         if(equipped){ctx.fillStyle='rgba(200,160,40,0.22)';_roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle='#f0c040';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
       });
+      if(scrollTop>0){ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+8);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(200,160,40,0.08)';_roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
@@ -972,11 +979,10 @@ function buildL1(){
   ];
   const cols=[
     ...[100,250,480,700,920,1160,1450,1680,1960,2220,2500,2760,3040,3200,3350].map(x=>new Col(x,FL-50,'gold')),
-    new Col(3300,FL-80,'lantern'),
   ];
   const triggers=[
     new Trigger(3380,FL-300,200,300,'Acender o Intihuatana',(player,level)=>{
-      if(!player.items.includes('lantern')){notify('Colete a Lanterna primeiro!');return;}
+      if(!player.items.includes('lantern')){notify('Volte para pegar sua Lanterna!');return;}
       player.interactAnim=90; sfx('unlock');
       showDialog([
         '"Chegamos ao Vale Sagrado. O verdadeiro \'ouro\' não era apenas o metal — era o domínio do tempo e das estrelas."',
@@ -989,12 +995,12 @@ function buildL1(){
   return{
     id:1,bg:'bg01',W:WW,H:WH,startX:60,startY:FL-90,
     title:'O Observatório das Nuvens',
-    hint:'Colete a 🔦 Lanterna e use [E] no Intihuatana ao final!',
+    hint:'Use [E] com sua 🔦 Lanterna no Intihuatana ao final!',
     plats,enemies,cols,triggers,
     intro:[
       '"Machu Picchu foi construída pelos Incas no século XV, a 2.430 metros de altitude nos Andes peruanos."',
       '"É considerada uma das Sete Maravilhas do Mundo Moderno — e ninguém sabe ao certo como as pedras chegaram até aqui."',
-      'Encontre a Lanterna de arqueólogo e use-a no Intihuatana para abrir o portal!'
+      'Sua Lanterna de Potosí ainda ilumina o caminho. Use-a no Intihuatana para abrir o portal!'
     ],
     update(player){tickMoving(this.plats);tickTrapdoors(this.plats);for(const e of this.enemies)e.update(this.plats,player);for(const c of this.cols)c.tick();},
     draw(player){
@@ -1259,6 +1265,9 @@ function buildL4(){
 
   const triggers=[
     new Trigger(2780,FL-460,240,460,'Completar a Fase!',(player,level)=>{
+      const nStones=player.items.filter(i=>i==='stone').length;
+      if(nStones<3){notify(`Volte e alinhe a Constelação do Condor! (${nStones}/3 pedras)`);return;}
+      if(!player.items.includes('tumi')){notify('Volte ao altar e encontre o Tumi Dourado!');return;}
       level.triggers[0].done=true;
       player.interactAnim=120;sfx('unlock');
       showDialog([
@@ -1267,7 +1276,9 @@ function buildL4(){
         '"A cidade permaneceu oculta por séculos, protegida pelas nuvens e pela floresta, até ser redescoberta em 1911 por Hiram Bingham."',
         'Descobertas: ✦ Lanterna do Arqueólogo ✦ Pedras da Constelação ✦ Tumi de Ouro e Turquesa',
         '🏆 FASE 1.3 CONCLUÍDA! A sabedoria do Vale Sagrado foi preservada. Próximo destino: América do Norte!'
-      ],()=>{_salvarProgresso(G.player?.score||0,G.deaths);unlockPhase('2.1');G.state='complete';});
+      ],()=>{
+        _salvarProgresso(G.player?.score||0,G.deaths);unlockPhase('2.1');G.state='complete';
+      });
     }),
   ];
 
@@ -1516,6 +1527,7 @@ const G={
     cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
     if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
+    else{this.player.items.push('lantern');} // Mesma Lanterna já coletada na Fase 1.1
     this.dialog=false;this.state='playing';this.timeOnLevel=0;
     BUBBLE.active=false;
     setTimeout(()=>{if(this.state==='playing') showDialog(this.level.intro,null);},900);
@@ -1564,6 +1576,7 @@ const G={
 
 function _journalColetar(tipo){
   const id=TIPO_TO_JOURNAL[tipo]||tipo; if(!id) return;
+  if(window.JournalStore){window.JournalStore.collect(id);return;}
   try{
     const raw=localStorage.getItem('mineralis_save_v2');
     const save=raw?JSON.parse(raw):{};

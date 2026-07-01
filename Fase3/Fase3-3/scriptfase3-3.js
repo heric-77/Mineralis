@@ -111,6 +111,8 @@ window.addEventListener('keydown',e=>{
   window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){ const el=document.getElementById(id); if(!el)return;
@@ -287,7 +289,7 @@ const ITEM_DEFS={
   cobre_nativo:    { cat:'minerio',nome:'Cobre Nativo',            icon:'🟠',fase:'2.3',desc:'Cobre puro — sem fundição.\nTradição Anishinaabe de 7.000 anos.',multiple:true },
   cinabrio:        { cat:'minerio',nome:'Cinábrio (HgS)',          icon:'🔴',fase:'3.3',desc:'Sulfeto de mercúrio escarlate.\nDensidade 8,1 g/cm³ — surpreendentemente pesado.\nUsado como pigmento vermilhão desde Roma.\nO mais belo e o mais tóxico da série.',multiple:true },
   // Artefatos
-  tumi_dourado:    { cat:'artefato',nome:'Tumi — Faca Cerimonial', icon:'🗡',fase:'1.3',journalId:'relevo_inca',desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
+  tumi_dourado:    { cat:'artefato',nome:'Tumi — Faca Cerimonial', icon:'🗡',fase:'1.3',journalId:'tumi_dourado',desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
   gorget_cobre:    { cat:'artefato',nome:'Gorget de Cobre',        icon:'🌐',fase:'2.3',journalId:'gorget_cobre',desc:'Ornamento Anishinaabe — rota comercial\ndo Lago Superior à Flórida e ao México.' },
   frasco_mercurio: { cat:'artefato',nome:'Frasco de Mercúrio',     icon:'⚗️',fase:'3.3',desc:'Vidro soprado, cera vermelha, mercúrio puro.\nPercorreu 10.000 km de Almadén a Potosí.\nA cadeia logística que conectou dois continentes\ndurante 300 anos de Império Espanhol.' },
 };
@@ -322,6 +324,15 @@ const INV={
         if(player.items.includes(id)||col[id]) out.push({id,...def,count:1});
       } else if(col[id]){ // Fases anteriores: persiste via coletados
         out.push({id,...def,count:1});
+      }
+    }
+    // Itens coletados em OUTRAS fases (catálogo global via JournalStore)
+    if (window.ALL_ITEM_DEFS) {
+      const idsLocais=new Set(Object.keys(ITEM_DEFS));
+      for(const [id,def] of Object.entries(window.ALL_ITEM_DEFS)){
+        if(def.cat!==cat||idsLocais.has(id)) continue;
+        const got = window.JournalStore ? window.JournalStore.isCollected(id) : !!col[id];
+        if(got) out.push({id,...def,count:1});
       }
     }
     return out;
@@ -363,14 +374,20 @@ const INV={
       ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,sel=(i===this.cursor),eq=(player.activeTool===item.id);
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,sel=(i===this.cursor),eq=(player.activeTool===item.id);
         if(sel){ctx.fillStyle='rgba(180,40,20,0.18)';_rr(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#e04030';ctx.lineWidth=1.5;_rr(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         const cnt=item.count>1?' ×'+item.count:'';
         ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20);
         ctx.font=(eq?'bold ':'')+'14px "Courier New"';ctx.fillStyle=eq?'#ffe060':(sel?'#f0e8c0':'#aaa');
         ctx.fillText(item.nome+cnt,PX+62,iy+14);
       });
+      if(scrollTop>0){ctx.fillStyle='#e04030';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+6);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.fillStyle='#e04030';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(180,40,20,0.08)';_rr(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
@@ -1262,6 +1279,8 @@ function buildL4(){
   ];
   const triggers=[
     new Trigger(2780,FL-460,240,460,'Completar a Fase!',(player,level)=>{
+      if(!player.items.includes('cinabrio')){notify('Volte às galerias e colete o Cinábrio!');return;}
+      if(!player.items.includes('frasco')){notify('Volte e encontre o Frasco de Mercúrio no altar!');return;}
       level.triggers[0].done=true;player.interactAnim=120;sfx('unlock');
       const cinN=player.items.filter(i=>i==='cinabrio').length;
       showDialog([
@@ -1541,6 +1560,7 @@ const G={
 function _journalColetar(tipo, count) {
   const id = TIPO_TO_JOURNAL[tipo] || tipo;
   if (!id) return;
+  if (window.JournalStore) window.JournalStore.collect(id, count!=null?{count}:undefined);
   try {
     const raw = localStorage.getItem('mineralis_save_v2');
     const save = raw ? JSON.parse(raw) : {versao:1,iniciado:true};
@@ -1618,4 +1638,7 @@ if(!gameReady){
     requestAnimationFrame(loadLoop);
     ctx.fillStyle='#080202';ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#e04030';ctx.font='bold 22px "Courier New"';ctx.textAlign='center';
-    ctx.fillText(`Carregando${'.'.repeat(Math.
+    ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
+    ctx.textAlign='left';
+  })();
+}

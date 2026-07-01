@@ -139,10 +139,28 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
 
   Cards.renderizar();
   // Todas as fases iniciam bloqueadas conforme o HTML.
-  // O desbloqueio só ocorre via "Nova Jornada" ou ao retornar de uma fase (?unlocked=).
+  // O desbloqueio em si só ocorre via "Nova Jornada" ou ao concluir uma fase,
+  // mas o ESTADO VISUAL precisa ser sincronizado com o save sempre que o
+  // menu carrega — senão fases já desbloqueadas voltam a aparecer com cadeado
+  // ao recarregar a página ou voltar sem o parâmetro ?unlocked=.
+  Cards.sincronizar();
 
   // Efeito de desbloqueio ao voltar de uma fase concluída (?unlocked=1.2 etc.)
   const _unlockParam = new URLSearchParams(window.location.search).get('unlocked');
+
+  // Som de desbloqueio pendente: quando a página acaba de carregar (ex.: ao
+  // voltar de uma fase concluída), o navegador ainda não recebeu nenhum
+  // gesto do usuário NESTA página — então o AudioContext nasce suspenso e
+  // Audio.novaJornada() não consegue tocar nada (fica preso no resume()).
+  // Por isso o som só disparava quando vinha de um clique real em "Nova
+  // Jornada" (o próprio clique já é o gesto). Aqui guardamos a intenção de
+  // tocar e disparamos no primeiro gesto do usuário na página do menu —
+  // igual já se faz para iniciar a trilha sonora de fundo.
+  let _pendingUnlockSound = false;
+
+  function _tocarSomDesbloqueio() {
+    if (typeof Audio !== 'undefined' && Audio.novaJornada) Audio.novaJornada();
+  }
 
   if (_unlockParam) {
     Cards.sincronizar(); // garante que a fase recém-desbloqueada apareça
@@ -168,14 +186,23 @@ frame.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
         card.classList.add('just-unlocked');
         card.addEventListener('animationend', () => card.classList.remove('just-unlocked'), { once: true });
       }
-      // novaJornada() já lida com AudioContext suspenso via .resume().then()
-      Audio.novaJornada();
+      // Se o usuário já interagiu com a página (contexto de áudio ativo),
+      // toca na hora. Senão, guarda para tocar no primeiro gesto.
+      if (typeof Audio !== 'undefined' && Audio.contextoAtivo && Audio.contextoAtivo()) {
+        _tocarSomDesbloqueio();
+      } else {
+        _pendingUnlockSound = true;
+      }
     }, 500);
   }
 
 
   function _iniciarAudio() {
     Audio.iniciarTrilha();
+    if (_pendingUnlockSound) {
+      _pendingUnlockSound = false;
+      _tocarSomDesbloqueio();
+    }
     document.removeEventListener('mousemove', _iniciarAudio);
     document.removeEventListener('click',     _iniciarAudio);
     document.removeEventListener('keydown',   _iniciarAudio);

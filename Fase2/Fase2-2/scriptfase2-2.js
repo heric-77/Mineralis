@@ -2,7 +2,7 @@
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
-function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
+function journalCollect(id){if(window.JournalStore){window.JournalStore.collect(id);return;}const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
 const UI_ACCENT='#e0b840';
 const UI_BORDER='#8a6820';
@@ -69,6 +69,10 @@ window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.co
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+// Evita tecla "travada" (ex: seta esquerda) quando a janela perde o foco
+// (alt-tab, clique fora do jogo, etc.) sem disparar o evento keyup.
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){const el=document.getElementById(id);if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -190,8 +194,12 @@ const INV={
       ctx.textAlign='center';ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
         if(selected){ctx.fillStyle='rgba(160,120,40,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle=UI_ACCENT;ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         ctx.font='24px serif';ctx.fillText(item.icon,PX+28,iy+22);
         ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
@@ -199,6 +207,8 @@ const INV={
         ctx.fillText(item.nome,PX+62,iy+16);
         if(equipped){ctx.fillStyle='rgba(160,120,40,0.22)';roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle=UI_ACCENT;ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
       });
+      if(scrollTop>0){ctx.font='bold 12px "Courier New"';ctx.fillStyle=UI_ACCENT;ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+10);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.font='bold 12px "Courier New"';ctx.fillStyle=UI_ACCENT;ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(160,120,40,0.08)';roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();

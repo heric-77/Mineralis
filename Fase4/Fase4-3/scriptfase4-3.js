@@ -102,6 +102,8 @@ window.addEventListener('keydown',e=>{
   window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){ const el=document.getElementById(id); if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -224,7 +226,7 @@ const ITEM_DEFS={
   cinabrio:         { cat:'minerio',   nome:'Cinábrio (HgS)',        icon:'🔴',fase:'3.3',desc:'Sulfeto de mercúrio escarlate.\nUsado para amalgamar a prata de Potosí.',multiple:true },
   halita:           { cat:'minerio',   nome:'Halita Saariana (Sal)', icon:'⬜',fase:'4.3',desc:'Sal-gema de Taoudenni — 700 km no Saara.\nEm Timbuktu séc. XIV = mesmo valor em ouro.\n"Salário" vem de "salarium" — pagamento romano.',multiple:true },
   // Artefatos
-  tumi_dourado:     { cat:'artefato',  nome:'Tumi — Faca Cerimonial',icon:'🗡',fase:'1.3',journalId:'relevo_inca',desc:'Faca ritual Inca de ouro e turquesa.' },
+  tumi_dourado:     { cat:'artefato',  nome:'Tumi — Faca Cerimonial',icon:'🗡',fase:'1.3',journalId:'tumi_dourado',desc:'Faca ritual Inca de ouro e turquesa.' },
   gorget_cobre:     { cat:'artefato',  nome:'Gorget de Cobre',       icon:'🌐',fase:'2.3',journalId:'gorget_cobre',desc:'Ornamento Anishinaabe — rota comercial do Lago Superior à Flórida.' },
   frasco_mercurio:  { cat:'artefato',  nome:'Frasco de Mercúrio',    icon:'⚗️',fase:'3.3',journalId:'frasco_mercurio',desc:'10.000 km de Almadén a Potosí.' },
   manuscrito_item:  { cat:'artefato',  nome:'Manuscrito de Timbuktu',icon:'📜',fase:'4.3',desc:'Manuscrito árabe sobre mineralogia, séc. XIV.\nDescreve propriedades de ouro, prata e mercúrio.\nChegou à Europa via Marrocos → Florença.\nUm dos 700.000 manuscritos da cidade.' },
@@ -241,7 +243,9 @@ const INV={
     if(col['mapa_potosi']&&!col['tupu_prata']) col['tupu_prata']=true;
     for(const tipo of player.items){const jid=TIPO_TO_JOURNAL[tipo]||tipo;col[jid]=true;}
     const halN=player.items.filter(i=>i==='halita').length;
-    const out=[]; for(const [id,def] of Object.entries(ITEM_DEFS)){ if(def.cat!==cat) continue; if(def.multiple){if(halN>0)out.push({id,...def,count:halN});} else if(def.fase==='4.3'){if(player.items.includes(id)||col[id])out.push({id,...def,count:1});} else if(col[id])out.push({id,...def,count:1}); } return out; },
+    const out=[]; for(const [id,def] of Object.entries(ITEM_DEFS)){ if(def.cat!==cat) continue; if(def.multiple){if(halN>0)out.push({id,...def,count:halN});} else if(def.fase==='4.3'){if(player.items.includes(id)||col[id])out.push({id,...def,count:1});} else if(col[id])out.push({id,...def,count:1}); }
+    if(window.ALL_ITEM_DEFS){ const idsLocais=new Set(Object.keys(ITEM_DEFS)); for(const [id,def] of Object.entries(window.ALL_ITEM_DEFS)){ if(def.cat!==cat||idsLocais.has(id))continue; const got=window.JournalStore?window.JournalStore.isCollected(id):!!col[id]; if(got)out.push({id,...def,count:1}); } }
+    return out; },
   toggle(player){ this.open=!this.open; if(this.open)this.cursor=Math.min(this.cursor,Math.max(0,this.tabItems(player).length-1)); G.dialog=this.open||BUBBLE.active; },
   close(){ this.open=false;G.dialog=BUBBLE.active; },
   navigate(player){ if(!this.open)return false; if(jp['ArrowLeft']||jp['KeyA']){this.tab=(this.tab+2)%3;this.cursor=0;return true;} if(jp['ArrowRight']||jp['KeyD']){this.tab=(this.tab+1)%3;this.cursor=0;return true;} const items=this.tabItems(player); if(jp['ArrowUp']||jp['KeyW']){this.cursor=Math.max(0,this.cursor-1);return true;} if(jp['ArrowDown']||jp['KeyS']){this.cursor=Math.min(items.length-1,this.cursor+1);return true;} if(isE()&&items.length>0&&this.tab===0){const item=items[this.cursor];player.activeTool=(player.activeTool===item.id)?null:item.id;return true;} return false; },
@@ -257,7 +261,12 @@ const INV={
     this.TABS.forEach((tab,i)=>{ const tx=PX+i*TAB_W,active=(i===this.tab); ctx.fillStyle=active?'rgba(180,140,20,0.18)':'rgba(0,0,0,0.3)';ctx.fillRect(tx+2,TAB_Y,TAB_W-4,34); ctx.fillStyle=active?tab.color:'#666';ctx.font=(active?'bold ':'')+'13px "Courier New"';ctx.textAlign='center';ctx.fillText(tab.label,tx+TAB_W/2,TAB_Y+22);ctx.textAlign='left'; if(active){ctx.fillStyle=tab.color;ctx.fillRect(tx+2,TAB_Y+32,TAB_W-4,3);} });
     const CY=TAB_Y+40,CH=PH-(CY-PY)-50,items=this.tabItems(player),COL_W=260,DESC_X=PX+280;
     if(items.length===0){ ctx.fillStyle='#554';ctx.font='14px "Courier New"';ctx.textAlign='center';ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left'; }
-    else { items.forEach((item,i)=>{ const iy=CY+16+i*52,sel=(i===this.cursor),eq=(player.activeTool===item.id); if(sel){ctx.fillStyle='rgba(180,140,20,0.18)';_rr(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#e0b030';ctx.lineWidth=1.5;_rr(PX+16,iy-10,COL_W,46,8);ctx.stroke();} const cnt=item.count>1?' ×'+item.count:''; ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20); ctx.font=(eq?'bold ':'')+'14px "Courier New"';ctx.fillStyle=eq?'#ffe060':(sel?'#f0e8c0':'#aaa');ctx.fillText(item.nome+cnt,PX+62,iy+14); });
+    else { const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{ const i=scrollTop+vi; const iy=CY+16+vi*ROW_H,sel=(i===this.cursor),eq=(player.activeTool===item.id); if(sel){ctx.fillStyle='rgba(180,140,20,0.18)';_rr(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#e0b030';ctx.lineWidth=1.5;_rr(PX+16,iy-10,COL_W,46,8);ctx.stroke();} const cnt=item.count>1?' ×'+item.count:''; ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20); ctx.font=(eq?'bold ':'')+'14px "Courier New"';ctx.fillStyle=eq?'#ffe060':(sel?'#f0e8c0':'#aaa');ctx.fillText(item.nome+cnt,PX+62,iy+14); });
+      if(scrollTop>0){ctx.fillStyle='#e0b030';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+6);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.fillStyle='#e0b030';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor]; if(sel){ ctx.fillStyle='rgba(180,140,20,0.08)';_rr(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill(); ctx.font='44px serif';ctx.textAlign='center';ctx.fillText(sel.icon,DESC_X+(PW-DESC_X+PX-16)/2,CY+68); ctx.font='bold 15px "Courier New"';ctx.fillStyle='#e0b030';ctx.fillText(sel.nome,DESC_X+(PW-DESC_X+PX-16)/2,CY+98); const catL={ferramenta:'🔧 Ferramenta',minerio:'⛏ Minério',artefato:'🏺 Artefato'}; ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.fillText(catL[sel.cat],DESC_X+(PW-DESC_X+PX-16)/2,CY+116);ctx.textAlign='left';ctx.fillStyle='rgba(180,140,20,0.25)';ctx.fillRect(DESC_X+20,CY+124,PW-DESC_X+PX-56,1); const descLines=sel.desc.split('\n');ctx.font='13px "Courier New"';ctx.fillStyle='#f0e8c0';descLines.forEach((l,i)=>{ctx.textAlign='center';ctx.fillText(l,DESC_X+(PW-DESC_X+PX-16)/2,CY+144+i*22);});ctx.textAlign='left';
         if(sel.cat==='ferramenta'){ const btnTxt=player.activeTool===sel.id?'[E] Desequipar':'[E] Equipar'; ctx.fillStyle=player.activeTool===sel.id?'rgba(180,80,20,0.3)':'rgba(180,140,20,0.2)';_rr(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.fill();ctx.strokeStyle=player.activeTool===sel.id?'#c04020':'#e0b030';ctx.lineWidth=1.5;_rr(DESC_X+40,CY+CH-60,PW-DESC_X+PX-96,34,8);ctx.stroke(); ctx.font='bold 13px "Courier New"';ctx.fillStyle=player.activeTool===sel.id?'#e06040':'#e0b030';ctx.textAlign='center';ctx.fillText(btnTxt,DESC_X+(PW-DESC_X+PX-16)/2,CY+CH-38);ctx.textAlign='left'; } } }
     ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(PX,PY+PH-38,PW,38);ctx.fillStyle='rgba(180,140,20,0.3)';ctx.fillRect(PX+16,PY+PH-39,PW-32,1);ctx.font='11px "Courier New"';ctx.fillStyle='#888';ctx.textAlign='center';ctx.fillText('◀ ▶ Abas   ↑ ↓ Navegar   E Equipar/Desequipar   I Fechar',W/2,PY+PH-14);ctx.textAlign='left';
@@ -839,6 +848,7 @@ function buildL4(){
   const cols=[ ...[100,200,900,1100,1340,1560,1820,2060,2380,2480].map(x=>new Col(x,FL-50,'halita')), new Col(2880,FL-440,'manuscrito') ];
   const triggers=[
     new Trigger(2780,FL-460,240,460,'Completar a Fase!',(player,level)=>{
+      if(player.items.filter(i=>i==='halita').length<2){notify('Ainda faltam lajes de Halita Saariana pelo caminho!');return;}
       if(!player.items.includes('manuscrito')){notify('Colete o Manuscrito de Timbuktu primeiro!');return;}
       level.triggers[0].done=true;player.interactAnim=120;sfx('unlock');
       const halN=player.items.filter(i=>i==='halita').length;
@@ -1053,10 +1063,11 @@ function _journalColetar(tipo, count){
   // Save item to both coletados (diary) and phase-specific collection
   const id = TIPO_TO_JOURNAL[tipo] || tipo;
   if (!id) return;
+  if (window.JournalStore) window.JournalStore.collect(id, count!=null?{count}:undefined);
   try {
     const raw = localStorage.getItem('mineralis_save_v2');
     const save = raw ? JSON.parse(raw) : {versao:1,iniciado:true};
-    // Global diary
+    // Global diary (mantido também aqui como fallback caso JournalStore não esteja carregado)
     if (!save.coletados) save.coletados = {};
     if (count && count > 1) {
       save.coletados[id] = Math.max(save.coletados[id]||0, count);
@@ -1128,4 +1139,7 @@ if(!gameReady){
     ctx.fillStyle='#080500';ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#e0b030';ctx.font='bold 22px "Courier New"';ctx.textAlign='center';
     ctx.fillText(`Carregando${'.'.repeat(Math.floor(Date.now()/400)%4)}  ${assetsLoaded}/${totalAssets}`,W/2,H/2);
-    ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('Fase 4.3 
+    ctx.fillStyle='#888';ctx.font='14px "Courier New"';ctx.fillText('Fase 4.3 — Timbuktu, Mali · Século XIV',W/2,H/2+30);
+    ctx.textAlign='left';
+  })();
+} 

@@ -8,7 +8,7 @@ const Audio = (() => {
   let trilhaAtiva   = false;
   let trilhaTimeout = null;
 
-  const VOL_NORMAL   = 0.38;
+  let   VOL_NORMAL   = 0.38;
   const VOL_DUCK     = 0.10;
   const DUCK_SPEED   = 0.25;
   const UNDUCK_SPEED = 1.2;
@@ -311,6 +311,10 @@ function setVolEfeitos(valor) {
   gainSFX.gain.setValueAtTime(valor, c.currentTime);
 }
 
+  function contextoAtivo() {
+    return !!(ctx && ctx.state === 'running');
+  }
+
   return {
     iniciarTrilha,
     pararTrilha,
@@ -319,6 +323,7 @@ function setVolEfeitos(valor) {
     novaJornada,
     setVolMusica,
     setVolEfeitos,
+    contextoAtivo,
   };
 
 })();

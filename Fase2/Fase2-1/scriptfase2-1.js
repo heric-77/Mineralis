@@ -3,7 +3,7 @@ const SAVE_KEY='mineralis_save_v2';
 function saveRead(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))||{};}catch{return{};}}
 function saveWrite(d){try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch{}}
 function unlockPhase(id){const s=saveRead();if(!s.fases)s.fases={};if(!s.fases[id])s.fases[id]={};s.fases[id].desbloqueada=true;saveWrite(s);}
-function journalCollect(id){const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
+function journalCollect(id){if(window.JournalStore){window.JournalStore.collect(id);return;}const s=saveRead();if(!s.coletados)s.coletados={};if(!s.coletados[id]){s.coletados[id]=true;saveWrite(s);}}
 
 // ─── CANVAS ──────────────────────────────────────────────────────────────────
 const W=1280,H=720;
@@ -63,6 +63,8 @@ window.addEventListener('keydown',e=>{if(!keys[e.code])jp[e.code]=true;keys[e.co
   if(e.code==='KeyM'){window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup',e=>delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){const el=document.getElementById(id);if(!el)return;
   el.addEventListener('touchstart',ev=>{ev.preventDefault();TOUCH[k]=true;if(k==='j'||k==='e')jp['_t'+k]=true;},{passive:false});
@@ -190,8 +192,12 @@ const INV={
       ctx.textAlign='center';ctx.fillText('Nenhum item coletado ainda.',W/2,CY+CH/2);
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,selected=(i===this.cursor),equipped=player.activeTools.has(item.id);
         if(selected){ctx.fillStyle='rgba(200,160,40,0.18)';roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         ctx.font='24px serif';ctx.fillText(item.icon,PX+28,iy+22);
         ctx.font=(equipped?'bold ':'')+'14px "Courier New"';
@@ -200,6 +206,8 @@ const INV={
         if(equipped){ctx.fillStyle='rgba(200,160,40,0.22)';roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle='#e0b840';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
         else if(item.consumivel){ctx.font='10px "Courier New"';ctx.fillStyle='#5a8a50';ctx.fillText('CONSUMÍVEL',PX+62,iy+32);}
       });
+      if(scrollTop>0){ctx.fillStyle='#e0b840';ctx.font='bold 13px "Courier New"';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+10);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.fillStyle='#e0b840';ctx.font='bold 13px "Courier New"';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(200,160,40,0.08)';roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
@@ -873,7 +881,7 @@ class Player{
         this.score+=15;sfx('ouro');
         burst(c.x+17,c.y+17,'#e0d8b0',8,2.5);
         if(!this.items.includes('quartzo_ok')){
-          this.items.push('quartzo_ok');journalCollect('quartzo_aureo');
+          this.items.push('quartzo_ok','quartzo_aureo');journalCollect('quartzo_aureo');
           showPopup('◈ QUARTZO AURÍFERO',['Veios da "Mother Lode" — 200 km de quartzo','Formados por atividade magmática há 120 mi a','A erosão fluvial libera pepitas do quartzo','Base geológica da Corrida do Ouro de 1849'],'#d8d0a0');
         }
         notify('◈ Quartzo aurífero coletado!');
@@ -1470,6 +1478,7 @@ function buildL4(){
       if(!player.items.includes('placa_reivindicacao')){notify('Volte e encontre a Placa de Reivindicação!');return;}
       const ouros=player.items.filter(i=>i==='ouro_pepita').length;
       if(ouros<3){notify(`Volte e colete mais ouro! (${ouros}/3)`);return;}
+      if(!player.items.includes('quartzo_ok')){notify('Volte aos veios e colete o Quartzo Aurífero!');return;}
       if(level._finFired)return;level._finFired=true;level.triggers[0].done=true;
       celebState.active=true;celebState.t=0;
       sfx('unlock');
@@ -1507,7 +1516,7 @@ function buildL4(){
       if(this.celebState.active)this.celebState.t+=0.06;
       const fim=this.triggers[0];
       if(!fim.done&&!G.dialog){
-        const ouros=player.items.filter(i=>i==='ouro_pepita')        const ouros=player.items.filter(i=>i==='ouro_pepita').length;
+        const ouros=player.items.filter(i=>i==='ouro_pepita').length;
         if(ouros>=3&&player.items.includes('placa_reivindicacao'))fim.fn(player,this);
       }
     },
@@ -1530,7 +1539,13 @@ const G={
     this.level=LEVELS[idx]();cam.x=0;cam.y=0;
     this.player=new Player(this.level.startX,this.level.startY);
     if(idx>0){this.player.items=[...this._storedItems];this.player.score=this._storedScore;this.player.activeTool=this._storedTool||null;}
-    else{this._storedItems=[];this._storedScore=0;this._storedTool=null;}
+    else{
+      this._storedItems=[];this._storedScore=0;this._storedTool=null;
+      // Picareta e Bateia já foram coletadas na Fase 1 — mesmas ferramentas, sem necessidade de achar de novo
+      this.player.items.push('bateia','picareta');
+      this.player.activeTools.add('bateia');
+      journalCollect('bateia');journalCollect('picareta_basica');
+    }
     this.dialog=false;this.state='playing';this.timeOnLevel=0;
     BUBBLE.active=false;popup.active=false;
     for(const k in jp)delete jp[k];

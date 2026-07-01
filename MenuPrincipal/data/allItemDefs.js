@@ -21,11 +21,6 @@ window.ALL_ITEM_DEFS = {
     journalId:'estanho',
     desc:'Liga-se ao cobre formando bronze desde 3.000 a.C.\nBolívia possui a 2ª maior reserva mundial.',
   },
-  ceramica_inca: {
-    cat:'artefato', nome:'Cerâmica Inca', icon:'🏺', fase:'1.1',
-    journalId:'ceramica_inca',
-    desc:'Vasilha cerimonial andina encontrada em Potosí.\nRelíquia da nobreza Inca.',
-  },
   mapa_potosi: {
     cat:'artefato', nome:'Tupu de Prata', icon:'✦', fase:'1.1',
     journalId:'mapa_potosi',
@@ -61,7 +56,7 @@ window.ALL_ITEM_DEFS = {
     desc:'Ilumina a mina e revela símbolos ocultos.\nNecessária para abrir portões de pedra.',
   },
   pedra_constelacao: {
-    cat:'ferramenta', nome:'Pedra da Constelação', icon:'💎', fase:'1.3',
+    cat:'artefato', nome:'Pedra da Constelação', icon:'💎', fase:'1.3',
     journalId:'pedra_constelacao',
     desc:'Peça da constelação do Condor.\nColete 3 para alinhar o painel astronômico.',
   },
@@ -326,6 +321,11 @@ window.ALL_ITEM_DEFS = {
     journalId:'bastao_sombra',
     desc:'Bastão fincado no solo para ler a sombra.\nFunciona como relógio solar e bússola no hemisfério sul.',
   },
+  ouro_aluvial_zimbabue: {
+    cat:'minerio', nome:'Ouro Aluvial (Zimbábue)', icon:'🟡', fase:'4.2',
+    journalId:'ouro_aluvial_zimbabue',
+    desc:'Pepitas e pó de ouro concentradas nos rios do planalto.\nVieram de veios de quartzo antigos, arredondadas pela água.',
+  },
   quartzo_aurifero: {
     cat:'minerio', nome:'Quartzo Aurífero', icon:'◇', fase:'4.2',
     journalId:'quartzo_aurifero',
@@ -459,20 +459,15 @@ window.ALL_ITEM_DEFS = {
     journalId:'agulha_aco',
     desc:'Magnetizada por fricção com magnetita → bússola primitiva.\nShen Kuo descreveu este processo em 1088 no Mengxi Bitan.',
   },
-  magnetita_octaedro: {
-    cat:'minerio', nome:'Magnetita Octaédrica', icon:'🖤', fase:'5.3',
-    journalId:'magnetita_octaedro',
-    desc:'Forma cristalina natural do Fe₃O₄ em octaedros perfeitos.\nCristais com faces triangulares simétricas — geometria pura.',
+  magnetita: {
+    cat:'minerio', nome:'Magnetita (Fe₃O₄)', icon:'⬛', fase:'5.3',
+    journalId:'magnetita',
+    desc:'Óxido de ferro magnético — o mineral mais magnético da natureza.\nEstrutura espinélio alinha domínios magnéticos.\nOs chineses Song a chamavam de cí shí (慈石) — "pedra que ama o ferro".',
   },
-  magnetita_macica: {
-    cat:'minerio', nome:'Magnetita Maciça', icon:'⬛', fase:'5.3',
-    journalId:'magnetita_macica',
-    desc:'Massa granular densa de magnetita.\nNão tem faces cristalinas visíveis, mas fortemente magnética.',
-  },
-  magnetita_veio: {
-    cat:'minerio', nome:'Magnetita em Veio', icon:'🖤', fase:'5.3',
-    journalId:'magnetita_veio',
-    desc:'Magnetita intercalada em gnaisse — veio escuro em rocha cinza.\nA diferença de cor facilita a identificação na mina.',
+  bussola: {
+    cat:'ferramenta', nome:'Bússola (Agulha + Bacia)', icon:'🧭', fase:'5.3',
+    journalId:'bussola',
+    desc:'A primeira bússola da história.\nAgulha magnetizada flutuando em água — aponta para o norte magnético, sempre.\nGuiou Vasco da Gama, Colombo e Magalhães.',
   },
   mengxi_bitan: {
     cat:'artefato', nome:'Mengxi Bitan (Dream Pool Essays)', icon:'📜', fase:'5.3',
@@ -570,20 +565,10 @@ window.ALL_ITEM_DEFS = {
     journalId:'mascara_kelp',
     desc:'Bexiga de alga seca usada como visor subaquático primitivo.\nPermite enxergar no leito do rio para encontrar seixos de pounamu.',
   },
-  pounamu_kawakawa: {
-    cat:'minerio', nome:'Pounamu Kawakawa', icon:'💚', fase:'6.3',
-    journalId:'pounamu_kawakawa',
-    desc:'Nefrita verde-escura — a mais comum e mais usada pelos Māori.\nNome vem da planta kawakawa, de folhas do mesmo tom.',
-  },
-  pounamu_kahurangi: {
-    cat:'minerio', nome:'Pounamu Kahurangi', icon:'💎', fase:'6.3',
-    journalId:'pounamu_kahurangi',
-    desc:'Verde pálido translúcido — "céu azul" em Māori.\nA translucidez indica alta pureza da nefrita.',
-  },
-  pounamu_inanga: {
-    cat:'minerio', nome:'Pounamu Inanga', icon:'🤍', fase:'6.3',
-    journalId:'pounamu_inanga',
-    desc:'Verde-claro quase branco — o mais raro de todos.\nNome do peixe de água doce neozelandês de cor prateada.',
+  pounamu: {
+    cat:'minerio', nome:'Pounamu (Nefrita)', icon:'🟢', fase:'6.3',
+    journalId:'pounamu',
+    desc:'Jade verde Māori — Ca₂(Mg,Fe)₅Si₈O₂₂(OH)₂.\nMais tenaz que diamante. Variedades:\n• kawakawa — verde-escuro (folha)\n• kahurangi — verde pálido translúcido\n• inanga — verde-claro quase branco (a mais rara)',
   },
   hei_tiki: {
     cat:'artefato', nome:'Hei-Tiki de Pounamu', icon:'🗿', fase:'6.3',

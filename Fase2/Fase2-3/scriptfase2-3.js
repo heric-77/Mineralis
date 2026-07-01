@@ -127,6 +127,8 @@ window.addEventListener('keydown', e => {
   window.location.href='../../MenuPrincipal/index.html';}
 });
 window.addEventListener('keyup', e => delete keys[e.code]);
+window.addEventListener('blur',()=>{for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in keys)delete keys[k];for(const k in jp)delete jp[k];TOUCH.l=TOUCH.r=TOUCH.j=TOUCH.e=false;}});
 
 const TOUCH={l:false,r:false,j:false,e:false};
 function bindT(id,k){ const el=document.getElementById(id); if(!el)return;
@@ -273,7 +275,7 @@ const ITEM_DEFS = {
   bateia:           { cat:'ferramenta', nome:'Bateia',                 icon:'🥌', fase:'1.2',
     desc:'Separa ouro pesado do sedimento leve.\nUsada há 2.000 anos na Amazônia.' },
   lanterna_arqueologa: { cat:'ferramenta', nome:'Lanterna',           icon:'🔦', fase:'1.1',
-    journalId:'lanterna',
+    journalId:'lanterna_arqueologa',
     desc:'Ilumina cavernas e revela cristais ocultos.\nNecessária para o efeito de luz nas minas.' },
   // ── Fases 2.1, 2.2 (herdados de viagens anteriores) ──
   picareta_mineira: { cat:'ferramenta', nome:'Picareta Industrial',   icon:'⛏', fase:'2.2',
@@ -297,10 +299,8 @@ const ITEM_DEFS = {
     desc:'Cobre puro em estado natural — sem fundição.\nCor alaranjada, maleável, densidade 8,9 g/cm³.\nTerceiro melhor condutor elétrico do planeta.',
     multiple:true },
   // ── Artefatos ──
-  ceramica_inca:    { cat:'artefato',  nome:'Cerâmica Inca',           icon:'🏺', fase:'1.1',
-    desc:'Vasilha ritual do Império Inca.\nPadrões geométricos representando o cosmos.' },
   tumi_dourado:     { cat:'artefato',  nome:'Tumi — Faca Cerimonial',  icon:'🗡', fase:'1.3',
-    journalId:'relevo_inca',
+    journalId:'tumi_dourado',
     desc:'Faca ritual Inca de ouro, prata e turquesa.\nUsada em oferendas ao deus sol — Inti.' },
   gorget_cobre:     { cat:'artefato',  nome:'Gorget de Cobre',         icon:'🌐', fase:'2.3',
     desc:'Ornamento peitoral Anishinaabe polido e fino.\nComercializado da Flórida ao México por redes\nnativas que existiam 7.000 anos antes dos europeus.' },
@@ -312,6 +312,7 @@ const TIPO_TO_JOURNAL = {
 };
 function _journalColetar(tipo){
   const id=TIPO_TO_JOURNAL[tipo]||tipo; if(!id) return;
+  if(window.JournalStore){window.JournalStore.collect(id);return;}
   try{
     const raw=localStorage.getItem('mineralis_save_v2');
     const save=raw?JSON.parse(raw):{};
@@ -409,8 +410,12 @@ const INV = {
       ctx.fillText('Explore a fase para desbloquear!',W/2,CY+CH/2+24);
       ctx.textAlign='left';
     } else {
-      items.forEach((item,i)=>{
-        const iy=CY+16+i*52,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
+      const ROW_H=52,maxRows=Math.max(1,Math.floor(CH/ROW_H));
+      const scrollTop=items.length>maxRows?Math.max(0,Math.min(this.cursor-maxRows+1,items.length-maxRows)):0;
+      const visible=items.slice(scrollTop,scrollTop+maxRows);
+      visible.forEach((item,vi)=>{
+        const i=scrollTop+vi;
+        const iy=CY+16+vi*ROW_H,selected=(i===this.cursor),equipped=(player.activeTool===item.id);
         if(selected){ctx.fillStyle='rgba(200,100,40,0.18)';_roundRect(PX+16,iy-10,COL_W,46,8);ctx.fill();ctx.strokeStyle='#e08830';ctx.lineWidth=1.5;_roundRect(PX+16,iy-10,COL_W,46,8);ctx.stroke();}
         const cnt=item.count>1?' ×'+item.count:'';
         ctx.font='20px serif';ctx.fillText(item.icon,PX+28,iy+20);
@@ -419,6 +424,8 @@ const INV = {
         ctx.fillText(item.nome+cnt,PX+62,iy+14);
         if(equipped){ctx.fillStyle='rgba(200,100,40,0.22)';_roundRect(PX+62,iy+20,80,16,4);ctx.fill();ctx.font='10px "Courier New"';ctx.fillStyle='#e08830';ctx.fillText('▶ EQUIPADO',PX+66,iy+32);}
       });
+      if(scrollTop>0){ctx.fillStyle='#e08830';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▲ mais',PX+16+COL_W/2,CY+6);ctx.textAlign='left';}
+      if(scrollTop+maxRows<items.length){ctx.fillStyle='#e08830';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText('▼ mais',PX+16+COL_W/2,CY+16+maxRows*ROW_H+2);ctx.textAlign='left';}
       const sel=items[this.cursor];
       if(sel){
         ctx.fillStyle='rgba(200,100,40,0.08)';_roundRect(DESC_X,CY,PW-DESC_X+PX-16,CH-10,8);ctx.fill();
@@ -940,7 +947,7 @@ class Player{
     const wf=this.state==='run'?this.walkT:(this.state==='idle'?Date.now()/800:0);
     const _tool=this.activeTool||null;
     ctx.save();drawCorvan(dx,dy,S,flip,wf,_tool);ctx.restore();
-    if(this.inv>0&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
+    if(this.inv>0&&this.inv<=100&&Math.floor(this.inv/6)%2===0){ctx.fillStyle='rgba(255,60,60,0.35)';ctx.fillRect(this.x-cam.x,this.y-cam.y,this.w,this.h);}
   }
 }
 
@@ -1354,6 +1361,9 @@ function buildL4(){
   let faseCompleted=false;
   const _fireComplete=(player)=>{
     if(G.transitioning||faseCompleted) return;
+    const cobreN0=player.items.filter(i=>i==='cobre').length;
+    if(cobreN0<3){notify(`Volte e colete mais Cobre Nativo! (${cobreN0}/3)`);return;}
+    if(!player.items.includes('gorget')){notify('Volte e encontre o Gorget de Cobre!');return;}
     faseCompleted=true; G.transitioning=true;
     player.interactAnim=120; sfx('unlock');
     const cobreN=player.items.filter(i=>i==='cobre').length;
@@ -1690,4 +1700,17 @@ function loop(){
     _prevState=G.state;
   }
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
-  if(G.state==='dead'     && jp['
+  if(G.state==='dead'     && jp['KeyR']) G.load(G.lvIdx);
+  if(G.state==='complete' && jp['Enter']) _voltarAoMenu();
+  G.update();G.draw();clearJP();
+}
+
+if(!gameReady){(function loadLoop(){
+  if(gameReady)return;requestAnimationFrame(loadLoop);
+  ctx.fillStyle='#0a0608';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#e0b840';ctx.font='bold 24px "Courier New"';ctx.textAlign='center';
+  ctx.fillText('Carregando...  '+assetsLoaded+'/'+totalAssets,W/2,H/2);
+  ctx.fillStyle='#888';ctx.font='14px "Courier New"';
+  ctx.fillText('Fase 2.3 - O Cobre do Lago Superior',W/2,H/2+36);
+  ctx.textAlign='left';
+})();}

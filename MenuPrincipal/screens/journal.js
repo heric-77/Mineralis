@@ -10,7 +10,6 @@ const Journal = (() => {
       { id:'lanterna',              nome:'Lanterna',                fase:'1.1', desc:'Ilumina túneis e cavernas, revelando veios metálicos nas sombras. Essencial nas minas de Potosí.' },
       { id:'pa_exploradora',        nome:'Pá Exploradora',          fase:'1.2', desc:'Ideal para escavar solo aluvial amazônico e encontrar fragmentos de cerâmica enterrados.' },
       { id:'bateia',                nome:'Bateia',                  fase:'1.2', desc:'Usada para garimpar ouro em rios. Separa o minério pesado do sedimento leve.' },
-      { id:'pedra_constelacao',     nome:'Pedra da Constelação',    fase:'1.3', desc:'Peça da constelação do Condor usada para alinhar o painel astronômico Inca em Machu Picchu.' },
       // ── América do Norte (Fases 2.x) ──
       { id:'pedra_de_toque',        nome:'Pedra de Toque',          fase:'2.1', desc:'Pedra usada para testar ouro: traço dourado = ouro puro; traço esverdeado = pirita.' },
       { id:'picareta_industrial',   nome:'Picareta Industrial',     fase:'2.2', desc:'Mais pesada e robusta. Penetra camadas de xisto e carvão compactado nos Apalaches.' },
@@ -65,6 +64,7 @@ const Journal = (() => {
       { id:'diamante_pequeno', nome:'Diamante Bruto (P)',   fase:'4.1', desc:'Diamante bruto pequeno extraído do kimberlito. Formado há 3 bilhões de anos nas profundezas da Terra.' },
       { id:'diamante_medio',   nome:'Diamante Bruto (M)',   fase:'4.1', desc:'Diamante bruto médio. O mineral natural mais duro do planeta, classificado 10 na escala Mohs.' },
       { id:'diamante_grande',  nome:'Diamante Bruto (G)',   fase:'4.1', desc:'Diamante bruto raro e valioso. Uma descoberta excepcional nas minas de kimberlito do Botswana.' },
+      { id:'ouro_aluvial_zimbabue', nome:'Ouro Aluvial (Zimbábue)', fase:'4.2', desc:'Pepitas e pó de ouro concentradas nos rios do planalto do Grande Zimbábue.' },
       { id:'quartzo_aurifero', nome:'Quartzo Aurífero',     fase:'4.2', desc:'Quartzo branco com inclusões douradas. Diferente da mica: mais pesado e não se parte em lâminas.' },
       { id:'mica_dourada',     nome:'Mica Dourada',         fase:'4.2', desc:'Biotita ou muscovita em flocos brilhantes. O "ouro de tolo" africano — confunde garimpeiros.' },
       { id:'halita',           nome:'Halita Saariana (Sal)',fase:'4.3', desc:'Sal-gema de Taoudenni — 700 km no Saara. Em Timbuktu (séc. XIV) valia o mesmo que ouro.' },
@@ -75,10 +75,10 @@ const Journal = (() => {
     ],
     artefatos: [
       // ── América do Sul (Fases 1.x) ──
-      { id:'ceramica_inca',    nome:'Cerâmica Inca',           fase:'1.1', desc:'Vasilha cerimonial com padrões geométricos. Usada em rituais do Império Inca em Potosí.' },
       { id:'tupu_prata',       nome:'Tupu de Prata',           fase:'1.1', desc:'Fivela ornamental da nobreza Inca em prata pura. Para os Incas, a prata era arte — não moeda.' },
       { id:'vaso_amazônico',   nome:'Urna Marajoara',          fase:'1.2', desc:'Cerâmica funerária da Ilha de Marajó (400–1300 d.C.). Evidência de civilizações amazônicas avançadas.' },
       { id:'relevo_inca',      nome:'Tumi — Faca Cerimonial',  fase:'1.3', desc:'Faca ritual Inca de ouro, prata e turquesa. Usada em oferendas ao deus sol — Inti.' },
+      { id:'pedra_constelacao',nome:'Pedra da Constelação',    fase:'1.3', desc:'Peça da constelação do Condor usada para alinhar o painel astronômico Inca em Machu Picchu.' },
       // ── América do Norte (Fases 2.x) ──
       { id:'placa_reivindicacao',nome:'Placa de Reivindicação',fase:'2.1', desc:'Plaqueta de madeira com coordenadas do "claim" do garimpeiro. Base do sistema legal da Corrida do Ouro.' },
       { id:'cracha_breaker_boy', nome:'Crachá de Breaker Boy', fase:'2.2', desc:'Chapa metálica amassada com número de um trabalhador infantil nas minas de carvão dos Apalaches.' },
@@ -134,6 +134,7 @@ const Journal = (() => {
     prata:               `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="8" y="6" width="8" height="12" fill="#aaa"/><rect x="7" y="8" width="10" height="8" fill="#ccc"/><rect x="9" y="7" width="6" height="10" fill="#bbb"/><rect x="10" y="6" width="4" height="2" fill="#ddd"/><rect x="9" y="9" width="2" height="2" fill="#eee"/></svg>`,
     estanho:             `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="7" y="7" width="10" height="10" fill="#8a9aaa"/><rect x="8" y="8" width="8" height="8" fill="#aabbc0"/><rect x="9" y="9" width="3" height="3" fill="#c0ccd0"/><rect x="6" y="9" width="2" height="6" fill="#7a8a9a"/><rect x="16" y="9" width="2" height="6" fill="#7a8a9a"/></svg>`,
     ouro_aluvial:        `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="9" y="8" width="6" height="6" fill="#ffd700"/><rect x="8" y="9" width="8" height="6" fill="#ffcc00"/><rect x="10" y="7" width="4" height="2" fill="#ffe060"/><rect x="7" y="10" width="2" height="4" fill="#cc9900"/><rect x="15" y="10" width="2" height="4" fill="#cc9900"/></svg>`,
+    ouro_aluvial_zimbabue:`<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="9" y="8" width="6" height="6" fill="#ffcc33"/><rect x="8" y="9" width="8" height="6" fill="#e0a800"/><rect x="10" y="7" width="4" height="2" fill="#ffe060"/><rect x="7" y="10" width="2" height="4" fill="#a87700"/><rect x="15" y="10" width="2" height="4" fill="#a87700"/></svg>`,
     tumi_dourado:        `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="9" y="6" width="8" height="6" fill="#ffd700"/><rect x="10" y="7" width="6" height="4" fill="#ffe060"/><rect x="8" y="8" width="2" height="4" fill="#cc9900"/><rect x="12" y="4" width="2" height="4" fill="#ffaa00"/><rect x="10" y="12" width="4" height="8" fill="#cc8800"/></svg>`,
     ouro_pepita:         `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="8" y="8" width="8" height="8" fill="#ffd700"/><rect x="9" y="7" width="6" height="10" fill="#ffcc00"/><rect x="7" y="10" width="10" height="4" fill="#ffe060"/><rect x="9" y="9" width="3" height="3" fill="#fff176"/></svg>`,
     quartzo_aureo:       `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="10" y="4" width="4" height="4" fill="#e8f0ff"/><rect x="8" y="8" width="8" height="8" fill="#d0d8ee"/><rect x="9" y="16" width="6" height="4" fill="#b8c0da"/><rect x="11" y="5" width="2" height="2" fill="#fff"/><rect x="12" y="10" width="3" height="2" fill="#ffd700" opacity="0.7"/></svg>`,
@@ -156,7 +157,6 @@ const Journal = (() => {
     petroleo:            `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="9" y="8" width="6" height="8" fill="#0a0a0a"/><rect x="10" y="9" width="4" height="6" fill="#1a1a1a"/><rect x="11" y="6" width="2" height="4" fill="#555"/><rect x="10" y="5" width="4" height="2" fill="#444"/></svg>`,
     opal:                `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="8" y="7" width="8" height="10" fill="#aa88cc"/><rect x="9" y="8" width="6" height="8" fill="#bb99dd"/><rect x="10" y="9" width="4" height="6" fill="#ccaaee"/><rect x="11" y="7" width="2" height="2" fill="#ffaaff"/><rect x="9" y="11" width="2" height="2" fill="#aaffaa" opacity="0.7"/></svg>`,
     // ── ARTEFATOS ────────────────────────────────────────────────────
-    ceramica_inca:       `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="8" y="6" width="8" height="2" fill="#8b4513"/><rect x="7" y="8" width="10" height="10" fill="#a0522d"/><rect x="8" y="9" width="8" height="8" fill="#8b4513"/><rect x="9" y="18" width="6" height="2" fill="#6b3510"/><rect x="9" y="10" width="2" height="2" fill="#5c2808"/><rect x="13" y="13" width="2" height="2" fill="#5c2808"/></svg>`,
     tupu_prata:          `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="10" y="3" width="4" height="4" fill="#c0c0d8"/><rect x="9" y="7" width="6" height="2" fill="#aaa"/><rect x="7" y="9" width="10" height="2" fill="#c0c0d8"/><rect x="9" y="11" width="6" height="2" fill="#aaa"/><rect x="10" y="13" width="4" height="6" fill="#c0c0d8"/><rect x="11" y="5" width="2" height="2" fill="#e0e0f0"/></svg>`,
     vaso_amazônico:      `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="9" y="5" width="6" height="2" fill="#8b4513"/><rect x="7" y="7" width="10" height="2" fill="#a0522d"/><rect x="6" y="9" width="12" height="8" fill="#8b4513"/><rect x="7" y="17" width="10" height="2" fill="#6b3510"/><rect x="8" y="10" width="2" height="2" fill="#5c2808"/><rect x="12" y="12" width="2" height="2" fill="#5c2808"/></svg>`,
     relevo_inca:         `<svg viewBox="0 0 24 24" shape-rendering="crispEdges"><rect x="5" y="6" width="14" height="12" fill="#c8a050"/><rect x="6" y="7" width="12" height="10" fill="#d8b060"/><rect x="9" y="9" width="6" height="3" fill="#a08030"/><rect x="8" y="13" width="8" height="2" fill="#a08030"/><rect x="10" y="8" width="2" height="2" fill="#6b3d1e"/></svg>`,
@@ -174,13 +174,23 @@ const Journal = (() => {
   };
 
 
+  // Alguns ids históricos deste catálogo não correspondem ao journalId
+  // canônico gravado pelas fases (ver MenuPrincipal/data/allItemDefs.js).
+  const _ID_ALIAS = { lanterna:'lanterna_arqueologa', relevo_inca:'tumi_dourado' };
+
+  function _isColetado(item, coletados) {
+    const jid = _ID_ALIAS[item.id] || item.id;
+    if (window.JournalStore) return window.JournalStore.isCollected(jid);
+    return !!coletados[jid] || !!coletados[item.id];
+  }
+
   function _renderAba(tipo) {
     const itens    = ITENS[tipo] || [];
     const save     = _getSave();
     const coletados = save?.coletados || {};
 
     return itens.map(item => {
-      const coletado = !!coletados[item.id];
+      const coletado = _isColetado(item, coletados);
       const icone    = ICONES[item.id] || '';
       return `
         <div class="journal-item ${coletado ? 'coletado' : 'bloqueado'}" data-id="${item.id}" title="${item.nome}">
@@ -202,7 +212,7 @@ const Journal = (() => {
     const save     = _getSave();
     const coletados = save?.coletados || {};
     const total    = ITENS[tipo].length;
-    const found    = ITENS[tipo].filter(i => coletados[i.id]).length;
+    const found    = ITENS[tipo].filter(i => _isColetado(i, coletados)).length;
     return `${found}/${total}`;
   }
 
