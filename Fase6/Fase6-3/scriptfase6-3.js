@@ -93,16 +93,16 @@ function _voltarAoMenu(){ _salvarFase(G.player?.score||0,G.deaths); window.locat
 // ── Assets ───────────────────────────────────────────────────────
 const IMG={};
 const ASSETS=[
-  ['bg01','Assets/Fase 6.3 - Cena 01.svg'],
-  ['bg02','Assets/Fase 6.3 - Cena 02.svg'],
-  ['bg03','Assets/Fase 6.3 - Cena 03.svg'],
-  ['bg04','Assets/Fase 6.3 - Cena 04.svg'],
-  ['kiwi_img',    'Assets/kiwi.svg'],
-  ['mascara_img', 'Assets/mascara_kelp.svg'],
-  ['toki_img',    'Assets/toki_pounamu.svg'],
-  ['corda_img',   'Assets/corda_harakeke.svg'],
-  ['heitiki_img', 'Assets/hei_tiki.svg'],
-  ['card63',      'Assets/pounamu.svg'],
+  ['bg01','Assets/cena1_rio_arahura.svg'],
+  ['bg02','Assets/cena2_leito_geologico.svg'],
+  ['bg03','Assets/cena3_visao_subaquatica.svg'],
+  ['bg04','Assets/cena4_clareira_mapa.svg'],
+  ['kiwi_img',    'Assets/6_3_kiwi.svg'],
+  ['mascara_img', 'Assets/6_3_mascara_kelp.svg'],
+  ['toki_img',    'Assets/6_3_toki_pounamu.svg'],
+  ['corda_img',   'Assets/6_3_corda_harakeke.svg'],
+  ['heitiki_img', 'Assets/6_3_hei_tiki.svg'],
+  ['card63',      'Assets/6_3_pounamu.svg'],
 ];
 let assetsLoaded=0, totalAssets=ASSETS.length, gameReady=false;
 ASSETS.forEach(([key,src])=>{

@@ -79,16 +79,16 @@ function _voltarAoMenu(){ _salvarFase(G.player?.score||0,G.deaths); window.locat
 // ── Assets ───────────────────────────────────────────────────────
 const IMG={};
 const ASSETS=[
-  ['bg01','Assets/Fase 5.3 - Cena 01.svg'],
-  ['bg02','Assets/Fase 5.3 - Cena 02.svg'],
-  ['bg03','Assets/Fase 5.3 - Cena 03.svg'],
-  ['bg04','Assets/Fase 5.3 - Cena 04.svg'],
-  ['grua_img',     'Assets/grua_coroa_vermelha.svg'],
-  ['agulha_img',   'Assets/agulha_aco.svg'],
-  ['picareta_img', 'Assets/picareta_aco_song.svg'],
-  ['bacia_img',    'Assets/bacia_laqueada.svg'],
-  ['mengxi_img',   'Assets/mengxi_bitan.svg'],
-  ['card53',       'Assets/magnetita.svg'],
+  ['bg01','Assets/cena1_fundicao_song.svg'],
+  ['bg02','Assets/cena2_minas_magnetita.svg'],
+  ['bg03','Assets/cena3_rio_gan.svg'],
+  ['bg04','Assets/cena4_laboratorio_shen_kuo.svg'],
+  ['grua_img',     'Assets/5_3_grua_coroa_vermelha.svg'],
+  ['agulha_img',   'Assets/5_3_agulha_aco.svg'],
+  ['picareta_img', 'Assets/5_3_picareta_aco_song.svg'],
+  ['bacia_img',    'Assets/5_3_bacia_laqueada.svg'],
+  ['mengxi_img',   'Assets/5_3_mengxi_bitan.svg'],
+  ['card53',       'Assets/5_3_magnetita.svg'],
 ];
 
 let assetsLoaded=0, totalAssets=ASSETS.length, gameReady=false;
