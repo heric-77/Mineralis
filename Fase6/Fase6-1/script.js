@@ -111,7 +111,7 @@ const ITEM_DEFS={
     desc:'Sistema de corda e roldana de madeira para descer nos shafts.\nOs shafts de Lightning Ridge têm 10–20m de profundidade.\nEscavados manualmente pelos garimpeiros artesanais.',
   },
   bastao_escuta:{
-    cat:'ferramenta',nome:'Bastão de Escuta Aborígene',icon:'🪵',
+    cat:'ferramenta',nome:'Bastão de Escuta Aborígene',icon:'🔍',
     journalId:'bastao_escuta',drawHand:'right',
     desc:'Bastão de madeira de mulga para diagnóstico de cavidades.\nPresionado ao solo, transmite ressonância do que há embaixo.\nArgila densa: som abafado. Bolsão de opala: som oco e ressonante.',
   },
@@ -598,7 +598,7 @@ class OpalField{
     if(this.state==='intact'){
       ctx.fillText('[E] Usar Bastão de Escuta',sx+this.w/2,sy-32);
       ctx.font='10px "Courier New"';ctx.fillStyle=`rgba(200,180,140,${ha*0.7})`;
-      ctx.fillText('🪵 Bastão necessário',sx+this.w/2,sy-18);
+      ctx.fillText('🔍 Bastão necessário',sx+this.w/2,sy-18);
     } else if(this.state==='probed'){
       ctx.fillText('[E] Escavar com Picareta',sx+this.w/2,sy-32);
       ctx.font='10px "Courier New"';ctx.fillStyle=`rgba(200,180,140,${ha*0.7})`;
@@ -966,7 +966,7 @@ class Player{
           '"O wombat conhece os vazios subterrâneos do outback como nenhum outro ser vivo. Ele me deixou o Bastão de Escuta — madeira de mulga pressionada ao solo. Coloco o ouvido na extremidade superior."',
           '"A diferença é clara: argila densa produz um zumbido abafado. Um bolsão oco onde a opala se forma — ressoa como um bong. É a sabedoria de 50.000 anos ouvindo a terra."',
         ],()=>{notify('✦ Bastão de Escuta obtido! Use [E] nos campos de argila →');},'CORVAN','#d0c890');
-        showPopup('🪵 BASTÃO DE ESCUTA ABORÍGENE',['Diagnóstico de cavidade por ressonância sonora','Solo maciço: zumbido abafado (mmmh)','Bolsão de opala: bong oco e ressonante','Sabedoria Yuwaalaraay de 50.000 anos'],'#c0a060');
+        showPopup('🔍 BASTÃO DE ESCUTA ABORÍGENE',['Diagnóstico de cavidade por ressonância sonora','Solo maciço: zumbido abafado (mmmh)','Bolsão de opala: bong oco e ressonante','Sabedoria Yuwaalaraay de 50.000 anos'],'#c0a060');
       }
 
       if(level.opalFields&&this.items.includes('bastao_escuta')){
@@ -1152,7 +1152,7 @@ function drawHUD(player,level){
   const TOOL_DEFS=[
     {id:'picareta_ponta_fina',icon:'⛏️',nome:'Picareta'},
     {id:'roldana_poco',icon:'🪤',nome:'Roldana'},
-    {id:'bastao_escuta',icon:'🪵',nome:'Bastão'},
+    {id:'bastao_escuta',icon:'🔍',nome:'Bastão'},
   ];
   const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
   const PX=12,PY=46,PW=178,PH_BASE=52;

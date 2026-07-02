@@ -167,10 +167,10 @@ const GRAV=0.46, PSPD=4.6, JUMPF=-12.4, MAXFALL=16;
 
 // ── Tile themes — tons de basalto/cobre para o Lago Superior ────
 const TILE_THEMES={
-  1:{top:'#3a3a40',body:'#252528',dark:'#18181c'},   // basalto escuro
-  2:{top:'#4a3830',body:'#2a2018',dark:'#1a1408'},   // rocha rochosa com cobre
-  3:{top:'#2a2a30',body:'#1c1c22',dark:'#12121a'},   // basalto profundo
-  4:{top:'#5a4030',body:'#3a2818',dark:'#221408'},   // afloramento alaranjado
+  1:{top:'#6e6e7a',body:'#38383e',dark:'#222226'},   // basalto escuro (contraste elevado contra o céu noturno)
+  2:{top:'#8a6448',body:'#402e20',dark:'#241a10'},   // rocha rochosa com cobre
+  3:{top:'#5c5c6c',body:'#2c2c34',dark:'#1a1a22'},   // basalto profundo
+  4:{top:'#9a6c46',body:'#4a3420',dark:'#2a1a10'},   // afloramento alaranjado
 };
 let tileTheme=TILE_THEMES[1];
 
@@ -227,8 +227,9 @@ function drawPlatform(p){
       ctx.fillStyle='rgba(0,0,0,0.1)'; ctx.fillRect(tx+tw-1,ty,1,th); ctx.fillRect(tx,ty+th-1,tw,1);
     }
   }
-  ctx.fillStyle=tileTheme.top; ctx.fillRect(sx,sy,p.w,4);
-  if(p.moving){ ctx.fillStyle='rgba(180,100,30,0.35)'; ctx.fillRect(sx,sy,p.w,4); }
+  ctx.fillStyle=tileTheme.top; ctx.fillRect(sx,sy,p.w,6);
+  ctx.fillStyle='rgba(255,255,255,0.16)'; ctx.fillRect(sx,sy,p.w,1.5);
+  if(p.moving){ ctx.fillStyle='rgba(180,100,30,0.35)'; ctx.fillRect(sx,sy,p.w,6); }
 }
 
 // ── Rounded rect ─────────────────────────────────────────────────
@@ -738,7 +739,7 @@ class AguiaCareca {
 // ── Collectible (Col) ─────────────────────────────────────────────
 // Tipos: 'cobre' (fragmento alaranjado), 'gorget', 'maco', 'martelo', 'escopro'
 class Col {
-  constructor(x,y,type){this.x=x;this.y=y;this.w=30;this.h=30;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
+  constructor(x,y,type,opts={}){this.x=x;this.y=y;this.w=30;this.h=30;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;this.testable=!!opts.testable;}
   tick(){if(!this.done)this.t+=0.06;}
   draw(){
     if(this.done) return;
@@ -746,6 +747,10 @@ class Col {
     if(sx<-50||sx>W+50) return;
     ctx.save();ctx.translate(sx+15,sy+15);
     if(this.type==='cobre'){
+      // Anel pulsante para destacar do cenário (evita confusão com veios decorativos do fundo)
+      const gpC=0.35+Math.sin(this.t*1.5)*0.2;
+      ctx.fillStyle=`rgba(255,170,90,${gpC})`; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=`rgba(255,200,120,${gpC+0.15})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.stroke();
       // Fragmento de cobre nativo — alaranjado-avermelhado irregular
       ctx.fillStyle='#c86020'; ctx.beginPath(); ctx.arc(0,0,12,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#e08840'; ctx.beginPath(); ctx.arc(-3,-3,7,0,Math.PI*2); ctx.fill();
@@ -803,12 +808,19 @@ class Calcita {
     const sx=this.x-cam.x, sy=this.y-cam.y+Math.sin(this.t)*4;
     if(sx<-40||sx>W+40) return;
     ctx.save();ctx.translate(sx+14,sy+14);
+    // Anel pulsante para destacar do cenário (evita confusão com veios decorativos do fundo)
+    const gpK=0.35+Math.sin(this.t*1.5+1)*0.2;
+    ctx.fillStyle=`rgba(230,220,180,${gpK})`; ctx.beginPath(); ctx.arc(0,0,19,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=`rgba(240,235,210,${gpK+0.15})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(0,0,19,0,Math.PI*2); ctx.stroke();
     // Calcita — aspecto branco-amarelado similar ao cobre mas diferente
     ctx.fillStyle='#e8e0c0'; ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.fill();
     ctx.fillStyle='#d4c8a0'; ctx.beginPath(); ctx.arc(-2,-2,7,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle='#b8a870'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.stroke();
     // brilho diferente do cobre
     ctx.fillStyle='rgba(255,255,220,0.5)'; ctx.beginPath(); ctx.arc(-3,-3,3,0,Math.PI*2); ctx.fill();
+    // Label de incerteza — precisa testar com o martelo
+    ctx.fillStyle='rgba(230,220,180,0.9)'; ctx.font='bold 11px "Courier New"'; ctx.textAlign='center';
+    ctx.fillText('?',0,-20);
     ctx.restore();
   }
 }
@@ -869,31 +881,52 @@ class Player{
     }
     if(this.inv>0) this.inv--;
     if(this.interactAnim>0) this.interactAnim--;
+    const martelEquipado=this.activeTool==='martelo_pedra';
+    const wantHammer=isE()&&martelEquipado;
     for(const c of level.cols){
-      if(!c.done&&this.overlaps(c)){
-        c.done=true;
-        if(c.type==='cobre'){
-          this.score+=10; this.items.push('cobre'); sfx('copper');
-          burst(c.x+15,c.y+15,'#e08040',12);
-          _journalColetar('cobre', this.items.filter(i=>i==='cobre').length);
-          notify('🟠 Cobre Nativo coletado! ('+this.items.filter(i=>i==='cobre').length+'/3)');
-          POPUP.show('Cobre Nativo','🟠','Cor alaranjada, maleável, 8,9 g/cm³.\nTerceiro melhor condutor elétrico.\nNos seres vivos: essencial para hemoglobina.');
-        } else {
-          this.items.push(c.type); sfx('item'); burst(c.x+15,c.y+15,'#e08040',12); _journalColetar(c.type);
-          if(c.type==='gorget') notify('🌐 Gorget de Cobre encontrado!');
-          else if(c.type==='maco')    notify('🪨 Maço de Pedra coletado!');
-          else if(c.type==='martelo') notify('🪓 Martelo de Pedra coletado!');
-          else if(c.type==='escopro') notify('🔧 Escopro de Cobre recebido!');
+      if(c.done) continue;
+      if(c.type==='cobre'&&c.testable){
+        // Teste do Martelinho: precisa EQUIPAR o Martelo no Diário [I] e martelar com [E] para extrair de verdade
+        if(this.overlaps(c)||this.near(c,34)){
+          if(wantHammer){
+            c.done=true; this.score+=10; this.items.push('cobre'); sfx('copper');
+            burst(c.x+15,c.y+15,'#e08040',12);
+            _journalColetar('cobre', this.items.filter(i=>i==='cobre').length);
+            notify('🪓 Martelada! Cobre Nativo testado e coletado. ('+this.items.filter(i=>i==='cobre').length+'/3)');
+            POPUP.show('Cobre Nativo','🟠','Cor alaranjada, maleável, 8,9 g/cm³.\nTerceiro melhor condutor elétrico.\nNos seres vivos: essencial para hemoglobina.');
+          } else if(!this.items.includes('martelo')){
+            notify('Volte à Fase 2.2 e colete o Martelo de Pedra!');
+          } else if(!martelEquipado){
+            notify('🎒 Equipe o Martelo de Pedra no Diário [I] antes de martelar!');
+          } else {
+            notify('🪓 Pressione [E] para martelar e testar!');
+          }
         }
+        continue;
+      }
+      if(!this.overlaps(c)) continue;
+      c.done=true;
+      if(c.type==='cobre'){
+        this.score+=10; this.items.push('cobre'); sfx('copper');
+        burst(c.x+15,c.y+15,'#e08040',12);
+        _journalColetar('cobre', this.items.filter(i=>i==='cobre').length);
+        notify('🟠 Cobre Nativo coletado! ('+this.items.filter(i=>i==='cobre').length+'/3)');
+        POPUP.show('Cobre Nativo','🟠','Cor alaranjada, maleável, 8,9 g/cm³.\nTerceiro melhor condutor elétrico.\nNos seres vivos: essencial para hemoglobina.');
+      } else {
+        this.items.push(c.type); sfx('item'); burst(c.x+15,c.y+15,'#e08040',12); _journalColetar(c.type);
+        if(c.type==='gorget') notify('🌐 Gorget de Cobre encontrado!');
+        else if(c.type==='maco')    notify('🪨 Maço de Pedra coletado!');
+        else if(c.type==='martelo') notify('🪓 Martelo de Pedra coletado!');
+        else if(c.type==='escopro') notify('🔧 Escopro de Cobre recebido!');
       }
     }
-    // Calcitas — Teste do Martelinho
+    // Calcitas — Teste do Martelinho: precisa martelar [E] com o Martelo para revelar que é falsa
     if(level.calcitas){
       for(const cl of level.calcitas){
-        if(!cl.done&&this.overlaps(cl)&&this.items.includes('martelo')){
+        if(!cl.done&&(this.overlaps(cl)||this.near(cl,34))&&wantHammer){
           cl.done=true; sfx('crack');
           burst(cl.x+14,cl.y+14,'#e8e0c0',10,2);
-          notify('💥 Calcita! Estilhaça — não é cobre.');
+          notify('💥 Martelada! Calcita estilhaça — não é cobre.');
         }
       }
     }
@@ -1235,9 +1268,9 @@ function buildL3(){
     new Enemy(1380,FL-44,'lobo',70), new Enemy(1900,FL-44,'urso',100),
     new Enemy(2320,FL-44,'lobo',80),
   ];
-  // Cobre nativo nos afloramentos
+  // Cobre nativo nos afloramentos — precisa martelar [E] com o Martelo para testar/extrair
   const cols=[
-    ...[100,200,420,640,880,1120,1380,1640,1900,2260,2540,2780].map(x=>new Col(x,FL-50,'cobre')),
+    ...[100,200,420,640,880,1120,1380,1640,1900,2260,2540,2780].map(x=>new Col(x,FL-50,'cobre',{testable:true})),
     new Col(3450,FL-450,'gorget'),
   ];
   // Calcitas falsas intercaladas — Teste do Martelinho

@@ -201,7 +201,7 @@ window.ALL_ITEM_DEFS = {
 
   // ── FASE 3.2 — Pântanos Vikings, Escandinávia ────────────────────
   ferrao_sondagem: {
-    cat:'ferramenta', nome:'Ferrão de Sondagem', icon:'🪵', fase:'3.2',
+    cat:'ferramenta', nome:'Ferrão de Sondagem', icon:'🎣', fase:'3.2',
     journalId:'ferrao_sondagem',
     desc:'Vara longa para sondar a lama antes de pisar.\nSom abafado: turfa mole. Som metálico: ferro.',
   },
@@ -371,7 +371,7 @@ window.ALL_ITEM_DEFS = {
 
   // ── FASE 5.1 — Jade de Mianmar (Vale de Hpakant) ─────────────────
   cinzel_bambu: {
-    cat:'ferramenta', nome:'Cinzel de Bambu', icon:'🪵', fase:'5.1',
+    cat:'ferramenta', nome:'Cinzel de Bambu', icon:'🔨', fase:'5.1',
     journalId:'cinzel_bambu',
     desc:'Ferramenta de extração sem metal.\nBambu endurecido permite corte preciso sem lascar o jade.',
   },
@@ -408,7 +408,7 @@ window.ALL_ITEM_DEFS = {
 
   // ── FASE 5.2 — Lápis-Lazúli de Badakhshan (Afeganistão) ──────────
   tora_fogo: {
-    cat:'ferramenta', nome:'Tora de Pinheiro Seco', icon:'🪵', fase:'5.2',
+    cat:'ferramenta', nome:'Tora de Pinheiro Seco', icon:'🌲', fase:'5.2',
     journalId:'tora_fogo',
     desc:'Técnica de fire-setting: aquecimento seguido de choque térmico.\nA mais antiga técnica de mineração da humanidade.',
   },
@@ -487,7 +487,7 @@ window.ALL_ITEM_DEFS = {
     desc:'Sistema de corda para descer nos shafts verticais.\nOs "fossickers" desciam sozinhos em poços estreitos.',
   },
   bastao_escuta: {
-    cat:'ferramenta', nome:'Bastão de Escuta Aborígene', icon:'🪵', fase:'6.1',
+    cat:'ferramenta', nome:'Bastão de Escuta Aborígene', icon:'🔍', fase:'6.1',
     journalId:'bastao_escuta',
     desc:'Diagnóstico de cavidades por ressonância sonora do solo.\nOs Yuwaalaraay conheciam esses depósitos há milênios.',
   },
