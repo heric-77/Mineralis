@@ -29,7 +29,7 @@ window.ALL_ITEM_DEFS = {
 
   // ── FASE 1.2 — Serra Pelada, Brasil ─────────────────────────────
   bateia: {
-    cat:'ferramenta', nome:'Bateia', icon:'🥌', fase:'1.2',
+    cat:'ferramenta', nome:'Bateia do Garimpo de Serra Pelada', icon:'🥌', fase:'1.2',
     journalId:'bateia',
     desc:'Separa ouro pesado do sedimento leve.\nUsada há 2.000 anos na Amazônia.',
   },

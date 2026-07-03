@@ -92,7 +92,7 @@ const ITEM_DEFS={
     desc:'Picareta de cabo longo para trabalho em parede vertical.\nCabo de madeira reforçado, 1,2m — mais pesada que a comum.\nO kimberlito é rocha vulcânica densa; exige impacto forte.',
   },
   peneira_classificacao:{
-    cat:'ferramenta',nome:'Peneira de Classificação',icon:'🪣',
+    cat:'ferramenta',nome:'Peneira de Classificação',icon:'▦',
     journalId:'peneira_classificacao',drawHand:'right',
     desc:'Malha de aço com furos calibrados para separar por tamanho.\nFragmentos menores que a malha caem — cristais maiores ficam.\nPrimeiro estágio de separação antes da Lupa de Lapidário.',
   },
@@ -696,7 +696,7 @@ class KimberliteWall{
     } else {
       ctx.fillText('[E] Peneirar Material',sx+this.w/2,sy-28);
       ctx.font='10px "Courier New"';ctx.fillStyle=`rgba(140,190,220,${ha*0.7})`;
-      ctx.fillText('🪣 Peneira necessária',sx+this.w/2,sy-14);
+      ctx.fillText('▦ Peneira necessária',sx+this.w/2,sy-14);
     }
     ctx.textAlign='left';
   }
@@ -741,7 +741,7 @@ class Col{
     if(this.done)return;
     const sx=this.x-cam.x,sy=this.y-cam.y;
     if(sx<-60||sx>W+60)return;
-    const TOOL_TYPES=['picareta_kimberlito','peneira_classificacao','lupa_lapidario'];
+    const TOOL_TYPES=['picareta_kimberlito','peneira_classificacao','lupa_lapidario','contrato_trabalho'];
     const isTool=TOOL_TYPES.includes(this.type);
     if(isTool){
       // Halo circular — sem retângulo de fundo
@@ -759,12 +759,13 @@ class Col{
     if(isTool&&playerX!==undefined){
       const dist=Math.hypot(playerX+20-(this.x+17),playerY+40-(this.y+17));
       if(dist<110){
-        const labels={picareta_kimberlito:'⛏️ Picareta de Kimberlito',peneira_classificacao:'🪣 Peneira de Classificação',lupa_lapidario:'🔍 Lupa de Lapidário'};
+        const labels={picareta_kimberlito:'⛏️ Picareta de Kimberlito',peneira_classificacao:'▦ Peneira de Classificação',lupa_lapidario:'🔍 Lupa de Lapidário',contrato_trabalho:'📜 Contrato de Trabalho'};
         const txt=`[E] Pegar ${labels[this.type]||this.type}`;
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
-        const bx=sx+17-tw/2,by=sy-42;
+        const headTop=playerY-cam.y-10;
+        const bx=sx+17-tw/2,by=Math.min(sy-42,headTop);
         ctx.fillStyle=`rgba(6,4,10,${0.88*pulse})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(200,180,240,${pulse})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
         ctx.fillStyle=`rgba(6,4,10,${0.88*pulse})`;
@@ -784,12 +785,13 @@ class Trigger{
     if(this.done||this.auto)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near)return;
-    const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const sx=this.x+this.w/2-cam.x,sy=Math.min(this.y-cam.y-26,py-cam.y-10)+Math.sin(Date.now()/350)*4;
     const txt='[E] '+this.label;ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
-    ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
-    ctx.strokeStyle='#c0a0e0';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();
-    ctx.fillStyle='#c0a0e0';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left';
+    const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6));
+    ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();
+    ctx.strokeStyle='#c0a0e0';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();
+    ctx.fillStyle='#c0a0e0';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left';
   }
 }
 
@@ -855,15 +857,31 @@ function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.ti
 function drawPopup(){
   if(!popup.active)return;
   const al=Math.min(1,popup.timer/400);ctx.save();ctx.globalAlpha=al;
-  const pw=340,lineH=20,ph=popup.lines.length*lineH+80;
+  const pw=340,lineH=20;
+  ctx.font='12px "Courier New"';
+  const maxTextW=pw-46;
+  const wrapped=[];
+  popup.lines.forEach(l=>{
+    const words=l.split(' ');let line='';let first=true;
+    for(const w of words){
+      const test=line?line+' '+w:w;
+      const prefix=first?'• ':'  ';
+      if(ctx.measureText(prefix+test).width>maxTextW&&line){wrapped.push({t:line,first});line=w;first=false;}
+      else line=test;
+    }
+    if(line)wrapped.push({t:line,first});
+  });
+  const ph=wrapped.length*lineH+80;
   const px=W-pw-18,py=56;
   ctx.fillStyle='rgba(6,4,10,0.94)';roundRect(px,py,pw,ph,10);ctx.fill();
   ctx.strokeStyle=popup.color;ctx.lineWidth=2;roundRect(px,py,pw,ph,10);ctx.stroke();
   ctx.strokeStyle='rgba(180,160,220,0.2)';ctx.lineWidth=1;roundRect(px+4,py+4,pw-8,ph-8,7);ctx.stroke();
-  ctx.font='bold 13px "Courier New"';ctx.fillStyle=popup.color;ctx.textAlign='center';ctx.fillText(popup.title,px+pw/2,py+22);
+  let titleFont='bold 13px "Courier New"';ctx.font=titleFont;
+  let ts=13;while(ctx.measureText(popup.title).width>pw-24&&ts>9){ts--;titleFont=`bold ${ts}px "Courier New"`;ctx.font=titleFont;}
+  ctx.fillStyle=popup.color;ctx.textAlign='center';ctx.fillText(popup.title,px+pw/2,py+22);
   ctx.fillStyle='rgba(200,180,240,0.12)';ctx.fillRect(px+14,py+30,pw-28,1);
   ctx.font='12px "Courier New"';ctx.fillStyle='#e8e0f0';
-  popup.lines.forEach((l,i)=>{ctx.textAlign='left';ctx.fillText('• '+l,px+16,py+48+i*lineH);});
+  wrapped.forEach((ln,i)=>{ctx.textAlign='left';ctx.fillText((ln.first?'• ':'  ')+ln.t,px+16,py+48+i*lineH);});
   ctx.textAlign='left';ctx.restore();
 }
 
@@ -1073,7 +1091,7 @@ class Player{
         } else if(c.type==='peneira_classificacao'){
           this.items.push('peneira_classificacao');sfx('item');
           burst(c.x+17,c.y+17,'#a0b8c0',10);journalCollect('peneira_classificacao');
-          showPopup('🪣 PENEIRA DE CLASSIFICAÇÃO',['Malha de aço para separar cristais por tamanho','Fragmentos pequenos caem, cristais maiores ficam','Primeiro estágio da identificação','Depois use a Lupa de Lapidário!'],'#90b8d0');
+          showPopup('▦ PENEIRA DE CLASSIFICAÇÃO',['Malha de aço para separar cristais por tamanho','Fragmentos pequenos caem, cristais maiores ficam','Primeiro estágio da identificação','Depois use a Lupa de Lapidário!'],'#90b8d0');
           notify('✦ Peneira coletada! Busque o Suricato →');
         } else if(c.type==='contrato_trabalho'){
           this.items.push('contrato_trabalho');this.score+=80;sfx('unlock');
@@ -1104,8 +1122,11 @@ class Player{
             '"O Suricato! Suricata suricatta — o animal de visão mais aguçada da savana. Em pé nas patas traseiras, escaneia o horizonte por predadores a 800 metros de distância. É a sentinela perfeita do Karoo."',
             '"Ele me deixou a Lupa de Lapidário de 10 aumentos — o instrumento que lapidários e gemologistas usam para examinar a clareza, as inclusões e as faces cristalinas de gemas brutas."',
             '"No século XIX, a primeira coisa que um comprador fazia ao receber um diamante bruto era examiná-lo com a lupa. O suricato, com sua postura de sentinela e visão aguçada, é a metáfora perfeita desse ato de escrutínio."',
-          ],()=>{notify('✦ Lupa coletada! Equipe-a no Diário [I] e desça na mina →');},'CORVAN','#d0a8e0');
-          showPopup('🔍 LUPA DE LAPIDÁRIO (10x)',['Instrumento essencial de gemologistas','Diamante: faces de 120° (estrutura cúbica)','Quartzo: faces de 60° (prisma hexagonal)','A diferença está no ângulo que você não vê a olho nu'],'#c0e0f0');
+          ],()=>{
+            notify('✦ Lupa coletada! Equipe-a no Diário [I] e desça na mina →');
+            // Popup só aparece depois do balão de diálogo fechar, para não sobrepor
+            showPopup('🔍 LUPA DE LAPIDÁRIO (10x)',['Instrumento essencial de gemologistas','Diamante: faces de 120° (estrutura cúbica)','Quartzo: faces de 60° (prisma hexagonal)','A diferença está no ângulo que você não vê a olho nu'],'#c0e0f0');
+          },'CORVAN','#d0a8e0');
         }
       }
 
@@ -1116,17 +1137,27 @@ class Player{
               ex.examine();
               const cnt=level.expositions.filter(e=>e.examined).length;
               const tot=level.expositions.length;
-              if(cnt===1)showPopup('💎 DIAMANTE — CARBONO PURO',['C — único elemento, dureza 10 Mohs','Formado a 1.200°C e 50.000 atmosferas a 150km','O mesmo carbono do grafite de um lápis!','Diferença: estrutura tetraédrica 3D vs camadas planas'],'#90d8ff');
-              else if(ex.type==='kimberlite')showPopup('🪨 KIMBERLITO — EMBALAGEM DE DIAMANTES',['Rocha vulcânica rara do manto terrestre','Explosão profunda trouxe diamantes em segundos','A "blue ground" contém os cristais mais puros','Kimberley foi o maior depósito kimberlítico conhecido'],'#80b8d0');
+              const showExPopup=()=>{
+                // Cada tipo de formação mostra seu balão informativo apenas na
+                // primeira vez — formações repetidas do mesmo tipo não repetem o popup.
+                level._popupShown=level._popupShown||new Set();
+                if(level._popupShown.has(ex.type))return;
+                level._popupShown.add(ex.type);
+                if(ex.type==='diamond')showPopup('💎 DIAMANTE — CARBONO PURO',['C — único elemento, dureza 10 Mohs','Formado a 1.200°C e 50.000 atmosferas a 150km','O mesmo carbono do grafite de um lápis!','Diferença: estrutura tetraédrica 3D vs camadas planas'],'#90d8ff');
+                else if(ex.type==='kimberlite')showPopup('⛰️ KIMBERLITO — EMBALAGEM DE DIAMANTES',['Rocha vulcânica rara do manto terrestre','Explosão profunda trouxe diamantes em segundos','A "blue ground" contém os cristais mais puros','Kimberley foi o maior depósito kimberlítico conhecido'],'#80b8d0');
+              };
               if(cnt===tot&&!level._expDialogDone){
                 level._expDialogDone=true;
                 showDialog([
                   '"O kimberlito é uma rocha vulcânica rara — vem do manto da Terra, de mais de 150 quilômetros de profundidade. Os diamantes dentro dele se formaram a bilhões de anos, sob pressão de 50.000 atmosferas e temperatura de 1.200°C."',
                   '"Para virem até cá, precisaram de uma explosão profunda que os trouxe em segundos até a superfície — em tubos vulcânicos chamados pipes de kimberlito. Cada diamante que você encontra nesta rocha azul é mais antigo que os dinossauros."',
                   '"O quartzo hialino e o diamante bruto têm aparência similar sob o pó de kimberlito. Para distinguir: use a lupa. O diamante tem faces cristalinas nítidas com ângulos de 120°; o quartzo tem faces hexagonais de 60°."',
-                ],(()=>{notify('✦ Busque as paredes de kimberlito para minerar!');}));
+                ],(()=>{notify('✦ Busque as paredes de kimberlito para minerar!');showExPopup();}));
+              } else {
+                // Sem diálogo nesta examinação — popup pode aparecer na hora
+                showExPopup();
               }
-              notify(`🪨 Formação examinada! (${cnt}/${tot})`);
+              notify(`⛰️ Formação examinada! (${cnt}/${tot})`);
             }
             break;
           }
@@ -1145,7 +1176,7 @@ class Player{
             burst(w.x+24,w.y+34,'#c8c8b0',8,2);
             notify('⛏️ Kimberlito minerado! Use a Peneira para classificar os fragmentos [E].');
           } else if(w.state==='mined'){
-            if(!this.items.includes('peneira_classificacao')){notify('🪣 Encontre a Peneira de Classificação primeiro!');break;}
+            if(!this.items.includes('peneira_classificacao')){notify('▦ Encontre a Peneira de Classificação primeiro!');break;}
             
             sfx('peneira');
             G.sieveMode={wall:w,slots:w.slots,cursor:0};
@@ -1300,15 +1331,19 @@ function drawHUD(player,level){
   ctx.textAlign='center';ctx.fillText(levelTitle,W/2,24);ctx.textAlign='left';
   ctx.shadowBlur=0;
 
-  // ── Diamantes — canto direito (padrão score) ───────────────────
-  const diamonds=player.items.filter(id=>id.startsWith('diamante_')).length;
-  ctx.fillStyle='#e8e0d0';ctx.font='bold 20px "Courier New"';
-  ctx.textAlign='right';ctx.fillText('💎 '+diamonds+'/3',W-14,26);ctx.textAlign='left';
+  // ── Diamantes — canto direito (padrão score) ────────────────────
+  // Só mostra a contagem a partir da Câmara de Coleta (cena 3), onde os
+  // diamantes existem de fato — nas cenas 1 e 2 não há nada a coletar ainda.
+  if(level&&level.num>=3){
+    const diamonds=player.items.filter(id=>id.startsWith('diamante_')).length;
+    ctx.fillStyle='#e8e0d0';ctx.font='bold 20px "Courier New"';
+    ctx.textAlign='right';ctx.fillText('💎 '+diamonds+'/3',W-14,26);ctx.textAlign='left';
+  }
 
   // ── Painel Diário de Bordo — padrão 1-1 ───────────────────────
   const TOOL_DEFS=[
     {id:'picareta_kimberlito', icon:'⛏️', nome:'Picareta'},
-    {id:'peneira_classificacao',icon:'🪣', nome:'Peneira'},
+    {id:'peneira_classificacao',icon:'▦', nome:'Peneira'},
     {id:'lupa_lapidario',      icon:'🔍', nome:'Lupa 10x'},
     {id:'contrato_trabalho',   icon:'📜', nome:'Contrato'},
   ];
@@ -1357,10 +1392,10 @@ function drawHUD(player,level){
   }
 
   // ── Hint rodapé — fundo escuro + texto legível ─────────────────
-  const hints=['Encontre a Picareta, a Peneira e a Lupa. Minere o kimberlito!',
-               'Use a Lupa para distinguir diamante de quartzo!',
-               'Peneira primeiro, depois examine com a Lupa.',
-               'Siga o suricato até o altar. [E] para completar.'];
+  const hints=['⛏️ Encontre a Picareta, a ▦ Peneira e a 🔍 Lupa. Minere o kimberlito!',
+               '🔍 Use a Lupa para distinguir 💎 diamante de ⬜ quartzo!',
+               '▦ Peneira primeiro, depois examine com a 🔍 Lupa.',
+               '🐾 Siga o suricato até o altar. [E] para completar.'];
   const hint=hints[levelNum]||'';
   ctx.fillStyle='rgba(0,0,0,0.60)';ctx.fillRect(0,H-32,W,32);
   ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
@@ -1428,11 +1463,10 @@ function drawDeath(player){
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
-  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Mortes: ${G.deaths||1}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+50);
+  ctx.fillText(`Mortes: ${G.deaths||1}`,W/2,H/2+78);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+110);
   ctx.textAlign='left';
 }
 
@@ -1461,14 +1495,11 @@ function drawComplete(player){
   ctx.fillText('✦  FASE 4.1 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
 
-  // Corvan + diamante
-  drawCorvan(W/2-160,200,4,false,Date.now()/300,'lupa_lapidario');
-  ctx.save();ctx.translate(W/2+80,270);ctx.scale(2.8,2.8);
-  drawDiamanteBruto(0,0,Date.now()/1000,'grande');
-  ctx.restore();
+  // Corvan
+  drawCorvan(W/2-40,140,3,false,Date.now()/300,'lupa_lapidario');
 
   ctx.fillStyle='#e8d8b0';ctx.font='17px "Courier New"';
-  ctx.fillText('O Palácio Subterrâneo revelou seus segredos!',W/2,196);
+  ctx.fillText('O Palácio Subterrâneo revelou seus segredos!',W/2,340);
 
   const score=player?player.score:0;
   const diamonds=player?player.items.filter(id=>id.startsWith('diamante_')).length:0;
@@ -1482,14 +1513,17 @@ function drawComplete(player){
     hasContrato?'✦  Contrato De Beers — precursor do apartheid':'✦  Contrato De Beers — não encontrado',
   ];
   ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';
-  lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
+  lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
 
+  const _scoreY=400+lines.length*32+40;
   ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';
-  ctx.fillText(`Pontuação: 💎 ${score}   Diamantes: ${diamonds}/3`,W/2,430);
+  ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths||0}`,W/2,_scoreY);
+  ctx.fillStyle='#a0c8e8';ctx.font='14px "Courier New"';
+  ctx.fillText(`💎 Diamantes coletados: ${diamonds}/3`,W/2,_scoreY+24);
 
   const pulse=0.65+Math.sin(Date.now()/550)*0.4;
   ctx.fillStyle=`rgba(210,180,240,${pulse})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 4.2 desbloqueada!   [E] Menu Principal',W/2,466);
+  ctx.fillText('✦ Fase 4.2 desbloqueada!   [M] Menu Principal',W/2,_scoreY+35+24);
   ctx.textAlign='left';
 }
 
@@ -1561,9 +1595,11 @@ function buildL2(){
   
   const expositions=[
     new KimberliteExposition(480,FLOOR-30,'diamond'),
-    new KimberliteExposition(900,FLOOR-30,'kimberlite'),
-    new KimberliteExposition(1500,FLOOR-30,'quartz'),
-    new KimberliteExposition(2000,FLOOR-30,'kimberlite'),
+    new KimberliteExposition(860,FLOOR-180-30,'kimberlite'),   // sobre a plataforma elevada em x:800
+    new KimberliteExposition(1240,FLOOR-220-30,'kimberlite'),  // salto mais alto e distante, x:1200
+    new KimberliteExposition(1660,FLOOR-100-30,'quartz'),      // sobre a plataforma em x:1600
+    new KimberliteExposition(1940,FLOOR-180-30,'kimberlite'),  // sobre a plataforma em x:1900
+    new KimberliteExposition(2300,FLOOR-80-30,'diamond'),      // sobre a plataforma final em x:2250
   ];
   const triggers=[];
   triggers.push(new Trigger(LW-60,FLOOR-120,60,120,'Câmara de Coleta',()=>{G.loadLevel(3);}));
@@ -1634,7 +1670,7 @@ const G={
   hintTimer:240,
   deaths:0,
 
-  loadLevel(n){
+  loadLevel(n,isRespawn=false){
     this.level=n;
     this.sieveMode=null;this.dialog=false;
     const prev=this.player;
@@ -1661,7 +1697,8 @@ const G={
     particles.length=0;dustPts.length=0;
 
     this.state='playing';
-    
+
+    if(isRespawn)return; // Reaparecer após morte não repete a narração de introdução da cena
     if(n===1){
       setTimeout(()=>showDialog([
         '"Kimberley, África do Sul, 1880. Estamos na borda do Big Hole — a maior escavação manual da história humana. Mais de 50.000 homens trabalharam aqui entre 1871 e 1914, retirando 2.722 kg de diamantes."',
@@ -1691,7 +1728,8 @@ const G={
     BUBBLE.active=false;BUBBLE.queue=[];BUBBLE.cb=null;
     INV.open=false;INV.cursor=0;INV.tab=0;
     this.sieveMode=null;
-    this.loadLevel(1);
+    // Reaparecer no início da própria cena onde a morte ocorreu, não sempre na cena 1
+    this.loadLevel(this.level||1,true);
   },
 
   advance(){
@@ -1827,28 +1865,30 @@ function loop(){
       m.x+=(targetX-m.x)*0.025;
     }
     const mx=m.x-cam.x,my=m.y-cam.y;
+    // O suricato é um animal da região, não um item colecionável — permanece
+    // visível na cena mesmo depois da interação, apenas sem o halo/tooltip.
+    const frame=Date.now()/1000;
     if(!m.gifted){
-      // Suricato desenhado em canvas nativo (nunca como imagem SVG plana)
-      const frame=Date.now()/1000;
-      // Halo dourado
+      // Halo dourado (só chama atenção antes da interação)
       ctx.save();
       const gl=ctx.createRadialGradient(mx,my,4,mx,my,50);
       gl.addColorStop(0,'rgba(240,200,80,0.25)');gl.addColorStop(1,'rgba(240,200,80,0)');
       ctx.fillStyle=gl;ctx.beginPath();ctx.arc(mx,my,50,0,Math.PI*2);ctx.fill();
       ctx.restore();
-      // Personagem canvas
-      drawMeerkat(mx,my,frame);
-      if(player&&Math.abs(player.x+13-m.x)<150){
-        const ha=0.7+Math.sin(Date.now()/350)*0.3;
-        ctx.font='bold 13px "Courier New"';
-        const txt='[E] Cumprimentar Suricato';
-        const tw=ctx.measureText(txt).width+20;
-        const bx=mx-tw/2,by=my-85;
-        ctx.fillStyle=`rgba(6,4,10,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
-        ctx.strokeStyle=`rgba(240,200,80,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
-        ctx.fillStyle=`rgba(240,200,80,${ha})`;
-        ctx.textAlign='center';ctx.fillText(txt,mx,by+16);ctx.textAlign='left';
-      }
+    }
+    // Personagem canvas — sempre desenhado (nunca como imagem SVG plana)
+    drawMeerkat(mx,my,frame);
+    if(!m.gifted&&player&&Math.abs(player.x+13-m.x)<150){
+      const ha=0.7+Math.sin(Date.now()/350)*0.3;
+      ctx.font='bold 13px "Courier New"';
+      const txt='[E] Cumprimentar Suricato';
+      const tw=ctx.measureText(txt).width+20;
+      const headTop=player.y-cam.y-10;
+      const bx=mx-tw/2,by=Math.min(my-85,headTop-24);
+      ctx.fillStyle=`rgba(6,4,10,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
+      ctx.strokeStyle=`rgba(240,200,80,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
+      ctx.fillStyle=`rgba(240,200,80,${ha})`;
+      ctx.textAlign='center';ctx.fillText(txt,mx,by+16);ctx.textAlign='left';
     }
   }
 

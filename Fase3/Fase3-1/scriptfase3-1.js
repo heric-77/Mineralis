@@ -588,7 +588,7 @@ class Col{
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
-        const bx=sx+17-tw/2,by=sy-42;
+        const bx=sx+17-tw/2,by=Math.min(sy-42,(playerY-cam.y)-8);
         ctx.fillStyle=`rgba(6,4,10,${0.88*pulse})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(200,180,240,${pulse})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
         ctx.fillStyle=`rgba(6,4,10,${0.88*pulse})`;
@@ -608,7 +608,9 @@ class Trigger{
     if(this.done||this.auto)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near)return;
-    const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const sx=this.x+this.w/2-cam.x;
+    let sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    sy=Math.min(sy,(py-cam.y)-8+16);
     const txt='[E] '+this.label;ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
     ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
@@ -1157,10 +1159,9 @@ function drawDeath(){
   ctx.fillStyle='#ff6080';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||msgs.queda,W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#cc8898';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||subs.queda,W/2,H/2-10);
-  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200,'lampada_de_sal');
   ctx.fillStyle='#d0a8e0';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+60);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+88);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+120);
   ctx.textAlign='left';
 }
 
@@ -1171,14 +1172,14 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#d0a8e0';ctx.shadowBlur=40;
   ctx.fillStyle='#d0a8e0';ctx.font='bold 40px "Courier New"';ctx.fillText('✦  FASE 3.1 CONCLUÍDA  ✦',W/2,110);
   ctx.shadowBlur=0;
-  drawCorvan(W/2-170,200,4,false,Date.now()/300,'lampada_de_sal');
-  ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawInsignia(0,0,Date.now()/1000);ctx.restore();
-  ctx.fillStyle='#e8d8f0';ctx.font='16px "Courier New"';ctx.fillText('O Palácio Subterrâneo foi revelado!',W/2,192);
+  drawCorvan(W/2-40,140,3,false,Date.now()/300,'lampada_de_sal');
+  ctx.fillStyle='#e8d8f0';ctx.font='16px "Courier New"';ctx.fillText('O Palácio Subterrâneo foi revelado!',W/2,340);
   const lines=['🪓  Talhadeira — clivagem cúbica, ângulo de 90°','🧊  Halita — o único mineral que consumimos diretamente','🕯️  Lâmpada de Sal — detecção de umidade medieval','🛡️  Insígnia da Guilda — os primeiros direitos trabalhistas'];
-  ctx.fillStyle='#c0b8d8';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,244+i*28));
-  ctx.fillStyle='#b0a8c8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: 🧊 ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
+  ctx.fillStyle='#c0b8d8';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  const _scoreY=400+lines.length*32+40;
+  ctx.fillStyle='#b0a8c8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,_scoreY);
   ctx.fillStyle=`rgba(200,180,240,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 3.2 desbloqueada!   [M] Menu Principal',W/2,458);ctx.textAlign='left';
+  ctx.fillText('✦ Fase 3.2 desbloqueada!   [M] Menu Principal',W/2,_scoreY+35);ctx.textAlign='left';
 }
 
 
@@ -1254,9 +1255,10 @@ function buildL1(){
           if(!this.bison.gifted&&Math.abs(player.x-this.bison.x)<160){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
             const t2='[E] Interagir com o Bisão Europeu 🦬';const tw=ctx.measureText(t2).width+24;
-            roundRect(gx-tw/2,gy-110,tw,24,4);ctx.fill();
-            ctx.strokeStyle='#d0a8e0';ctx.lineWidth=1.5;roundRect(gx-tw/2,gy-110,tw,24,4);ctx.stroke();
-            ctx.fillStyle='#d0a8e0';ctx.textAlign='center';ctx.fillText(t2,gx,gy-93);ctx.textAlign='left';
+            const bTop=Math.min(gy-110,(player.y-cam.y)-8);
+            roundRect(gx-tw/2,bTop,tw,24,4);ctx.fill();
+            ctx.strokeStyle='#d0a8e0';ctx.lineWidth=1.5;roundRect(gx-tw/2,bTop,tw,24,4);ctx.stroke();
+            ctx.fillStyle='#d0a8e0';ctx.textAlign='center';ctx.fillText(t2,gx,bTop+17);ctx.textAlign='left';
           }
           if(this.bison.gifted){
             ctx.fillStyle='rgba(200,180,230,0.6)';ctx.font='12px "Courier New"';
@@ -1419,7 +1421,8 @@ function buildL3(){
           ctx.fillStyle=gg;ctx.fillRect(ix-40,iy-60,80,80);
           ctx.save();ctx.translate(ix,iy-30);ctx.scale(1.5,1.5);drawInsignia(0,0,Date.now()/800);ctx.restore();
           ctx.font='bold 12px "Courier New"';ctx.fillStyle=`rgba(200,180,240,${ia})`;
-          ctx.textAlign='center';ctx.fillText('[E] Pegar Insígnia da Guilda',ix,iy-66);ctx.textAlign='left';
+          const insTy=Math.min(iy-66,(player.y-cam.y)-8);
+          ctx.textAlign='center';ctx.fillText('[E] Pegar Insígnia da Guilda',ix,insTy);ctx.textAlign='left';
         }
       }
       if(this.saltWalls){

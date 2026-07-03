@@ -43,6 +43,8 @@ function sfx(type) {
   // Harmattan arriving: vento crescente
   else if (type==='harmattan'){ o.type='sawtooth'; o.frequency.setValueAtTime(60,t); g.gain.setValueAtTime(.04,t); g.gain.linearRampToValueAtTime(.15,t+1.5); g.gain.exponentialRampToValueAtTime(.001,t+2.5); }
   else if (type==='stone')    { o.type='square'; o.frequency.setValueAtTime(120,t); g.gain.setValueAtTime(.1,t); g.gain.exponentialRampToValueAtTime(.001,t+.15); }
+  // Encontro amistoso com o dromedário: sino suave e curto, sem alarme
+  else if (type==='greet')    { o.type='sine'; o.frequency.setValueAtTime(660,t); o.frequency.exponentialRampToValueAtTime(880,t+.2); g.gain.setValueAtTime(.08,t); g.gain.exponentialRampToValueAtTime(.001,t+.5); }
   o.start(t); o.stop(t+2.5);
 }
 
@@ -135,7 +137,18 @@ function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;
 
 // ── Camera ────────────────────────────────────────────────────────
 const cam={x:0,y:0};
-function updateCam(px,worldW){ const target=px-W/2+24; const clamped=Math.max(0,Math.min(target,worldW-W)); cam.x+=(clamped-cam.x)*0.12; }
+let _camXf=0; // acumulador de precisão total (fracionário) da câmera
+function updateCam(px,worldW){
+  const target=px-W/2+24; const clamped=Math.max(0,Math.min(target,worldW-W));
+  _camXf+=(clamped-_camXf)*0.12;
+  // cam.x exposto sempre arredondado para pixel inteiro: todo o jogo (chão,
+  // itens, inimigos, Corvan) usa "algo-cam.x" para desenhar, então se cam.x
+  // ficasse fracionário cada elemento arredondaria de forma independente/
+  // inconsistente a cada frame, criando um jitter relativo entre eles — o
+  // efeito de "tremer/desfocar" mesmo parado. Arredondar aqui, uma única vez,
+  // mantém tudo perfeitamente alinhado quadro a quadro.
+  cam.x=Math.round(_camXf);
+}
 
 const GRAV=0.46, PSPD=4.6, JUMPF=-12.4, MAXFALL=16;
 
@@ -230,8 +243,9 @@ const ITEM_DEFS={
   gorget_cobre:     { cat:'artefato',  nome:'Gorget de Cobre',       icon:'🌐',fase:'2.3',journalId:'gorget_cobre',desc:'Ornamento Anishinaabe — rota comercial do Lago Superior à Flórida.' },
   frasco_mercurio:  { cat:'artefato',  nome:'Frasco de Mercúrio',    icon:'⚗️',fase:'3.3',journalId:'frasco_mercurio',desc:'10.000 km de Almadén a Potosí.' },
   manuscrito_item:  { cat:'artefato',  nome:'Manuscrito de Timbuktu',icon:'📜',fase:'4.3',desc:'Manuscrito árabe sobre mineralogia, séc. XIV.\nDescreve propriedades de ouro, prata e mercúrio.\nChegou à Europa via Marrocos → Florença.\nUm dos 700.000 manuscritos da cidade.' },
+  amostra_estratificada:{ cat:'artefato',nome:'Amostra de Sal Estratificado',icon:'◼',fase:'4.3',desc:'Extraída ao examinar as camadas de halita\nde Taoudenni com o Machado Tuaregue.\nPrimeira amostra geológica catalogada\nda expedição rumo a Timbuktu.' },
 };
-const TIPO_TO_JOURNAL={ machado:'machado_item',balanca:'balanca_item',astrolabio:'astrolabio_item', halita:'halita',manuscrito:'manuscrito_item' };
+const TIPO_TO_JOURNAL={ machado:'machado_item',balanca:'balanca_item',astrolabio:'astrolabio_item', halita:'halita',manuscrito:'manuscrito_item',amostra_estratificada:'amostra_estratificada' };
 
 // ── Inventory ─────────────────────────────────────────────────────
 const INV={
@@ -334,10 +348,21 @@ function drawNotif(){
 const POPUP={ active:false,title:'',lines:[],icon:'⬜',timer:0,
   show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=text.split('\n');this.timer=duration;},
   tick(){if(this.timer>0){this.timer-=16;if(this.timer<=0)this.active=false;}},
-  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60;
+  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PX=W-PW-20,PY=60;
+    ctx.font='12px "Courier New"';
+    const maxTextW=PW-52-16;
+    const wrapped=[];
+    this.lines.forEach(line=>{
+      const words=line.split(' ');let cur='';
+      for(const word of words){ const test=cur?cur+' '+word:word; if(ctx.measureText(test).width>maxTextW&&cur){wrapped.push(cur);cur=word;}else cur=test; }
+      wrapped.push(cur);
+    });
+    const PH=wrapped.length*20+100;
     ctx.save();ctx.globalAlpha=alpha; ctx.fillStyle='rgba(4,3,0,0.94)';_rr(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle='#a07818';ctx.lineWidth=2;_rr(PX,PY,PW,PH,12);ctx.stroke();
-    // Título centrado no topo
-    ctx.font='bold 14px "Courier New"';ctx.fillStyle='#f0d060';
+    // Título centrado no topo (encolhe se muito longo)
+    let ts=14;ctx.font=`bold ${ts}px "Courier New"`;
+    while(ctx.measureText(this.title).width>PW-24&&ts>9){ts--;ctx.font=`bold ${ts}px "Courier New"`;}
+    ctx.fillStyle='#f0d060';
     ctx.textAlign='center';ctx.fillText(this.title,PX+PW/2,PY+26);
     // Separador
     ctx.fillStyle='rgba(180,140,20,0.4)';ctx.fillRect(PX+14,PY+34,PW-28,1);
@@ -345,7 +370,7 @@ const POPUP={ active:false,title:'',lines:[],icon:'⬜',timer:0,
     ctx.font='28px serif';ctx.textAlign='left';ctx.fillText(this.icon,PX+14,PY+66);
     // Texto à direita do ícone
     ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';
-    this.lines.forEach((l,i)=>ctx.fillText(l,PX+52,PY+48+i*20));
+    wrapped.forEach((l,i)=>ctx.fillText(l,PX+52,PY+48+i*20));
     ctx.textAlign='left';ctx.restore(); }
 };
 
@@ -353,7 +378,7 @@ const POPUP={ active:false,title:'',lines:[],icon:'⬜',timer:0,
 class SalDeposit {
   constructor(x,y){ this.x=x; this.y=y; this.w=48; this.h=36; this.done=false; this.t=Math.random()*Math.PI*2; }
   tick(){ if(!this.done)this.t+=0.04; }
-  draw(){
+  draw(player){
     if(this.done) return;
     const sx=this.x-cam.x,sy=this.y-cam.y+Math.sin(this.t)*3;
     if(sx<-60||sx>W+60) return;
@@ -373,10 +398,14 @@ class SalDeposit {
     // Borda dourada externa bem visível
     ctx.strokeStyle=`rgba(220,180,40,${0.7+pulse*0.3})`; ctx.lineWidth=2.5;
     ctx.strokeRect(-2,-2,this.w+4,this.h+4);
-    // Label em cima — fundo escuro para legibilidade
+    // Label em cima — fundo escuro para legibilidade; avisa se o Machado
+    // ainda não está equipado, para o jogador entender por que [E] não funciona.
+    const activeShort=player?(player.activeTool||'').replace(/_item$/,''):null;
+    const equipped=activeShort==='machado';
     ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(-2,-28,this.w+4,20);
-    ctx.fillStyle=`rgba(240,200,60,${0.85+pulse*0.15})`; ctx.font='bold 10px "Courier New"'; ctx.textAlign='center';
-    ctx.fillText('[E] ← → HORIZONTAL',this.w/2,-14); ctx.textAlign='left';
+    ctx.fillStyle=equipped?`rgba(240,200,60,${0.85+pulse*0.15})`:'rgba(224,120,90,0.9)';
+    ctx.font='bold 10px "Courier New"'; ctx.textAlign='center';
+    ctx.fillText(equipped?'[E] ← → HORIZONTAL':'🔒 Equipar Machado [I]',this.w/2,-14); ctx.textAlign='left';
     ctx.restore();
   }
 }
@@ -474,11 +503,20 @@ class Dromedario{
 }
 
 // ── Col (items flutuantes) ────────────────────────────────────────
+const TOOL_LABELS={machado:'Machado de Pedra',balanca:'Balança de Bronze',manuscrito:'Manuscrito de Timbuktu'};
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=30;this.h=30;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
-  draw(){
+  draw(player){
     if(this.done)return; const sx=this.x-cam.x,sy=this.y-cam.y+Math.sin(this.t)*5; if(sx<-50||sx>W+50)return;
+    const isTool=TOOL_LABELS.hasOwnProperty(this.type);
+    const near=isTool&&player&&player.near(this,70);
+    if(near){
+      const pulse=0.5+Math.sin(Date.now()/300)*0.5;
+      const glow=ctx.createRadialGradient(sx+15,sy+15,0,sx+15,sy+15,26);
+      glow.addColorStop(0,`rgba(224,176,48,${0.35+pulse*0.2})`);glow.addColorStop(1,'rgba(224,176,48,0)');
+      ctx.fillStyle=glow;ctx.beginPath();ctx.arc(sx+15,sy+15,26,0,Math.PI*2);ctx.fill();
+    }
     ctx.save();ctx.translate(sx+15,sy+15);
     if(this.type==='halita'){ ctx.fillStyle='#f0ece0';ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d0cab8';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.stroke();ctx.fillStyle='rgba(255,255,240,0.6)';ctx.beginPath();ctx.arc(-4,-4,4,0,Math.PI*2);ctx.fill(); }
     else if(this.type==='machado'){ if(IMG['machado_img'])ctx.drawImage(IMG['machado_img'],0,0,96,96,-15,-15,30,30);else{ctx.fillStyle='#585850';ctx.fillRect(-12,-8,24,16);ctx.fillStyle='#8a4818';ctx.fillRect(8,-18,6,36);} }
@@ -486,13 +524,23 @@ class Col{
     else if(this.type==='astrolabio'){ if(IMG['astrolabio_img'])ctx.drawImage(IMG['astrolabio_img'],0,0,96,96,-15,-15,30,30);else{ctx.fillStyle='#c09028';ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#a07018';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#1a1408';ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();} }
     else if(this.type==='manuscrito'){ if(IMG['manuscrito_img'])ctx.drawImage(IMG['manuscrito_img'],0,0,96,96,-15,-15,30,30);else{ctx.fillStyle='#e8c870';ctx.fillRect(-12,-16,24,32);ctx.fillStyle='#2a1a08';for(let r=0;r<5;r++)ctx.fillRect(-8,-12+r*6,16,2);} }
     ctx.restore();
+    if(near){
+      const label=TOOL_LABELS[this.type];
+      const txt='[E] Pegar '+label; ctx.font='13px "Courier New"'; const tw=ctx.measureText(txt).width+22;
+      const headTop=(player.y-cam.y)-16, itemTop=sy-16;
+      const cy=Math.min(itemTop,headTop-24);
+      const cx=Math.max(tw/2+6,Math.min(sx+15,W-tw/2-6));
+      ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(cx-tw/2,cy-16,tw,24,4);ctx.fill();
+      ctx.strokeStyle='#e0b030';ctx.lineWidth=1.5;roundRect(cx-tw/2,cy-16,tw,24,4);ctx.stroke();
+      ctx.fillStyle='#e0b030';ctx.textAlign='center';ctx.fillText(txt,cx,cy);ctx.textAlign='left';
+    }
   }
 }
 
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
-  constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#e0b030';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#e0b030';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  constructor(x,y,w,h,label,fn,hideUntil=null){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;this.hideUntil=hideUntil;}
+  draw(px,py){ if(this.done)return; if(this.hideUntil&&!this.hideUntil())return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x,itemSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4,headSy=py-cam.y-16-8,sy=Math.min(itemSy,headSy); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6)); ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#e0b030';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#e0b030';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left'; }
 }
 
 // ── Player ────────────────────────────────────────────────────────
@@ -516,25 +564,35 @@ class Player{
     if(this.inv>0)this.inv--;
     if(this.interactAnim>0)this.interactAnim--; if(this.machadoAnim>0)this.machadoAnim--;
     // Coletar itens
-    for(const c of level.cols){ if(!c.done&&this.overlaps(c)){ c.done=true;
-      if(c.type==='halita'){this.score+=10;this.items.push('halita');sfx('sal_ok');burst(c.x+15,c.y+15,'#f0ece0',10);_journalColetar('halita', this.items.filter(i=>i==='halita').length);notify('⬜ Halita Saariana coletada! ('+this.items.filter(i=>i==='halita').length+'/2)');POPUP.show('Halita Saariana (Sal)','⬜','Sal de Taoudenni — extraído do Saara.\nSéc. XIV: 1 laje de sal = 1 laje de ouro.\n"Salário" vem de "salarium" romano.',7000);}
+    for(const c of level.cols){ if(c.done)continue; const isTool=TOOL_LABELS.hasOwnProperty(c.type);
+      if(isTool){ if(!this.overlaps(c)||!isE())continue; } else if(!this.overlaps(c))continue;
+      c.done=true;
+      if(c.type==='halita'){this.score+=10;this.items.push('halita');sfx('sal_ok');burst(c.x+15,c.y+15,'#f0ece0',10);const halN=this.items.filter(i=>i==='halita').length;_journalColetar('halita', halN);notify('⬜ Halita Saariana coletada! ('+halN+'/2)');if(halN===1)POPUP.show('Halita Saariana (Sal)','⬜','Sal de Taoudenni — extraído do Saara.\nSéc. XIV: 1 laje de sal = 1 laje de ouro.\n"Salário" vem de "salarium" romano.',7000);}
       else{this.items.push(c.type);sfx('item');burst(c.x+15,c.y+15,'#d4a030',10);_journalColetar(c.type);
         if(c.type==='machado')   notify('🪓 Machado de Pedra Tuaregue coletado!');
         if(c.type==='balanca')   notify('⚖️ Balança de Bronze coletada!');
         if(c.type==='astrolabio'){notify('🔭 Astrolábio de Latão recebido!');POPUP.show('Astrolábio Islâmico','🔭','Inventado pelos gregos, aperfeiçoado pelos árabes.\nMede altitude do sol → determina norte.\nTransmitido à Europa pelos estudiosos de Timbuktu.',8000);}
         if(c.type==='manuscrito'){sfx('manus');notify('📜 Manuscrito de Timbuktu encontrado!');}
       }
-    } }
+    }
     // Depósitos de sal — mecânica do machado horizontal
-    if(level.salDeposits&&this.items.includes('machado')){
+    // Exige a ferramenta EQUIPADA (não basta só ter coletado o Machado alguma
+    // vez) — o jogador precisa equipá-lo pelo Diário [I] antes de conseguir
+    // extrair a laje, igual ao padrão de "ferramenta ativa" do resto do jogo.
+    if(level.salDeposits){
+      const activeShort=(this.activeTool||'').replace(/_item$/,'');
+      const machadoEquipped=activeShort==='machado';
       for(const sd of level.salDeposits){ if(!sd.done&&this.near({x:sd.x,y:sd.y,w:sd.w,h:sd.h},60)&&isE()){
+        if(!this.items.includes('machado')){ notify('Você precisa do Machado de Pedra Tuaregue!'); break; }
+        if(!machadoEquipped){ notify('🔒 Equipe o Machado de Pedra pelo Diário [I] antes de usar!'); break; }
         this.machadoAnim=50; this.interactAnim=50;
         // Verifica modo: se player está se movendo = golpe horizontal; parado = vertical (fail)
         if(Math.abs(this.vx)>0.5||this.machadoMode==='horizontal'){ // Correto
-          sd.done=true; sfx('sal_ok'); this.score+=15; this.items.push('halita'); _journalColetar('halita', this.items.filter(i=>i==='halita').length);
+          sd.done=true; sfx('sal_ok'); this.score+=15; this.items.push('halita');
+          const halN=this.items.filter(i=>i==='halita').length; _journalColetar('halita', halN);
           burst(sd.x+sd.w/2,sd.y,'#f0ece0',16,2.5);
           notify('⬜ Golpe horizontal correto! Laje de sal extraída.');
-          POPUP.show('Halita Saariana (Sal)','⬜','Sal de Taoudenni — extraído do Saara.\nSéc. XIV: 1 laje de sal = 1 laje de ouro.\n"Salário" vem de "salarium" romano.',7000);
+          if(halN===1)POPUP.show('Halita Saariana (Sal)','⬜','Sal de Taoudenni — extraído do Saara.\nSéc. XIV: 1 laje de sal = 1 laje de ouro.\n"Salário" vem de "salarium" romano.',7000);
         } else { // Errado — sal virou pó
           sd.done=true; sfx('sal_fail'); burst(sd.x+sd.w/2,sd.y,'#e8e0d0',20,1.5);
           notify('💨 Sal virou pó! Golpe vertical fragmenta a laje — use o machado se movendo (←→).');
@@ -564,8 +622,13 @@ class Player{
     if(this.dead)return;
     // Corvan pixel-art — padrão fase 1-1 (S=1.67, pé alinhado com base do hitbox)
     const S=1.67,FOOT_Y=46*S;
-    const cx=this.x-cam.x+this.w/2-16*S;
-    const cy=this.y-cam.y+this.h-FOOT_Y;
+    // Arredonda para pixel inteiro: cam.x/cam.y variam em fração de pixel a cada
+    // frame (câmera segue o jogador com suavização), e como o sprite é desenhado
+    // com dezenas de retângulos pequenos escalados (S=1.67, não-inteiro), qualquer
+    // resíduo sub-pixel faz o personagem "tremer/desfocar" visualmente quando
+    // parado — sensível pois image-rendering:pixelated amplifica esse jitter.
+    const cx=Math.round(this.x-cam.x+this.w/2-16*S);
+    const cy=Math.round(this.y-cam.y+this.h-FOOT_Y);
     const flip=this.facing===-1;
     const wf=this.state==='run'?this.frame:(this.state==='idle'?Date.now()/800:0);
     ctx.save();drawCorvanInline(cx,cy,S,flip,wf);ctx.restore();
@@ -620,7 +683,7 @@ function buildL1(){
   const triggers=[
     new Trigger(2880,FL-300,200,300,'Aproximar do Dromedário',(player,level)=>{
       if(!player.items.includes('balanca')){notify('Colete a Balança de Bronze primeiro!');return;}
-      player.interactAnim=60; sfx('item'); level.dromedario.land(DROM_X,DROM_Y);
+      player.interactAnim=60; sfx('greet'); level.dromedario.land(DROM_X,DROM_Y);
       showDialog([
         '"O Dromedário de Caravana — companheiro inseparável dos Tuaregues há milênios. Este porta os ornamentos de bronze de uma caravana que saiu de Taoudenni há 21 dias."',
         '"Ele carrega um instrumento dos sábios islâmicos de Timbuktu — um astrolábio de latão, forjado com precisão de relojoeiro."',
@@ -652,7 +715,7 @@ function buildL1(){
       const rx=DROM_X-cam.x,ry=DROM_Y-cam.y;
       if(rx>-80&&rx<W+80){ ctx.fillStyle='#c8a050';ctx.beginPath();ctx.ellipse(rx+40,ry+50,80,18,0,0,Math.PI*2);ctx.fill(); }
       this.dromedario.draw();
-      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(); for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(player); for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -696,8 +759,14 @@ function buildL2(){
         '"Há 10.000 anos, o Saara era um lago. Girafas pastavam onde hoje há dunas. Quando o clima secou, o lago evaporou — e deixou sal."',
         '"Camada sobre camada de halita, preservada pelo calor e pela ausência de chuva. Os Tuaregues exploram este sal há séculos — as mesmas minas, as mesmas técnicas, os mesmos caminhos."',
         '"Enquanto a Europa construía catedrais no século XIV, eles cruzavam este deserto com o único produto que valia tanto quanto ouro: o sal, sem o qual nenhuma civilização sobrevive."',
-        'Técnica dominada! O bazar de Timbuktu e a tempestade do Harmattan esperam.',
-      ],()=>{notify('✦ Geologia do deserto revelada!');level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);});
+        'Técnica dominada! Vou extrair uma amostra desta estratificação para o diário.',
+      ],()=>{
+        player.score+=25;player.items.push('amostra_estratificada');_journalColetar('amostra_estratificada');
+        sfx('sal_ok');burst(player.x+20,player.y-10,'#e8e2d0',12);
+        notify('◼ Amostra de Sal Estratificado extraída! Geologia do deserto revelada.');
+        POPUP.show('Amostra de Sal Estratificado','◼','Extraída ao examinar as camadas de halita\nde Taoudenni com o Machado Tuaregue.\nPrimeira amostra geológica catalogada\nda expedição rumo a Timbuktu.',8000);
+        level.triggers[0].done=true;setTimeout(()=>G.nextLevel(),4000);
+      });
     }),
   ];
   return{
@@ -723,8 +792,8 @@ function buildL2(){
         ctx.fillStyle=clr;ctx.fillRect(0,sy,W,ht);
         ctx.fillStyle='rgba(200,195,185,0.3)';ctx.fillRect(0,sy+ht-2,W,2);
       }
-      for(const sd of this.salDeposits)sd.draw();
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const sd of this.salDeposits)sd.draw(player);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -813,7 +882,7 @@ function buildL3(){
         for(let s=0;s<5;s++) ctx.fillRect(mx-16+s*8,my-10+s%2*6,4,20);
       }
       for(const ap of this.astroPoints)ap.draw();
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -859,7 +928,9 @@ function buildL4(){
         '"A história que a Europa decidiu esquecer: antes de Columbus, antes da Revolução Industrial, havia um mundo conectado por caravanas, manuscritos e curiosidade."',
         `🏆 FASE 4.3 CONCLUÍDA! ${halN} lajes de sal coletadas.\nTrilogia da África encerrada.\nPróximo destino: Ásia!`,
       ],()=>{_salvarProgresso(G.player?.score||0,G.deaths);G.state='complete';});
-    }),
+    },()=>G.player&&G.player.items.includes('manuscrito')),
+    // hideUntil acima garante que este aviso só aparece depois que o Manuscrito
+    // (Col) já foi coletado — evita dois balões [E] sobrepostos no altar.
   ];
   return{
     id:4,bg:'bg04',W:WW,H:WH,startX:60,startY:FL-90,
@@ -898,7 +969,7 @@ function buildL4(){
       ag.addColorStop(0,'rgba(220,180,40,0.22)');ag.addColorStop(1,'rgba(220,180,40,0)');
       ctx.fillStyle=ag;ctx.fillRect(3310-cam.x,FL-490-cam.y,280,280);
       this.dromedario.draw();
-      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw();for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw();for(const c of this.cols)c.draw(player);for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -929,7 +1000,10 @@ function drawHUD(player,level){
     {id:'balanca',    icon:'⚖️',nome:'Balança'},
     {id:'astrolabio', icon:'🔭',nome:'Astrolábio'},
   ];
-  const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
+  // A ferramenta ativa já aparece em destaque em "Ferramenta ativa" logo abaixo,
+  // então a lista de "Ferramentas coletadas" mostra só as DEMAIS, sem repetir.
+  const activeShortHUD=player.activeTool?player.activeTool.replace(/_item$/,''):null;
+  const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id)&&t.id!==activeShortHUD&&t.id!==player.activeTool);
   const NOME_CURTO={machado:'Machado',balanca:'Balança',astrolabio:'Astrolábio'};
   const PX=12,PY=46,PW=178,PH_BASE=52;
   const PH=PH_BASE+(tools.length>0?6+tools.length*22:0);
@@ -950,13 +1024,23 @@ function drawHUD(player,level){
   ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
   ctx.fillStyle='rgba(180,140,20,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
   // Ferramenta ativa
+  // player.activeTool pode vir em duas formas: id curto local ('machado', usado
+  // pelo Col/inventário local) ou id do catálogo completo ('machado_item', usado
+  // ao equipar pelo Diário [I]). Normalizamos para o id curto antes de exibir.
   const atY=PY+44;ctx.textAlign='center';
+  const activeShort=player.activeTool?player.activeTool.replace(/_item$/,''):null;
   if(player.activeTool&&ITEM_DEFS[player.activeTool]){
     const def=ITEM_DEFS[player.activeTool];
-    const nomeExib=NOME_CURTO[player.activeTool]||def.nome;
+    const nomeExib=NOME_CURTO[activeShort]||NOME_CURTO[player.activeTool]||def.nome;
     ctx.fillStyle='rgba(180,140,20,0.1)';_rr(PX+6,atY-14,PW-12,20,3);ctx.fill();
-    ctx.font='11px "Courier New"';ctx.fillStyle='#f0c040';
-    ctx.fillText(def.icon+' '+nomeExib,midX,atY+1);
+    let fs=11;ctx.font=fs+'px "Courier New"';const label=def.icon+' '+nomeExib;
+    while(ctx.measureText(label).width>PW-20&&fs>8){fs--;ctx.font=fs+'px "Courier New"';}
+    ctx.fillStyle='#f0c040';
+    // Clip defensivo: garante que o texto nunca ultrapasse visualmente o painel,
+    // mesmo que algum nome futuro seja mais longo que o encolhimento de fonte cubra.
+    ctx.save();ctx.beginPath();ctx.rect(PX+6,atY-14,PW-12,20);ctx.clip();
+    ctx.fillText(label,midX,atY+1);
+    ctx.restore();
   } else {
     ctx.font='12px "Courier New"';ctx.fillStyle='#c0c8d8';ctx.fillText('Não Equipado',midX,atY);
   }
@@ -965,7 +1049,7 @@ function drawHUD(player,level){
   if(tools.length>0){
     ctx.fillStyle='rgba(180,140,20,0.3)';ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
     tools.forEach((t,i)=>{
-      const ty=PY+PH_BASE+8+i*22,equipped=player.activeTool===t.id;
+      const ty=PY+PH_BASE+8+i*22,equipped=(activeShort===t.id)||(player.activeTool===t.id);
       ctx.textAlign='center';
       ctx.font='11px serif';ctx.fillStyle=equipped?'#f0c040':'#a08020';
       ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
@@ -1033,21 +1117,22 @@ function drawDeath(){
   ctx.fillStyle='#ff5050';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#e8d090';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'O Saara é implacável.',W/2,H/2-10);
-  CORVAN.draw(ctx, 'hurt', Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
-  ctx.fillStyle='#e0b030';ctx.font='20px "Courier New"';ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+168);ctx.textAlign='left';
+  ctx.fillStyle='#e0b030';ctx.font='20px "Courier New"';ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+40);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+72);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+108);ctx.textAlign='left';
 }
 
 function drawComplete(){
   const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0c0700');g.addColorStop(1,'#241200');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);rg.addColorStop(0,'rgba(200,160,40,.16)');rg.addColorStop(1,'rgba(200,160,40,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#e0b030';ctx.shadowBlur=40;ctx.fillStyle='#d4a020';ctx.font='bold 40px "Courier New"';ctx.fillText('✦  FASE 4.3 CONCLUÍDA  ✦',W/2,120);
-  ctx.shadowBlur=0;ctx.fillStyle='#e8d090';ctx.font='20px "Courier New"';ctx.fillText('A Cidade Onde o Ouro Vira Conhecimento!',W/2,170);
+  ctx.shadowBlur=0;
+  drawCorvanInline(W/2-40,140,3,false,0);
+  ctx.fillStyle='#e8d090';ctx.font='20px "Courier New"';ctx.fillText('A Cidade Onde o Ouro Vira Conhecimento!',W/2,340);
   const lines=['⬜  Halita Saariana — o sal que valia ouro no Saara medieval','📜  Manuscrito de Timbuktu — o elo que ligou África e Europa','🔭  Astrolábio Islâmico — a bússola que atravessou continentes','🐪  Dromedário — 700 km de deserto, 21 dias, uma cidade'];
-  ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,232+i*32));
-  ctx.fillStyle='#e0b030';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,398);
-  ctx.fillStyle=`rgba(200,160,30,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('▶ [M] Menu Principal ◀',W/2,444);
-  ctx.font='64px serif';ctx.fillText('🏆',W/2-32,528);ctx.textAlign='left';
+  ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  ctx.fillStyle='#e0b030';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400+lines.length*32+30);
+  ctx.fillStyle=`rgba(200,160,30,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('✦ Fase 5.1 desbloqueada!   [M] Menu Principal',W/2,400+lines.length*32+70);
+  ctx.font='64px serif';ctx.fillText('🏆',W/2-32,400+lines.length*32+130);ctx.textAlign='left';
 }
 
 // ── Game engine ───────────────────────────────────────────────────

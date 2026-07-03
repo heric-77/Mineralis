@@ -9,27 +9,11 @@
 </head>
 <body>
 
-  <!-- ── Tela de carregamento ── -->
-  <div id="loading-screen">
-    <div class="loading-inner">
-      <div class="loading-gem">💚</div>
-      <div class="loading-title">Mineralis</div>
-      <div class="loading-sub">Fase 5.1 — O Jade Sagrado de Mianmar</div>
-      <div class="loading-bar-wrap">
-        <div class="loading-bar" id="loading-bar"></div>
-      </div>
-      <div class="loading-hint" id="loading-hint">Carregando ativos…</div>
-    </div>
-  </div>
-
-  <!-- ── Canvas principal ── -->
   <div id="wrap">
     <canvas id="c"></canvas>
 
-    <!-- ── Controles touch (mobile) ── -->
     <div id="touch-controls">
 
-      <!-- Esquerda / Direita -->
       <div id="touch-dpad">
         <button id="tb-l" class="touch-btn dpad-btn" aria-label="Mover esquerda">
           <span class="btn-arrow">◀</span>
@@ -39,7 +23,6 @@
         </button>
       </div>
 
-      <!-- Ação / Pular -->
       <div id="touch-actions">
         <button id="tb-e" class="touch-btn action-btn btn-e" aria-label="Interagir / E">
           <span class="btn-label">E</span>
@@ -53,7 +36,6 @@
 
     </div><!-- /touch-controls -->
 
-    <!-- ── Botões extras flutuantes (mobile) ── -->
     <div id="touch-extras">
       <button id="tb-inv" class="touch-btn extra-btn" aria-label="Diário de Bordo [I]"
         ontouchstart="dispatchKey('KeyI',true)" ontouchend="dispatchKey('KeyI',false)">
@@ -67,55 +49,9 @@
 
   </div><!-- /wrap -->
 
-  <script>
-    // ── Helper: simula keydown/keyup para botões extras (mobile) ──
-    function dispatchKey(code, down) {
-      const type = down ? 'keydown' : 'keyup';
-      window.dispatchEvent(new KeyboardEvent(type, { code, bubbles: true }));
-    }
-
-    // ── Loading screen: esconde após o jogo indicar que está pronto ──
-    // O script seta gameReady=true e chama startGame(); a loading screen
-    // é controlada via observer no próprio script abaixo.
-    const _loadScreen = document.getElementById('loading-screen');
-    const _loadBar    = document.getElementById('loading-bar');
-    const _loadHint   = document.getElementById('loading-hint');
-
-    // Simula progresso visual enquanto assets carregam
-    let _loadProgress = 0;
-    const _loadInterval = setInterval(() => {
-      _loadProgress = Math.min(_loadProgress + Math.random() * 8, 90);
-      if (_loadBar) _loadBar.style.width = _loadProgress + '%';
-    }, 120);
-
-    // Quando o script do jogo sinalizar início, finaliza a tela
-    window._onGameReady = function () {
-      clearInterval(_loadInterval);
-      if (_loadBar) _loadBar.style.width = '100%';
-      if (_loadHint) _loadHint.textContent = 'Pressione ENTER ou toque para começar';
-      setTimeout(() => {
-        if (_loadScreen) {
-          _loadScreen.classList.add('fade-out');
-          setTimeout(() => _loadScreen.remove(), 500);
-        }
-      }, 600);
-    };
-  </script>
-
   <script src="../../MenuPrincipal/data/allItemDefs.js"></script>
   <script src="../../MenuPrincipal/data/journalStore.js"></script>
   <script src="scriptfase5-1.js"></script>
-
-  <script>
-    // Dispara _onGameReady assim que o canvas tiver conteúdo (fallback)
-    const _cvs = document.getElementById('c');
-    const _obs = new MutationObserver(() => {
-      if (_cvs && _cvs.width > 0) { window._onGameReady && window._onGameReady(); _obs.disconnect(); }
-    });
-    _obs.observe(_cvs, { attributes: true });
-    // Fallback por tempo: máximo 5s
-    setTimeout(() => { window._onGameReady && window._onGameReady(); }, 5000);
-  </script>
 
 </body>
 </html>

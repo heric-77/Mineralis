@@ -1,10 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  MINERALIS  –  Fase 6.3 (FINAL)  ·  A Última Pedra do Guardião
-//  scriptfase6-3.js
-//  Te Wahi Pounamu, Ilha do Sul, Nova Zelândia · Māori · Séc. XIII
-//  Pounamu · Mergulho · Toki · Hei-Tiki · Mapa-Múndi Final
-// ═══════════════════════════════════════════════════════════════
-
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
@@ -328,6 +321,7 @@ const BUBBLE={
     CORVAN.drawFace(ctx, this.faceFrame, fx, fy, faceW, faceH);
     ctx.strokeStyle='rgba(40,180,100,0.5)';ctx.lineWidth=1.5;ctx.strokeRect(fx,fy,faceW,faceH);
     const tx=fx+faceW+pad; ctx.font=NAMEFNT;ctx.fillStyle='#40c878';ctx.fillText(this.speakerTxt,tx,by+pad+14);
+    ctx.fillStyle='rgba(40,180,100,0.35)';ctx.fillRect(tx,by+pad+20,textAreaW,1);
     ctx.font=FONT;ctx.fillStyle='#f0e8c0';this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+36+i*lineH));
     const pulse=0.55+Math.sin(Date.now()/400)*0.45; ctx.fillStyle=`rgba(40,180,100,${pulse})`;ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-8);ctx.textAlign='left';
   }
@@ -585,7 +579,7 @@ class WorldMap {
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40c878';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40c878';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; let sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headY=py-cam.y-8; sy=Math.min(sy,headY); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40c878';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40c878';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
 }
 
 // ── Col (itens flutuantes) ────────────────────────────────────────
@@ -757,7 +751,12 @@ class Player{
   draw(){
     if(this.dead)return;
     const dx=this.x-cam.x, dy=this.y-cam.y;
-    const dw=this.w*2.4, dh=this.h*1.45;
+    // Escala corrigida para o padrão real do jogo (S=1.5, o mesmo usado desde
+    // a Fase1-1, origem do sprite, e na maioria das fases). Uma correção
+    // anterior usou S≈1.67 (copiado da Fase4-3), mas esse valor é uma exceção
+    // — só Fase3-3/Fase4-3 usam S=1.67. dh agora é fixo em 46*1.5=69px,
+    // independente da altura da hitbox de colisão (80px) desta fase.
+    const dw=this.w, dh=69;
     const ox=(dw-this.w)/2, oy=dh-this.h;
     const flip=this.facing===-1;
     if(this.swimming){
@@ -1233,14 +1232,6 @@ function drawTitle(){
   ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,0,W,H);
   // Estrelas (céu de NZ)
   for(let i=0;i<120;i++){const sx=(i*149.5)%W,sy=(i*89.7)%300;ctx.fillStyle=`rgba(200,255,230,${.15+Math.sin(Date.now()/1400+i)*.15})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
-  // Corvan caminhando
-  {
-    const walkPeriod = 9000;
-    const tWalk = (Date.now() % walkPeriod) / walkPeriod;
-    const cwX = tWalk * (W + 120) - 60;
-    const cwY = H - 140;
-    CORVAN.drawLarge(ctx, cwX, cwY, 2.2, false, Date.now()/180, null);
-  }
   // Kiwi no título (anda à frente)
   if(IMG['kiwi_img']&&IMG['kiwi_img'].complete){
     const kx=((Date.now()/22)%(W+120))-60;
@@ -1262,7 +1253,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(80,220,140,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
   ctx.fillStyle='#a0c8b0';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover  ↑/Espaço Pular  ↓ Mergulhar  E Interagir  I Inventário',W/2,504);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,504);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1271,11 +1262,10 @@ function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#ff2020';ctx.shadowBlur=30;
   ctx.fillStyle='#ff5050';ctx.font='bold 56px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);ctx.shadowBlur=0;
-  CORVAN.drawLarge(ctx, W/2-24, H/2+10, 3, false);
   ctx.fillStyle='#40c878';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+172);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+204);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+30);
+  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+62);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+94);
   ctx.textAlign='left';
 }
 
@@ -1309,7 +1299,7 @@ function drawComplete(){
     '🦤  Kiwi — quem vê o precioso sem precisar enxergar',
   ];
   ctx.fillStyle='#c0e8d0';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
-  ctx.fillStyle='#40c878';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
+  ctx.fillStyle='#40c878';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
   ctx.fillStyle=`rgba(80,220,140,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';
   ctx.fillText('▶ [M] Menu Principal — Modo Guardião ◀',W/2,594);
   ctx.font='42px serif';ctx.fillText('🏆',W/2-20,640);
@@ -1430,7 +1420,7 @@ function _salvarProgresso(score,deaths){
 
 function startGame(){
   CORVAN.load('Assets/', () => {});
-  G.load(0); G.state='title'; loop();
+  G.state='title'; cam.x=0; cam.y=0; loop();
 }
 
 function loop(){

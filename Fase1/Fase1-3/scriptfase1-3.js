@@ -782,7 +782,10 @@ class Trigger{
     if(this.done) return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near) return;
-    const sx=this.x+this.w/2-cam.x, sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const sx=this.x+this.w/2-cam.x;
+    const baseSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const headSy=py-cam.y-8;
+    const sy=Math.min(baseSy,headSy);
     const txt='[E] '+this.label;
     ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
@@ -1492,10 +1495,9 @@ function drawDeath(){
   ctx.fillStyle='#ff5050';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#f8e890';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'Machu Picchu fica nas nuvens — a queda é longa!',W/2,H/2-10);
-  if(SPRITES['hurt']) drawSprite('hurt',Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#f0c040';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+168);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+40);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+72);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+108);
   ctx.textAlign='left';
 }
 
@@ -1503,13 +1505,15 @@ function drawComplete(){
   const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#100800');g.addColorStop(1,'#301800');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);rg.addColorStop(0,'rgba(240,192,64,.18)');rg.addColorStop(1,'rgba(240,192,64,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#f0c040';ctx.shadowBlur=40;
-  ctx.fillStyle='#f0c040';ctx.font='bold 46px "Courier New"';ctx.fillText('✦  FASE 1.3 CONCLUÍDA  ✦',W/2,130);
-  ctx.shadowBlur=0;ctx.fillStyle='#e8d090';ctx.font='20px "Courier New"';ctx.fillText('O Tesouro do Condor foi preservado!',W/2,188);
+  ctx.fillStyle='#f0c040';ctx.font='bold 46px "Courier New"';ctx.fillText('✦  FASE 1.3 CONCLUÍDA  ✦',W/2,60);
+  ctx.shadowBlur=0;
+  drawCorvan(W/2-40,140,3,false,Date.now()/260,null);
+  ctx.fillStyle='#e8d090';ctx.font='20px "Courier New"';ctx.fillText('O Tesouro do Condor foi preservado!',W/2,340);
   const lines=['✦  Faca Cerimonial Tumi — ouro, prata e turquesa','✦  Intihuatana — o relógio solar Inca revelado','✦  Constelação do Condor — geometria das estrelas','✦  Sistema de irrigação do Vale Sagrado'];
-  ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,250+i*30));
-  ctx.fillStyle='#f0c040';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
-  ctx.fillStyle=`rgba(240,192,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('▶[M] Menu Principal◀',W/2,450);
-  ctx.font='64px serif';ctx.fillText('🏆',W/2-32,540);ctx.textAlign='left';
+  ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  ctx.fillStyle='#f0c040';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
+  ctx.fillStyle=`rgba(240,192,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('✦ Fase 2.1 desbloqueada!   [M] Menu Principal',W/2,580);
+  ctx.font='48px serif';ctx.fillText('🏆',W/2+220,140);ctx.textAlign='left';
 }
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];

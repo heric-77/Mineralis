@@ -121,15 +121,15 @@ const Options = (() => {
             <div class="options-section-title">📜 CRÉDITOS</div>
             <div class="options-credits">
               <p>Design & Programação</p>
-              <p class="options-credits-name">Equipe Mineralis</p>
+              <p class="options-credits-name">Dominic Krelling | Franciele Torquato | Gustavo Schmitt | Heric Moreira Ribeiro</p>
               <div class="options-credits-sep">· · ·</div>
               <p>Trilha Sonora</p>
               <p class="options-credits-name">Web Audio API ♪</p>
               <div class="options-credits-sep">· · ·</div>
               <p>Arte Pixel</p>
-              <p class="options-credits-name">Sprites & SVG artesanal</p>
+              <p class="options-credits-name">Sprites & SVG Artesanal | Franciele Torquato </p>
               <div class="options-credits-sep">· · ·</div>
-              <p class="options-version">v1.0 · 2025 · Mineralis</p>
+              <p class="options-version">v1.0 · 2026 · Mineralis</p>
             </div>
           </div>
 

@@ -185,7 +185,7 @@ const ITEM_DEFS = {
     phase:'1.1',
   },
   bateia: {
-    cat:'ferramenta', nome:'Bateia', icon:'🥌', journalId:'bateia',
+    cat:'ferramenta', nome:'Bateia do Garimpo de Serra Pelada', icon:'🥌', journalId:'bateia',
     desc:'Separa ouro pesado do sedimento leve.\nUse [E] nas zonas ⚓ para garimpar.',
     phase:'1.2',
     drawHand:'left',
@@ -881,7 +881,8 @@ class Col{
       if(near){
         const lbl='[E] Coletar';
         const tw=ctx.measureText(lbl).width+16;
-        const bx=sx+this.w/2-tw/2, by=sy-36;
+        const headY=py-cam.y-8;
+        const bx=sx+this.w/2-tw/2, by=Math.min(sy-36,headY);
         ctx.fillStyle='rgba(0,0,0,0.7)';roundRect(bx,by,tw,22,5);ctx.fill();
         ctx.strokeStyle='#78d840';ctx.lineWidth=1.2;roundRect(bx,by,tw,22,5);ctx.stroke();
         ctx.fillStyle='#78d840';ctx.font='bold 12px "Courier New"';
@@ -898,7 +899,9 @@ class Trigger{
     if(this.done)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+80&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+80;
     if(!near)return;
-    const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const baseSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const headY=py-cam.y-8;
+    const sx=this.x+this.w/2-cam.x,sy=Math.min(baseSy,headY);
     const txt='[E] '+this.label;
     ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24;
     ctx.fillStyle='rgba(0,22,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
@@ -1747,15 +1750,14 @@ function drawDeath(){
     rocha:   'Cuidado com as rochas escorregadias da Amazônia!',
     espinho: 'Os espinhos da selva são afiados demais!',
   };
-  drawCorvan(W/2-48,H/2+20,3,false,Date.now()/200);
   ctx.textAlign='center';ctx.shadowColor='#ff4040';ctx.shadowBlur=30;
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-60);
   ctx.shadowBlur=0;
   ctx.fillStyle='#a8e880';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'A selva não perdoa descuido.',W/2,H/2-28);
   ctx.fillStyle='#78d840';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+40);
+  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+68);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+100);
   ctx.textAlign='left';
 }
 
@@ -1768,22 +1770,22 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#78d840';ctx.shadowBlur=40;
   ctx.fillStyle='#78d840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.2 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  // Corvan + Urna side by side
-  drawCorvan(W/2-160,200,4,false,Date.now()/300);
-  ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawUrna(0,0,Date.now()/1000,false);ctx.restore();
+  // Corvan portrait
+  drawCorvan(W/2-40,140,3,false,Date.now()/300);
 
-  ctx.fillStyle='#d8f0d0';ctx.font='17px "Courier New"';ctx.fillText('O Ouro dos Rios foi preservado!',W/2,196);
+  ctx.fillStyle='#d8f0d0';ctx.font='17px "Courier New"';ctx.fillText('O Ouro dos Rios foi preservado!',W/2,340);
   const lines=[
     '✦  Bateia — ferramenta milenar de garimpo aluvial',
     '✦  Pá Exploradora — escavação de solo amazônico',
     '✦  Ouro Aluvial — erodido por milhões de anos',
     '✦  Urna Marajoara — cerâmica de 1.000 anos',
   ];
-  ctx.fillStyle='#a8e880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
-  ctx.fillStyle='rgba(120,216,64,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,368);
-  ctx.fillStyle='#78d840';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
+  ctx.fillStyle='#a8e880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  ctx.fillStyle='rgba(120,216,64,0.8)';ctx.font='14px "Courier New"';ctx.fillText('📚 Itens arquivados no Diário de Bordo!',W/2,400+lines.length*32);
+  const _scoreY=400+lines.length*32+40;
+  ctx.fillStyle='#78d840';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,_scoreY);
   ctx.fillStyle=`rgba(120,216,64,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText(' [M] Menu Principal',W/2,436);
+  ctx.fillText('✦ Fase 1.3 desbloqueada!   [M] Menu Principal',W/2,_scoreY+35);
   ctx.textAlign='left';
 }
 

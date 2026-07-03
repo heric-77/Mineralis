@@ -57,7 +57,7 @@ const PhasesData = [
     caminho:'../Fase4/Fase4-3/index.html' },
 
   // ── ÁSIA ──
-  { id:'5.1', nome:'Rotas de Jade da China Antiga', local:'Xinjiang, China',
+  { id:'5.1', nome:'O Jade Sagrado de Mianmar', local:'Vale de Hpakant, Mianmar',
     continente:'Ásia', desbloqueada:false, estrelas:0,
     mapPos:{ top:'5%', left:'74%' },
     caminho:'../Fase5/Fase5-1/index.html' },

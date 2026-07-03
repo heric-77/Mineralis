@@ -1,9 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  MINERALIS  –  Fase 6.2  ·  O Vidro que Navegou o Oceano
-//  scriptfase6-2.js
-//  Talasea, Papua Nova Guiné · Povo Lapita · 1500 a.C.
-//  Obsidiana · Knapping (ângulo + força) · Riolito · Cerâmica Lapita
-// ═══════════════════════════════════════════════════════════════
 
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
@@ -71,6 +65,8 @@ function _salvarFase(score, deaths){
     if(!save.fases['6.2']) save.fases['6.2']={desbloqueada:true,estrelas:0};
     save.fases['6.2'].estrelas=Math.max(save.fases['6.2'].estrelas||0,estrelas);
     save.fases['6.2'].desbloqueada=true;
+    if(!save.fases['6.3']) save.fases['6.3']={desbloqueada:false,estrelas:0};
+    save.fases['6.3'].desbloqueada=true;
     localStorage.setItem(SAVE_KEY,JSON.stringify(save));
   }catch(e){}
 }
@@ -679,7 +675,7 @@ class Col{
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40d0d0';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40d0d0';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; const syItem=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headClearY=(py-cam.y)+8; const sy=Math.min(syItem,headClearY); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40d0d0';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40d0d0';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
 }
 
 // ── Player ────────────────────────────────────────────────────────
@@ -769,7 +765,13 @@ class Player{
   }
   _hurt(dmg,level){ if(this.inv>0)return; this.hp-=dmg;this.inv=100; burst(this.x+20,this.y+40,'#ff4040',10);sfx('hit'); if(this.hp<=0){this.hp=0;this.dead=true;} }
   draw(){
-    if(this.dead)return; const dx=this.x-cam.x,dy=this.y-cam.y; const dw=this.w*2.4,dh=this.h*1.45; const ox=(dw-this.w)/2,oy=dh-this.h; const flip=this.facing===-1;
+    if(this.dead)return; const dx=this.x-cam.x,dy=this.y-cam.y;
+    // Escala corrigida para o padrão real do jogo (S=1.5, o mesmo usado desde
+    // a Fase1-1, origem do sprite, e na maioria das fases). Uma correção
+    // anterior usou S≈1.67 (copiado da Fase4-3), mas esse valor é uma exceção
+    // — só Fase3-3/Fase4-3 usam S=1.67. dh agora é fixo em 46*1.5=69px,
+    // independente da altura da hitbox de colisão (80px) desta fase.
+    const dw=this.w,dh=69; const ox=(dw-this.w)/2,oy=dh-this.h; const flip=this.facing===-1;
     if(this.interactAnim>0&&this.state!=='jump') CORVAN.draw(ctx, 'dig',  this.frame,    dx-ox,dy-oy,dw,dh,flip);
     else if(this.state==='run')                  CORVAN.draw(ctx, 'walk', this.frame,    dx-ox,dy-oy,dw,dh,flip);
     else                                         CORVAN.draw(ctx, 'idle', this.frame%4,  dx-ox,dy-oy,dw,dh,flip);
@@ -1117,20 +1119,9 @@ function drawTitle(){
   else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a0a10');g.addColorStop(1,'#020204');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,0,W,H);
   for(let i=0;i<120;i++){const sx=(i*141.5)%W,sy=(i*91.7)%280;ctx.fillStyle=`rgba(120,220,220,${.15+Math.sin(Date.now()/1400+i)*.15})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
-  {
-    const walkPeriod = 9000;
-    const tWalk = (Date.now() % walkPeriod) / walkPeriod;
-    const cwX = tWalk * (W + 120) - 60;
-    const cwY = H - 140;
-    CORVAN.drawLarge(ctx, cwX, cwY, 2.2, false, Date.now()/180, null);
-  }
-  if(IMG['casuario_img']&&IMG['casuario_img'].complete){
-    const lx=((Date.now()/20)%(W+130))-65; const ly=200+Math.sin(Date.now()/950)*14;
-    ctx.drawImage(IMG['casuario_img'],0,0,96,96,lx,ly,116,116);
-  }
   ctx.textAlign='center';
   ctx.shadowColor='#188888';ctx.shadowBlur=40;
-  ctx.fillStyle='#40d0d0';ctx.font='bold 48px "Courier New"';ctx.fillText('O VIDRO QUE NAVEGOU O OCEANO',W/2,168);
+  ctx.fillStyle='#40d0d0';ctx.font='bold 48px "Courier New"';ctx.fillText('O Vidro que Navegou o Oceano',W/2,168);
   ctx.shadowBlur=0;
   ctx.fillStyle='#308888';ctx.font='22px "Courier New"';ctx.fillText('Fase 6.2  —  Talasea, Papua Nova Guiné · Povo Lapita · 1500 a.C.',W/2,216);
   if(IMG.card62){
@@ -1143,7 +1134,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(40,180,180,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
   ctx.fillStyle='#a0d0d0';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover  ↑/Espaço Pular  E Interagir  I Inventário',W/2,504);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,504);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1176,9 +1167,9 @@ function drawComplete(){
     '🦤  Casuário do Sul — o guardião mais perigoso da Oceania',
   ];
   ctx.fillStyle='#c0e8e8';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
-  ctx.fillStyle='#40d0d0';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
+  ctx.fillStyle='#40d0d0';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
   ctx.fillStyle=`rgba(40,180,180,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';
-  ctx.fillText('▶ [M] Menu Principal ◀',W/2,594);
+  ctx.fillText('✦ Fase 6.3 desbloqueada!   [M] Menu Principal',W/2,594);
   ctx.font='42px serif';ctx.fillText('🏆',W/2-20,640);
   ctx.textAlign='left';
 }
@@ -1275,13 +1266,15 @@ function _salvarProgresso(score,deaths){
     if(!save.fases['6.2']) save.fases['6.2']={desbloqueada:true,estrelas:0};
     save.fases['6.2'].estrelas=Math.max(save.fases['6.2'].estrelas||0,estrelas);
     save.fases['6.2'].desbloqueada=true;
+    if(!save.fases['6.3']) save.fases['6.3']={desbloqueada:false,estrelas:0};
+    save.fases['6.3'].desbloqueada=true;
     localStorage.setItem(SAVE_KEY,JSON.stringify(save));
   }catch(e){}
 }
 
 function startGame(){
   CORVAN.load('Assets/', () => {});
-  G.load(0); G.state='title'; loop();
+  G.state='title'; cam.x=0; cam.y=0; loop();
 }
 
 function loop(){

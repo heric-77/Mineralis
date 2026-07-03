@@ -1,10 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  MINERALIS  –  Fase 5.2  ·  O Azul que o Mundo Buscou
-//  scriptfase5-2.js
-//  Sar-e-Sang, Badakhshan, Afeganistão · 2500 a.C.
-//  Lápis-Lazúli · Fire-Setting · Sodalita · Pigmento Ultramarino
-// ═══════════════════════════════════════════════════════════════
-
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
@@ -22,7 +15,6 @@ function resize() {
 }
 resize(); window.addEventListener('resize', resize);
 
-// ── Audio ──────────────────────────────────────────────────────
 let AC;
 try { AC = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
 function sfx(type) {
@@ -63,7 +55,36 @@ function sfx(type) {
   o.start(t); o.stop(t+stopAt);
 }
 
-// ── Save ─────────────────────────────────────────────────────────
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null;
+const _NOTES_S2=[146.8,155.6,185.0,196.0,220.0,233.1,261.6,293.7];
+function startBgMusic(){
+  if(_bgMusicActive||!AC)return;
+  _bgMusicActive=true;
+  if(AC.state==='suspended')AC.resume();
+  _bgMusicGain=AC.createGain();_bgMusicGain.gain.value=0.045;_bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur,type,vol){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||'triangle';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol||0.07,start+0.06);
+    g.gain.setValueAtTime(vol||0.07,start+dur-0.18);g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g);g.connect(_bgMusicGain);o.start(start);o.stop(start+dur);
+  }
+  const SEQ=[0,3,4,3,0,2,1,0,4,6,4,3,2,1,0,0];
+  function _ciclo(){
+    if(!_bgMusicActive)return;
+    const t=AC.currentTime+0.1, step=0.55;
+    _nota(_NOTES_S2[0]/2,t,SEQ.length*step,'sine',0.035);
+    SEQ.forEach((idx,i)=>_nota(_NOTES_S2[idx%_NOTES_S2.length],t+i*step,step*1.05));
+    _bgMusicTimeout=setTimeout(_ciclo,(SEQ.length*step-0.2)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false;clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){_bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5);_bgMusicGain=null;}
+}
+let _prevBgState='';
+
 const SAVE_KEY = 'mineralis_save_v2';
 function _salvarFase(score, deaths){
   const estrelas = deaths===0?4:deaths<=2?3:deaths<=5?2:1;
@@ -74,12 +95,13 @@ function _salvarFase(score, deaths){
     if(!save.fases['5.2']) save.fases['5.2']={desbloqueada:true,estrelas:0};
     save.fases['5.2'].estrelas=Math.max(save.fases['5.2'].estrelas||0,estrelas);
     save.fases['5.2'].desbloqueada=true;
+    if(!save.fases['5.3']) save.fases['5.3']={desbloqueada:false,estrelas:0};
+    save.fases['5.3'].desbloqueada=true;
     localStorage.setItem(SAVE_KEY,JSON.stringify(save));
   }catch(e){}
 }
 function _voltarAoMenu(){ _salvarFase(G.player?.score||0,G.deaths); window.location.href='../../MenuPrincipal/index.html'; }
 
-// ── Assets ───────────────────────────────────────────────────────
 const IMG={};
 const ASSETS=[
   ['bg01','Assets/cena1_vale_sar_e_sang.svg'],
@@ -101,7 +123,6 @@ ASSETS.forEach(([key,src])=>{
   img.src=src;
 });
 
-// ── Input ─────────────────────────────────────────────────────────
 const keys={}, jp={};
 window.addEventListener('keydown',e=>{
   if(!keys[e.code]) jp[e.code]=true; keys[e.code]=true;
@@ -122,7 +143,6 @@ const isJ=()=>jp['ArrowUp']||jp['KeyW']||jp['Space']||jp['_tj'];
 const isE=()=>jp['KeyE']||jp['Enter']||jp['_te'];
 function clearJP(){ for(const k in jp) delete jp[k]; }
 
-// ── Particles ─────────────────────────────────────────────────────
 let particles=[];
 function burst(x,y,color,n=8,spd=3.5){
   for(let i=0;i<n;i++){
@@ -158,13 +178,11 @@ function tickParticles(){
 }
 function drawParticles(){for(const p of particles){ctx.globalAlpha=p.life/p.max;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cam.x,p.y-cam.y,p.r*(p.life/p.max),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
 
-// ── Camera ────────────────────────────────────────────────────────
 const cam={x:0,y:0};
 function updateCam(px,worldW){ const t=px-W/2+24; const c=Math.max(0,Math.min(t,worldW-W)); cam.x+=(c-cam.x)*0.12; }
 
 const GRAV=0.46, PSPD=4.6, JUMPF=-12.4, MAXFALL=16;
 
-// ── Tile themes — calcário branco/rosado com veios azuis ──────────
 const TILE_THEMES={
   1:{top:'#d8d0c0',body:'#b8ac98',dark:'#8a7c68'},  // calcário externo
   2:{top:'#c8bca8',body:'#a89880',dark:'#786858'},  // galerias
@@ -173,7 +191,6 @@ const TILE_THEMES={
 };
 let tileTheme=TILE_THEMES[1];
 
-// ── Platform helpers ──────────────────────────────────────────────
 function solid(x,y,w,h){ return {type:'solid',x,y,w,h}; }
 function movH(x,y,w,x0,x1,spd){ return {type:'solid',moving:true,x,y,w,h:18,x0,x1,spd,vx:spd,vy:0}; }
 function movV(x,y,w,y0,y1,spd){ return {type:'solid',moving:true,x,y,w,h:18,y0,y1,spd,vx:0,vy:spd}; }
@@ -186,7 +203,26 @@ function tickTrapdoors(plats){ for(const p of plats){ if(p.type!=='trapdoor') co
 function drawPlatform(p){
   const sx=p.x-cam.x, sy=p.y-cam.y;
   if(sx>W+80||sx+p.w<-80||sy>H+40||sy+p.h<-40) return;
-  if(p.type==='spike'){ const nc=Math.max(1,Math.floor(p.w/20)); ctx.fillStyle='#786858'; for(let i=0;i<nc;i++){const tx=sx+i*(p.w/nc);ctx.beginPath();ctx.moveTo(tx,sy+p.h);ctx.lineTo(tx+p.w/nc/2,sy);ctx.lineTo(tx+p.w/nc,sy+p.h);ctx.fill();} return; }
+  if(p.type==='spike'){
+    // Visibilidade melhorada (padrão da Fase5-1): gradiente claro + contorno
+    // escuro + aresta de brilho + sombra de contato — antes era um triângulo
+    // marrom-acinzentado chapado ('#786858') sem contorno, que sumia de vista
+    // contra os fundos escuros das galerias/cânion desta fase.
+    const nc=Math.max(1,Math.floor(p.w/20)), tw=p.w/nc;
+    for(let i=0;i<nc;i++){
+      const tx=sx+i*tw, baseY=sy+p.h, tipY=sy, tipX=tx+tw/2;
+      ctx.fillStyle='rgba(0,0,0,0.25)';
+      ctx.beginPath();ctx.ellipse(tipX,baseY+1,tw/2.3,2.5,0,0,Math.PI*2);ctx.fill();
+      const grad=ctx.createLinearGradient(tx,baseY,tx,tipY);
+      grad.addColorStop(0,'#8a8a92');grad.addColorStop(1,'#e8e8ee');
+      ctx.fillStyle=grad;
+      ctx.beginPath();ctx.moveTo(tx+1,baseY);ctx.lineTo(tipX,tipY);ctx.lineTo(tx+tw-1,baseY);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#3a3a42';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(tx+3,baseY-2);ctx.lineTo(tipX-1,tipY+3);ctx.stroke();
+    }
+    return;
+  }
   if(p.type==='trapdoor'){ const alpha=p.crumble!==undefined?p.crumble/70:1; ctx.globalAlpha=alpha; ctx.fillStyle=tileTheme.dark;ctx.fillRect(sx,sy,p.w,p.h); ctx.fillStyle=tileTheme.top;ctx.fillRect(sx,sy,p.w,3); ctx.globalAlpha=1; return; }
   if(p.type==='_dead') return;
   const ts=24,cols=Math.ceil(p.w/ts),rows=Math.ceil(p.h/ts);
@@ -199,12 +235,23 @@ function drawPlatform(p){
   if(p.moving){ ctx.fillStyle='rgba(40,60,200,0.35)'; ctx.fillRect(sx,sy,p.w,4); }
 }
 
-// ── Utils ─────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
 function _rr(x,y,w,h,r){ roundRect(x,y,w,h,r); }
+// Caixa de texto sólida (fundo preto + borda colorida) para avisos/ações no
+// mundo (fogueiras, fragmentos etc.) — mesmo padrão já usado no tooltip
+// "[E] Pegar X" dos itens (Col) e dos Triggers. Antes esses avisos eram só
+// texto pulsante semi-transparente (chegava a alpha=0, ficando invisível por
+// completo em parte do ciclo) sem nenhum fundo, difícil de ler contra
+// qualquer cenário mais claro/cheio de detalhes.
+function drawActionTooltip(cx,cy,txt,color,pulse=1,fontSize=10){
+  ctx.font='bold '+fontSize+'px "Courier New"';
+  const tw=ctx.measureText(txt).width+22;
+  ctx.fillStyle='rgba(0,0,0,0.8)'; roundRect(cx-tw/2,cy-14,tw,22,4); ctx.fill();
+  ctx.strokeStyle=color; ctx.globalAlpha=0.5+pulse*0.5; ctx.lineWidth=1.5; roundRect(cx-tw/2,cy-14,tw,22,4); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.fillStyle=color; ctx.textAlign='center'; ctx.fillText(txt,cx,cy+1); ctx.textAlign='left';
+}
 function wrapText(text,maxW){ ctx.font='15px "Courier New"'; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
 
-// ── Item Definitions ──────────────────────────────────────────────
 const ITEM_DEFS={
   // Herdados
   picareta_basica:  { cat:'ferramenta',nome:'Picareta Básica',       icon:'⛏',fase:'1.1',desc:'Extrai minérios das paredes rochosas.' },
@@ -213,7 +260,7 @@ const ITEM_DEFS={
   machado_item:     { cat:'ferramenta',nome:'Machado Tuaregue',      icon:'🪓',fase:'4.3',desc:'Golpe horizontal para sal.' },
   picareta_aco_song:{ cat:'ferramenta',nome:'Picareta de Aço Song',  icon:'⛏',fase:'5.3',desc:'Aço chinês do séc. XI.' },
   // Novas 5.2
-  tora_pinheiro:    { cat:'ferramenta',nome:'Tora de Pinheiro Seco', icon:'🪵',fase:'5.2',desc:'Madeira seca para a fogueira do fire-setting.\nAquece a rocha até o limite — mas se a água\nvier cedo demais, a tora se perde.',multiple:true },
+  tora_pinheiro:    { cat:'ferramenta',nome:'Tora de Pinheiro Seco', icon:'🌲',fase:'5.2',desc:'Madeira seca para a fogueira do fire-setting.\nAquece a rocha até o limite — mas se a água\nvier cedo demais, a tora se perde.',multiple:true },
   anfora_barro:     { cat:'ferramenta',nome:'Ânfora com Água Fria',  icon:'🏺',fase:'5.2',desc:'Resfriamento brusco após o aquecimento.\nAs duas partes do fire-setting são inseparáveis:\nfogo que expande, água que contrai — a rocha racha.' },
   pilao_agata:      { cat:'ferramenta',nome:'Pilão de Ágata',        icon:'⚱️',fase:'5.2',desc:'A ágata é mais dura que o lápis — não contamina\no pigmento com sua própria cor ao moer.\nUsado por lapidários medievais para extrair\nultramarino puro em processo de semanas.' },
   // Minérios
@@ -234,7 +281,6 @@ const TIPO_TO_JOURNAL={
   lapis:'lapis_lazuli', frasco:'frasco_ultramarino',
 };
 
-// ── Inventory ─────────────────────────────────────────────────────
 const INV={
   open:false,tab:0,cursor:0,
   TABS:[{id:'ferramenta',label:'🔧 Ferramentas',color:'#3868c8'},{id:'minerio',label:'⛏ Minérios',color:'#2850a8'},{id:'artefato',label:'🏺 Artefatos',color:'#4878d0'}],
@@ -298,7 +344,6 @@ const INV={
   }
 };
 
-// ── Dialog Bubble ─────────────────────────────────────────────────
 let dlgFaceT=0;
 const BUBBLE={
   active:false,queue:[],cb:null,lines:[],speakerTxt:'CORVAN',faceFrame:0,
@@ -328,7 +373,6 @@ const BUBBLE={
 function showDialog(lines,cb,speaker='CORVAN'){ BUBBLE.show(lines,cb,speaker); }
 function checkDlg(){ if(G.dialog&&!INV.open&&isE()) BUBBLE.advance(); }
 
-// ── Notification ──────────────────────────────────────────────────
 let notifText='',notifAlpha=0,notifTimer=0;
 function notify(msg,ms=2800){notifText=msg;notifTimer=ms;notifAlpha=1;}
 function tickNotif(){if(notifTimer>0){notifTimer-=16;if(notifTimer<=0)notifAlpha=0;else notifAlpha=Math.min(1,notifTimer/300);}}
@@ -339,17 +383,34 @@ function drawNotif(){
   ctx.fillStyle='#4878d0';ctx.textAlign='center';ctx.fillText(notifText,W/2,ny+19);ctx.textAlign='left';ctx.restore();
 }
 
-// ── Pop-up informativo ────────────────────────────────────────────
 const POPUP={ active:false,title:'',lines:[],icon:'🔷',timer:0,
   show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=text.split('\n');this.timer=duration;},
   tick(){if(this.timer>0){this.timer-=16;if(this.timer<=0)this.active=false;}},
-  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60;
+  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PX=W-PW-20,PY=60;
+    ctx.font='12px "Courier New"';
+    const maxTextW=PW-32;
+    const wrapped=[];
+    this.lines.forEach(line=>{
+      const words=line.split(' ');let cur='';
+      for(const w of words){ const test=cur?cur+' '+w:w; if(ctx.measureText(test).width>maxTextW&&cur){wrapped.push(cur);cur=w;}else cur=test; }
+      wrapped.push(cur);
+    });
+    const PH=wrapped.length*20+100;
     ctx.save();ctx.globalAlpha=alpha; ctx.fillStyle='rgba(2,4,12,0.94)';_rr(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle='#204090';ctx.lineWidth=2;_rr(PX,PY,PW,PH,12);ctx.stroke();
-    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46); ctx.font='bold 13px "Courier New"';ctx.fillStyle='#4878d0';ctx.fillText(this.title,PX+60,PY+28);
-    ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';this.lines.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*20));ctx.restore(); }
+    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46);
+    // BUG: textAlign continuava 'center' (herdado do desenho do ícone acima)
+    // na hora de escrever o título, então o título era centralizado em vez de
+    // começar em PX+60 — títulos longos ("Pilão e Almofariz de Ágata")
+    // estouravam para FORA da caixa pela esquerda. Reset explícito + encolhe
+    // a fonte se ainda não couber na largura disponível (defensivo).
+    ctx.textAlign='left';
+    const titleMaxW=PX+PW-16-(PX+60);
+    let tfs=13; ctx.font='bold '+tfs+'px "Courier New"';
+    while(ctx.measureText(this.title).width>titleMaxW&&tfs>9){ tfs--; ctx.font='bold '+tfs+'px "Courier New"'; }
+    ctx.fillStyle='#4878d0';ctx.fillText(this.title,PX+60,PY+28);
+    ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';wrapped.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*20));ctx.restore(); }
 };
 
-// ── Fire-Setting Spot — mecânica inédita: aquecer + resfriar ──────
 class FireSettingSpot {
   constructor(x,y){
     this.x=x; this.y=y; this.w=90; this.h=70;
@@ -396,7 +457,7 @@ class FireSettingSpot {
       notify('💨 Água cedo demais! A rocha não rachou — a tora se perdeu. Busque mais lenha.');
     }
   }
-  draw(){
+  draw(px,py,hasPilao){
     const sx=this.x-cam.x, sy=this.y-cam.y;
     if(sx<-120||sx>W+120) return;
     ctx.save(); ctx.translate(sx,sy);
@@ -434,28 +495,45 @@ class FireSettingSpot {
       // Tora
       ctx.fillStyle='#5a3010'; ctx.fillRect(-16,18,32,6);
       ctx.restore();
-      // Barra de aquecimento
-      const bw=100, bx2=sx+this.w/2-bw/2, by2=sy-24;
+      // Barra de aquecimento — BUG: ficava em sy-24 (acima do TOPO da parede),
+      // enquanto a chama é desenhada bem abaixo da parede (fy=sy+h+4). Isso
+      // deixava uns 80px de distância entre a fogueira e seu próprio status,
+      // com a parede inteira no meio — na prática a chama aparecia sozinha,
+      // sem nenhum alerta visível por perto, parecendo um item "solto" sem
+      // explicação. Reposicionado para ficar logo acima da própria chama.
+      const bw=100, bx2=fx-bw/2, by2=fy-46;
       ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(bx2,by2,bw,10);
       const heatCol = this.heat<80 ? `rgba(${Math.round(180+this.heat*0.7)},${Math.round(140-this.heat)},40,0.9)` : 'rgba(255,80,30,0.95)';
       ctx.fillStyle=heatCol; ctx.fillRect(bx2,by2,bw*(this.heat/100),10);
       ctx.strokeStyle=this.heat>=80?'#ffe060':'rgba(200,150,40,0.6)'; ctx.lineWidth=this.heat>=80?2:1;
       ctx.strokeRect(bx2,by2,bw,10);
+      // BUG: o clamp "headY-8" fazia esse aviso subir/descer seguindo a altura
+      // do JOGADOR (que pode estar longe, em outra plataforma), em vez de
+      // ficar fixo relativo à própria fogueira — parecia "pular junto com o
+      // Corvan" em vez de estático sobre o objeto. Removido: a posição agora
+      // é sempre fixa em relação à chama/parede.
       if(this.heat>=80){
         const pulse=0.6+Math.sin(this.t*4)*0.4;
-        ctx.font='bold 10px "Courier New"'; ctx.fillStyle=`rgba(255,200,80,${pulse})`; ctx.textAlign='center';
-        ctx.fillText('[E] Despeje a água!', sx+this.w/2, by2-6); ctx.textAlign='left';
+        drawActionTooltip(fx,by2-6,'[E] Despeje a água!','#ffc850',pulse);
       } else {
-        ctx.font='9px "Courier New"'; ctx.fillStyle='#c0a850'; ctx.textAlign='center';
-        ctx.fillText(`Aquecendo ${Math.floor(this.heat)}%`, sx+this.w/2, by2-6); ctx.textAlign='left';
+        drawActionTooltip(fx,by2-6,`🔥 Aquecendo ${Math.floor(this.heat)}%`,'#e0c060',1,9);
       }
     } else if(this.state==='unlit'){
       const pulse=0.5+Math.sin(this.t*2)*0.5;
-      ctx.font='bold 10px "Courier New"'; ctx.fillStyle=`rgba(220,140,40,${pulse})`; ctx.textAlign='center';
-      ctx.fillText('[E] Acender com 🪵 Tora', sx+this.w/2, sy-10); ctx.textAlign='left';
+      drawActionTooltip(sx+this.w/2,sy-10,'[E] Acender com 🌲 Tora','#e0983c',pulse);
     }
-    // Fragmentos
-    for(const f of this.fragments) f.draw();
+    // Fragmentos — só o mais próximo do jogador mostra o texto de ação. Antes
+    // TODOS os fragmentos exibiam seu aviso o tempo todo (sem checar
+    // proximidade), e como ficam a só 28px um do outro, 2-3 avisos apareciam
+    // sobrepostos/ilegíveis sempre que a rocha rachava com múltiplos
+    // fragmentos por perto.
+    let nearestF=null, nearestD=80;
+    for(const f of this.fragments){
+      if(f.done) continue;
+      const d=Math.hypot((px+20)-(f.x+f.w/2),(py+40)-(f.y+f.h/2));
+      if(d<nearestD){nearestD=d;nearestF=f;}
+    }
+    for(const f of this.fragments) f.draw(px,py,hasPilao,f===nearestF);
   }
 }
 
@@ -470,7 +548,7 @@ class LapisFragment {
     this.t=Math.random()*Math.PI*2;
   }
   tick(){ this.t+=0.05; }
-  draw(){
+  draw(px,py,hasPilao,showTooltip=true){
     if(this.done) return;
     const sx=this.x-cam.x, sy=this.y-cam.y+Math.sin(this.t)*1.5;
     if(sx<-40||sx>W+40) return;
@@ -492,19 +570,28 @@ class LapisFragment {
     }
     ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1; ctx.strokeRect(0,0,this.w,this.h);
     ctx.restore();
-    // Indicador
+    // Indicador — só desenhado para o fragmento mais próximo (showTooltip),
+    // e agora numa caixa sólida em vez de texto pulsante semi-transparente
+    // (que ficava ilegível contra o fundo e, com vários fragmentos por
+    // perto, virava uma sopa de letras sobrepostas).
+    if(!showTooltip) return;
+    // Posição fixa relativa ao fragmento (mesmo ajuste do FireSettingSpot):
+    // clampar pela altura da cabeça do jogador fazia o aviso "pular" para
+    // cima/baixo conforme o Corvan pulava, em vez de ficar parado sobre o
+    // próprio fragmento.
+    const promptY=sy-6;
     if(!this.examined){
       const pulse=0.5+Math.sin(this.t*2)*0.5;
-      ctx.fillStyle=`rgba(200,170,220,${pulse})`;
-      ctx.font='bold 9px "Courier New"'; ctx.textAlign='center';
-      ctx.fillText('[E] Moer amostra',sx+this.w/2,sy-6); ctx.textAlign='left';
+      if(hasPilao){
+        drawActionTooltip(sx+this.w/2,promptY,'[E] Moer amostra','#c8aae0',pulse,9);
+      } else {
+        drawActionTooltip(sx+this.w/2,promptY,'🔒 Precisa do Pilão','#e0785a',pulse,9);
+      }
     } else {
       if(this.type==='lapis'){
-        ctx.fillStyle='rgba(220,190,80,0.9)'; ctx.font='bold 9px "Courier New"'; ctx.textAlign='center';
-        ctx.fillText('✓ [E] Coletar',sx+this.w/2,sy-6); ctx.textAlign='left';
+        drawActionTooltip(sx+this.w/2,promptY,'✓ [E] Coletar','#e0d060',1,9);
       } else {
-        ctx.fillStyle='rgba(150,150,160,0.8)'; ctx.font='bold 9px "Courier New"'; ctx.textAlign='center';
-        ctx.fillText('✗ sodalita — [E] descartar',sx+this.w/2,sy-6); ctx.textAlign='left';
+        drawActionTooltip(sx+this.w/2,promptY,'✗ sodalita — [E] descartar','#a0a0b0',1,9);
       }
     }
   }
@@ -535,12 +622,18 @@ class OvelhaMarcoPolo {
     const sx=this.x-cam.x, sy=this.y-cam.y; if(sx<-100||sx>W+100) return;
     ctx.save();
     if(IMG['ovelha_img']&&IMG['ovelha_img'].complete&&IMG['ovelha_img'].naturalWidth>0){
-      const dw=110,dh=110,bob=this.state==='guide'?Math.sin(this.frame*1.4)*2:0;
-      if(this.facing<0){ctx.translate(sx+dw/2,sy-dh/2+bob);ctx.scale(-1,1);}else ctx.translate(sx-dw/2,sy-dh/2+bob);
+      // Reduzida de 110→66 (60%) para condizer com a escala do Corvan (dh≈77);
+      // no tamanho antigo a ovelha ficava quase 1,5x maior que o próprio jogador.
+      // O "pé" é mantido na mesma linha de chão de antes (sy+55), só encolhendo
+      // a partir do topo, para não flutuar nem afundar na pedra.
+      const dw=66,dh=66,bob=this.state==='guide'?Math.sin(this.frame*1.4)*2:0;
+      const topY=sy+55-dh+bob;
+      if(this.facing<0){ctx.translate(sx+dw/2,topY);ctx.scale(-1,1);}else ctx.translate(sx-dw/2,topY);
       ctx.drawImage(IMG['ovelha_img'],0,0,96,96,0,0,dw,dh);
     } else {
       ctx.translate(sx,sy); const bob=this.state==='guide'?Math.sin(this.frame*1.4)*2:0;
       if(this.facing<0)ctx.scale(-1,1);
+      ctx.scale(0.6,0.6); // mesma redução de escala do desenho vetorial de reserva
       ctx.fillStyle='#dcc898'; ctx.beginPath(); ctx.ellipse(0,bob,28,15,0,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#e4d0a0'; ctx.beginPath(); ctx.arc(24,bob-10,10,0,Math.PI*2); ctx.fill();
       // Chifres espiralados enormes
@@ -596,12 +689,25 @@ class Enemy{
 }
 
 // ── Col (itens flutuantes) ────────────────────────────────────────
+// Ferramentas coletáveis (exigem [E] e mostram alerta padrão) — pirita e
+// frasco não entram aqui: pirita é bônus decorativo e frasco é auto-coleta
+// do artefato final.
+const TOOL_LABELS={tora:'Tora de Pinheiro',anfora:'Ânfora com Água Fria'};
+
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=30;this.h=30;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
-  draw(){
+  draw(player){
     if(this.done) return;
     const sx=this.x-cam.x, sy=this.y-cam.y+Math.sin(this.t)*5; if(sx<-50||sx>W+50) return;
+    const isTool=TOOL_LABELS.hasOwnProperty(this.type);
+    const near=isTool&&player&&player.near(this,70);
+    if(near){
+      const pulse=0.5+Math.sin(Date.now()/300)*0.5;
+      const glow=ctx.createRadialGradient(sx+15,sy+15,0,sx+15,sy+15,26);
+      glow.addColorStop(0,`rgba(72,120,208,${0.35+pulse*0.2})`); glow.addColorStop(1,'rgba(72,120,208,0)');
+      ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(sx+15,sy+15,26,0,Math.PI*2); ctx.fill();
+    }
     ctx.save(); ctx.translate(sx+15, sy+15);
     if(this.type==='tora'){
       if(IMG['tora_img']) ctx.drawImage(IMG['tora_img'],0,0,48,48,-15,-15,30,30);
@@ -615,15 +721,32 @@ class Col{
     } else if(this.type==='frasco'){
       if(IMG['frasco_img']) ctx.drawImage(IMG['frasco_img'],0,0,48,48,-15,-15,30,30);
       else{ ctx.fillStyle='#6aa8a8';ctx.fillRect(-10,-8,20,20); ctx.fillStyle='#2030a0';ctx.fillRect(-8,-4,16,14); }
+    } else if(this.type==='pirita'){
+      // Fragmento solto de pirita — bônus decorativo colecionável na galeria
+      const sh=0.6+Math.sin(this.t*2)*0.4;
+      ctx.fillStyle=`rgba(230,190,60,${sh})`;
+      ctx.beginPath(); ctx.moveTo(0,-9); ctx.lineTo(8,0); ctx.lineTo(0,9); ctx.lineTo(-8,0); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle='rgba(255,224,120,0.9)'; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle='rgba(255,240,180,0.8)'; ctx.beginPath(); ctx.arc(-2,-2,2,0,Math.PI*2); ctx.fill();
     }
     ctx.restore();
+    if(near){
+      const label=TOOL_LABELS[this.type];
+      const txt='[E] Pegar '+label; ctx.font='13px "Courier New"'; const tw=ctx.measureText(txt).width+22;
+      const headTop=(player.y-cam.y)-16, itemTop=sy-16;
+      const cy=Math.min(itemTop,headTop-24);
+      const cx=Math.max(tw/2+6,Math.min(sx+15,W-tw/2-6));
+      ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(cx-tw/2,cy-16,tw,24,4);ctx.fill();
+      ctx.strokeStyle='#4878d0';ctx.lineWidth=1.5;roundRect(cx-tw/2,cy-16,tw,24,4);ctx.stroke();
+      ctx.fillStyle='#4878d0';ctx.textAlign='center';ctx.fillText(txt,cx,cy);ctx.textAlign='left';
+    }
   }
 }
 
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#4878d0';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#4878d0';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; let sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headY=py-cam.y; if(sy-16>headY-8) sy=headY-8+16; const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6)); ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#4878d0';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#4878d0';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left'; }
 }
 
 // ── Player ────────────────────────────────────────────────────────
@@ -650,20 +773,45 @@ class Player{
     let eConsumed = false;
     const ePressed = isE();
 
-    // Coletáveis simples
+    // Coletáveis simples — ferramentas (tora/ânfora) exigem [E] com o alerta
+    // visível (igual ao padrão de outras fases); os demais tipos continuam
+    // sendo coletados automaticamente ao encostar.
     for(const c of level.cols){
-      if(!c.done&&this.overlaps(c)){
+      if(c.done) continue;
+      const isTool=TOOL_LABELS.hasOwnProperty(c.type);
+      if(isTool){ if(!this.overlaps(c)||!ePressed) continue; }
+      else if(!this.overlaps(c)) continue;
+      {
         c.done=true;
-        this.items.push(c.type); sfx('item'); _journalColetar(c.type);
-        burst(c.x+15,c.y+15,'#4878d0',10);
-        if(c.type==='tora')   notify('🪵 Tora de Pinheiro coletada! ('+this.items.filter(i=>i==='tora').length+')');
-        if(c.type==='anfora') notify('🏺 Ânfora de Água Fria coletada!');
-        if(c.type==='pilao')  notify('⚱️ Pilão de Ágata recebido!');
-        if(c.type==='frasco'){ sfx('glass'); notify('🧪 Frasco de Ultramarino Medieval encontrado!'); }
+        if(c.type==='pirita'){
+          // Bônus decorativo — não é ferramenta/artefato, só pontuação, então
+          // não entra no Diário de Bordo nem no array de itens.
+          this.score+=5; sfx('coin'); burst(c.x+15,c.y+15,'#e6c04a',10);
+          notify('✨ Fragmento de pirita! (+5)');
+        } else {
+          this.items.push(c.type); sfx('item'); _journalColetar(c.type);
+          burst(c.x+15,c.y+15,'#4878d0',10);
+          // Ferramentas/artefatos (tora, ânfora, pilão, frasco) NÃO somam mais
+          // pontuação: eles já aparecem no Diário de Bordo, e o contador ⭐ só
+          // é exibido em cenas com bônus "puros" sem entrada no Diário (ex.:
+          // pirita). Antes essas coletas ainda incrementavam this.score em
+          // segredo mesmo com o contador escondido na Cena 1 — ao chegar na
+          // Cena 2 (onde o contador aparece), o placar já vinha "carregado"
+          // com pontos de itens que o jogador nunca viu contabilizados.
+          if(c.type==='tora'){   notify('🌲 Tora de Pinheiro coletada! ('+this.items.filter(i=>i==='tora').length+')'); }
+          if(c.type==='anfora'){ notify('🏺 Ânfora de Água Fria coletada!'); }
+          if(c.type==='pilao'){  notify('⚱️ Pilão de Ágata recebido!'); }
+          if(c.type==='frasco'){ sfx('glass'); notify('🧪 Frasco de Ultramarino Medieval encontrado!'); }
+        }
       }
     }
 
-    // Fire-Setting Spots — ignição e despejo de água
+    // Fire-Setting Spots — ignição e despejo de água. A Tora é consumível
+    // (combustível, é gasta ao usar — não faz sentido "equipar" lenha), então
+    // continua bastando tê-la no inventário. Já a Ânfora é uma ferramenta
+    // única, como o Machado da Fase4-3: precisa estar EQUIPADA pelo Diário
+    // [I] antes de funcionar, não basta só tê-la coletado.
+    const anforaEquipada = this.activeTool==='anfora_barro';
     if(level.fireSpots && ePressed && !eConsumed){
       for(const spot of level.fireSpots){
         if(this.near({x:spot.x,y:spot.y,w:spot.w,h:spot.h},70)){
@@ -672,16 +820,19 @@ class Player{
               const idx=this.items.indexOf('tora'); this.items.splice(idx,1);
               spot.ignite(); eConsumed=true;
             } else {
-              notify('Você precisa de uma 🪵 Tora de Pinheiro para acender!');
+              notify('Você precisa de uma 🌲 Tora de Pinheiro para acender!');
               eConsumed=true;
             }
             break;
           } else if(spot.state==='heating'){
-            if(this.items.includes('anfora')){
-              spot.pourWater(this); eConsumed=true;
-            } else {
+            if(!this.items.includes('anfora')){
               notify('Você precisa da 🏺 Ânfora com Água Fria!');
               eConsumed=true;
+            } else if(!anforaEquipada){
+              notify('🔒 Equipe a Ânfora pelo Diário [I] antes de usar!');
+              eConsumed=true;
+            } else {
+              spot.pourWater(this); eConsumed=true;
             }
             break;
           }
@@ -689,8 +840,26 @@ class Player{
       }
     }
 
+    // Fragmentos — examinar (moer) e coletar/descartar. O Pilão também
+    // precisa estar EQUIPADO (mesmo padrão da Ânfora acima), não basta tê-lo
+    // no inventário.
+    const pilaoEquipado = this.activeTool==='pilao_agata';
+    if(level.fireSpots && ePressed && !eConsumed && !pilaoEquipado){
+      outer2:
+      for(const spot of level.fireSpots){
+        for(const frag of spot.fragments){
+          if(frag.done||frag.examined) continue;
+          if(this.near({x:frag.x,y:frag.y,w:frag.w,h:frag.h},50)){
+            if(!this.items.includes('pilao')) notify('🔒 Você precisa do ⚱️ Pilão de Ágata para examinar este fragmento!');
+            else notify('🔒 Equipe o Pilão de Ágata pelo Diário [I] antes de usar!');
+            eConsumed=true; break outer2;
+          }
+        }
+      }
+    }
+
     // Fragmentos — examinar (moer) e coletar/descartar
-    if(level.fireSpots && ePressed && !eConsumed && this.items.includes('pilao')){
+    if(level.fireSpots && ePressed && !eConsumed && pilaoEquipado){
       outer:
       for(const spot of level.fireSpots){
         for(const frag of spot.fragments){
@@ -712,7 +881,10 @@ class Player{
               // Coletar ou descartar
               frag.done=true; eConsumed=true;
               if(frag.type==='lapis'){
-                this.score+=15; this.items.push('lapis'); sfx('duduk');
+                // Sem pontuação aqui — lápis-lazúli já é um minério contado no
+                // Diário de Bordo (com contador ×N), igual ao critério usado
+                // para tora/ânfora/pilão/frasco (ver comentário acima).
+                this.items.push('lapis'); sfx('duduk');
                 burst(frag.x+10,frag.y+8,'#3868e0',14);
                 _journalColetar('lapis', this.items.filter(i=>i==='lapis').length);
                 const gradeLabel={grau1:'Grau 1 (pirita abundante)',grau2:'Grau 2 (calcita visível)',puro:'Lazurita pura — o mais raro!'}[frag.grade];
@@ -770,7 +942,20 @@ class Player{
   }
   _hurt(dmg,level){ if(this.inv>0)return; this.hp-=dmg;this.inv=100; burst(this.x+20,this.y+40,'#ff4040',10);sfx('hit'); if(this.hp<=0){this.hp=0;this.dead=true;} }
   draw(){
-    if(this.dead)return; const dx=this.x-cam.x,dy=this.y-cam.y; const dw=this.w*2.4,dh=this.h*1.45; const ox=(dw-this.w)/2,oy=dh-this.h; const flip=this.facing===-1;
+    if(this.dead)return; const dx=this.x-cam.x,dy=this.y-cam.y;
+    // CORVAN.draw() calcula a escala a partir de dh (S=dh/46, personagem-base
+    // tem 46 unidades de altura); dw só serve para centralizar horizontalmente
+    // e nesta fórmula (dx-ox onde ox=(dw-w)/2) o termo se cancela, então dw
+    // não tem efeito visual real — só a altura (dh) importa.
+    // CORREÇÃO: a correção anterior usava Fase4-3 (S=1.67) como referência,
+    // mas ao conferir TODAS as fases anteriores, S=1.67 é na verdade uma
+    // exceção (só Fase3-3 e Fase4-3 usam esse valor). O padrão real, usado
+    // por Fase1-1 (a própria origem do sprite), Fase2-1/2/3, Fase3-1,
+    // Fase4-1, Fase5-1 e Fase6-1, é S=1.5 → altura fixa de 46*1.5=69px,
+    // independente da altura do hitbox de colisão de cada fase. dh agora é
+    // fixo em 69 (em vez de proporcional a this.h) para bater exatamente
+    // com esse padrão predominante.
+    const dw=this.w,dh=69; const ox=(dw-this.w)/2,oy=dh-this.h; const flip=this.facing===-1;
     if(this.interactAnim>0&&this.state!=='jump') CORVAN.draw(ctx, 'dig',  this.frame,    dx-ox,dy-oy,dw,dh,flip);
     else if(this.state==='run')                  CORVAN.draw(ctx, 'walk', this.frame,    dx-ox,dy-oy,dw,dh,flip);
     else                                         CORVAN.draw(ctx, 'idle', this.frame%4,  dx-ox,dy-oy,dw,dh,flip);
@@ -826,7 +1011,10 @@ function buildL1(){
     new Col(240,FL-50,'tora'),
     new Col(580,FL-50,'anfora'),
   ];
-  const OVELHA_X=3000, OVELHA_Y=FL-90;
+  // OVELHA_Y era FL-90: como a ovelha não tem física/gravidade (posição fixa
+  // via land()), isso a deixava ~35-40px acima do chão real, flutuando visivelmente
+  // acima da pedra decorativa em vez de parecer apoiada nela. Aproximada do chão.
+  const OVELHA_X=3000, OVELHA_Y=FL-50;
   const ovelha=new OvelhaMarcoPolo(); ovelha.land(OVELHA_X,OVELHA_Y);
   const triggers=[
     new Trigger(2880,FL-300,200,300,'Aproximar da Ovelha',(player,level)=>{
@@ -847,7 +1035,7 @@ function buildL1(){
   return{
     id:1, bg:'bg01', W:WW, H:WH, startX:60, startY:FL-90,
     title:'O Vale de Sar-e-Sang',
-    hint:'Colete 🪵 Tora e 🏺 Ânfora, depois encontre a Ovelha de Marco Polo!',
+    hint:'Colete 🌲 Tora e 🏺 Ânfora, depois encontre a Ovelha de Marco Polo!',
     plats, enemies, cols, triggers, ovelha, fireSpots:[],
     intro:[
       '"2500 antes de Cristo. Estas minas já funcionam há 4.500 anos quando chegamos aqui. O lápis que sai deste vale chegou ao Egito de Tutankamon, a Sumer, ao Vale do Indo — atravessando desertos e montanhas sem qualquer rota comercial formal."',
@@ -857,26 +1045,24 @@ function buildL1(){
     update(player){ tickMoving(this.plats); for(const e of this.enemies)e.update(this.plats,player); if(!G.dialog)this.ovelha.update(player); for(const c of this.cols)c.tick(); POPUP.tick();
       if(Math.random()<0.003) sfx('eagle'); },
     draw(player){
-      // Pinheiros tortos (parallax)
+      // Pinheiros tortos (parallax) — aumentados para condizer com a escala
+      // das paredes do cânion ao fundo (antes ficavam pequenos/"de brinquedo"
+      // perto das formações rochosas altas do fundo SVG).
       for(let i=0;i<7;i++){
         const tx=200+i*460-cam.x*0.5; if(tx<-40||tx>W+40) continue;
-        const th=140+(i%3)*30; const ty=FL-cam.y-th;
-        ctx.fillStyle='#302818'; ctx.fillRect(tx-3,ty+th-30,6,30);
+        const th=220+(i%3)*40; const ty=FL-cam.y-th;
+        ctx.fillStyle='#302818'; ctx.fillRect(tx-4,ty+th-40,8,40);
         ctx.fillStyle='#3a4028';
-        for(let lev=0;lev<3;lev++){ ctx.beginPath(); const cw=14+lev*6; ctx.moveTo(tx-cw,ty+lev*36+24); ctx.lineTo(tx,ty+lev*36); ctx.lineTo(tx+cw,ty+lev*36+24); ctx.closePath(); ctx.fill(); }
+        for(let lev=0;lev<3;lev++){ ctx.beginPath(); const cw=20+lev*9; ctx.moveTo(tx-cw,ty+lev*54+36); ctx.lineTo(tx,ty+lev*54); ctx.lineTo(tx+cw,ty+lev*54+36); ctx.closePath(); ctx.fill(); }
       }
-      // Fogueiras de mineiros antigos (decorativas)
-      for(let i=0;i<4;i++){
-        const fx=500+i*640-cam.x*0.7; if(fx<-40||fx>W+40) continue;
-        const fy=FL-cam.y-6;
-        const flicker=Math.sin(Date.now()/150+i)*2;
-        ctx.fillStyle='#ff7020'; ctx.beginPath(); ctx.moveTo(fx-6,fy); ctx.quadraticCurveTo(fx-7,fy-10+flicker,fx,fy-18-flicker); ctx.quadraticCurveTo(fx+7,fy-10+flicker,fx+6,fy); ctx.closePath(); ctx.fill();
-      }
+      // Removidas as fogueiras decorativas dos "mineiros antigos": o fire-setting
+      // só é ensinado na Cena 3, então fogueiras já acesas na Cena 1 confundiam
+      // o jogador (parecia mecânica interativa antes da hora).
       // Pedra onde a ovelha pousa
       const rx=OVELHA_X-cam.x, ry=OVELHA_Y-cam.y;
       if(rx>-80&&rx<W+80){ ctx.fillStyle='#c0b498'; ctx.beginPath(); ctx.ellipse(rx+30,ry+40,60,16,0,0,Math.PI*2); ctx.fill(); }
       this.ovelha.draw();
-      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(); for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(player); for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -906,7 +1092,15 @@ function buildL2(){
     {x:1500,shown:false, text:'O Azul Mais Caro da História', icon:'👑',body:'O ultramarino era mais caro que ouro na\nEuropa medieval. Reservado para pintar\no manto da Virgem Maria — considerado\na cor mais próxima do divino.'},
     {x:2300,shown:false, text:'O Teste da Pirita', icon:'✨',body:'A sodalita é o imitador mais perigoso —\ntambém azul, também calcita, mesma origem.\nMas NUNCA tem pirita. Pontos dourados\nmetálicos = sempre lápis-lazúli genuíno.'},
   ];
-  const cols=[];
+  // Fragmentos soltos de pirita — bônus colecionável espalhado pela galeria.
+  // Antes a cena não tinha absolutamente nada para coletar (cols=[]), só
+  // plataformas e inimigos até o trigger do final — sem nenhum objetivo claro
+  // no caminho. Dá um motivo simples para explorar as plataformas elevadas.
+  const cols=[
+    new Col(440,FL-290,'pirita'), new Col(880,FL-280,'pirita'), new Col(1360,FL-310,'pirita'),
+    new Col(1570,FL-230,'pirita'), new Col(1805,FL-290,'pirita'), new Col(2090,FL-225,'pirita'),
+    new Col(2560,FL-245,'pirita'),
+  ];
   const triggers=[
     new Trigger(2870,FL-300,200,300,'Examinar Veio Principal',(player,level)=>{
       player.interactAnim=90; sfx('shimmer');
@@ -930,6 +1124,7 @@ function buildL2(){
     update(player){
       tickMoving(this.plats); tickTrapdoors(this.plats);
       for(const e of this.enemies)e.update(this.plats,player);
+      for(const c of this.cols)c.tick();
       for(const gm of this.geoMessages){ if(!gm.shown&&player.x>gm.x&&!G.dialog){gm.shown=true;POPUP.show(gm.text,gm.icon,gm.body,7500);} }
       POPUP.tick();
     },
@@ -948,6 +1143,7 @@ function buildL2(){
         }
       }
       for(const e of this.enemies)e.draw();
+      for(const c of this.cols)c.draw(player);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
@@ -968,17 +1164,33 @@ function buildL3(){
     movH(1310,FL-36,100,1310,1410,1.8), movH(1840,FL-36,100,1840,1940,2.2),
     movH(2480,FL-36,100,2480,2580,2.0),
   ];
-  // Toras extras de reserva (caso desperdice)
+  // Toras extras de reserva (caso desperdice). A do meio ficava em x=1600,
+  // a só 50px do fireSpot em x=1550 — perto o suficiente para o tooltip
+  // "[E] Pegar Tora" (Col) e o status da fogueira/fragmentos (FireSettingSpot)
+  // aparecerem sobrepostos ao mesmo tempo. Movida para x=1230 (~320px de
+  // distância), sobre o mesmo chão sólido, sem esse conflito.
+  // A primeira (x=560) caía dentro do vão 530-630 (sem plataforma nenhuma
+  // embaixo) — mesma causa da 1ª fogueira, ver comentário abaixo. Movida
+  // para x=200, dentro do trecho de chão inicial (solid#1: 0-300), logo
+  // depois do ponto de partida do jogador (startX=60).
   const cols=[
-    new Col(560,FL-50,'tora'),
-    new Col(1600,FL-50,'tora'),
+    new Col(200,FL-50,'tora'),
+    new Col(1230,FL-50,'tora'),
     new Col(2450,FL-50,'tora'),
   ];
-  // 3 pontos de fire-setting espalhados
+  // 3 pontos de fire-setting espalhados. Tentativa anterior recentralizou as
+  // 3 spots dentro das respectivas plataformas sólidas (660/1460/2340), mas
+  // a 1ª (em solid#3: 630-780) só é alcançável cruzando o vão 530-630, que
+  // NÃO tem plataforma móvel — só as fases mais altas (movH) cobrem alguns
+  // vãos, alternando com vãos "a seco" que dependem de pular por cima ou
+  // usar as placas flutuantes lá em cima. Isso fazia o jogador cair ao
+  // tentar chegar na 1ª fogueira. Movida para solid#2 (380-530), alcançável
+  // pela movH(300,380) já existente logo no início — sem vão a seco no
+  // caminho. As outras duas (1460/2340) ficam mantidas.
   const fireSpots=[
-    new FireSettingSpot(700,FL-70),
-    new FireSettingSpot(1550,FL-70),
-    new FireSettingSpot(2200,FL-70),
+    new FireSettingSpot(420,FL-70),
+    new FireSettingSpot(1460,FL-70),
+    new FireSettingSpot(2340,FL-70),
   ];
   // Planos de fragmentos: garante pelo menos 1 lápis por spot, com mix de sodalita
   fireSpots[0].fragmentPlan=['lapis','sodalita','lapis'];
@@ -1000,7 +1212,7 @@ function buildL3(){
   return{
     id:3, bg:'bg03', W:WW, H:WH, startX:60, startY:FL-90,
     title:'Fire-Setting: A Técnica Mais Antiga',
-    hint:'[E] Acender c/ 🪵 Tora → aguarde 80%+ → [E] Ânfora → examine c/ Pilão!',
+    hint:'[E] Acender c/ 🌲 Tora → aguarde 80%+ → [E] Ânfora → examine c/ Pilão!',
     plats, enemies, cols, triggers, fireSpots,
     intro:[
       '"Três pontos de extração. Em cada um: encoste a Tora à parede [E] para acender. Espere a barra de calor passar de 80% — só então use a Ânfora [E] para resfriar."',
@@ -1015,9 +1227,14 @@ function buildL3(){
       POPUP.tick();
     },
     draw(player){
-      for(const spot of this.fireSpots) spot.draw();
+      // Reflete o Pilão EQUIPADO (não só coletado) — mesma exigência aplicada
+      // na ação de moer em Player.update(), senão a dica visual ("[E] Moer
+      // amostra" vs "🔒 Precisa do Pilão") ficaria inconsistente com o que
+      // realmente acontece ao apertar [E].
+      const hasPilao=player.activeTool==='pilao_agata';
+      for(const spot of this.fireSpots) spot.draw(player.x,player.y,hasPilao);
       for(const e of this.enemies)e.draw();
-      for(const c of this.cols)c.draw();
+      for(const c of this.cols)c.draw(player);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
@@ -1090,60 +1307,91 @@ function buildL4(){
       // Glow do frasco no altar
       const ag=ctx.createRadialGradient(2900-cam.x,FL-450-cam.y,0,2900-cam.x,FL-450-cam.y,150);
       ag.addColorStop(0,'rgba(40,80,220,0.3)'); ag.addColorStop(1,'rgba(40,80,220,0)');
-      ctx.fillStyle=ag; ctx.fillRect(3300-cam.x,FL-500-cam.y,300,300);
+      ctx.fillStyle=ag; ctx.fillRect(2900-150-cam.x,FL-450-150-cam.y,300,300);
       this.ovelha.draw();
-      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(); for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(player); for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
 
-// ── HUD ────────────────────────────────────────────────────────────
 function drawHUD(player,level){
-  ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,0,W,38);
-  for(let i=0;i<player.maxHp;i++){ ctx.fillStyle=i<player.hp?'#e02020':'#333'; ctx.beginPath();const hx=16+i*28,hy=10;ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill(); }
-  ctx.fillStyle='rgba(70,120,220,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#4878d0';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  const tY=44;
-  ctx.fillStyle='rgba(0,0,0,0.5)';_rr(16,tY,140,28,4);ctx.fill();
-  ctx.strokeStyle=player.activeTool?'#4878d0':'#444';ctx.lineWidth=1.5;_rr(16,tY,140,28,4);ctx.stroke();
-  if(player.activeTool&&ITEM_DEFS[player.activeTool]){const def=ITEM_DEFS[player.activeTool];ctx.font='14px serif';ctx.fillText(def.icon,24,tY+20);ctx.font='11px "Courier New"';ctx.fillStyle='#4878d0';ctx.fillText(def.nome,42,tY+20);}
-  else{ctx.font='11px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',22,tY+20);}
-  ctx.fillStyle='rgba(40,80,200,0.15)';_rr(162,tY,46,28,4);ctx.fill();ctx.strokeStyle='#204090';ctx.lineWidth=1.5;_rr(162,tY,46,28,4);ctx.stroke();
-  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#5888d8';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  let ix=W-16;const inv=[];
-  if(player.items.includes('frasco'))  inv.push('🧪 FRASCO');
-  if(player.items.includes('pilao'))   inv.push('⚱️ PILÃO');
-  if(player.items.includes('anfora'))  inv.push('🏺 ÂNFORA');
+  // Barra superior — mesmo padrão (fundo escuro + linha divisória) do resto do jogo
+  ctx.fillStyle='rgba(2,4,12,0.85)';ctx.fillRect(0,0,W,38);
+  ctx.fillStyle='rgba(40,80,200,0.25)';ctx.fillRect(0,36,W,2);
+  // Corações em azul (tema da fase — lápis-lazúli/ultramarino), em vez do
+  // vermelho padrão das demais fases, que destoava da paleta de Sar-e-Sang.
+  for(let i=0;i<player.maxHp;i++){ ctx.fillStyle=i<player.hp?'#4878d0':'#333'; ctx.beginPath();const hx=16+i*28,hy=10;ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill(); }
+  ctx.fillStyle='#d8e0f8';ctx.font='20px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
+  // O contador de estrelas só faz sentido em cenas que têm bônus de pontuação
+  // "puros" (ex.: pirita — sem entrada própria no Diário, tipos que não estão
+  // em TIPO_TO_JOURNAL). Ferramentas/artefatos (tora, ânfora, pilão, frasco)
+  // já aparecem no Diário de Bordo — não precisam também de um placar, então
+  // cenas onde só existem esses itens (como a Cena 1) não mostram o contador.
+  const hasScoreBonus = level.cols && level.cols.some(c=>!TIPO_TO_JOURNAL.hasOwnProperty(c.type));
+  if(hasScoreBonus){
+    ctx.fillStyle='#4878d0';ctx.font='bold 20px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,26);ctx.textAlign='left';
+  }
+
+
   const toraN=player.items.filter(i=>i==='tora').length;
-  if(toraN>0) inv.push('🪵 '+toraN);
+  const TOOL_DEFS=[
+    {id:'tora_pinheiro',icon:'🌲',nome:'Tora',has:()=>toraN>0,count:toraN},
+    {id:'anfora_barro', icon:'🏺',nome:'Ânfora',has:()=>player.items.includes('anfora')},
+    {id:'pilao_agata',  icon:'⚱️',nome:'Pilão',has:()=>player.items.includes('pilao')},
+  ];
+  const tools=TOOL_DEFS.filter(t=>t.has());
+  const PX=12,PY=46,PW=190,HEADER_H=26;
+  const PH=HEADER_H+(tools.length>0?10+tools.length*22:26);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(2,4,12,0.9)';_rr(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#3858c0';ctx.lineWidth=1.5;_rr(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.restore();
+  const midX=PX+PW/2,kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#6890e0';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#6890e0';ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(40,80,200,0.2)';_rr(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle='#6890e0';ctx.lineWidth=1;_rr(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#88a8f0';ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+  ctx.fillStyle='rgba(40,80,200,0.3)';ctx.fillRect(PX+6,PY+HEADER_H,PW-12,1);
+  ctx.textAlign='center';
+  if(tools.length>0){
+    tools.forEach((t,i)=>{
+      const ty=PY+HEADER_H+8+i*22,eq=(player.activeTool===t.id);
+      const cnt=t.count>0?' ×'+t.count:'';
+      ctx.font=(eq?'bold ':'')+'12px "Courier New"';ctx.fillStyle=eq?'#f0d060':'#a8c0e8';
+      ctx.fillText(t.icon+' '+t.nome+cnt+(eq?' ◀':''),midX,ty+10);
+    });
+  } else {
+    // Padrão do jogo (Fase4-3, Fase5-1): "Não Equipado", já que as ferramentas
+    // já existem como entradas fixas do Diário — só ainda não foram obtidas/
+    // equipadas. "Nenhuma ferramenta" dava a entender que a fase não tem
+    // ferramentas nenhuma, o que é diferente do padrão das demais fases.
+    ctx.font='12px "Courier New"';ctx.fillStyle='#6878a0';
+    ctx.fillText('Não Equipado',midX,PY+HEADER_H+18);
+  }
+  ctx.textAlign='left';
+
   const lapN=player.items.filter(i=>i==='lapis').length;
-  if(lapN>0) inv.push('🔷 '+lapN);
-  for(const it of inv){ctx.fillStyle='#4878d0';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,tY+20);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
-  ctx.fillStyle='rgba(140,170,230,.72)';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
-  if(G.timeOnLevel<600){ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(8,H-44,480,28);ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';ctx.fillText('← → Mover  ↑/Espaço Pular  E Interagir  I Inventário',14,H-25);}
+  ctx.font='12px "Courier New"';ctx.fillStyle='#88a8f0';ctx.textAlign='right';
+  if(lapN>0) ctx.fillText('🔷 Lápis-Lazúli ×'+lapN,W-14,52);
+  if(player.items.includes('frasco')) ctx.fillText('🧪 Frasco coletado',W-14,52+(lapN>0?18:0));
+  ctx.textAlign='left';
+
+  ctx.fillStyle='#cfe0ff';ctx.font='18px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
 }
 
-// ── Title Screen ──────────────────────────────────────────────────
 function drawTitle(){
   const bg=IMG['bg01'];
   if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.55;drawBg('bg01');ctx.globalAlpha=1;}
   else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a1030');g.addColorStop(1,'#020408');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,0,W,H);
   for(let i=0;i<120;i++){const sx=(i*143.5)%W,sy=(i*87.7)%280;ctx.fillStyle=`rgba(160,190,255,${.15+Math.sin(Date.now()/1400+i)*.15})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
-  {
-    const walkPeriod = 9000;
-    const tWalk = (Date.now() % walkPeriod) / walkPeriod;
-    const cwX = tWalk * (W + 120) - 60;
-    const cwY = H - 140;
-    CORVAN.drawLarge(ctx, cwX, cwY, 2.2, false, Date.now()/180, null);
-  }
-  if(IMG['ovelha_img']&&IMG['ovelha_img'].complete){
-    const lx=((Date.now()/24)%(W+130))-65; const ly=H-160+Math.sin(Date.now()/260)*2;
-    ctx.drawImage(IMG['ovelha_img'],0,0,96,96,lx,ly,116,116);
-  }
   ctx.textAlign='center';
   ctx.shadowColor='#2848c8';ctx.shadowBlur=40;
-  ctx.fillStyle='#4878e0';ctx.font='bold 48px "Courier New"';ctx.fillText('O AZUL QUE O MUNDO BUSCOU',W/2,168);
+  ctx.fillStyle='#4878e0';ctx.font='bold 48px "Courier New"';ctx.fillText('O Azul que o Mundo Buscou',W/2,168);
   ctx.shadowBlur=0;
   ctx.fillStyle='#4060a0';ctx.font='22px "Courier New"';ctx.fillText('Fase 5.2  —  Sar-e-Sang, Badakhshan · 2500 a.C.',W/2,216);
   if(IMG.card52){
@@ -1156,7 +1404,7 @@ function drawTitle(){
   ctx.fillStyle=`rgba(60,100,220,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
   ctx.fillStyle='#a0b0d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover  ↑/Espaço Pular  E Interagir  I Inventário',W/2,504);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,504);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1189,14 +1437,13 @@ function drawComplete(){
     '🐏  Ovelha de Marco Polo — testemunha do Pamir',
   ];
   ctx.fillStyle='#c8d8f0';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
-  ctx.fillStyle='#4878d0';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
+  ctx.fillStyle='#4878d0';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
   ctx.fillStyle=`rgba(60,100,220,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';
-  ctx.fillText('▶ [M] Menu Principal ◀',W/2,594);
+  ctx.fillText('✦ Fase 5.3 desbloqueada!   [M] Menu Principal',W/2,594);
   ctx.font='42px serif';ctx.fillText('🏆',W/2-20,640);
   ctx.textAlign='left';
 }
 
-// ── Game engine ───────────────────────────────────────────────────
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];
 const G={
   state:'title', lvIdx:0, level:null, player:null,
@@ -1297,6 +1544,11 @@ function startGame(){
 
 function loop(){
   requestAnimationFrame(loop);
+  if(G.state!==_prevBgState){
+    if(G.state==='playing'&&_prevBgState!=='playing')startBgMusic();
+    if((G.state==='dead'||G.state==='complete'||G.state==='title')&&_prevBgState==='playing')stopBgMusic();
+    _prevBgState=G.state;
+  }
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
   if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
   if(G.state==='complete' &&(jp['Enter']||jp['KeyM'])) _voltarAoMenu();

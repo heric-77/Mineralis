@@ -590,7 +590,8 @@ class Col{
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
-        const bx=sx+17-tw/2, by=sy-42;
+        const headY=playerY-cam.y-8;
+        const bx=sx+17-tw/2, by=Math.min(sy-42,headY);
         ctx.fillStyle=`rgba(8,4,0,${0.88*pulse})`;
         roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(220,185,80,${pulse})`;ctx.lineWidth=1.5;
@@ -612,7 +613,8 @@ class Trigger{
     if(this.done||this.auto)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near)return;
-    const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const headY=py-cam.y-8;
+    const sx=this.x+this.w/2-cam.x,sy=Math.min(this.y-cam.y-26,headY)+Math.sin(Date.now()/350)*4;
     const txt='[E] '+this.label;ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
     ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
@@ -1214,9 +1216,11 @@ function buildL1(){
           if(!this.llama.gifted&&Math.abs(player.x-this.llama.x)<140){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
             const t2='[E] Interaja com a Lhama 🦙';const tw=ctx.measureText(t2).width+24;
-            roundRect(lx-tw/2,ly-90,tw,24,4);ctx.fill();
-            ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,ly-90,tw,24,4);ctx.stroke();
-            ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,ly-73);ctx.textAlign='left';
+            const headY=player.y-cam.y-8;
+            const by=Math.min(ly-90,headY);
+            roundRect(lx-tw/2,by,tw,24,4);ctx.fill();
+            ctx.strokeStyle='#e0b840';ctx.lineWidth=1.5;roundRect(lx-tw/2,by,tw,24,4);ctx.stroke();
+            ctx.fillStyle='#e0b840';ctx.textAlign='center';ctx.fillText(t2,lx,by+17);ctx.textAlign='left';
           }
           if(this.llama.gifted&&Math.abs(player.x-this.llama.x)<200){
             ctx.fillStyle='rgba(220,185,80,0.65)';ctx.font='12px "Courier New"';
@@ -1382,9 +1386,11 @@ function buildL3(){
           if(Math.abs(player.x-this.tupu.x)<120){
             ctx.fillStyle='rgba(0,0,0,0.82)';ctx.font='14px "Courier New"';
             const lt='[E] Pegar o Tupu de Prata';const ltw=ctx.measureText(lt).width+24;
-            roundRect(tx-ltw/2,ty-70,ltw,24,4);ctx.fill();
-            ctx.strokeStyle='#c0c0d8';ctx.lineWidth=1.5;roundRect(tx-ltw/2,ty-70,ltw,24,4);ctx.stroke();
-            ctx.fillStyle='#c0c0d8';ctx.textAlign='center';ctx.fillText(lt,tx,ty-53);ctx.textAlign='left';
+            const headY=player.y-cam.y-8;
+            const lby=Math.min(ty-70,headY);
+            roundRect(tx-ltw/2,lby,ltw,24,4);ctx.fill();
+            ctx.strokeStyle='#c0c0d8';ctx.lineWidth=1.5;roundRect(tx-ltw/2,lby,ltw,24,4);ctx.stroke();
+            ctx.fillStyle='#c0c0d8';ctx.textAlign='center';ctx.fillText(lt,tx,lby+17);ctx.textAlign='left';
           }
         }
       }
@@ -1709,10 +1715,9 @@ function drawDeath(){
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
-  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+90);ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+118);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+150);
   ctx.textAlign='left';
 }
 function drawComplete(){
@@ -1722,14 +1727,14 @@ function drawComplete(){
   ctx.textAlign='center';ctx.shadowColor='#e0b840';ctx.shadowBlur=40;
   ctx.fillStyle='#e0b840';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 1.1 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  drawCorvan(W/2-160,200,4,false,Date.now()/300);
-  ctx.save();ctx.translate(W/2+80,280);ctx.scale(2.8,2.8);drawTupu(0,0,Date.now()/1000);ctx.restore();
-  ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Segredo de Potosí foi desvendado!',W/2,196);
+  drawCorvan(W/2-40,140,3,false,Date.now()/300);
+  ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';ctx.fillText('O Segredo de Potosí foi desvendado!',W/2,340);
   const lines=['✦  Picareta — ferramenta da mineração andina','✦  Prata — melhor condutor, metal dos Incas','✦  Estanho — base do bronze por 5.000 anos','✦  Tupu de Prata — arte ornamental Inca','✦  Folhas de Coca — combate ao Soroche'];
-  ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
-  ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◆ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,428);
+  ctx.fillStyle='#c8b880';ctx.font='14px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  const _scoreY=400+lines.length*32+40;
+  ctx.fillStyle='#c0c8d8';ctx.font='16px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,_scoreY);
   ctx.fillStyle=`rgba(220,185,80,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 1.2 desbloqueada!   [M] Menu Principal',W/2,458);ctx.textAlign='left';
+  ctx.fillText('✦ Fase 1.2 desbloqueada!   [M] Menu Principal',W/2,_scoreY+35);ctx.textAlign='left';
 }
 
 const LEVELS=[buildL1,buildL2,buildL3,buildL4];

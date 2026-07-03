@@ -833,12 +833,14 @@ class Trigger{
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near) return;
     const sx=this.x+this.w/2-cam.x, sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const headY=py-cam.y-6;
+    const boxTop=Math.min(sy-16,headY-24);
     const txt='[E] '+this.label;
     ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
-    ctx.fillStyle='rgba(0,0,0,0.78)'; roundRect(sx-tw/2,sy-16,tw,24,4); ctx.fill();
-    ctx.strokeStyle='#e08830'; ctx.lineWidth=1.5; roundRect(sx-tw/2,sy-16,tw,24,4); ctx.stroke();
-    ctx.fillStyle='#e08830'; ctx.textAlign='center'; ctx.fillText(txt,sx,sy); ctx.textAlign='left';
+    ctx.fillStyle='rgba(0,0,0,0.78)'; roundRect(sx-tw/2,boxTop,tw,24,4); ctx.fill();
+    ctx.strokeStyle='#e08830'; ctx.lineWidth=1.5; roundRect(sx-tw/2,boxTop,tw,24,4); ctx.stroke();
+    ctx.fillStyle='#e08830'; ctx.textAlign='center'; ctx.fillText(txt,sx,boxTop+16); ctx.textAlign='left';
   }
 }
 
@@ -1115,12 +1117,14 @@ function buildL1(){
       if(!aguiaInteracted&&player.items.includes('maco')&&player.items.includes('martelo')){
         const ax=this.aguia.x-cam.x, ay=this.aguia.y-cam.y;
         if(ax>0&&ax<W){
+          const headY=player.y-cam.y-6;
+          const boxTop=Math.min(ay-36,headY-24);
           const txt='[E] Interagir com a Águia';
           ctx.font='14px "Courier New"';
           const tw=ctx.measureText(txt).width+24;
-          ctx.fillStyle='rgba(0,0,0,0.78)'; roundRect(ax-tw/2,ay-36,tw,24,4); ctx.fill();
-          ctx.strokeStyle='#ffe060'; ctx.lineWidth=1.5; roundRect(ax-tw/2,ay-36,tw,24,4); ctx.stroke();
-          ctx.fillStyle='#ffe060'; ctx.textAlign='center'; ctx.fillText(txt,ax,ay-18); ctx.textAlign='left';
+          ctx.fillStyle='rgba(0,0,0,0.78)'; roundRect(ax-tw/2,boxTop,tw,24,4); ctx.fill();
+          ctx.strokeStyle='#ffe060'; ctx.lineWidth=1.5; roundRect(ax-tw/2,boxTop,tw,24,4); ctx.stroke();
+          ctx.fillStyle='#ffe060'; ctx.textAlign='center'; ctx.fillText(txt,ax,boxTop+18); ctx.textAlign='left';
         }
       }
     }
@@ -1607,11 +1611,10 @@ function drawDeath(){
   ctx.fillStyle='#ff5050';ctx.font='bold 54px "Courier New"';ctx.fillText(msgs[cause]||'CORVAN CAIU!',W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#e8c890';ctx.font='16px "Courier New"';ctx.fillText(subs[cause]||'O Grande Lago não perdoa.',W/2,H/2-10);
-  CORVAN.draw(ctx, 'hurt', Math.floor(Date.now()/250)%4,W/2-40,H/2-30,80,Math.round(80/172*352));
   ctx.fillStyle='#e08830';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+100);
-  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+132);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+168);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+40);
+  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+72);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+108);
   ctx.textAlign='left';
 }
 
@@ -1620,17 +1623,19 @@ function drawComplete(){
   const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);rg.addColorStop(0,'rgba(200,100,40,.16)');rg.addColorStop(1,'rgba(200,100,40,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#e08830';ctx.shadowBlur=40;
   ctx.fillStyle='#e08040';ctx.font='bold 42px "Courier New"';ctx.fillText('✦  FASE 2.3 CONCLUÍDA  ✦',W/2,120);
-  ctx.shadowBlur=0;ctx.fillStyle='#e8d090';ctx.font='20px "Courier New"';ctx.fillText('O Metal que o Lago Guardou foi preservado!',W/2,175);
+  ctx.shadowBlur=0;
+  drawCorvan(W/2-40,140,3,false,0,null);
+  ctx.fillStyle='#e8d090';ctx.font='20px "Courier New"';ctx.fillText('O Metal que o Lago Guardou foi preservado!',W/2,340);
   const lines=[
     '🟠  Cobre Nativo — puro, sem fundição, 7.000 anos de história',
     '🌐  Gorget de Cobre Anishinaabe — rota comercial continental',
     '🔧  Escopro por cold hammering — metalurgia sem fogo',
     '🦅  Conhecimento da Águia — sabedoria antes dos europeus',
   ];
-  ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,238+i*32));
-  ctx.fillStyle='#e08830';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,400);
-  ctx.fillStyle=`rgba(200,120,40,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';ctx.fillText('▶ [M] Menu Principal ◀',W/2,446);
-  ctx.font='64px serif';ctx.fillText('🏆',W/2-32,530);
+  ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  ctx.fillStyle='#e08830';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,556);
+  ctx.fillStyle='#f0a860';ctx.font='16px "Courier New"';ctx.fillText('✦ Fase 3.1 desbloqueada!   [M] Menu Principal',W/2,586);
+  ctx.font='40px serif';ctx.fillText('🏆',W/2+180,140);
   ctx.textAlign='left';
 }
 

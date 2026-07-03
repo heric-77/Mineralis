@@ -56,6 +56,8 @@ function sfx(type){
   else if(type==='unlock'){o.frequency.setValueAtTime(330,t);o.frequency.setValueAtTime(440,t+.15);o.frequency.setValueAtTime(660,t+.3);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);}
   else if(type==='hit')   {o.type='sawtooth';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(60,t+.2);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);}
   else if(type==='tigre') {o.type='sawtooth';o.frequency.setValueAtTime(110,t);o.frequency.setValueAtTime(140,t+.08);o.frequency.setValueAtTime(90,t+.18);g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);}
+  // Coleta de artefato regional de cena (pena, nefrita, quartzo) — "tin" curto e leve, distinto do jade
+  else if(type==='artefato'){o.type='sine';o.frequency.setValueAtTime(720,t);o.frequency.setValueAtTime(960,t+.06);g.gain.setValueAtTime(.11,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);}
   o.start(t);o.stop(t+1.4);
 }
 
@@ -127,7 +129,7 @@ const ITEM_DEFS={
     desc:'Bambu queimado e endurecido ao fogo, com ponta oblíqua.\nMais duro que o jade superficial, mais gentil que o metal.\nO metal fraturaria o jade. O bambu extrai sem quebrar.',
   },
   bacia_madeira:{
-    cat:'ferramenta',nome:'Bacia de Madeira com Areia',icon:'🪣',
+    cat:'ferramenta',nome:'Bacia de Madeira com Areia',icon:'🥌',
     journalId:'bacia_jade',drawHand:'right',
     desc:'Bacia de teca com areia fina no fundo para estabilizar blocos.\nImobiliza o jade durante o teste de sonoridade.\nSem estabilização, o som não ressoa com clareza diagnóstica.',
   },
@@ -524,6 +526,27 @@ function drawSerpentinitaItem(cx,cy,bobT=0){
   ctx.restore();
 }
 
+// ── Quartzito — o outro falso jade, visual e cor distintos da serpentinita ──
+// (evita que as duas pedras "não-jade" do teste de sonoridade pareçam idênticas)
+function drawQuartzitoItem(cx,cy,bobT=0){
+  ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*4);
+  const glow=ctx.createRadialGradient(0,0,2,0,0,22);
+  glow.addColorStop(0,'rgba(180,190,200,0.18)');glow.addColorStop(1,'rgba(180,190,200,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
+  // Corpo acinzentado/esbranquiçado, textura granular (sem translucidez do jade)
+  ctx.fillStyle='#9098a0';
+  ctx.beginPath();ctx.moveTo(-13,-9);ctx.lineTo(-3,-15);ctx.lineTo(13,-10);ctx.lineTo(15,4);
+  ctx.lineTo(6,13);ctx.lineTo(-8,12);ctx.lineTo(-16,0);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#a8b0b8';
+  ctx.beginPath();ctx.moveTo(-13,-9);ctx.lineTo(-3,-15);ctx.lineTo(9,-11);ctx.lineTo(0,-2);ctx.closePath();ctx.fill();
+  // Pontos granulares (aspecto de quartzo cristalino, sem veios contínuos)
+  ctx.fillStyle='rgba(220,225,230,0.6)';
+  ctx.beginPath();ctx.arc(-4,-6,2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(4,-2,1.6,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(-2,4,1.8,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
 // ── Bracelete Imperial (artefato) ─────────────────────────────────────────
 function drawBracaleteItem(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
@@ -612,7 +635,6 @@ function drawCinzelItem(cx,cy,bobT=0){
   ctx.restore();
 }
 
-// ── Bacia de Madeira (item no chão) ───────────────────────────────────────
 function drawBaciaItem(cx,cy,bobT=0){
   ctx.save();ctx.translate(cx,cy+Math.sin(bobT)*5);
   const glow=ctx.createRadialGradient(0,0,2,0,0,26);
@@ -673,18 +695,48 @@ class Col{
     if(isTool&&playerX!==undefined){
       const dist=Math.hypot(playerX+20-(this.x+17),playerY+40-(this.y+17));
       if(dist<110){
-        const labels={cinzel_bambu:'🎋 Cinzel de Bambu',bacia_madeira:'🪣 Bacia de Madeira',placa_jade_ressoante:'🟩 Placa Ressoante'};
+        const labels={cinzel_bambu:'🎋 Cinzel de Bambu',bacia_madeira:'🥌 Bacia de Madeira',placa_jade_ressoante:'▦  Placa Ressoante'};
         const txt=`[E] Pegar ${labels[this.type]||this.type}`;
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
-        const bx=sx+17-tw/2,by=sy-42;
+        const bx=Math.max(6,Math.min(sx+17-tw/2,W-tw-6)),by=Math.min(sy-42,playerY-cam.y-68-8);
         ctx.fillStyle=`rgba(2,10,6,${0.88*pulse})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(100,220,140,${pulse})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
         ctx.fillStyle=`rgba(140,240,180,${pulse})`;
-        ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
+        ctx.textAlign='center';ctx.fillText(txt,bx+tw/2,by+16);ctx.textAlign='left';
       }
     }
+  }
+}
+
+// ── Artefatos Regionais (colecionáveis de cena — NÃO são itens de diário) ──
+// Cada cena tem um colecionável diferente, ligado ao contexto regional do
+// roteiro (Vale de Hpakant / Mianmar). Servem só para "dar sentido" ao
+// mundo — não entram no Diário de Bordo [I] nem no inventário de ferramentas.
+const ARTIFACT_DEFS={
+  1:{idPrefix:'artefato_pena',    icon:'🪶',label:'Pena de Calau',        total:3,hex:'#e8b860',rgb:'232,184,96', flavor:'O calau sobrevoa o vale — ave sagrada da floresta de Kachin.'},
+  2:{idPrefix:'artefato_nefrita', icon:'💠',label:'Seixo de Nefrita',     total:3,hex:'#68b8d0',rgb:'104,184,208',flavor:'Nefrita — "o outro jade". Mais comum, ainda assim reverenciada.'},
+  3:{idPrefix:'jadeia_',          icon:'💚',label:'Jadeíta',              total:3,hex:'#50d090',rgb:'80,208,144', flavor:null}, // mecânica principal — já coletada via teste de sonoridade
+  4:{idPrefix:'artefato_quartzo', icon:'✨',label:'Grão de Quartzo',      total:3,hex:'#e8e0a0',rgb:'232,224,160',flavor:'Abrasivo de quartzo — usado para a lapidação final do jade.'},
+};
+
+class Artifact{
+  constructor(x,y,level){this.x=x;this.y=y;this.w=28;this.h=28;this.done=false;this.t=Math.random()*Math.PI*2;this.level=level;}
+  tick(){if(!this.done)this.t+=0.045;}
+  draw(playerX,playerY){
+    if(this.done)return;
+    const sx=this.x-cam.x,sy=this.y-cam.y;
+    if(sx<-60||sx>W+60)return;
+    const def=ARTIFACT_DEFS[this.level]||ARTIFACT_DEFS[1];
+    const bob=Math.sin(this.t)*6;
+    const a=0.28+Math.abs(Math.sin(this.t*0.8))*0.32;
+    const cx=sx+this.w/2,cy=sy+this.h/2+bob;
+    const glow=ctx.createRadialGradient(cx,cy,4,cx,cy,28);
+    glow.addColorStop(0,`rgba(${def.rgb},${a})`);glow.addColorStop(1,`rgba(${def.rgb},0)`);
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);ctx.fill();
+    ctx.font='22px "Courier New"';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(def.icon,cx,cy);ctx.textAlign='left';ctx.textBaseline='alphabetic';
   }
 }
 
@@ -695,12 +747,14 @@ class Trigger{
     if(this.done||this.auto)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near)return;
-    const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const sx=this.x+this.w/2-cam.x,sy=Math.min(this.y-cam.y-26+Math.sin(Date.now()/350)*4,py-cam.y-68-8);
     const txt='[E] '+this.label;ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
-    ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
-    ctx.strokeStyle='#60c080';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();
-    ctx.fillStyle='#60c080';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left';
+    const bx=Math.max(6,Math.min(sx-tw/2,W-tw-6));
+    const tcx=bx+tw/2;
+    ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(bx,sy-16,tw,24,4);ctx.fill();
+    ctx.strokeStyle='#60c080';ctx.lineWidth=1.5;roundRect(bx,sy-16,tw,24,4);ctx.stroke();
+    ctx.fillStyle='#60c080';ctx.textAlign='center';ctx.fillText(txt,tcx,sy);ctx.textAlign='left';
   }
 }
 
@@ -770,15 +824,32 @@ function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.ti
 function drawPopup(){
   if(!popup.active)return;
   const al=Math.min(1,popup.timer/400);ctx.save();ctx.globalAlpha=al;
-  const pw=340,lineH=20,ph=popup.lines.length*lineH+80;
+  const pw=340,padX=16,bulletIndent=14,lineH=20;
+  // Quebra de linha: cada bullet vira 1+ linhas conforme largura disponível
+  ctx.font='12px "Courier New"';
+  const maxTextW=pw-(padX*2)-bulletIndent;
+  const rows=[];
+  popup.lines.forEach(raw=>{
+    const words=raw.split(' ');let line='',first=true;
+    for(const w of words){
+      const test=line?line+' '+w:w;
+      if(ctx.measureText(test).width>maxTextW&&line){rows.push({text:line,bullet:first});line=w;first=false;}
+      else line=test;
+    }
+    if(line)rows.push({text:line,bullet:first});
+  });
+  const ph=rows.length*lineH+80;
   const px=W-pw-18,py=56;
   ctx.fillStyle='rgba(2,10,4,0.94)';roundRect(px,py,pw,ph,10);ctx.fill();
   ctx.strokeStyle=popup.color;ctx.lineWidth=2;roundRect(px,py,pw,ph,10);ctx.stroke();
   ctx.strokeStyle='rgba(100,200,140,0.2)';ctx.lineWidth=1;roundRect(px+4,py+4,pw-8,ph-8,7);ctx.stroke();
   ctx.font='bold 13px "Courier New"';ctx.fillStyle=popup.color;ctx.textAlign='center';ctx.fillText(popup.title,px+pw/2,py+22);
   ctx.fillStyle='rgba(100,200,140,0.12)';ctx.fillRect(px+14,py+30,pw-28,1);
-  ctx.font='12px "Courier New"';ctx.fillStyle='#e0f0e0';
-  popup.lines.forEach((l,i)=>{ctx.textAlign='left';ctx.fillText('• '+l,px+16,py+48+i*lineH);});
+  ctx.font='12px "Courier New"';ctx.fillStyle='#e0f0e0';ctx.textAlign='left';
+  rows.forEach((r,i)=>{
+    const prefix=r.bullet?'• ':'  ';
+    ctx.fillText(prefix+r.text,px+padX,py+48+i*lineH);
+  });
   ctx.textAlign='left';ctx.restore();
 }
 
@@ -855,7 +926,8 @@ function drawSonicOverlay(sonic){
     ctx.save();ctx.translate(sx+slotW/2,sy+28);
     if(hasPlaca){
       if(slot.isJade) drawJadeItem(0,0,Date.now()/800,slot.variety||'verde');
-      else            drawSerpentinitaItem(0,0,Date.now()/700);
+      else if(slot.type==='quartzito') drawQuartzitoItem(0,0,Date.now()/700+i);
+      else            drawSerpentinitaItem(0,0,Date.now()/700+i);
     } else {
       // Sem placa: pedra ambígua verde genérica
       ctx.fillStyle='rgba(60,100,70,0.7)';ctx.beginPath();ctx.ellipse(0,0,14,10,0,0,Math.PI*2);ctx.fill();
@@ -876,15 +948,20 @@ function drawSonicOverlay(sonic){
         ctx.font='bold 11px "Courier New"';ctx.fillStyle='#60e8a0';
         ctx.textAlign='center';ctx.fillText('🎵 Ressoa — JADE',sx+slotW/2,sy+slotH-10);
       } else {
-        // Onda serpentinita: curta e morta
-        ctx.strokeStyle='#808870';ctx.lineWidth=1.5;ctx.beginPath();
+        // Onda do falso jade: curta e morta — leve variação por pedra (fase e
+        // cor) para que duas pedras "não-jade" no mesmo teste não pareçam
+        // cópias idênticas uma da outra.
+        const isQuartzito=slot.type==='quartzito';
+        const tf=Date.now()/500+i*1.3;
+        ctx.strokeStyle=isQuartzito?'#9098a8':'#808870';ctx.lineWidth=1.5;ctx.beginPath();
         for(let j=0;j<waveW;j++){
           const exp=Math.exp(-j/waveW*8);
-          const fy=waveY+8+Math.sin((j/waveW)*Math.PI*2)*8*exp;
+          const fy=waveY+8+Math.sin((j/waveW)*Math.PI*2+(isQuartzito?tf*0.15:0))*8*exp;
           j===0?ctx.moveTo(waveX+j,fy):ctx.lineTo(waveX+j,fy);
         }ctx.stroke();
-        ctx.font='bold 11px "Courier New"';ctx.fillStyle='#909880';
-        ctx.textAlign='center';ctx.fillText('— Sem eco — NÃO é jade',sx+slotW/2,sy+slotH-10);
+        ctx.font='bold 11px "Courier New"';ctx.fillStyle=isQuartzito?'#a0a8b0':'#909880';
+        const nome=isQuartzito?'Quartzito':'Serpentinita';
+        ctx.textAlign='center';ctx.fillText(`— Sem eco — ${nome}`,sx+slotW/2,sy+slotH-10);
       }
     } else {
       ctx.strokeStyle='rgba(100,140,110,0.5)';ctx.lineWidth=1;ctx.beginPath();
@@ -912,11 +989,17 @@ class RiverStoneWall{
     this.slots=this._makeSlots();
   }
   _makeSlots(){
-    // 1 jadeíta + 2 serpentinitas, embaralhados
+    // 1 jadeíta + 2 "falsos jades" — variados entre serpentinita e quartzito
+    // (as duas pedras impostoras historicamente mais confundidas com jade)
+    // para não parecerem duas cópias idênticas da mesma pedra no teste.
+    const falsos=['serpentinita','quartzito'];
+    const f1=falsos[Math.floor(Math.random()*falsos.length)];
+    let f2=falsos[Math.floor(Math.random()*falsos.length)];
+    if(f2===f1&&Math.random()<0.7)f2=falsos.find(f=>f!==f1); // prioriza variedade
     const arr=[
       {type:'jade_'+this.jadeVariety,isJade:true,variety:this.jadeVariety,consumed:false},
-      {type:'serpentinita',isJade:false,consumed:false},
-      {type:'serpentinita',isJade:false,consumed:false},
+      {type:f1,isJade:false,consumed:false},
+      {type:f2,isJade:false,consumed:false},
     ];
     for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
     return arr;
@@ -1046,10 +1129,11 @@ class Player{
               '#70e8c0');
             sonic.wall.done=true;G.sonicMode=null;G.dialog=false;
           } else {
-            // Serpentinita — erro: apenas feedback, sem custo de vida
+            // Falso jade (serpentinita ou quartzito) — erro: apenas feedback, sem custo de vida
             wrongPicks++;sfx('cinzel_serpentina');
             burst(this.x+20,this.y,'#909870',8,2);
-            notify('❌ "Esta não canta." — Serpentinita descartada.');
+            const nomeFalso=slot.type==='quartzito'?'Quartzito':'Serpentinita';
+            notify(`❌ "Esta não canta." — ${nomeFalso} descartado(a).`);
             if(wrongPicks>=2&&!sonicHintShown){
               sonicHintShown=true;
               const sv=G.sonicMode;
@@ -1095,9 +1179,25 @@ class Player{
     this.x=Math.max(0,this.x);
 
     if(!this.inv){
-      for(const p of level.plats){if(p.type==='spike'&&this.overlaps(p))this._hurt(2,level,'espinho');}
+      // Espinho: 1 coração por toque, igual ao padrão das demais fases (era 2,
+      // tirando 2/3 da vida numa única encostada).
+      for(const p of level.plats){if(p.type==='spike'&&this.overlaps(p))this._hurt(1,level,'espinho');}
     }
     if(this.inv>0)this.inv--;if(this.interactAnim>0)this.interactAnim--;
+
+    // Artefatos regionais de cena — coleta automática ao passar perto, sem tecla e sem alerta.
+    // NÃO entram no Diário de Bordo: só somam na contagem do canto superior direito.
+    if(level.artifacts){
+      for(const art of level.artifacts){
+        if(art.done)continue;
+        if(!this.overlaps({x:art.x-10,y:art.y-10,w:art.w+20,h:art.h+20}))continue;
+        art.done=true;
+        const def=ARTIFACT_DEFS[level.num]||ARTIFACT_DEFS[1];
+        this.items.push(def.idPrefix+'_'+Math.round(art.x));
+        this.score+=15;sfx('artefato');
+        burst(art.x+14,art.y+14,def.hex,10,2.2);
+      }
+    }
 
     if(isE()){
       // Coleta de ferramentas
@@ -1114,7 +1214,7 @@ class Player{
         } else if(c.type==='bacia_madeira'){
           this.items.push('bacia_madeira');sfx('item');
           burst(c.x+17,c.y+17,'#a08060',10);journalCollect('bacia_madeira');
-          showPopup('🪣 BACIA DE MADEIRA COM AREIA',['Teca com areia fina — estabiliza blocos de jade','Sem a bacia o som se perde na pedra do rio','Use antes de aplicar o teste de sonoridade','Combine com a Placa Ressoante para diagnóstico completo'],'#c09870');
+          showPopup('BACIA DE MADEIRA COM AREIA',['Teca com areia fina — estabiliza blocos de jade','Sem a bacia o som se perde na pedra do rio','Use antes de aplicar o teste de sonoridade','Combine com a Placa Ressoante para diagnóstico completo'],'#c09870');
           notify('✦ Bacia coletada! Busque o Tigre para a Placa →');
         }
         break;
@@ -1137,8 +1237,11 @@ class Player{
             '"O Tigre-de-Indochina. Panthera tigris corbetti — hoje criticamente ameaçado, com menos de 200 indivíduos na natureza. No século XIII, era o predador dominante desta floresta."',
             '"Ele descansava sobre a Placa de Jade Ressoante — uma placa fina de jadeíta usada pelos lapidários Kachin como referência sonora. Ao percutir levemente, ela produz um Mi natural: 659 Hz."',
             '"Esta é a ferramenta diagnóstica mais importante desta fase. Bata levemente em qualquer pedra candidata e compare o som com esta placa: jadeíta ressoa com o mesmo tom. Serpentinita soa morta."',
-          ],()=>{notify('✦ Placa Ressoante! Use [P] no teste de sonoridade para ouvir a referência.')},'CORVAN','#a0d870');
-          showPopup('🟩 PLACA DE JADE RESSOANTE',['Produz Mi natural (659 Hz) ao ser percutida','Jadeíta: tom sustentado por 1-2 segundos','Serpentinita: som morto, sem eco, sem sustain','Pressione [P] durante o teste para ouvir'],'#70e8b0');
+          ],()=>{
+            notify('✦ Placa Ressoante! Use [P] no teste de sonoridade para ouvir a referência.');
+            // Popup só aparece depois do balão de diálogo fechar, para não sobrepor
+            showPopup('🟩 PLACA DE JADE RESSOANTE',['Produz Mi natural (659 Hz) ao ser percutida','Jadeíta: tom sustentado por 1-2 segundos','Serpentinita: som morto, sem eco, sem sustain','Pressione [P] durante o teste para ouvir'],'#70e8b0');
+          },'CORVAN','#a0d870');
         }
       }
 
@@ -1160,7 +1263,7 @@ class Player{
                   '"O rio Uru carrega ambas as pedras, misturadas. O teste de sonoridade é o único diagnóstico confiável sem laboratório moderno — e os lapidários Kachin o usam há milênios."',
                 ],(()=>{notify('✦ Busque as pedras do rio para cinzelar e testar!');}));
               }
-              notify(`🪨 Formação examinada! (${cnt}/${tot})`);
+              notify(`⛰️ Formação examinada! (${cnt}/${tot})`);
             }
             break;
           }
@@ -1216,7 +1319,12 @@ class Player{
     const STEP=6;
     for(const p of plats){if(p.type==='spike'||p.type==='_dead')continue;
       if(this.overlaps(p)){
-        if(this.y+this.h*0.5<=p.y)continue;
+        // Usa os PÉS (com pequena tolerância), não o centro do corpo, para decidir
+        // se ainda estamos "abaixo" da plataforma. Com o centro (h*0.5 = até 40px
+        // de folga), o jogador ficava bloqueado de lado no meio do pulo — travava
+        // horizontalmente antes mesmo de encostar no topo — e depois "escorregava"
+        // de repente quando o centro cruzava a linha. Pés = comportamento previsível.
+        if(this.y+this.h<=p.y+4)continue;
         const stepUp=p.y-(this.y+this.h);
         if(this.onG&&stepUp>-STEP&&stepUp<=0){this.y=p.y-this.h;}
         else{if(this.vx>0)this.x=p.x-this.w;else this.x=p.x+p.w;this.vx=0;}
@@ -1306,88 +1414,80 @@ function drawDust(){for(const p of dustPts){ctx.save();ctx.globalAlpha=(p.life/p
 // ── HUD ────────────────────────────────────────────────────────────────────
 function drawHUD(player,level){
   if(!player)return;
-  // Corações
+  // Barra topo — mesmo padrão da Fase 3.1 (altura 38 + linha divisória), desenhada ANTES dos corações
+  ctx.fillStyle='rgba(2,12,4,0.85)';ctx.fillRect(0,0,W,38);
+  ctx.fillStyle='rgba(80,200,120,0.2)';ctx.fillRect(0,36,W,2);
+  // Corações — cor do tema da fase (verde-jade), padrão idêntico à Fase 3.1
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#e02020':'#333';
+    ctx.fillStyle=i<player.hp?'#2ecc71':'#334';
     ctx.beginPath();const hx=16+i*28,hy=10;
     ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
     ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill();
   }
-  // Barra topo
-  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,34);
   const levelTitles=['A Floresta e o Rio','O Leito do Uru','A Câmara de Jade','O Entardecer de Hpakant'];
   const levelNum=(G.currentLevel?G.currentLevel.num:1)-1;
   const levelTitle=levelTitles[levelNum]||'';
-  ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=6;
   ctx.fillStyle='#d8f0e0';ctx.font='20px "Courier New"';
   ctx.textAlign='center';ctx.fillText(levelTitle,W/2,24);ctx.textAlign='left';
-  ctx.shadowBlur=0;
-  // Contador de jade
-  const jadeCount=player.items.filter(id=>id.startsWith('jadeia_')).length;
-  ctx.fillStyle='#d8f0e0';ctx.font='bold 20px "Courier New"';
-  ctx.textAlign='right';ctx.fillText('💚 '+jadeCount+'/3',W-14,26);ctx.textAlign='left';
-  // Painel Diário
+  // Contador do colecionável desta cena (artefato regional — não é item de diário)
+  const artDef=ARTIFACT_DEFS[level.num]||ARTIFACT_DEFS[3];
+  const artCount=player.items.filter(id=>id.startsWith(artDef.idPrefix)).length;
+  ctx.fillStyle=artDef.hex;ctx.font='bold 20px "Courier New"';
+  ctx.textAlign='right';ctx.fillText(artDef.icon+' '+artCount+'/'+artDef.total,W-14,26);ctx.textAlign='left';
+
+  // Painel Diário de Bordo — mesmo padrão visual/estrutural da Fase 3.1
   const TOOL_DEFS=[
     {id:'cinzel_bambu',        icon:'🎋',nome:'Cinzel Bambu'},
-    {id:'bacia_madeira',       icon:'🪣',nome:'Bacia c/Areia'},
+    {id:'bacia_madeira',       icon:'🥌',nome:'Bacia c/Areia'},
     {id:'placa_jade_ressoante',icon:'🟩',nome:'Placa Ressoante'},
     {id:'bracelete_imperial',  icon:'⭕',nome:'Bracelete Imp.'},
   ];
   const tools=TOOL_DEFS.filter(t=>player.items.includes(t.id));
-  const PX=12,PY=46,PW=182,PH_BASE=52;
-  const PH=PH_BASE+(tools.length>0?6+tools.length*22:0);
+  const PX=12,PY=46,PW=190,HEADER_H=26;
+  const PH=HEADER_H+(tools.length>0?10+tools.length*22:26);
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
+  ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=8;
   ctx.fillStyle='rgba(2,12,4,0.88)';roundRect(PX,PY,PW,PH,6);ctx.fill();
   ctx.shadowBlur=0;
   ctx.strokeStyle='#3a9858';ctx.lineWidth=1.5;roundRect(PX,PY,PW,PH,6);ctx.stroke();
-  ctx.strokeStyle='rgba(80,200,120,0.25)';ctx.lineWidth=1;roundRect(PX+3,PY+3,PW-6,PH-6,4);ctx.stroke();
   ctx.restore();
-  const midX=PX+PW/2;
-  const kw=26,kx=PX+PW-kw-6,ky=PY+5;
-  ctx.font='11px serif';ctx.fillStyle='#80d090';ctx.textAlign='left';ctx.fillText('📔',PX+8,PY+20);
+  const midX=PX+PW/2,kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#80d090';ctx.fillText('📔',PX+8,PY+20);
   ctx.font='bold 10px "Courier New"';ctx.fillStyle='#80d090';ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
   ctx.fillStyle='rgba(80,200,120,0.2)';roundRect(kx,ky,kw,18,3);ctx.fill();
   ctx.strokeStyle='#80d090';ctx.lineWidth=1;roundRect(kx,ky,kw,18,3);ctx.stroke();
-  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#a0d870';
-  ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
-  ctx.fillStyle='rgba(80,200,120,0.3)';ctx.fillRect(PX+6,PY+26,PW-12,1);
-  const activeTool=player.activeTools&&player.activeTools.size>0?[...player.activeTools][0]:null;
-  const atY=PY+44;ctx.textAlign='center';
-  if(activeTool&&ITEM_DEFS[activeTool]){
-    const def=ITEM_DEFS[activeTool];
-    ctx.fillStyle='rgba(80,200,120,0.1)';roundRect(PX+6,atY-14,PW-12,20,3);ctx.fill();
-    ctx.font='11px "Courier New"';ctx.fillStyle='#c0f0d0';
-    ctx.fillText(def.icon+' '+def.nome,midX,atY+1);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#a0d870';ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+  ctx.fillStyle='rgba(80,200,120,0.3)';ctx.fillRect(PX+6,PY+HEADER_H,PW-12,1);
+  // Lista de ferramentas — cada item aparece uma única vez; a equipada é destacada
+  ctx.textAlign='center';
+  if(tools.length>0){
+    tools.forEach((t,i)=>{
+      const ty=PY+HEADER_H+8+i*22,equipped=player.activeTools.has(t.id);
+      ctx.font=(equipped?'bold ':'')+'12px "Courier New"';ctx.fillStyle=equipped?'#f0d060':'#a8c8b0';
+      ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
+    });
   } else {
-    ctx.font='12px "Courier New"';ctx.fillStyle='#90b8a0';ctx.fillText('Não Equipado',midX,atY);
+    ctx.font='12px "Courier New"';ctx.fillStyle='#c0d8c8';
+    ctx.fillText('Não Equipado',midX,PY+HEADER_H+18);
   }
   ctx.textAlign='left';
-  if(tools.length>0){
-    ctx.fillStyle='rgba(80,200,120,0.3)';ctx.fillRect(PX+6,PY+PH_BASE,PW-12,1);
-    tools.forEach((t,i)=>{
-      const ty=PY+PH_BASE+8+i*22;
-      const equipped=activeTool===t.id;
-      ctx.textAlign='center';
-      ctx.font='11px serif';ctx.fillStyle=equipped?'#c0f0d0':'#608070';
-      ctx.fillText(t.icon+' '+t.nome+(equipped?' ◀':''),midX,ty+10);
-      ctx.textAlign='left';
-    });
-  }
-  // Hint rodapé
+
+  // Hint rodapé — mesmo padrão da Fase 3.1 (sem barra/sombra), com emojis contextuais de ferramentas/itens
   const hints=[
-    'Encontre o Cinzel e a Bacia. Procure o Tigre para a Placa Ressoante!',
-    'Examine as formações de jade e serpentinita no vale.',
-    'Cinzele pedras [E], depois teste a sonoridade! [P] para ouvir referência.',
-    'Siga o Tigre até a Oficina do Lapidário. [E] para concluir.',
+    (()=>{
+      if(!player.items.includes('cinzel_bambu'))return '🎋 Encontre o Cinzel de Bambu →';
+      if(!player.items.includes('bacia_madeira'))return 'Encontre a 🥌 Bacia de Madeira →';
+      if(!player.items.includes('placa_jade_ressoante'))return '🐅 Procure o Tigre para a Placa Ressoante →';
+      return '✦ Ferramentas obtidas — siga em frente →';
+    })(),
+    '💚 Examine as formações de jade e serpentinita no vale.',
+    '🎋 Cinzele pedras [E], depois teste a sonoridade! [P] para ouvir referência.',
+    '🐅 Siga o Tigre até a Oficina do Lapidário [⭕]. [E] para concluir.',
   ];
-  const hint=hints[levelNum]||'';
-  ctx.fillStyle='rgba(0,0,0,0.60)';ctx.fillRect(0,H-32,W,32);
-  ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
-  ctx.fillStyle='#d0f0d8';ctx.font='17px "Courier New"';
-  ctx.textAlign='center';ctx.fillText(hint,W/2,H-10);
-  ctx.textAlign='left';ctx.shadowBlur=0;
+  const hintText=hints[levelNum]||'';
+  ctx.fillStyle='#a8d8b8';ctx.font='18px "Courier New"';
+  ctx.textAlign='center';ctx.fillText(hintText,W/2,H-10);ctx.textAlign='left';
 }
 
 // ── Tela de Título ─────────────────────────────────────────────────────────
@@ -1433,11 +1533,10 @@ function drawTitle(){
 
   ctx.fillStyle='#80c0a0';ctx.font='18px "Courier New"';
   ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
-  ctx.fillText('[M] Menu Principal   |   [P] Ouvir placa de referência (no teste)',W/2,528);
+  ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
 
-// ── Tela de Morte ──────────────────────────────────────────────────────────
 function drawDeath(player){
   ctx.fillStyle='rgba(0,0,0,0.78)';ctx.fillRect(0,0,W,H);
   const cause=player?player.deathCause||'queda':'queda';
@@ -1449,11 +1548,10 @@ function drawDeath(player){
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
-  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#80d890';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Tentativas: ${G.deaths||1}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+80);
+  ctx.fillText(`Tentativas: ${G.deaths||1}`,W/2,H/2+108);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+140);
   ctx.textAlign='left';
 }
 
@@ -1476,34 +1574,32 @@ function drawComplete(player){
   ctx.fillStyle='#a0f0c0';ctx.font='bold 38px "Courier New"';
   ctx.fillText('✦  FASE 5.1 CONCLUÍDA  ✦',W/2,108);
   ctx.shadowBlur=0;
-  drawCorvan(W/2-160,200,4,false,Date.now()/300,'placa_jade_ressoante');
-  ctx.save();ctx.translate(W/2+80,260);ctx.scale(2.6,2.6);
-  drawJadeItem(0,0,Date.now()/1000,'verde');
-  ctx.restore();
+  drawCorvan(W/2-40,140,3,false,Date.now()/300,'placa_jade_ressoante');
   ctx.fillStyle='#c0e8c8';ctx.font='17px "Courier New"';
-  ctx.fillText('O vale de Hpakant revelou seus segredos.',W/2,196);
+  ctx.fillText('O vale de Hpakant revelou seus segredos.',W/2,340);
   const jadeCount=player?player.items.filter(id=>id.startsWith('jadeia_')).length:0;
   const hasB=player&&player.items.includes('bracelete_imperial');
   const lines=[
     `✦  Cinzel de Bambu Endurecido — extração sem fratura`,
     `✦  Bacia de Madeira com Areia — estabilização sonora`,
     `✦  Placa de Jade Ressoante — diagnóstico auditivo (Mi / 659 Hz)`,
-    `✦  Jadeítas coletadas: ${jadeCount}/3`,
     hasB?'✦  Bracelete de Jade Imperial — o artesão Kachin sem nome':'✦  Bracelete Imperial — não encontrado',
   ];
   ctx.fillStyle='#90c898';ctx.font='14px "Courier New"';
-  lines.forEach((l,i)=>ctx.fillText(l,W/2,248+i*28));
+  lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  const _scoreY=400+lines.length*32+40;
   ctx.fillStyle='#80b090';ctx.font='16px "Courier New"';
-  ctx.fillText(`Pontuação: 💚 ${player?player.score:0}   Jadeítas: ${jadeCount}/3`,W/2,420);
+  ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,_scoreY);
+  ctx.fillStyle='#80b090';ctx.font='14px "Courier New"';
+  ctx.fillText(`💚 Jadeítas coletadas: ${jadeCount}/3`,W/2,_scoreY+22);
+  // Resumo dos artefatos regionais de cena (colecionáveis à parte do diário)
+  const artTotals=[1,2,4].map(n=>{const d=ARTIFACT_DEFS[n];const c=player?player.items.filter(id=>id.startsWith(d.idPrefix)).length:0;return `${d.icon} ${c}/${d.total}`;}).join('   ');
+  ctx.fillText(`Artefatos regionais: ${artTotals}`,W/2,_scoreY+44);
   const pulse=0.65+Math.sin(Date.now()/550)*0.4;
   ctx.fillStyle=`rgba(120,240,160,${pulse})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 5.2 desbloqueada!   [E] Menu Principal',W/2,456);
+  ctx.fillText('✦ Fase 5.2 desbloqueada!   [M] Menu Principal',W/2,_scoreY+35+44);
   ctx.textAlign='left';
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ── CONSTRUÇÃO DOS NÍVEIS ──────────────────────────────────────────────────
-// ═══════════════════════════════════════════════════════════════════════════
 
 function buildL1(){
   // Cena 1: Floresta tropical + entrada do vale
@@ -1532,10 +1628,16 @@ function buildL1(){
     new Col(300,GROUND-90,'cinzel_bambu'),
     new Col(1700,GROUND-90,'bacia_madeira'),
   ];
+  // Colecionável de cena — Penas de Calau (ave sagrada mencionada no roteiro)
+  const artifacts=[
+    new Artifact(585,GROUND-70-56,1),
+    new Artifact(1320,GROUND-130-56,1),
+    new Artifact(2310,GROUND-60-56,1),
+  ];
   const triggers=[];
   triggers.push(new Trigger(LW-60,GROUND-120,60,120,'Descer ao Leito do Rio',()=>{G.loadLevel(2);}));
   const tigre={x:2880,y:GROUND-4,gifted:false};
-  return {num:1,W:LW,H:LH,startX:80,startY:GROUND-68,plats,cols,triggers,tigre,_startDone:false};
+  return {num:1,W:LW,H:LH,startX:80,startY:GROUND-68,plats,cols,artifacts,triggers,tigre,_startDone:false};
 }
 
 function buildL2(){
@@ -1566,9 +1668,15 @@ function buildL2(){
     new JadeExposition(1550,FLOOR-30,'jade'),
     new JadeExposition(2080,FLOOR-30,'serpentinite'),
   ];
+  // Colecionável de cena — Seixos de Nefrita ("o outro jade", mencionado no roteiro)
+  const artifacts=[
+    new Artifact(430,FLOOR-190-46,2),
+    new Artifact(1090,FLOOR-110-46,2),
+    new Artifact(2220,FLOOR-130-46,2),
+  ];
   const triggers=[];
   triggers.push(new Trigger(LW-60,FLOOR-120,60,120,'Câmara de Coleta',()=>{G.loadLevel(3);}));
-  return {num:2,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols:[],triggers,expositions,_expDialogDone:false};
+  return {num:2,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols:[],artifacts,triggers,expositions,_expDialogDone:false};
 }
 
 function buildL3(){
@@ -1616,6 +1724,12 @@ function buildL4(){
   plats.push({x:1680,y:FLOOR-70,w:90,h:20,type:'plat'});
   plats.push({x:1900,y:FLOOR-18,w:50,h:18,type:'spike'});
   plats.push({x:1980,y:FLOOR-60,w:140,h:60,type:'plat'});
+  // Colecionável de cena — Grãos de Abrasivo de Quartzo (lapidação, citado no roteiro)
+  const artifacts=[
+    new Artifact(550,FLOOR-80-46,4),
+    new Artifact(1270,FLOOR-100-46,4),
+    new Artifact(1700,FLOOR-70-46,4),
+  ];
   const triggers=[];
   triggers.push(new Trigger(LW-120,FLOOR-160,120,160,'Entrar na Oficina',(player)=>{
     if(!player.items.includes('jadeia_verde')){notify('💚 Volte ao leito do rio e cinzele a Jadeíta Verde-Imperial!');return;}
@@ -1625,7 +1739,7 @@ function buildL4(){
     G.state='complete';
   }));
   const tigre={x:200,y:FLOOR-4,gifted:false,isGuide:true};
-  return {num:4,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols:[],triggers,tigre};
+  return {num:4,W:LW,H:LH,startX:80,startY:FLOOR-68,plats,cols:[],artifacts,triggers,tigre};
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1640,14 +1754,24 @@ const G={
   dialog:false,
   sonicMode:null,
   deaths:0,
+  // Snapshot do que o jogador tinha ao ENTRAR na cena atual pela primeira vez
+  // (antes de coletar qualquer coisa nesta tentativa). Usado para resetar de
+  // verdade o progresso da cena quando ele morre e reinicia — do contrário,
+  // um respawn após morte reaproveitava this.player.items da tentativa que
+  // acabou de falhar, então tudo já aparecia coletado de novo.
+  _enteredLevel:null,_levelEntryItems:[],_levelEntryScore:0,_levelEntryTools:null,
 
-  loadLevel(n){
+  loadLevel(n,skipIntro=false){
     this.level=n;
     this.sonicMode=null;this.dialog=false;
     const prev=this.player;
-    const prevItems=prev?[...prev.items]:[];
-    const prevScore=prev?prev.score:0;
-    const prevTools=prev?new Set(prev.activeTools):new Set();
+    const isRespawnSameLevel=skipIntro&&this._enteredLevel===n;
+    const prevItems=isRespawnSameLevel?[...this._levelEntryItems]:(prev?[...prev.items]:[]);
+    const prevScore=isRespawnSameLevel?this._levelEntryScore:(prev?prev.score:0);
+    const prevTools=isRespawnSameLevel?new Set(this._levelEntryTools||[]):(prev?new Set(prev.activeTools):new Set());
+    if(!isRespawnSameLevel){
+      this._enteredLevel=n;this._levelEntryItems=[...prevItems];this._levelEntryScore=prevScore;this._levelEntryTools=new Set(prevTools);
+    }
 
     if(n===1)this.currentLevel=buildL1();
     else if(n===2)this.currentLevel=buildL2();
@@ -1662,12 +1786,28 @@ const G={
     if(this.player.items.includes('cinzel_bambu'))this.player.activeTools.add('cinzel_bambu');
     if(this.player.items.includes('placa_jade_ressoante'))this.player.activeTools.add('placa_jade_ressoante');
 
+    // Reconciliação anti-duplicata: ao reconstruir a cena (ex.: respawn após morte),
+    // marca como já feito tudo que o jogador já possui, para não coletar de novo.
+    if(lv.cols){for(const c of lv.cols){if(this.player.items.includes(c.type))c.done=true;}}
+    if(lv.walls){for(const w of lv.walls){if(this.player.items.includes('jadeia_'+w.jadeVariety))w.done=true;}}
+    if(lv.bracaleteObj&&this.player.items.includes('bracelete_imperial'))lv.bracaleteObj.done=true;
+    if(lv.tigre&&!lv.tigre.isGuide&&this.player.items.includes('placa_jade_ressoante'))lv.tigre.gifted=true;
+    if(lv.artifacts){
+      const def=ARTIFACT_DEFS[n];
+      if(def){
+        let already=this.player.items.filter(id=>id.startsWith(def.idPrefix)).length;
+        for(const a of lv.artifacts){if(already<=0)break;a.done=true;already--;}
+      }
+    }
+
     cam.x=0;cam.y=0;cam.W=W;cam.H=H;
     cam.LW=lv.W;cam.LH=lv.H;
     particles.length=0;dustPts.length=0;
     this.state='playing';
 
-    if(n===1){
+    if(skipIntro){
+      // Reentrada por morte — sem repetir a narração de entrada da cena
+    } else if(n===1){
       setTimeout(()=>showDialog([
         '"Século XIII, norte de Mianmar. Vale de Hpakant. O rio Uru corre sobre pedras cobertas de musgo verde-escuro. Algumas têm veias translúcidas visíveis — jade."',
         '"O jade não é apenas uma pedra aqui. Para os chineses, conecta os vivos aos ancestrais, representa cinco virtudes, cura pelo toque. Um bracelete de jadeíta imperial pode valer mais que um diamante."',
@@ -1697,7 +1837,7 @@ const G={
     BUBBLE.active=false;BUBBLE.queue=[];BUBBLE.cb=null;
     INV.open=false;INV.cursor=0;INV.tab=0;
     this.sonicMode=null;
-    this.loadLevel(1);
+    this.loadLevel(this.level||1,true); // volta ao início da cena ATUAL, sem repetir a narração
   },
 
   advance(){
@@ -1741,9 +1881,13 @@ function stopBgMusic(){
 let _prevBgState='';
 
 function startGame(){
-  G.loadLevel(1);
+  // Mostra a capa (título) primeiro — o jogo só entra em 'playing' quando o
+  // jogador confirma com ENTER/ESPAÇO (ver checagem em loop() abaixo). Antes,
+  // startGame() pulava direto para loadLevel(1)+'playing', então a capa nunca
+  // aparecia entre o clique no menu e a Cena 1.
   G.state='title';
   cam.x=0;cam.y=0;
+  particles.length=0;dustPts.length=0;
   loop();
 }
 
@@ -1758,26 +1902,14 @@ function loop(){
   ctx.save();ctx.translate(dx,dy);
   ctx.clearRect(-10,-10,W+20,H+20);
 
+  const lv=G.currentLevel;
+
   if(G.state==='title'){
     drawTitle();
     ctx.restore();
-    if(jp['Enter']||jp['Space']||jp['KeyE']||jp['_te']){
-      G.state='playing';
-      cam.x=0;cam.y=0;
-      particles.length=0;dustPts.length=0;
-      clearJP();
-      setTimeout(()=>{
-        if(G.state==='playing')showDialog([
-          '"Século XIII, vale de Hpakant. O rio Uru corre sobre pedras cobertas de musgo. Algumas têm veias translúcidas — jade verdadeiro."',
-          '"Encontre as ferramentas, procure o Tigre, e aprenda a ouvir a pedra."',
-        ],null);
-      },800);
-    }
-    clearJP();
-    return;
+    if(jp['Enter']||jp['Space']){G.loadLevel(1);}
+    clearJP();return;
   }
-
-  const lv=G.currentLevel;
 
   if(G.state==='dead'){
     if(lv){tileTheme=TILE_THEMES[lv.num]||TILE_THEMES[1];drawBg(lv.num,lv.W,lv.H);}
@@ -1807,9 +1939,10 @@ function loop(){
   if(lv.walls){for(const w of lv.walls)w.tick();}
   if(lv.expositions){for(const ex of lv.expositions)ex.tick();}
   if(lv.cols){for(const c of lv.cols)c.tick();}
+  if(lv.artifacts){for(const a of lv.artifacts)a.tick();}
 
   for(const p of lv.plats){
-    if(p.type==='_dead'||p.type==='spike')continue;
+    if(p.type==='_dead')continue;
     drawPlatform(p);
   }
   drawDust();
@@ -1831,16 +1964,25 @@ function loop(){
       ctx.font='bold 13px "Courier New"';
       const txt='[E] Pegar Bracelete Imperial';
       const tw=ctx.measureText(txt).width+20;
-      ctx.fillStyle=`rgba(2,12,4,${0.88*ha})`;roundRect(bsx-tw/2,bsy-56,tw,24,5);ctx.fill();
-      ctx.strokeStyle=`rgba(100,240,160,${ha})`;ctx.lineWidth=1.5;roundRect(bsx-tw/2,bsy-56,tw,24,5);ctx.stroke();
+      const bby=Math.min(bsy-56,player.y-cam.y-68-8);
+      const bbx=Math.max(6,Math.min(bsx-tw/2,W-tw-6));
+      ctx.fillStyle=`rgba(2,12,4,${0.88*ha})`;roundRect(bbx,bby,tw,24,5);ctx.fill();
+      ctx.strokeStyle=`rgba(100,240,160,${ha})`;ctx.lineWidth=1.5;roundRect(bbx,bby,tw,24,5);ctx.stroke();
       ctx.fillStyle=`rgba(160,255,200,${ha})`;
-      ctx.textAlign='center';ctx.fillText(txt,bsx,bsy-40);ctx.textAlign='left';
+      ctx.textAlign='center';ctx.fillText(txt,bbx+tw/2,bby+16);ctx.textAlign='left';
     }
   }
 
   if(lv.cols){
     for(const c of lv.cols){
       c.draw(player?player.x:0,player?player.y:0);
+    }
+  }
+
+  // Artefatos regionais de cena (colecionável de "sentido de mundo")
+  if(lv.artifacts){
+    for(const a of lv.artifacts){
+      a.draw(player?player.x:0,player?player.y:0);
     }
   }
 
@@ -1858,19 +2000,20 @@ function loop(){
       gl.addColorStop(0,'rgba(255,160,40,0.2)');gl.addColorStop(1,'rgba(255,160,40,0)');
       ctx.fillStyle=gl;ctx.beginPath();ctx.arc(mx,my,60,0,Math.PI*2);ctx.fill();
       ctx.restore();
-      const frame=Date.now()/1000;
-      drawTigre(mx,my,frame);
-      if(player&&Math.abs(player.x+13-m.x)<150){
-        const ha=0.7+Math.sin(Date.now()/350)*0.3;
-        ctx.font='bold 13px "Courier New"';
-        const txt='[E] Aproximar do Tigre';
-        const tw=ctx.measureText(txt).width+20;
-        const bx=mx-tw/2,by=my-100;
-        ctx.fillStyle=`rgba(2,12,4,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
-        ctx.strokeStyle=`rgba(255,180,60,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
-        ctx.fillStyle=`rgba(255,200,100,${ha})`;
-        ctx.textAlign='center';ctx.fillText(txt,mx,by+16);ctx.textAlign='left';
-      }
+    }
+    // O Tigre não é um item colecionável — permanece sempre visível em cena
+    const frame=Date.now()/1000;
+    drawTigre(mx,my,frame);
+    if(!m.gifted&&player&&Math.abs(player.x+13-m.x)<150){
+      const ha=0.7+Math.sin(Date.now()/350)*0.3;
+      ctx.font='bold 13px "Courier New"';
+      const txt='[E] Aproximar do Tigre';
+      const tw=ctx.measureText(txt).width+20;
+      const bx=Math.max(6,Math.min(mx-tw/2,W-tw-6)),by=Math.min(my-100,player.y-cam.y-68-8);
+      ctx.fillStyle=`rgba(2,12,4,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
+      ctx.strokeStyle=`rgba(255,180,60,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
+      ctx.fillStyle=`rgba(255,200,100,${ha})`;
+      ctx.textAlign='center';ctx.fillText(txt,bx+tw/2,by+16);ctx.textAlign='left';
     }
   }
 

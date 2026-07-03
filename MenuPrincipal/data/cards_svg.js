@@ -703,74 +703,59 @@ const CardsSVG = {
 
   // ── ÁSIA ──
   '5.1': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">
-    <rect x="0" y="0" width="80" height="80" fill="#2C1810"/>
-    <rect x="2" y="2" width="76" height="76" fill="#3D2214"/>
-    <rect x="3" y="3" width="74" height="74" fill="#1a0f08"/>
-    <rect x="3" y="3" width="74" height="1" fill="#6B3A1F"/>
-    <rect x="3" y="3" width="1" height="74" fill="#6B3A1F"/>
-    <rect x="3" y="76" width="74" height="1" fill="#0d0804"/>
-    <rect x="76" y="3" width="1" height="74" fill="#0d0804"/>
-    <!-- Sky desert xinjiang -->
-    <rect x="4" y="4" width="72" height="24" fill="#8A7A50"/>
-    <rect x="4" y="4" width="72" height="8"  fill="#9A8A60"/>
-    <!-- Mountain range -->
-    <rect x="4"  y="16" width="8"  height="12" fill="#6A5A3A"/>
-    <rect x="8"  y="12" width="8"  height="16" fill="#7A6A4A"/>
-    <rect x="14" y="9"  width="8"  height="19" fill="#8A7A5A"/>
-    <rect x="18" y="12" width="8"  height="16" fill="#7A6A4A"/>
-    <rect x="22" y="16" width="6"  height="12" fill="#6A5A3A"/>
-    <rect x="50" y="14" width="8"  height="14" fill="#6A5A3A"/>
-    <rect x="54" y="10" width="8"  height="18" fill="#7A6A4A"/>
-    <rect x="58" y="8"  width="8"  height="20" fill="#8A7A5A"/>
-    <rect x="62" y="10" width="8"  height="18" fill="#7A6A4A"/>
-    <rect x="66" y="14" width="8"  height="14" fill="#6A5A3A"/>
-    <!-- Camel caravan (silk road) -->
-    <rect x="30" y="20" width="6" height="4" fill="#C8A060"/>
-    <rect x="30" y="18" width="3" height="2" fill="#C8A060"/>
-    <rect x="31" y="17" width="2" height="1" fill="#C8A060"/>
-    <rect x="40" y="21" width="6" height="4" fill="#C8A060"/>
-    <rect x="40" y="19" width="3" height="2" fill="#C8A060"/>
-    <rect x="41" y="18" width="2" height="1" fill="#C8A060"/>
+    <rect x="0" y="0" width="80" height="80" fill="#0e1808"/>
+    <rect x="2" y="2" width="76" height="76" fill="#1a3010"/>
+    <rect x="3" y="3" width="74" height="74" fill="#152608"/>
+    <rect x="3" y="3" width="74" height="1" fill="#3a6028"/>
+    <rect x="3" y="3" width="1" height="74" fill="#3a6028"/>
+    <rect x="3" y="76" width="74" height="1" fill="#0a1406"/>
+    <rect x="76" y="3" width="1" height="74" fill="#0a1406"/>
+    <!-- Céu da floresta tropical (Vale de Hpakant) -->
+    <rect x="4" y="4" width="72" height="20" fill="#3a6028"/>
+    <rect x="4" y="4" width="72" height="8"  fill="#4a7838"/>
+    <!-- Copa da floresta -->
+    <rect x="4"  y="12" width="12" height="16" fill="#1e3c22"/>
+    <rect x="14" y="9"  width="12" height="19" fill="#243e28"/>
+    <rect x="24" y="12" width="12" height="16" fill="#1a3820"/>
+    <rect x="44" y="10" width="12" height="18" fill="#243e28"/>
+    <rect x="54" y="8"  width="12" height="20" fill="#2a5030"/>
+    <rect x="64" y="12" width="12" height="16" fill="#1e3c22"/>
+    <!-- Rio Uru cortando o vale -->
+    <rect x="4" y="28" width="72" height="10" fill="#4a8870"/>
+    <rect x="4" y="28" width="72" height="3"  fill="#5aacac"/>
+    <rect x="10" y="31" width="10" height="1" fill="#7ac0c0"/>
+    <rect x="34" y="33" width="14" height="1" fill="#7ac0c0"/>
+    <rect x="58" y="31" width="12" height="1" fill="#7ac0c0"/>
     <!-- Jade deposits (green) -->
-    <rect x="8"  y="44" width="5" height="5" fill="#2A8A2A"/>
-    <rect x="9"  y="43" width="4" height="7" fill="#3A9A3A"/>
-    <rect x="9"  y="44" width="2" height="2" fill="#5ACA5A"/>
-    <rect x="24" y="46" width="4" height="4" fill="#2A8A2A"/>
-    <rect x="25" y="45" width="3" height="6" fill="#3A9A3A"/>
-    <rect x="48" y="44" width="5" height="5" fill="#2A8A2A"/>
-    <rect x="49" y="43" width="4" height="7" fill="#3A9A3A"/>
-    <rect x="49" y="44" width="2" height="2" fill="#5ACA5A"/>
-    <rect x="62" y="46" width="4" height="4" fill="#2A8A2A"/>
-    <!-- Desert ground -->
-    <rect x="4" y="28" width="72" height="38" fill="#B89050"/>
-    <rect x="4" y="28" width="72" height="3"  fill="#C8A060"/>
-    <!-- Sand ripples -->
-    <rect x="4"  y="32" width="20" height="1" fill="#C8A060"/>
-    <rect x="30" y="34" width="25" height="1" fill="#C8A060"/>
-    <rect x="60" y="33" width="14" height="1" fill="#C8A060"/>
-    <!-- Bronze artifacts -->
-    <rect x="16" y="54" width="5" height="3" fill="#CD8A3A"/>
-    <rect x="40" y="56" width="4" height="3" fill="#CD8A3A"/>
-    <rect x="60" y="54" width="5" height="3" fill="#CD8A3A"/>
-    <!-- Iron ore -->
-    <rect x="30" y="52" width="4" height="4" fill="#AA3300"/>
-    <rect x="31" y="51" width="3" height="6" fill="#CC4400"/>
-    <!-- Miner -->
-    <rect x="36" y="30" width="4" height="5" fill="#B22222"/>
-    <rect x="36" y="28" width="4" height="2" fill="#D4956A"/>
-    <rect x="35" y="26" width="6" height="2" fill="#5C3A1E"/>
-    <rect x="37" y="26" width="2" height="1" fill="#FFD700"/>
-    <rect x="40" y="31" width="5" height="1" fill="#8B6835"/>
-    <rect x="44" y="29" width="3" height="3" fill="#888888"/>
-    <!-- Stars (3) -->
-    <rect x="4" y="4" width="3" height="3" fill="#C8A060"/>
-    <rect x="73" y="4" width="3" height="3" fill="#C8A060"/>
-    <rect x="4" y="73" width="3" height="3" fill="#C8A060"/>
-    <rect x="73" y="73" width="3" height="3" fill="#C8A060"/>
-    <rect x="5" y="5" width="1" height="1" fill="#FFD080"/>
-    <rect x="74" y="5" width="1" height="1" fill="#FFD080"/>
-    <rect x="5" y="74" width="1" height="1" fill="#FFD080"/>
-    <rect x="74" y="74" width="1" height="1" fill="#FFD080"/>
+    <rect x="8"  y="46" width="5" height="5" fill="#2A8A2A"/>
+    <rect x="9"  y="45" width="4" height="7" fill="#3A9A3A"/>
+    <rect x="9"  y="46" width="2" height="2" fill="#5ACA5A"/>
+    <rect x="24" y="48" width="4" height="4" fill="#2A8A2A"/>
+    <rect x="25" y="47" width="3" height="6" fill="#3A9A3A"/>
+    <rect x="48" y="46" width="5" height="5" fill="#2A8A2A"/>
+    <rect x="49" y="45" width="4" height="7" fill="#3A9A3A"/>
+    <rect x="49" y="46" width="2" height="2" fill="#5ACA5A"/>
+    <rect x="62" y="48" width="4" height="4" fill="#2A8A2A"/>
+    <!-- Chão da mata -->
+    <rect x="4" y="38" width="72" height="28" fill="#1e4428"/>
+    <rect x="4" y="38" width="72" height="3"  fill="#2a5030"/>
+    <!-- Explorador (Corvan) -->
+    <rect x="36" y="42" width="4" height="5" fill="#B22222"/>
+    <rect x="36" y="40" width="4" height="2" fill="#D4956A"/>
+    <rect x="35" y="38" width="6" height="2" fill="#5C3A1E"/>
+    <rect x="37" y="38" width="2" height="1" fill="#FFD700"/>
+    <rect x="40" y="43" width="5" height="1" fill="#8B6835"/>
+    <!-- Pepita de jade em destaque -->
+    <rect x="44" y="41" width="3" height="3" fill="#5ACA5A"/>
+    <!-- Estrelas dos cantos -->
+    <rect x="4" y="4" width="3" height="3" fill="#5aacac"/>
+    <rect x="73" y="4" width="3" height="3" fill="#5aacac"/>
+    <rect x="4" y="73" width="3" height="3" fill="#5aacac"/>
+    <rect x="73" y="73" width="3" height="3" fill="#5aacac"/>
+    <rect x="5" y="5" width="1" height="1" fill="#B8E0E0"/>
+    <rect x="74" y="5" width="1" height="1" fill="#B8E0E0"/>
+    <rect x="5" y="74" width="1" height="1" fill="#B8E0E0"/>
+    <rect x="74" y="74" width="1" height="1" fill="#B8E0E0"/>
   </svg>`,
 
   '5.2': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" shape-rendering="crispEdges">

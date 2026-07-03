@@ -1,0 +1,20 @@
+# Pastas de dependências
+node_modules/
+
+# Arquivos temporários do Word/Office
+~$*
+*.tmp
+.~lock.*
+
+# Arquivos do sistema (Windows)
+Thumbs.db
+desktop.ini
+
+# Logs e arquivos de debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Opcional: Se usar Godot, ignore também os arquivos de importação
+.godot/
+*.import

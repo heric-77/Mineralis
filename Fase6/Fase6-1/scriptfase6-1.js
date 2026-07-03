@@ -703,7 +703,8 @@ class Col{
         const pulse=0.7+Math.sin(Date.now()/300)*0.3;
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
-        const bx=sx+17-tw/2,by=sy-42;
+        const headY=playerY-cam.y-8;
+        const bx=sx+17-tw/2,by=Math.min(sy-42,headY-24);
         ctx.fillStyle=`rgba(6,4,10,${0.88*pulse})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(220,200,140,${pulse})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
         ctx.fillStyle=`rgba(220,200,140,${pulse})`;
@@ -719,7 +720,10 @@ class Trigger{
     if(this.done||this.auto)return;
     const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72;
     if(!near)return;
-    const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const sx=this.x+this.w/2-cam.x;
+    const baseSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4;
+    const headSy=py-cam.y-8;
+    const sy=Math.min(baseSy,headSy);
     const txt='[E] '+this.label;ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
     ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
@@ -1252,11 +1256,10 @@ function drawDeath(player){
   ctx.fillStyle='#ff6060';ctx.font='bold 54px "Courier New"';ctx.fillText(msg,W/2,H/2-50);
   ctx.shadowBlur=0;
   ctx.fillStyle='#cc8888';ctx.font='16px "Courier New"';ctx.fillText(sub,W/2,H/2-10);
-  drawCorvan(W/2-24,H/2+10,3,false,Date.now()/200);
   ctx.fillStyle='#e0b840';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Mortes: ${G.deaths||1}`,W/2,H/2+168);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+200);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+50);
+  ctx.fillText(`Mortes: ${G.deaths||1}`,W/2,H/2+78);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+110);
   ctx.textAlign='left';
 }
 
@@ -1289,12 +1292,9 @@ function drawComplete(player){
   ctx.fillStyle='#f0d040';ctx.font='bold 42px "Courier New"';
   ctx.fillText('✦  FASE 6.1 CONCLUÍDA  ✦',W/2,118);
   ctx.shadowBlur=0;
-  drawCorvan(W/2-160,200,4,false,Date.now()/300,'bastao_escuta');
-  ctx.save();ctx.translate(W/2+90,280);ctx.scale(3,3);
-  drawOpalaItem(0,0,Date.now()/800,'red');
-  ctx.restore();
+  drawCorvan(W/2-40,140,3,false,Date.now()/300,'bastao_escuta');
   ctx.fillStyle='#e8d8a0';ctx.font='17px "Courier New"';
-  ctx.fillText('Os olhos da terra revelaram seus segredos!',W/2,196);
+  ctx.fillText('Os olhos da terra revelaram seus segredos!',W/2,340);
   const opalas=player?player.items.filter(id=>id.startsWith('opala_')).length:0;
   const hasBastao=player&&player.items.includes('bastao_escuta');
   const lines=[
@@ -1305,12 +1305,15 @@ function drawComplete(player){
     `✦  Churinga — devolvida ao lugar. Não é nossa para levar.`,
   ];
   ctx.fillStyle='#c8b860';ctx.font='14px "Courier New"';
-  lines.forEach((l,i)=>ctx.fillText(l,W/2,252+i*28));
+  lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
+  const _scoreY=400+lines.length*32+40;
   ctx.fillStyle='#c0b880';ctx.font='16px "Courier New"';
-  ctx.fillText(`Pontuação: 🔴 ${player?player.score:0}   Opalas: ${opalas}/3`,W/2,430);
+  ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,_scoreY);
+  ctx.fillStyle='#c8b860';ctx.font='14px "Courier New"';
+  ctx.fillText(`🔴 Opalas coletadas: ${opalas}/3`,W/2,_scoreY+22);
   const pulse=0.65+Math.sin(Date.now()/550)*0.4;
   ctx.fillStyle=`rgba(220,190,100,${pulse})`;ctx.font='15px "Courier New"';
-  ctx.fillText('✦ Fase 6.2 desbloqueada!   [E] Menu Principal',W/2,466);
+  ctx.fillText('✦ Fase 6.2 desbloqueada!   [M] Menu Principal',W/2,_scoreY+35+22);
   ctx.textAlign='left';
 }
 
@@ -1546,7 +1549,7 @@ const G={
 };
 
 function startGame(){
-  G.loadLevel(1);G.state='title';cam.x=0;cam.y=0;loop();
+  G.state='title';cam.x=0;cam.y=0;loop();
 }
 
 function loop(){
@@ -1562,12 +1565,9 @@ function loop(){
 
   if(G.state==='title'){
     drawTitle();ctx.restore();
-    if(jp['Enter']||jp['Space']||jp['KeyE']||jp['_te']){
-      G.state='playing';cam.x=0;cam.y=0;particles.length=0;dustPts.length=0;clearJP();
-      setTimeout(()=>{if(G.state==='playing')showDialog([
-        '"Lightning Ridge, Austrália. Para os povos Yuwaalaraay, a opala nasceu quando o Criador desceu à Terra numa bola de fogo — e onde tocou o chão, as pedras começaram a brilhar com todas as cores do arco-íris."',
-        '"Cada opala negra é única. Não existem duas iguais no mundo. Preciso encontrar a Picareta de Ponta Fina e a Roldana de Poço — e encontrar o Wombat. Ele conhece os vazios da terra melhor do que qualquer instrumento."',
-      ],null);},800);
+    if(jp['Enter']||jp['Space']){
+      clearJP();
+      G.loadLevel(1);
     }
     clearJP();return;
   }
@@ -1617,7 +1617,8 @@ function loop(){
       const ha=0.5+Math.sin(Date.now()/400)*0.5;
       ctx.font='bold 13px "Courier New"';
       const txt='[E] Examinar Churinga';const tw=ctx.measureText(txt).width+20;
-      const bx=co.x-cam.x-tw/2,by=co.y-cam.y-50;
+      const headY=player.y-cam.y-8;
+      const bx=co.x-cam.x-tw/2,by=Math.min(co.y-cam.y-50,headY-24);
       ctx.fillStyle=`rgba(6,4,10,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
       ctx.strokeStyle=`rgba(200,160,80,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
       ctx.fillStyle=`rgba(200,160,80,${ha})`;
@@ -1644,7 +1645,8 @@ function loop(){
         ctx.font='bold 13px "Courier New"';
         const txt='[E] Cumprimentar Wombat';
         const tw=ctx.measureText(txt).width+20;
-        const bx=mx-tw/2,by=my-75;
+        const headY=player.y-cam.y-8;
+        const bx=mx-tw/2,by=Math.min(my-75,headY-24);
         ctx.fillStyle=`rgba(6,4,10,${0.88*ha})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(200,160,80,${ha})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
         ctx.fillStyle=`rgba(200,160,80,${ha})`;

@@ -1,10 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  MINERALIS  –  Fase 5.3  ·  A Pedra que Aprendeu o Norte
-//  scriptfase5-3.js
-//  Jiangxi, China — Dinastia Song · Século XI
-//  Magnetita · Agulha · Bússola · Shen Kuo
-// ═══════════════════════════════════════════════════════════════
-
 const W = 1280, H = 720;
 const wrap   = document.getElementById('wrap');
 const canvas = document.getElementById('c');
@@ -59,6 +52,84 @@ function sfx(type) {
   else if (type==='stone')     { o.type='square'; o.frequency.setValueAtTime(120,t); g.gain.setValueAtTime(.1,t); g.gain.exponentialRampToValueAtTime(.001,t+.15); }
   o.start(t); o.stop(t+1.5);
 }
+
+// ── Música ambiente ──────────────────────────────────────────────
+// Fase 5.3 não tinha trilha de fundo (só sfx pontuais). O roteiro atravessa
+// 4 momentos com humores bem distintos: a energia rítmica da forja Song
+// (Cena1), o mistério escuro e gotejante da mina de magnetita (Cena2), a
+// busca metódica de escavar/testar/confirmar minério (Cena3) e a resolução
+// calorosa no laboratório de Shen Kuo, onde tudo converge (Cena4). Em vez
+// de 4 músicas soltas, todas compartilham a MESMA escala pentatônica
+// chinesa (modo gong, em Ré — D E F# A B), a mesma usada no timbre do
+// guqin (sfx 'guqin' do Mengxi Bitan), para dar identidade sonora coerente
+// à fase inteira, variando apenas ritmo/densidade/camadas por cena.
+let _bgMusicActive=false,_bgMusicTimeout=null,_bgMusicGain=null,_bgMusicScene=-1;
+const _NOTES_53=[146.8,164.8,185.0,220.0,246.9,293.7,329.6,370.0,440.0]; // D3 E3 F#3 A3 B3 D4 E4 F#4 A4
+const _BG_SCENES=[
+  { // Cena 1 — A Fundição Song: trabalho, ritmo de martelo, energia
+    step:0.4, vol:0.065, type:'triangle',
+    seq:[0,3,5,3,0,4,6,4,0,3,5,3,0,2,4,2],
+    anvil:true,
+  },
+  { // Cena 2 — Colinas de Gnaisse / Minas de Magnetita: escuro, esparso
+    step:0.85, vol:0.045, type:'sine',
+    seq:[0,null,3,null,0,null,4,null,0,null,2,null],
+  },
+  { // Cena 3 — Coleta + Teste: busca metódica, curiosidade, repetição
+    step:0.55, vol:0.055, type:'triangle',
+    seq:[0,2,4,2,0,3,5,3,0,2,4,6,4,2,0,0],
+    echo:true,
+  },
+  { // Cena 4 — Rio Gan + Laboratório de Shen Kuo: calorosa, conclusiva
+    step:0.5, vol:0.07, type:'triangle',
+    seq:[0,2,4,6,8,6,4,2,0,3,5,7,5,3,0,0],
+    harmony:2,
+  },
+];
+function startBgMusic(sceneIdx){
+  if(!AC) return;
+  if(_bgMusicActive && _bgMusicScene===sceneIdx) return;
+  stopBgMusic();
+  _bgMusicActive=true; _bgMusicScene=sceneIdx;
+  if(AC.state==='suspended') AC.resume();
+  const cfg=_BG_SCENES[sceneIdx]||_BG_SCENES[0];
+  _bgMusicGain=AC.createGain(); _bgMusicGain.gain.value=cfg.vol; _bgMusicGain.connect(AC.destination);
+  function _nota(freq,start,dur,type,vol){
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||cfg.type; o.frequency.value=freq;
+    const v=vol!==undefined?vol:0.07;
+    g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(v,start+0.06);
+    g.gain.setValueAtTime(v,start+dur-0.18); g.gain.linearRampToValueAtTime(0,start+dur);
+    o.connect(g); g.connect(_bgMusicGain); o.start(start); o.stop(start+dur);
+  }
+  function _anvil(start){
+    // Batida de martelo na forja (só na Cena1) — clonk metálico curto
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='square'; o.frequency.setValueAtTime(1200,start); o.frequency.exponentialRampToValueAtTime(300,start+0.08);
+    g.gain.setValueAtTime(0.05,start); g.gain.exponentialRampToValueAtTime(0.001,start+0.1);
+    o.connect(g); g.connect(_bgMusicGain); o.start(start); o.stop(start+0.12);
+  }
+  function _ciclo(){
+    if(!_bgMusicActive||_bgMusicScene!==sceneIdx) return;
+    const t=AC.currentTime+0.1, step=cfg.step;
+    _nota(_NOTES_53[0]/2, t, cfg.seq.length*step, 'sine', cfg.vol*0.5);
+    cfg.seq.forEach((idx,i)=>{
+      if(idx===null) return;
+      const start=t+i*step;
+      _nota(_NOTES_53[idx%_NOTES_53.length], start, step*1.05);
+      if(cfg.harmony!==undefined) _nota(_NOTES_53[(idx+cfg.harmony)%_NOTES_53.length], start, step*1.05, cfg.type, cfg.vol*0.5);
+      if(cfg.echo && i%2===1) _nota(_NOTES_53[idx%_NOTES_53.length]*2, start+step*0.5, step*0.5, 'sine', cfg.vol*0.3);
+      if(cfg.anvil && i%4===0) _anvil(start);
+    });
+    _bgMusicTimeout=setTimeout(_ciclo,(cfg.seq.length*step-0.2)*1000);
+  }
+  _ciclo();
+}
+function stopBgMusic(){
+  _bgMusicActive=false; _bgMusicScene=-1; clearTimeout(_bgMusicTimeout);
+  if(_bgMusicGain&&AC){ _bgMusicGain.gain.linearRampToValueAtTime(0,AC.currentTime+0.5); _bgMusicGain=null; }
+}
+let _prevBgState='', _prevBgScene=-1;
 
 // ── Save ─────────────────────────────────────────────────────────
 const SAVE_KEY = 'mineralis_save_v2';
@@ -207,7 +278,7 @@ function drawPlatform(p){
 // ── Utils ─────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
 function _rr(x,y,w,h,r){ roundRect(x,y,w,h,r); }
-function wrapText(text,maxW){ ctx.font='15px "Courier New"'; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
+function wrapText(text,maxW,font){ ctx.font=font||'15px "Courier New"'; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
 
 // ── Item Definitions ──────────────────────────────────────────────
 const ITEM_DEFS={
@@ -301,6 +372,7 @@ const BUBBLE={
     CORVAN.drawFace(ctx, this.faceFrame, fx, fy, faceW, faceH);
     ctx.strokeStyle='rgba(200,40,20,0.5)';ctx.lineWidth=1.5;ctx.strokeRect(fx,fy,faceW,faceH);
     const tx=fx+faceW+pad; ctx.font=NAMEFNT;ctx.fillStyle='#e04030';ctx.fillText(this.speakerTxt,tx,by+pad+14);
+    ctx.fillStyle='rgba(200,40,20,0.35)';ctx.fillRect(tx,by+pad+20,textAreaW,1);
     ctx.font=FONT;ctx.fillStyle='#f0e8c0';this.lines.forEach((l,i)=>ctx.fillText(l,tx,by+pad+36+i*lineH));
     const pulse=0.55+Math.sin(Date.now()/400)*0.45; ctx.fillStyle=`rgba(200,40,20,${pulse})`;ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText('[E] Continuar →',bx+bubW-pad,by+bubH-8);ctx.textAlign='left';
   }
@@ -321,11 +393,24 @@ function drawNotif(){
 
 // ── Pop-up informativo ────────────────────────────────────────────
 const POPUP={ active:false,title:'',lines:[],icon:'⬛',timer:0,
-  show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=text.split('\n');this.timer=duration;},
+  // FIX: o corpo do texto era só um text.split('\n') — dependia do autor ter
+  // quebrado as linhas manualmente do tamanho certo para a caixa (PW=370).
+  // Qualquer frase um pouco mais longa "estourava" pela borda direita (ex.:
+  // "...pedra que ama o ferro" cortado). Agora usa wrapText() para calcular
+  // a quebra de linha de verdade, a partir da largura real disponível.
+  show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=wrapText(text,370-16-16,'12px "Courier New"');this.timer=duration;},
   tick(){if(this.timer>0){this.timer-=16;if(this.timer<=0)this.active=false;}},
   draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60;
     ctx.save();ctx.globalAlpha=alpha; ctx.fillStyle='rgba(4,3,0,0.94)';_rr(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle='#c02010';ctx.lineWidth=2;_rr(PX,PY,PW,PH,12);ctx.stroke();
-    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46); ctx.font='bold 13px "Courier New"';ctx.fillStyle='#e04030';ctx.fillText(this.title,PX+60,PY+28);
+    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46);
+    // FIX: textAlign ficava 'center' (herdado do ícone acima) ao desenhar o
+    // título — mesmo bug já corrigido na Fase5-2 (task #92). Reset explícito
+    // + encolhimento defensivo de fonte para títulos mais longos.
+    ctx.textAlign='left';
+    const titleMaxW=PX+PW-16-(PX+60);
+    let tfs=13; ctx.font='bold '+tfs+'px "Courier New"';
+    while(ctx.measureText(this.title).width>titleMaxW&&tfs>9){ tfs--; ctx.font='bold '+tfs+'px "Courier New"'; }
+    ctx.fillStyle='#e04030';ctx.fillText(this.title,PX+60,PY+28);
     ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';this.lines.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*20));ctx.restore(); }
 };
 
@@ -436,7 +521,10 @@ class GruaCoroaVermelha {
     }
     if(IMG['grua_img']&&IMG['grua_img'].complete&&IMG['grua_img'].naturalWidth>0){
       const dw=100, dh=100;
-      const bob=Math.sin(this.frame*1.5)*5;
+      // BUG: o bob (oscilação senoidal vertical) era aplicado sempre, mesmo
+      // com state='landed' — fazia a Grua parecer flutuando/voando mesmo
+      // parada no lugar. Agora só oscila enquanto realmente voa (orbit/land).
+      const bob=(this.state==='landed')?0:Math.sin(this.frame*1.5)*5;
       const flipLeft=Math.cos(this.angle)<0;
       if(flipLeft){ctx.translate(sx+dw/2,sy-dh/2+bob);ctx.scale(-1,1);}
       else ctx.translate(sx-dw/2,sy-dh/2+bob);
@@ -444,7 +532,7 @@ class GruaCoroaVermelha {
     } else {
       // Fallback grua vetorial
       ctx.translate(sx,sy);
-      const bob=Math.sin(this.frame*1.5)*5;
+      const bob=(this.state==='landed')?0:Math.sin(this.frame*1.5)*5;
       // Corpo branco
       ctx.fillStyle='#f8f8f0'; ctx.beginPath(); ctx.ellipse(0,bob,24,14,0,0,Math.PI*2); ctx.fill();
       // Pescoço longo
@@ -619,12 +707,24 @@ class Enemy{
 }
 
 // ── Col (collectible itens flutuantes) ────────────────────────────
+// Ferramentas coletáveis (exigem [E] e mostram alerta padrão) — magnetita e
+// mengxi continuam sendo coletados automaticamente ao encostar (minério/artefato).
+const TOOL_LABELS={picareta_aco:'Picareta de Aço Song',bacia:'Bacia de Madeira Laqueada',agulha:'Agulha de Costura de Aço'};
+
 class Col{
   constructor(x,y,type){this.x=x;this.y=y;this.w=30;this.h=30;this.type=type;this.done=false;this.t=Math.random()*Math.PI*2;}
   tick(){if(!this.done)this.t+=0.06;}
-  draw(){
+  draw(player){
     if(this.done) return;
     const sx=this.x-cam.x, sy=this.y-cam.y+Math.sin(this.t)*5; if(sx<-50||sx>W+50) return;
+    const isTool=TOOL_LABELS.hasOwnProperty(this.type);
+    const near=isTool&&player&&player.near(this,70);
+    if(near){
+      const pulse=0.5+Math.sin(Date.now()/300)*0.5;
+      const glow=ctx.createRadialGradient(sx+15,sy+15,0,sx+15,sy+15,26);
+      glow.addColorStop(0,`rgba(224,64,48,${0.35+pulse*0.2})`); glow.addColorStop(1,'rgba(224,64,48,0)');
+      ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(sx+15,sy+15,26,0,Math.PI*2); ctx.fill();
+    }
     ctx.save(); ctx.translate(sx+15, sy+15);
     if(this.type==='picareta_aco'){
       if(IMG['picareta_img']) ctx.drawImage(IMG['picareta_img'],0,0,48,48,-15,-15,30,30);
@@ -649,13 +749,27 @@ class Col{
       ctx.fillRect(-2,-14+pulse,2,2); ctx.fillRect(3,12-pulse,2,2);
     }
     ctx.restore();
+    if(near){
+      const label=TOOL_LABELS[this.type];
+      const txt='[E] Pegar '+label; ctx.font='13px "Courier New"'; const tw=ctx.measureText(txt).width+22;
+      const headTop=(player.y-cam.y)-16, itemTop=sy-16;
+      const cy=Math.min(itemTop,headTop-24);
+      const cx=Math.max(tw/2+6,Math.min(sx+15,W-tw/2-6));
+      ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(cx-tw/2,cy-16,tw,24,4);ctx.fill();
+      ctx.strokeStyle='#e04030';ctx.lineWidth=1.5;roundRect(cx-tw/2,cy-16,tw,24,4);ctx.stroke();
+      ctx.fillStyle='#e04030';ctx.textAlign='center';ctx.fillText(txt,cx,cy);ctx.textAlign='left';
+    }
   }
 }
 
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x,sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#e04030';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#e04030';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; const itemSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headTop=py-cam.y-8; const sy=Math.min(itemSy,headTop); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24;
+    // FIX: faltava o clamp horizontal (mesmo padrão já aplicado na Fase4-3/
+    // Fase5-2) — perto das bordas do nível a caixa saía da tela.
+    const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6));
+    ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#e04030';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#e04030';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left'; }
 }
 
 // ── Player ────────────────────────────────────────────────────────
@@ -679,9 +793,16 @@ class Player{
       for(const e of level.enemies){ if(!e.dead&&this.overlaps(e)){ if(this.vy>2&&this.y+this.h<e.y+e.h*0.5){e.dead=true;this.vy=-8;burst(e.x+20,e.y,'#e04030',10);sfx('coin');}else{this._hurt(1,level);this.vy=-7;this.vx=(this.x<e.x?-7:7);} } } }
     if(this.inv>0)this.inv--;
     if(this.interactAnim>0)this.interactAnim--;
-    // Coletáveis
+    // Coletáveis — ferramentas (picareta/bacia/agulha) exigem [E] com o alerta
+    // visível (igual ao padrão de outras fases); minério/artefato continuam
+    // sendo coletados automaticamente ao encostar.
+    const ePressedCol=isE();
     for(const c of level.cols){
-      if(!c.done&&this.overlaps(c)){
+      if(c.done) continue;
+      const isTool=TOOL_LABELS.hasOwnProperty(c.type);
+      if(isTool){ if(!this.overlaps(c)||!ePressedCol) continue; }
+      else if(!this.overlaps(c)) continue;
+      {
         c.done=true;
         if(c.type==='magnetita'){
           this.score+=15; this.items.push('magnetita'); sfx('magnetita');
@@ -798,7 +919,15 @@ class Player{
   draw(){
     if(this.dead)return;
     const dx=this.x-cam.x, dy=this.y-cam.y;
-    const dw=this.w*2.4, dh=this.h*1.45;
+    // CORVAN.draw() escala a partir de dh (S=dh/46); dw só centraliza e se
+    // cancela nesta fórmula (dx-ox), não afeta o tamanho visual. Com
+    // dw=w*2.4, dh=h*1.45 o Corvan saía bem maior que a hitbox (40×80).
+    // Uma correção anterior usou S=1.67 (Fase4-3) como referência, mas ao
+    // conferir todas as fases, S=1.67 é uma exceção (só Fase3-3/Fase4-3) —
+    // o padrão real, usado desde a Fase1-1 (origem do sprite) e na maioria
+    // das fases, é S=1.5 → altura fixa de 46*1.5=69px, independente da
+    // hitbox de colisão de cada fase.
+    const dw=this.w, dh=69;
     const ox=(dw-this.w)/2, oy=dh-this.h;
     const flip=this.facing===-1;
     if(this.interactAnim>0&&this.state!=='jump') CORVAN.draw(ctx, 'dig',  this.frame,    dx-ox,dy-oy,dw,dh,flip);
@@ -856,8 +985,19 @@ function buildL1(){
     new Col(240,FL-50,'picareta_aco'),
     new Col(580,FL-50,'bacia'),
   ];
-  const GRUA_X=3000, GRUA_Y=FL-90;
+  // GRUA_Y: o sprite da Grua (100px) é centralizado verticalmente em torno
+  // de this.y no draw() (translate usa sy-dh/2), então os "pés" ficam em
+  // this.y+50. FL-90 deixava os pés ~40px ACIMA da plataforma real (que
+  // existe em x=2820..3420, topo em FL) — por isso ela parecia flutuar no
+  // ar mesmo parada. FL-50 encosta os pés exatamente no chão da plataforma.
+  const GRUA_X=3000, GRUA_Y=FL-50;
+  // BUG: GruaCoroaVermelha nascia com state='orbit' (padrão da classe), o que
+  // a fazia voar em círculos ao redor do Corvan pela cena INTEIRA, desde o
+  // início, em vez de ficar pousada no chão no final (onde a interação
+  // acontece) — diferente do padrão da Ovelha de Marco Polo (Fase5-2), que já
+  // nasce pousada. Agora ela já começa pousada em GRUA_X/GRUA_Y.
   const grua=new GruaCoroaVermelha();
+  grua.x=GRUA_X; grua.y=GRUA_Y; grua.state='landed';
   grua.visible=true;
   const triggers=[
     new Trigger(2880,FL-300,200,300,'Aproximar da Grua',(player,level)=>{
@@ -898,7 +1038,7 @@ function buildL1(){
       const rx=GRUA_X-cam.x, ry=GRUA_Y-cam.y;
       if(rx>-80&&rx<W+80){ ctx.fillStyle='#3a3028'; ctx.beginPath(); ctx.ellipse(rx+30,ry+40,60,16,0,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#4a3a30'; ctx.beginPath(); ctx.ellipse(rx+28,ry+28,52,14,0,0,Math.PI*2); ctx.fill(); }
       this.grua.draw();
-      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(); for(const t of this.triggers)t.draw(player.x,player.y);
+      for(const e of this.enemies)e.draw(); for(const c of this.cols)c.draw(player); for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
 }
@@ -978,7 +1118,7 @@ function buildL2(){
         ctx.fillStyle='rgba(140,170,200,0.5)'; ctx.beginPath(); ctx.arc(wx,wy,2.5,0,Math.PI*2); ctx.fill();
       }
       for(const e of this.enemies)e.draw();
-      for(const c of this.cols)c.draw();
+      for(const c of this.cols)c.draw(player);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
@@ -1085,7 +1225,7 @@ function buildL3(){
       ag.addColorStop(0,'rgba(200,160,40,0.25)'); ag.addColorStop(1,'rgba(200,160,40,0)');
       ctx.fillStyle=ag; ctx.fillRect(3270-cam.x,FL-500-cam.y,360,300);
       for(const e of this.enemies)e.draw();
-      for(const c of this.cols)c.draw();
+      for(const c of this.cols)c.draw(player);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
@@ -1186,7 +1326,7 @@ function buildL4(){
       }
       this.grua.draw();
       for(const e of this.enemies)e.draw();
-      for(const c of this.cols)c.draw();
+      for(const c of this.cols)c.draw(player);
       for(const t of this.triggers)t.draw(player.x,player.y);
     }
   };
@@ -1194,79 +1334,110 @@ function buildL4(){
 
 // ── HUD ────────────────────────────────────────────────────────────
 function drawHUD(player,level){
+  // Barra superior — mesmo padrão (fundo escuro + linha divisória) do resto do jogo
   ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,0,W,38);
+  ctx.fillStyle='rgba(200,60,40,0.25)';ctx.fillRect(0,36,W,2);
   for(let i=0;i<player.maxHp;i++){ ctx.fillStyle=i<player.hp?'#e02020':'#333'; ctx.beginPath();const hx=16+i*28,hy=10;ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);ctx.bezierCurveTo(hx+10,hy+18,hx,hy+14,hx,hy+5);ctx.closePath();ctx.fill(); }
-  ctx.fillStyle='rgba(220,40,30,.9)';ctx.font='13px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
-  ctx.fillStyle='#e04030';ctx.font='bold 15px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,24);ctx.textAlign='left';
-  // Ferramenta ativa
-  const tY=44;
-  ctx.fillStyle='rgba(0,0,0,0.5)';_rr(16,tY,140,28,4);ctx.fill();
-  ctx.strokeStyle=player.activeTool?'#e04030':'#444';ctx.lineWidth=1.5;_rr(16,tY,140,28,4);ctx.stroke();
-  if(player.activeTool&&ITEM_DEFS[player.activeTool]){const def=ITEM_DEFS[player.activeTool];ctx.font='14px serif';ctx.fillText(def.icon,24,tY+20);ctx.font='11px "Courier New"';ctx.fillStyle='#e04030';ctx.fillText(def.nome,42,tY+20);}
-  else{ctx.font='11px "Courier New"';ctx.fillStyle='#555';ctx.fillText('Sem ferramenta',22,tY+20);}
-  // Inventário
-  ctx.fillStyle='rgba(180,40,20,0.15)';_rr(162,tY,46,28,4);ctx.fill();ctx.strokeStyle='#8a2010';ctx.lineWidth=1.5;_rr(162,tY,46,28,4);ctx.stroke();
-  ctx.font='bold 11px "Courier New"';ctx.fillStyle='#c03020';ctx.textAlign='center';ctx.fillText('[I]',185,tY+19);ctx.textAlign='left';
-  // Itens no HUD
-  let ix=W-16;const inv=[];
-  if(player.items.includes('mengxi'))      inv.push('📚 MENGXI');
-  if(player.items.includes('bussola'))     inv.push('🧭 BÚSSOLA');
-  if(player.items.includes('agulha'))      inv.push('🪡 AGULHA');
-  if(player.items.includes('bacia'))       inv.push('🥣 BACIA');
-  if(player.items.includes('picareta_aco')) inv.push('⛏ PICARETA');
-  const mn=player.items.filter(i=>i==='magnetita').length;
-  if(mn>0) inv.push('⬛ '+mn);
-  for(const it of inv){ctx.fillStyle='#e04030';ctx.font='12px "Courier New"';ctx.textAlign='right';ctx.fillText(it,ix,tY+20);ctx.textAlign='left';ix-=ctx.measureText(it).width+20;}
+  ctx.save();ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=6;
+  ctx.fillStyle='#f0e0d0';ctx.font='20px "Courier New"';ctx.textAlign='center';ctx.fillText(level.title,W/2,24);ctx.textAlign='left';
+  ctx.restore();
+  // O contador de estrelas só faz sentido em cenas que têm coleta de
+  // magnetita (única fonte de pontuação); as demais só têm ferramentas/
+  // artefatos, já refletidos no Diário de Bordo — mostrar "⭐ 0" ali não
+  // fazia sentido (mesmo padrão corrigido na Fase5-2).
+  const hasScoreBonus = level.cols && level.cols.some(c=>c.type==='magnetita');
+  if(hasScoreBonus){
+    ctx.fillStyle='#e04030';ctx.font='bold 20px "Courier New"';ctx.textAlign='right';ctx.fillText('⭐ '+player.score,W-14,26);ctx.textAlign='left';
+  }
+
+  // Diário de Bordo — painel único no padrão do jogo (Fase5-2/Fase5-1/Fase4-3)
+  const TOOL_DEFS=[
+    {id:'picareta_aco_song',icon:'⛏', nome:'Picareta',has:()=>player.items.includes('picareta_aco')},
+    {id:'bacia_laqueada',   icon:'🥣',nome:'Bacia',   has:()=>player.items.includes('bacia')},
+    {id:'agulha_aco',       icon:'🪡',nome:'Agulha',  has:()=>player.items.includes('agulha')},
+    {id:'bussola',          icon:'🧭',nome:'Bússola', has:()=>player.items.includes('bussola')},
+  ];
+  const tools=TOOL_DEFS.filter(t=>t.has());
+  const PX=12,PY=46,PW=190,HEADER_H=26;
+  const PH=HEADER_H+(tools.length>0?10+tools.length*22:26);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=8;
+  ctx.fillStyle='rgba(10,2,0,0.9)';_rr(PX,PY,PW,PH,6);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#8a2010';ctx.lineWidth=1.5;_rr(PX,PY,PW,PH,6);ctx.stroke();
+  ctx.restore();
+  const midX=PX+PW/2,kw=26,kx=PX+PW-kw-6,ky=PY+5;
+  ctx.font='11px serif';ctx.fillStyle='#e04030';ctx.fillText('📔',PX+8,PY+20);
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#e04030';ctx.fillText('DIÁRIO DE BORDO',PX+24,PY+20);
+  ctx.fillStyle='rgba(180,40,20,0.2)';_rr(kx,ky,kw,18,3);ctx.fill();
+  ctx.strokeStyle='#e04030';ctx.lineWidth=1;_rr(kx,ky,kw,18,3);ctx.stroke();
+  ctx.font='bold 10px "Courier New"';ctx.fillStyle='#f0a080';ctx.textAlign='center';ctx.fillText('[I]',kx+kw/2,ky+13);ctx.textAlign='left';
+  ctx.fillStyle='rgba(180,40,20,0.3)';ctx.fillRect(PX+6,PY+HEADER_H,PW-12,1);
+  ctx.textAlign='center';
+  if(tools.length>0){
+    tools.forEach((t,i)=>{
+      const ty=PY+HEADER_H+8+i*22,eq=(player.activeTool===t.id);
+      ctx.font=(eq?'bold ':'')+'12px "Courier New"';ctx.fillStyle=eq?'#ffe060':'#e0a888';
+      ctx.fillText(t.icon+' '+t.nome+(eq?' ◀':''),midX,ty+10);
+    });
+  } else {
+    // Padrão do jogo (Fase4-3, Fase5-1, Fase5-2): "Não Equipado", já que as
+    // ferramentas já existem como entradas fixas do Diário — só ainda não
+    // foram obtidas/equipadas.
+    ctx.font='12px "Courier New"';ctx.fillStyle='#a06050';
+    ctx.fillText('Não Equipado',midX,PY+HEADER_H+18);
+  }
+  ctx.textAlign='left';
+
+  const magN=player.items.filter(i=>i==='magnetita').length;
+  ctx.font='12px "Courier New"';ctx.fillStyle='#e0a888';ctx.textAlign='right';
+  if(magN>0) ctx.fillText('⬛ Magnetita ×'+magN,W-14,52);
+  if(player.items.includes('mengxi')) ctx.fillText('📚 Mengxi Bitan coletado',W-14,52+(magN>0?18:0));
+  ctx.textAlign='left';
+
   // Barra de fricção (Etapa 3)
   if(player.frictionCount>0 && !player.needleMagnetized){
-    const bW=180,bX=16,bY=tY+32;
+    const bW=180,bX=16,bY=PY+PH+8;
     ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(bX,bY,bW,12);
     ctx.fillStyle='rgba(200,80,40,0.9)';ctx.fillRect(bX,bY,bW*(player.frictionCount/20),12);
     ctx.strokeStyle='rgba(200,140,80,0.6)';ctx.lineWidth=1;ctx.strokeRect(bX,bY,bW,12);
     ctx.font='10px "Courier New"';ctx.fillStyle='#ffb060';ctx.fillText(`🪡 FRICÇÃO ${player.frictionCount}/20`,bX+2,bY+10);
   }
-  ctx.fillStyle='rgba(220,140,120,.72)';ctx.font='12px "Courier New"';ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
-  if(G.timeOnLevel<600){ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(8,H-44,480,28);ctx.fillStyle='#aaa';ctx.font='12px "Courier New"';ctx.fillText('← → Mover  ↑/Espaço Pular  E Interagir  I Inventário',14,H-25);}
+
+  ctx.save();ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
+  ctx.fillStyle='#f0e0c0';ctx.font='17px "Courier New"';ctx.textAlign='center';ctx.fillText(level.hint,W/2,H-10);ctx.textAlign='left';
+  ctx.restore();
 }
 
 // ── Title Screen ──────────────────────────────────────────────────
 function drawTitle(){
-  const bg=IMG['bg01'];
-  if(bg&&bg.complete&&bg.naturalWidth>0){ctx.globalAlpha=0.55;drawBg('bg01');ctx.globalAlpha=1;}
-  else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1a0408');g.addColorStop(1,'#050202');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+  drawBg('bg01');
   ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,0,W,H);
-  // Estrelas
+  // Estrelas / faíscas metálicas
   for(let i=0;i<100;i++){const sx=(i*149.5)%W,sy=(i*89.7)%280;ctx.fillStyle=`rgba(255,200,160,${.15+Math.sin(Date.now()/1200+i)*.15})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
-  // Corvan caminhando na tela de título
-  {
-    const walkPeriod = 9000;
-    const tWalk = (Date.now() % walkPeriod) / walkPeriod;
-    const cwX = tWalk * (W + 120) - 60;
-    const cwY = H - 140;
-    CORVAN.drawLarge(ctx, cwX, cwY, 2.2, false, Date.now()/180, null);
-  }
-  // Grua voando no título
-  if(IMG['grua_img']&&IMG['grua_img'].complete){
-    const lx=((Date.now()/22)%(W+120))-60;
-    const ly=200+Math.sin(Date.now()/900)*18;
-    ctx.drawImage(IMG['grua_img'],0,0,96,96,lx,ly,110,110);
-  }
+  // A Grua de Coroa Vermelha (companion) foi removida da capa — o padrão do
+  // jogo (Fase4-3, Fase5-1, etc.) é a tela de título não mostrar Corvan nem
+  // nenhum bicho/companheiro, só título, subtítulo, card e prompts. A grua
+  // continua aparecendo normalmente na tela de conclusão (drawComplete).
   ctx.textAlign='center';
   ctx.shadowColor='#c02010';ctx.shadowBlur=40;
-  ctx.fillStyle='#e02020';ctx.font='bold 50px "Courier New"';ctx.fillText('A PEDRA QUE APRENDEU O NORTE',W/2,168);
+  ctx.fillStyle='#e02020';ctx.font='bold 42px "Courier New"';ctx.fillText('A Pedra que Aprendeu o Norte',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#a04040';ctx.font='22px "Courier New"';ctx.fillText('Fase 5.3  —  Jiangxi, China · Dinastia Song · Séc. XI',W/2,216);
+  ctx.fillStyle='#a04040';ctx.font='19px "Courier New"';ctx.fillText('Fase 5.3  —  Jiangxi, China · Dinastia Song · Séc. XI',W/2,200);
   if(IMG.card53){
-    const cardSize=160,cardX=W/2-80,cardY=246;
+    const cardSize=160,cardX=W/2-80,cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
     glow.addColorStop(0,'rgba(80,80,140,0.25)'); glow.addColorStop(1,'rgba(80,80,140,0)');
     ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(W/2,cardY+80,130,0,Math.PI*2); ctx.fill();
+    ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=18;
     ctx.drawImage(IMG.card53,cardX,cardY,cardSize,cardSize);
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(200,60,40,0.55)';ctx.lineWidth=2;ctx.strokeRect(cardX,cardY,cardSize,cardSize);
   }
   ctx.fillStyle=`rgba(220,60,40,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
   ctx.fillStyle='#c0c8d8';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover  ↑/Espaço Pular  E Interagir  I Inventário',W/2,504);
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }
@@ -1275,11 +1446,10 @@ function drawDeath(){
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';ctx.shadowColor='#ff2020';ctx.shadowBlur=30;
   ctx.fillStyle='#ff5050';ctx.font='bold 56px "Courier New"';ctx.fillText('VOCÊ CAIU!',W/2,H/2-50);ctx.shadowBlur=0;
-  CORVAN.drawLarge(ctx, W/2-24, H/2+10, 3, false);
   ctx.fillStyle='#e04030';ctx.font='20px "Courier New"';
-  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+140);
-  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+172);
-  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+204);
+  ctx.fillText('Pressione  R  para recomeçar',W/2,H/2+30);
+  ctx.fillText(`Mortes: ${G.deaths}`,W/2,H/2+62);
+  ctx.fillStyle='#888';ctx.font='15px "Courier New"';ctx.fillText('[M] Menu Principal',W/2,H/2+94);
   ctx.textAlign='left';
 }
 
@@ -1299,9 +1469,9 @@ function drawComplete(){
     '🦩  Grua de Coroa Vermelha — a sabedoria que guiou Shen Kuo',
   ];
   ctx.fillStyle='#e0c878';ctx.font='16px "Courier New"';lines.forEach((l,i)=>ctx.fillText(l,W/2,400+i*32));
-  ctx.fillStyle='#e02020';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ⭐ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
+  ctx.fillStyle='#e02020';ctx.font='18px "Courier New"';ctx.fillText(`Pontuação: ◈ ${G.player?.score||0}   Mortes: ${G.deaths}`,W/2,548);
   ctx.fillStyle=`rgba(220,60,40,${.6+Math.sin(Date.now()/600)*.4})`;ctx.font='17px "Courier New"';
-  ctx.fillText('▶ [M] Menu Principal ◀',W/2,594);
+  ctx.fillText('✦ Fase 6.1 desbloqueada!   [M] Menu Principal',W/2,594);
   ctx.font='42px serif';ctx.fillText('🏆',W/2-20,640);
   ctx.textAlign='left';
 }
@@ -1413,11 +1583,19 @@ function _salvarProgresso(score,deaths){
 
 function startGame(){
   CORVAN.load('Assets/', () => {});
-  G.load(0); G.state='title'; loop();
+  G.state='title'; cam.x=0; cam.y=0; loop();
 }
 
 function loop(){
   requestAnimationFrame(loop);
+  // Música ambiente: toca durante o gameplay, trocando de variação quando
+  // a cena muda (G.lvIdx), e para nas telas de título/morte/conclusão.
+  if(G.state==='playing'){
+    if(_prevBgState!=='playing'||G.lvIdx!==_prevBgScene){ startBgMusic(G.lvIdx); _prevBgScene=G.lvIdx; }
+  } else if(_prevBgState==='playing'){
+    stopBgMusic();
+  }
+  _prevBgState=G.state;
   if(G.state==='title'    &&(jp['Enter']||jp['Space'])) G.load(0);
   if(G.state==='dead'     && jp['KeyR'])                G.load(G.lvIdx);
   if(G.state==='complete' &&(jp['Enter']||jp['KeyM'])) _voltarAoMenu();
