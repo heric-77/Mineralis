@@ -200,7 +200,7 @@ function drawPlatform(p){
 // ── Utils ─────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
 function _rr(x,y,w,h,r){ roundRect(x,y,w,h,r); }
-function wrapText(text,maxW){ ctx.font='15px "Courier New"'; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
+function wrapText(text,maxW,font='15px "Courier New"'){ ctx.font=font; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
 
 // ── Item Definitions ──────────────────────────────────────────────
 const ITEM_DEFS={
@@ -342,10 +342,16 @@ function drawNotif(){
 const POPUP={ active:false,title:'',lines:[],icon:'🔺',timer:0,
   show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=text.split('\n');this.timer=duration;},
   tick(){if(this.timer>0){this.timer-=16;if(this.timer<=0)this.active=false;}},
-  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60;
+  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,lineH=20;
+    const innerW=PW-32;
+    const wrapped=wrapText(this.lines.join(' '),innerW,'12px "Courier New"');
+    const PH=wrapped.length*lineH+100,PX=W-PW-20,PY=60;
     ctx.save();ctx.globalAlpha=alpha; ctx.fillStyle='rgba(2,6,8,0.94)';_rr(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle='#188888';ctx.lineWidth=2;_rr(PX,PY,PW,PH,12);ctx.stroke();
-    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46); ctx.font='bold 13px "Courier New"';ctx.fillStyle='#40d0d0';ctx.fillText(this.title,PX+60,PY+28);
-    ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';this.lines.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*20));ctx.restore(); }
+    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46); ctx.textAlign='left';
+    let titleFont=13;ctx.font=`bold ${titleFont}px "Courier New"`;
+    while(ctx.measureText(this.title).width>PW-60-14&&titleFont>9){titleFont--;ctx.font=`bold ${titleFont}px "Courier New"`;}
+    ctx.fillStyle='#40d0d0';ctx.fillText(this.title,PX+60,PY+28);
+    ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';wrapped.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*lineH));ctx.restore(); }
 };
 
 // ── Núcleo de Obsidiana — mecânica central: ângulo + força ─────────
@@ -675,7 +681,7 @@ class Col{
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; const syItem=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headClearY=(py-cam.y)+8; const sy=Math.min(syItem,headClearY); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40d0d0';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40d0d0';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; const syItem=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headClearY=(py-cam.y)+8; const sy=Math.min(syItem,headClearY); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6)); ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40d0d0';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40d0d0';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left'; }
 }
 
 // ── Player ────────────────────────────────────────────────────────

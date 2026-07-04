@@ -704,11 +704,12 @@ class Col{
         ctx.font='bold 13px "Courier New"';
         const tw=ctx.measureText(txt).width+20;
         const headY=playerY-cam.y-8;
-        const bx=sx+17-tw/2,by=Math.min(sy-42,headY-24);
+        let bx=sx+17-tw/2;bx=Math.max(6,Math.min(bx,W-tw-6));
+        const by=Math.min(sy-42,headY-24);
         ctx.fillStyle=`rgba(6,4,10,${0.88*pulse})`;roundRect(bx,by,tw,24,5);ctx.fill();
         ctx.strokeStyle=`rgba(220,200,140,${pulse})`;ctx.lineWidth=1.5;roundRect(bx,by,tw,24,5);ctx.stroke();
         ctx.fillStyle=`rgba(220,200,140,${pulse})`;
-        ctx.textAlign='center';ctx.fillText(txt,sx+17,by+16);ctx.textAlign='left';
+        ctx.textAlign='center';ctx.fillText(txt,bx+tw/2,by+16);ctx.textAlign='left';
       }
     }
   }
@@ -726,14 +727,15 @@ class Trigger{
     const sy=Math.min(baseSy,headSy);
     const txt='[E] '+this.label;ctx.font='14px "Courier New"';
     const tw=ctx.measureText(txt).width+24;
-    ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();
-    ctx.strokeStyle='#c09060';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();
-    ctx.fillStyle='#c09060';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left';
+    const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6));
+    ctx.fillStyle='rgba(0,0,0,0.82)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();
+    ctx.strokeStyle='#c09060';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();
+    ctx.fillStyle='#c09060';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left';
   }
 }
 
-function wrapText(text,maxW){
-  ctx.font='15px "Courier New"';
+function wrapText(text,maxW,font='15px "Courier New"'){
+  ctx.font=font;
   const pars=text.split('\n'),result=[];
   for(const para of pars){
     const words=para.split(' ');let line='';
@@ -794,16 +796,25 @@ function tickPopup(){if(popup.active&&popup.timer>0){popup.timer-=16;if(popup.ti
 function drawPopup(){
   if(!popup.active)return;
   const al=Math.min(1,popup.timer/400);ctx.save();ctx.globalAlpha=al;
-  const pw=340,lineH=20,ph=popup.lines.length*lineH+80;
+  const pw=340,lineH=20;
+  const innerW=pw-32-14;
+  const wrapped=[];
+  popup.lines.forEach(l=>{
+    wrapText(l,innerW,'12px "Courier New"').forEach((seg,i)=>wrapped.push((i===0?'• ':'  ')+seg));
+  });
+  const ph=wrapped.length*lineH+80;
   const px=W-pw-18,py=56;
   ctx.fillStyle='rgba(6,4,10,0.94)';roundRect(px,py,pw,ph,10);ctx.fill();
   ctx.strokeStyle=popup.color;ctx.lineWidth=2;roundRect(px,py,pw,ph,10);ctx.stroke();
   ctx.strokeStyle='rgba(200,180,120,0.2)';ctx.lineWidth=1;roundRect(px+4,py+4,pw-8,ph-8,7);ctx.stroke();
-  ctx.font='bold 13px "Courier New"';ctx.fillStyle=popup.color;ctx.textAlign='center';ctx.fillText(popup.title,px+pw/2,py+22);
+  let titleFont=13;ctx.font=`bold ${titleFont}px "Courier New"`;
+  while(ctx.measureText(popup.title).width>pw-24&&titleFont>9){titleFont--;ctx.font=`bold ${titleFont}px "Courier New"`;}
+  ctx.fillStyle=popup.color;ctx.textAlign='center';ctx.fillText(popup.title,px+pw/2,py+22);
+  ctx.textAlign='left';
   ctx.fillStyle='rgba(200,180,120,0.12)';ctx.fillRect(px+14,py+30,pw-28,1);
   ctx.font='12px "Courier New"';ctx.fillStyle='#e8e0c0';
-  popup.lines.forEach((l,i)=>{ctx.textAlign='left';ctx.fillText('• '+l,px+16,py+48+i*lineH);});
-  ctx.textAlign='left';ctx.restore();
+  wrapped.forEach((l,i)=>{ctx.fillText(l,px+16,py+48+i*lineH);});
+  ctx.restore();
 }
 
 let notifText='',notifAlpha=0,notifTimer=0;
@@ -1133,7 +1144,7 @@ function drawHUD(player,level){
   if(!player)return;
 
   for(let i=0;i<player.maxHp;i++){
-    ctx.fillStyle=i<player.hp?'#e02020':'#333';
+    ctx.fillStyle=i<player.hp?'#e08040':'#333';
     ctx.beginPath();const hx=16+i*28,hy=10;
     ctx.arc(hx+5,hy+5,5,Math.PI,0);ctx.arc(hx+15,hy+5,5,Math.PI,0);
     ctx.lineTo(hx+20,hy+5);ctx.bezierCurveTo(hx+20,hy+14,hx+10,hy+18,hx+10,hy+18);
@@ -1150,8 +1161,11 @@ function drawHUD(player,level){
   ctx.shadowBlur=0;
 
   const opalas=player.items.filter(id=>id.startsWith('opala_')).length;
-  ctx.fillStyle='#f0d060';ctx.font='bold 20px "Courier New"';
-  ctx.textAlign='right';ctx.fillText('🔴 '+opalas+'/3',W-14,26);ctx.textAlign='left';
+  const _lvNum=G.currentLevel?G.currentLevel.num:1;
+  if(_lvNum>=3||opalas>0){
+    ctx.fillStyle='#f0d060';ctx.font='bold 20px "Courier New"';
+    ctx.textAlign='right';ctx.fillText('🔴 '+opalas+'/3',W-14,26);ctx.textAlign='left';
+  }
 
   const TOOL_DEFS=[
     {id:'picareta_ponta_fina',icon:'⛏️',nome:'Picareta'},
@@ -1204,7 +1218,18 @@ function drawHUD(player,level){
                'Desça pelos shafts com a Roldana. Observe a geologia.',
                'Use o Bastão para detectar bolsões. Picareta para escavar.',
                'Caminhe até o horizonte do songline para concluir.'];
-  const hint=hints[levelNum]||'';
+  let hint=hints[levelNum]||'';
+  if(levelNum===0){
+    const needPicareta=!player.items.includes('picareta_ponta_fina');
+    const needRoldana=!player.items.includes('roldana_poco');
+    const needBastao=!player.items.includes('bastao_escuta');
+    const parts=[];
+    if(needPicareta)parts.push('a Picareta');
+    if(needRoldana)parts.push('a Roldana');
+    hint=parts.length?('Encontre '+parts.join(' e ')+'.'):'';
+    if(needBastao)hint+=(hint?' ':'')+'Busque o Wombat para o Bastão!';
+    if(!hint)hint='Prossiga pela planície.';
+  }
   ctx.fillStyle='rgba(0,0,0,0.60)';ctx.fillRect(0,H-32,W,32);
   ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=6;
   ctx.fillStyle='#f0e8b0';ctx.font='17px "Courier New"';
@@ -1233,9 +1258,23 @@ function drawTitle(){
   ctx.fillStyle='#f0b840';ctx.font='19px "Courier New"';
   ctx.fillText('Fase 6.1  —  Opala Negra de Lightning Ridge, Austrália',W/2,200);
 
-  ctx.save();ctx.translate(W/2,310);
-  drawOpalaItem(0,0,Date.now()/800,'red');
-  ctx.restore();
+  // FIX: o card da fase (IMG['card61'], já carregado) nunca era desenhado
+  // na capa — só o item procedural (drawOpalaItem) aparecia. Padronizado
+  // com o mesmo layout de card+glow+borda usado nas demais fases.
+  if(IMG.card61){
+    const cardSize=160,cardX=W/2-80,cardY=230;
+    const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
+    glow.addColorStop(0,'rgba(200,140,40,0.25)'); glow.addColorStop(1,'rgba(200,140,40,0)');
+    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(W/2,cardY+80,130,0,Math.PI*2); ctx.fill();
+    ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=18;
+    ctx.drawImage(IMG.card61,cardX,cardY,cardSize,cardSize);
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(240,184,64,0.55)';ctx.lineWidth=2;ctx.strokeRect(cardX,cardY,cardSize,cardSize);
+  } else {
+    ctx.save();ctx.translate(W/2,310);
+    drawOpalaItem(0,0,Date.now()/800,'red');
+    ctx.restore();
+  }
   ctx.fillStyle=`rgba(210,180,100,${.55+Math.sin(Date.now()/550)*.4})`;
   ctx.font='19px "Courier New"';
   ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
@@ -1344,7 +1383,7 @@ function buildL1(){
     new Col(1650,GROUND-70,'roldana_poco'),
   ];
 
-  const wombat={x:2750,y:GROUND-4,gifted:false};
+  const wombat={x:2750,y:GROUND-74,gifted:false};
   const triggers=[];
   triggers.push(new Trigger(LW-60,GROUND-120,60,120,'Descer pelo Shaft',()=>{G.loadLevel(2);}));
   return {num:1,W:LW,H:LH,startX:80,startY:GROUND-68,plats,cols,triggers,wombat,_startDone:false};
@@ -1504,6 +1543,7 @@ const G={
     this.player.churingaDevolvida=prevChuringaDevolvida;
     if(this.player.items.includes('picareta_ponta_fina'))this.player.activeTools.add('picareta_ponta_fina');
     if(this.player.items.includes('bastao_escuta'))this.player.activeTools.add('bastao_escuta');
+    if(lv.cols){for(const c of lv.cols){if(this.player.items.includes(c.type))c.done=true;}}
 
     cam.x=0;cam.y=0;cam.W=W;cam.H=H;cam.LW=lv.W;cam.LH=lv.H;
     particles.length=0;dustPts.length=0;
@@ -1631,15 +1671,16 @@ function loop(){
   if(lv.wombat){
     const m=lv.wombat;
     const mx=m.x-cam.x,my=m.y-cam.y;
+    const frame=Date.now()/600;
     if(!m.gifted){
-      const frame=Date.now()/600;
       ctx.save();
       const gl=ctx.createRadialGradient(mx,my,4,mx,my,55);
       gl.addColorStop(0,'rgba(200,160,80,0.22)');gl.addColorStop(1,'rgba(200,160,80,0)');
       ctx.fillStyle=gl;ctx.beginPath();ctx.arc(mx,my,55,0,Math.PI*2);ctx.fill();
       ctx.restore();
-      drawWombat(mx,my,frame);
-
+    }
+    drawWombat(mx,my,frame);
+    if(!m.gifted){
       if(player&&Math.abs(player.x+13-m.x)<150){
         const ha=0.7+Math.sin(Date.now()/350)*0.3;
         ctx.font='bold 13px "Courier New"';

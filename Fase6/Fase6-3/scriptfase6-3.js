@@ -226,7 +226,7 @@ function drawPlatform(p){
 // ── Utils ─────────────────────────────────────────────────────────
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
 function _rr(x,y,w,h,r){ roundRect(x,y,w,h,r); }
-function wrapText(text,maxW){ ctx.font='15px "Courier New"'; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
+function wrapText(text,maxW,font='15px "Courier New"'){ ctx.font=font; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
 
 // ── Item Definitions ──────────────────────────────────────────────
 const ITEM_DEFS={
@@ -344,10 +344,19 @@ function drawNotif(){
 const POPUP={ active:false,title:'',lines:[],icon:'🟢',timer:0,
   show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=text.split('\n');this.timer=duration;},
   tick(){if(this.timer>0){this.timer-=16;if(this.timer<=0)this.active=false;}},
-  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60;
+  draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,innerW=PW-32;
+    const wrapped=[]; for(const l of this.lines){ const segs=wrapText(l,innerW,'12px "Courier New"'); segs.forEach(s=>wrapped.push(s)); }
+    const PH=wrapped.length*20+100,PX=W-PW-20,PY=60;
     ctx.save();ctx.globalAlpha=alpha; ctx.fillStyle='rgba(0,4,2,0.94)';_rr(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle='#208050';ctx.lineWidth=2;_rr(PX,PY,PW,PH,12);ctx.stroke();
-    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46); ctx.font='bold 13px "Courier New"';ctx.fillStyle='#40c878';ctx.fillText(this.title,PX+60,PY+28);
-    ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';this.lines.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*20));ctx.restore(); }
+    ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46);
+    let titleFont=13;
+    ctx.font=`bold ${titleFont}px "Courier New"`;
+    while(ctx.measureText(this.title).width>PW-84&&titleFont>9){
+      titleFont--;
+      ctx.font=`bold ${titleFont}px "Courier New"`;
+    }
+    ctx.textAlign='left';ctx.fillStyle='#40c878';ctx.fillText(this.title,PX+60,PY+28);
+    ctx.font='12px "Courier New"';ctx.fillStyle='#f0e8c0';ctx.textAlign='left';wrapped.forEach((l,i)=>ctx.fillText(l,PX+16,PY+52+i*20));ctx.restore(); }
 };
 
 // ── Seixo Subaquático (Cena 3 — busca em mergulho) ────────────────
@@ -579,7 +588,7 @@ class WorldMap {
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; let sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headY=py-cam.y-8; sy=Math.min(sy,headY); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(sx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40c878';ctx.lineWidth=1.5;roundRect(sx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40c878';ctx.textAlign='center';ctx.fillText(txt,sx,sy);ctx.textAlign='left'; }
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; let sy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headY=py-cam.y-8; sy=Math.min(sy,headY); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24; const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6)); ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#40c878';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#40c878';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left'; }
 }
 
 // ── Col (itens flutuantes) ────────────────────────────────────────
@@ -1232,28 +1241,25 @@ function drawTitle(){
   ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,0,W,H);
   // Estrelas (céu de NZ)
   for(let i=0;i<120;i++){const sx=(i*149.5)%W,sy=(i*89.7)%300;ctx.fillStyle=`rgba(200,255,230,${.15+Math.sin(Date.now()/1400+i)*.15})`;ctx.fillRect(sx,sy,i%4===0?2:1,i%4===0?2:1);}
-  // Kiwi no título (anda à frente)
-  if(IMG['kiwi_img']&&IMG['kiwi_img'].complete){
-    const kx=((Date.now()/22)%(W+120))-60;
-    const ky=200+Math.sin(Date.now()/900)*8;
-    ctx.drawImage(IMG['kiwi_img'],0,0,96,96,kx,ky,100,100);
-  }
   ctx.textAlign='center';
-  ctx.shadowColor='#20a050';ctx.shadowBlur=40;
-  ctx.fillStyle='#40e090';ctx.font='bold 46px "Courier New"';ctx.fillText('A ÚLTIMA PEDRA DO GUARDIÃO',W/2,168);
+  ctx.shadowColor='#60e890';ctx.shadowBlur=40;
+  ctx.fillStyle='#d0f0d0';ctx.font='bold 42px "Courier New"';ctx.fillText('A Última Pedra do Guardião',W/2,148);
   ctx.shadowBlur=0;
-  ctx.fillStyle='#60a880';ctx.font='22px "Courier New"';ctx.fillText('Fase 6.3 (FINAL)  —  Te Wahi Pounamu, NZ · Māori · Séc. XIII',W/2,214);
+  ctx.fillStyle='#80d890';ctx.font='19px "Courier New"';ctx.fillText('Fase 6.3 (FINAL)  —  Te Wahi Pounamu, Nova Zelândia — Século XIII',W/2,200);
   if(IMG.card63){
-    const cardSize=160,cardX=W/2-80,cardY=246;
+    const cardSize=160,cardX=W/2-80,cardY=230;
     const glow=ctx.createRadialGradient(W/2,cardY+80,0,W/2,cardY+80,130);
-    glow.addColorStop(0,'rgba(40,200,120,0.28)'); glow.addColorStop(1,'rgba(40,200,120,0)');
+    glow.addColorStop(0,'rgba(60,220,120,0.28)'); glow.addColorStop(1,'rgba(60,220,120,0)');
     ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(W/2,cardY+80,130,0,Math.PI*2); ctx.fill();
+    ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=18;
     ctx.drawImage(IMG.card63,cardX,cardY,cardSize,cardSize);
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(60,200,100,0.55)';ctx.lineWidth=2;ctx.strokeRect(cardX,cardY,cardSize,cardSize);
   }
-  ctx.fillStyle=`rgba(80,220,140,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
-  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,460);
-  ctx.fillStyle='#a0c8b0';ctx.font='18px "Courier New"';
-  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,504);
+  ctx.fillStyle=`rgba(120,240,160,${.55+Math.sin(Date.now()/550)*.4})`;ctx.font='19px "Courier New"';
+  ctx.fillText('▶  Pressione ENTER para começar  ◀',W/2,454);
+  ctx.fillStyle='#80c0a0';ctx.font='18px "Courier New"';
+  ctx.fillText('← → Mover   |   ↑ Espaço Pular   |   E Interagir   |   I Diário de Bordo',W/2,500);
   ctx.fillText('[M] Menu Principal',W/2,538);
   ctx.textAlign='left';
 }

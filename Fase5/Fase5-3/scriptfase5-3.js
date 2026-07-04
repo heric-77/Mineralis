@@ -279,6 +279,28 @@ function drawPlatform(p){
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
 function _rr(x,y,w,h,r){ roundRect(x,y,w,h,r); }
 function wrapText(text,maxW,font){ ctx.font=font||'15px "Courier New"'; const paragraphs=text.split('\n'); const result=[]; for(const para of paragraphs){ const words=para.split(' ');let line=''; for(const word of words){ const test=line?line+' '+word:word; if(ctx.measureText(test).width>maxW&&line){result.push(line);line=word;}else line=test; } if(line)result.push(line); } return result; }
+// FIX: tooltips flutuantes (Trigger, Col) usavam posição própria sem saber
+// de outras áreas fixas da tela — o POPUP informativo (canto superior
+// direito) e a faixa de itens do HUD (contador de magnetita, "Mengxi Bitan
+// coletado" etc., também no canto superior direito). Perto do fim de uma
+// cena (ex.: gatilho final em x alto, câmera no limite direito do nível),
+// essas caixas coincidem na tela e ficam ilegíveis sobrepostas. Esta função
+// empurra a caixa para baixo de qualquer área reservada com que colida.
+function _reservedUiRects(){
+  const rects=[];
+  const pr=POPUP.rect(); if(pr) rects.push(pr);
+  // Faixa do HUD onde ficam o contador de estrelas/magnetita e a lista de
+  // itens especiais coletados (ex.: "📚 Mengxi Bitan coletado").
+  rects.push({x:W-260,y:36,w:256,h:60});
+  return rects;
+}
+function _avoidPopup(bx,by,tw){
+  const boxL=bx-tw/2, boxR=bx+tw/2, boxT=by-16, boxB=by+8;
+  for(const r of _reservedUiRects()){
+    if(boxR>r.x && boxL<r.x+r.w && boxB>r.y && boxT<r.y+r.h) return r.y+r.h+24;
+  }
+  return by;
+}
 
 // ── Item Definitions ──────────────────────────────────────────────
 const ITEM_DEFS={
@@ -353,7 +375,12 @@ const INV={
 let dlgFaceT=0;
 const BUBBLE={
   active:false,queue:[],cb:null,lines:[],speakerTxt:'CORVAN',faceFrame:0,
-  show(messages,cb,speaker='CORVAN'){ this.queue=[...messages];this.cb=cb;this.active=true;this.speakerTxt=speaker;G.dialog=true;this._next(); },
+  // FIX: se o Diário (INV) ficasse aberto quando um diálogo automático fosse
+  // disparado (ex.: aviso de hematita ao encostar num depósito), checkDlg()
+  // exige "!INV.open" para avançar o balão — com o Diário aberto, [E] nunca
+  // fecha o diálogo e o jogo trava permanentemente nessa mensagem. Fechamos
+  // o Diário à força sempre que um novo diálogo começa.
+  show(messages,cb,speaker='CORVAN'){ if(INV.open) INV.close(); this.queue=[...messages];this.cb=cb;this.active=true;this.speakerTxt=speaker;G.dialog=true;this._next(); },
   _next(){ if(!this.queue.length){ this.active=false;G.dialog=false; if(this.cb){const f=this.cb;this.cb=null;f();} return; } this.lines=wrapText(this.queue.shift(),480); },
   advance(){ if(this.active) this._next(); },
   draw(player){
@@ -400,6 +427,9 @@ const POPUP={ active:false,title:'',lines:[],icon:'⬛',timer:0,
   // a quebra de linha de verdade, a partir da largura real disponível.
   show(title,icon,text,duration=8000){this.active=true;this.title=title;this.icon=icon;this.lines=wrapText(text,370-16-16,'12px "Courier New"');this.timer=duration;},
   tick(){if(this.timer>0){this.timer-=16;if(this.timer<=0)this.active=false;}},
+  // Retângulo atual na tela (usado por outros elementos flutuantes — como
+  // tooltips de Trigger/Col — para não desenhar por cima do POPUP).
+  rect(){ if(!this.active) return null; const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60; return {x:PX,y:PY,w:PW,h:PH}; },
   draw(){ if(!this.active)return; const alpha=Math.min(1,this.timer/400); const PW=370,PH=this.lines.length*20+100,PX=W-PW-20,PY=60;
     ctx.save();ctx.globalAlpha=alpha; ctx.fillStyle='rgba(4,3,0,0.94)';_rr(PX,PY,PW,PH,12);ctx.fill();ctx.strokeStyle='#c02010';ctx.lineWidth=2;_rr(PX,PY,PW,PH,12);ctx.stroke();
     ctx.font='32px serif';ctx.textAlign='center';ctx.fillText(this.icon,PX+40,PY+46);
@@ -498,6 +528,17 @@ class GruaCoroaVermelha {
     } else if(this.state==='land'){
       this.x+=(this.landX-this.x)*0.06; this.y+=(this.landY-this.y)*0.06;
       if(Math.abs(this.x-this.landX)<8&&Math.abs(this.y-this.landY)<8) this.state='landed';
+    } else if(this.state==='walk'){
+      // FIX: na Cena4 ela sobrevoava o Corvan a fase inteira (state='orbit'
+      // padrão), o que não fazia sentido para o hint "Siga a Grua" — uma
+      // guia deveria CAMINHAR no chão à frente dele, não voar. 'y' fica fixo
+      // (definido externamente ao nível do piso); só o x se move, seguindo
+      // um pouco na frente do Corvan e esperando se ele ficar muito atrás.
+      const lead=110;
+      if(Math.abs(player.vx)>0.3) this._walkDir=player.vx<0?-1:1;
+      const dir=this._walkDir||1;
+      const targetX=player.x+lead*dir;
+      this.x+=(targetX-this.x)*0.05;
     }
     if(this.sparkT%18===0 && this.state==='orbit'){
       this.sparks.push({x:this.x,y:this.y,vx:(Math.random()-.5)*.5,vy:(Math.random()+.2)*.4,life:60,max:60,size:2+Math.random()*2});
@@ -521,18 +562,19 @@ class GruaCoroaVermelha {
     }
     if(IMG['grua_img']&&IMG['grua_img'].complete&&IMG['grua_img'].naturalWidth>0){
       const dw=100, dh=100;
-      // BUG: o bob (oscilação senoidal vertical) era aplicado sempre, mesmo
-      // com state='landed' — fazia a Grua parecer flutuando/voando mesmo
-      // parada no lugar. Agora só oscila enquanto realmente voa (orbit/land).
-      const bob=(this.state==='landed')?0:Math.sin(this.frame*1.5)*5;
-      const flipLeft=Math.cos(this.angle)<0;
+      // FIX: o bob (oscilação senoidal vertical) era aplicado sempre, mesmo
+      // parada/andando no chão — fazia parecer flutuando/voando. Agora só
+      // oscila enquanto ela realmente voa (orbit/land); parada ou andando
+      // (landed/walk) fica com os pés fixos no chão.
+      const bob=(this.state==='orbit'||this.state==='land')?Math.sin(this.frame*1.5)*5:0;
+      const flipLeft=(this.state==='walk')?(this._walkDir||1)<0:Math.cos(this.angle)<0;
       if(flipLeft){ctx.translate(sx+dw/2,sy-dh/2+bob);ctx.scale(-1,1);}
       else ctx.translate(sx-dw/2,sy-dh/2+bob);
       ctx.drawImage(IMG['grua_img'],0,0,96,96,0,0,dw,dh);
     } else {
       // Fallback grua vetorial
       ctx.translate(sx,sy);
-      const bob=(this.state==='landed')?0:Math.sin(this.frame*1.5)*5;
+      const bob=(this.state==='orbit'||this.state==='land')?Math.sin(this.frame*1.5)*5:0;
       // Corpo branco
       ctx.fillStyle='#f8f8f0'; ctx.beginPath(); ctx.ellipse(0,bob,24,14,0,0,Math.PI*2); ctx.fill();
       // Pescoço longo
@@ -753,8 +795,10 @@ class Col{
       const label=TOOL_LABELS[this.type];
       const txt='[E] Pegar '+label; ctx.font='13px "Courier New"'; const tw=ctx.measureText(txt).width+22;
       const headTop=(player.y-cam.y)-16, itemTop=sy-16;
-      const cy=Math.min(itemTop,headTop-24);
+      let cy=Math.min(itemTop,headTop-24);
       const cx=Math.max(tw/2+6,Math.min(sx+15,W-tw/2-6));
+      // FIX: sobreposição com o POPUP informativo quando ambos ativos juntos.
+      cy=_avoidPopup(cx,cy,tw);
       ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(cx-tw/2,cy-16,tw,24,4);ctx.fill();
       ctx.strokeStyle='#e04030';ctx.lineWidth=1.5;roundRect(cx-tw/2,cy-16,tw,24,4);ctx.stroke();
       ctx.fillStyle='#e04030';ctx.textAlign='center';ctx.fillText(txt,cx,cy);ctx.textAlign='left';
@@ -765,10 +809,13 @@ class Col{
 // ── Trigger ───────────────────────────────────────────────────────
 class Trigger{
   constructor(x,y,w,h,label,fn){this.x=x;this.y=y;this.w=w;this.h=h;this.label=label;this.fn=fn;this.done=false;}
-  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; const itemSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headTop=py-cam.y-8; const sy=Math.min(itemSy,headTop); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24;
+  draw(px,py){ if(this.done)return; const near=Math.abs((px+24)-(this.x+this.w/2))<this.w/2+72&&Math.abs((py+40)-(this.y+this.h/2))<this.h/2+72; if(!near)return; const sx=this.x+this.w/2-cam.x; const itemSy=this.y-cam.y-26+Math.sin(Date.now()/350)*4; const headTop=py-cam.y-8; let sy=Math.min(itemSy,headTop); const txt='[E] '+this.label;ctx.font='14px "Courier New"';const tw=ctx.measureText(txt).width+24;
     // FIX: faltava o clamp horizontal (mesmo padrão já aplicado na Fase4-3/
     // Fase5-2) — perto das bordas do nível a caixa saía da tela.
     const bx=Math.max(tw/2+6,Math.min(sx,W-tw/2-6));
+    // FIX: sobreposição com o POPUP informativo (canto superior direito)
+    // quando ambos ficavam ativos ao mesmo tempo.
+    sy=_avoidPopup(bx,sy,tw);
     ctx.fillStyle='rgba(0,0,0,0.78)';roundRect(bx-tw/2,sy-16,tw,24,4);ctx.fill();ctx.strokeStyle='#e04030';ctx.lineWidth=1.5;roundRect(bx-tw/2,sy-16,tw,24,4);ctx.stroke();ctx.fillStyle='#e04030';ctx.textAlign='center';ctx.fillText(txt,bx,sy);ctx.textAlign='left'; }
 }
 
@@ -1246,7 +1293,14 @@ function buildL4(){
     trap(340,FL-80,110),trap(1100,FL-90,100),
     spike(395,FL-20,50),spike(810,FL-20,50),spike(1250,FL-20,50),spike(1730,FL-20,50),spike(2250,FL-20,60),
   ];
-  const grua=new GruaCoroaVermelha(); grua.visible=true;
+  // FIX: ela sobrevoava o Corvan a cena inteira (state='orbit', padrão da
+  // classe) — não fazia sentido para o hint "Siga a Grua", que sugere uma
+  // guia caminhando à frente dele, não voando. Agora ela anda no chão
+  // (state='walk'), com 'y' fixo na altura do piso (pés em FL, mesma lógica
+  // já usada para o pouso da Cena1: this.y = FL - 50 -> pés em FL).
+  const grua=new GruaCoroaVermelha();
+  grua.x=60; grua.y=FL-50; grua.state='walk';
+  grua.visible=true;
   const gruaMessages=[
     {x:500, shown:false, text:'"A bússola Song chegou à Europa via Ásia Central em cerca de 150 anos. Tornou possível a navegação de alto mar — e, com ela, as explorações que conectaram todo o mundo da série Mineralis."'},
     {x:1300,shown:false, text:'"Shen Kuo era polímata: astrônomo, matemático, farmacologista, engenheiro. Em seu Dream Pool Essays (1088), descreveu mais de 600 experimentos científicos — séculos antes da revolução científica europeia."'},
@@ -1500,6 +1554,10 @@ const G={
     // Manter bússola entre cenas
     if(!this.compass) this.compass = new Compass();
     if(this.player.items.includes('bussola')) this.compass.activate();
+    // FIX: INV.open não era resetado ao trocar de cena — se por algum motivo
+    // ficasse "preso" true, checkDlg() (que exige !INV.open) nunca deixaria
+    // nenhum diálogo avançar na cena nova, travando o jogo permanentemente.
+    INV.open=false;
     this.dialog=false; this.state='playing'; this.timeOnLevel=0;
     BUBBLE.active=false; POPUP.active=false;
     setTimeout(()=>{if(this.state==='playing')showDialog(this.level.intro,null);},900);
@@ -1516,7 +1574,14 @@ const G={
   update(){
     if(this.state!=='playing') return;
     this.timeOnLevel++;
+    const _wasDialog=this.dialog;
     checkDlg();
+    // FIX: se este [E] acabou de FECHAR um diálogo (dialog true→false neste
+    // frame), não deixa o mesmo toque de tecla ser lido de novo logo abaixo
+    // por Player.update() (que só passa a rodar DEPOIS que dialog vira
+    // false) — sem isso, o mesmo [E] podia disparar imediatamente outra
+    // interação (fricção, trigger, etc.) no instante em que o balão fechava.
+    if(_wasDialog && !this.dialog){ delete jp['KeyE']; delete jp['Enter']; delete jp['_te']; }
     if(INV.open) INV.navigate(this.player);
     updateCam(this.player.x,this.level.W);
     this.level.update(this.player);
